@@ -1,0 +1,57 @@
+---
+import { url } from '../utils/helpers';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-links">
+      <a href={url('/')}>Home</a>
+      <a href={url('/courses/')}>Courses</a>
+      <a href={url('/about/')}>About</a>
+      <a href={url('/policies/')}>Policies</a>
+      <a href={url('/rss.xml')}>RSS Feed</a>
+    </div>
+    <p class="footer-copy">
+      &copy; {year} Teaching Hub. Content licensed under
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-8) 0;
+    margin-top: var(--space-16);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  .footer-links a {
+    color: var(--color-text-secondary);
+  }
+
+  .footer-links a:hover {
+    color: var(--color-primary);
+  }
+
+  .footer-copy {
+    margin: 0;
+  }
+</style>

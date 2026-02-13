@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+---
+
+<BaseLayout title="Search" description="Search across all course materials, notes, exercises, and exams.">
+  <div class="container page-content">
+    <Breadcrumb items={[{ label: 'Search' }]} />
+    <h1>Search</h1>
+    <p class="search-intro">Search across all course materials, notes, exercises, homework, and exams.</p>
+    <div id="search-container"></div>
+  </div>
+</BaseLayout>
+
+<script>
+  async function initSearch() {
+    const base = (window as any).__pagefindBase || '/teaching/';
+    const pagefindPath = `${base}pagefind/pagefind-ui.js`;
+    try {
+      const mod = await import(/* @vite-ignore */ pagefindPath);
+      new mod.PagefindUI({
+        element: '#search-container',
+        showSubResults: true,
+        showImages: false,
+        baseUrl: base,
+      });
+    } catch {
+      const container = document.getElementById('search-container');
+      if (container) {
+        container.innerHTML = '<p>Search is available after building the site. Run <code>npm run build</code> to generate the search index.</p>';
+      }
+    }
+  }
+  initSearch();
+</script>
+
+<style>
+  .search-intro {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Pagefind UI overrides */
+  :global(.pagefind-ui__search-input) {
+    font-family: var(--font-sans) !important;
+    font-size: var(--font-size-base) !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--color-border) !important;
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    padding: var(--space-3) var(--space-4) !important;
+  }
+
+  :global(.pagefind-ui__result-link) {
+    color: var(--color-primary) !important;
+  }
+
+  :global(.pagefind-ui__result) {
+    border-top-color: var(--color-border) !important;
+  }
+
+  :global(.pagefind-ui__result-excerpt) {
+    color: var(--color-text-secondary) !important;
+  }
+</style>

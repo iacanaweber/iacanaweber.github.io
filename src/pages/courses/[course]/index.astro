@@ -1,0 +1,146 @@
+---
+import CourseLayout from '../../../layouts/CourseLayout.astro';
+import { getCollection } from 'astro:content';
+import { url, materialTypeLabel } from '../../../utils/helpers';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const courses = await getCollection('courses');
+  return courses.map(course => ({
+    params: { course: course.slug },
+    props: { course },
+  }));
+};
+
+const { course } = Astro.props;
+const { Content } = await course.render();
+
+const notes = (await getCollection('notes', ({ data }) => data.course === course.slug && !data.draft));
+const exercises = (await getCollection('exercises', ({ data }) => data.course === course.slug && !data.draft));
+const homework = (await getCollection('homework', ({ data }) => data.course === course.slug && !data.draft));
+const tests = (await getCollection('tests', ({ data }) => data.course === course.slug && !data.draft));
+const resources = (await getCollection('resources', ({ data }) => data.course === course.slug));
+
+const sections = [
+  { key: 'notes', count: notes.length },
+  { key: 'exercises', count: exercises.length },
+  { key: 'homework', count: homework.length },
+  { key: 'tests', count: tests.length },
+  { key: 'resources', count: resources.length },
+];
+---
+
+<CourseLayout
+  title={course.data.title}
+  courseSlug={course.slug}
+  courseTitle={course.data.title}
+  courseColor={course.data.color}
+  currentSection="overview"
+  description={course.data.description}
+>
+  <h1>{course.data.title}</h1>
+  <p class="course-subtitle">
+    <span class="course-badge" style={`background: ${course.data.color}`}>{course.data.shortName}</span>
+    {course.data.semester}
+  </p>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats">
+    {sections.filter(s => s.count > 0).map(s => (
+      <a href={url(`/courses/${course.slug}/${s.key}/`)} class="stat-item">
+        <span class="stat-count">{s.count}</span>
+        <span class="stat-label">{materialTypeLabel(s.key)}</span>
+      </a>
+    ))}
+  </div>
+
+  <!-- Objectives -->
+  {course.data.objectives && course.data.objectives.length > 0 && (
+    <section class="overview-section">
+      <h2>Objectives</h2>
+      <ul>
+        {course.data.objectives.map(obj => <li>{obj}</li>)}
+      </ul>
+    </section>
+  )}
+
+  <!-- Bibliography -->
+  {course.data.bibliography && course.data.bibliography.length > 0 && (
+    <section class="overview-section">
+      <h2>Bibliography</h2>
+      <ul>
+        {course.data.bibliography.map(book => <li>{book}</li>)}
+      </ul>
+    </section>
+  )}
+
+  <!-- Markdown content from the course file (schedule, extra info, etc.) -->
+  <section class="overview-section prose">
+    <Content />
+  </section>
+</CourseLayout>
+
+<style>
+  .course-subtitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  .course-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: #fff;
+    border-radius: var(--radius-sm);
+  }
+
+  .quick-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    min-width: 100px;
+  }
+
+  .stat-item:hover {
+    border-color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .stat-count {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  .overview-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .overview-section h2 {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+</style>

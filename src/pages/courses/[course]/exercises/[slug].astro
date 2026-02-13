@@ -1,0 +1,39 @@
+---
+import MaterialLayout from '../../../../layouts/MaterialLayout.astro';
+import { getCollection } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const courses = await getCollection('courses');
+  const items = await getCollection('exercises', ({ data }) => !data.draft);
+  return items.map(item => {
+    const course = courses.find(c => c.slug === item.data.course);
+    return {
+      params: { course: item.data.course, slug: item.slug },
+      props: { entry: item, course },
+    };
+  });
+};
+
+const { entry, course } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<MaterialLayout
+  title={entry.data.title}
+  date={entry.data.date}
+  lastUpdated={entry.data.lastUpdated}
+  tags={entry.data.tags}
+  pdfLink={entry.data.pdfLink}
+  sourceLink={entry.data.sourceLink}
+  solutionsAvailable={entry.data.solutionsAvailable}
+  solutionsPublic={entry.data.solutionsPublic}
+  courseSlug={course.slug}
+  courseTitle={course.data.title}
+  courseColor={course.data.color}
+  materialType="exercises"
+  description={entry.data.description}
+  math={entry.data.math}
+>
+  <Content />
+</MaterialLayout>

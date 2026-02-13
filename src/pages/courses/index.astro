@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import { getCollection } from 'astro:content';
+
+const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Courses" description="Browse all available courses and their materials.">
+  <div class="container page-content">
+    <Breadcrumb items={[{ label: 'Courses' }]} />
+    <h1>Courses</h1>
+    <p class="page-intro">Browse course materials, notes, exercises, and exams for all available courses.</p>
+    <div class="course-grid">
+      {courses.map(course => (
+        <CourseCard
+          slug={course.slug}
+          title={course.data.title}
+          shortName={course.data.shortName}
+          description={course.data.description}
+          semester={course.data.semester}
+          color={course.data.color}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-intro {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    max-width: 600px;
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import { url } from '../utils/helpers';
+
+interface Props {
+  slug: string;
+  title: string;
+  shortName: string;
+  description: string;
+  semester: string;
+  color?: string;
+}
+
+const { slug, title, shortName, description, semester, color = '#2563eb' } = Astro.props;
+---
+
+<article class="card course-card" style={`--course-color: ${color}`}>
+  <div class="course-badge">{shortName}</div>
+  <h3 class="course-title">
+    <a href={url(`/courses/${slug}/`)}>{title}</a>
+  </h3>
+  <p class="course-semester">{semester}</p>
+  <p class="course-desc">{description}</p>
+  <a href={url(`/courses/${slug}/`)} class="btn btn-sm btn-primary">View Course</a>
+</article>
+
+<style>
+  .course-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    border-top: 4px solid var(--course-color);
+  }
+
+  .course-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    background: var(--course-color);
+    color: #fff;
+    border-radius: var(--radius-sm);
+  }
+
+  .course-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: 0;
+  }
+
+  .course-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .course-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .course-semester {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+
+  .course-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    flex: 1;
+  }
+</style>

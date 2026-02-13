@@ -1,0 +1,99 @@
+---
+import CourseLayout from '../../../../layouts/CourseLayout.astro';
+import { getCollection } from 'astro:content';
+import { collectTags } from '../../../../utils/helpers';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const courses = await getCollection('courses');
+  return courses.map(course => ({
+    params: { course: course.slug },
+    props: { course },
+  }));
+};
+
+const { course } = Astro.props;
+const items = (await getCollection('resources', ({ data }) => data.course === course.slug))
+  .sort((a, b) => a.data.order - b.data.order);
+
+const typeLabels: Record<string, string> = {
+  book: 'Books',
+  tool: 'Tools',
+  link: 'Links',
+  video: 'Videos',
+  other: 'Other',
+};
+
+const grouped = items.reduce((acc, item) => {
+  const type = item.data.type;
+  if (!acc[type]) acc[type] = [];
+  acc[type].push(item);
+  return acc;
+}, {} as Record<string, typeof items>);
+---
+
+<CourseLayout
+  title="Resources"
+  courseSlug={course.slug}
+  courseTitle={course.data.title}
+  courseColor={course.data.color}
+  currentSection="resources"
+  description={`Resources and references for ${course.data.title}.`}
+>
+  <h1>Resources</h1>
+  <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);">
+    Recommended books, tools, and links for this course.
+  </p>
+
+  {Object.entries(grouped).length > 0 ? (
+    Object.entries(grouped).map(([type, resources]) => (
+      <section class="resource-section">
+        <h2>{typeLabels[type] ?? type}</h2>
+        <div class="resource-list">
+          {resources.map(r => (
+            <div class="resource-item card">
+              <h3>
+                {r.data.url ? (
+                  <a href={r.data.url} target="_blank" rel="noopener">{r.data.title}</a>
+                ) : (
+                  r.data.title
+                )}
+              </h3>
+              <p>{r.data.description}</p>
+              {r.data.tags.length > 0 && (
+                <div class="tag-list">
+                  {r.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    ))
+  ) : (
+    <p>No resources listed yet. Check back soon.</p>
+  )}
+</CourseLayout>
+
+<style>
+  .resource-section {
+    margin-bottom: var(--space-8);
+  }
+
+  .resource-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .resource-item h3 {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-1);
+  }
+
+  .resource-item p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+</style>

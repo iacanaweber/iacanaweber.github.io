@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+---
+
+<BaseLayout title="Policies" description="Academic policies, integrity guidelines, and content licensing.">
+  <div class="container page-content">
+    <Breadcrumb items={[{ label: 'Policies' }]} />
+
+    <div class="prose" style="max-width: 720px;">
+      <h1>Policies</h1>
+
+      <section>
+        <h2>Academic Integrity</h2>
+        <p>
+          All students are expected to follow the university's academic integrity policies.
+          The following guidelines apply to all courses:
+        </p>
+        <ul>
+          <li>Homework assignments must be completed individually unless explicitly stated otherwise.</li>
+          <li>You may discuss general concepts with classmates, but all submitted work must be your own.</li>
+          <li>Copying code, solutions, or text from any source (including AI tools) without attribution is considered plagiarism.</li>
+          <li>If in doubt about whether something constitutes a violation, ask the instructor before submitting.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Use of AI Tools</h2>
+        <p>
+          The use of AI assistants (such as ChatGPT, GitHub Copilot, etc.) may be permitted for certain
+          assignments, depending on the course and the specific task. Each assignment will clearly state
+          whether AI tools are allowed and under what conditions. When AI use is permitted:
+        </p>
+        <ul>
+          <li>You must disclose which tools you used and how.</li>
+          <li>You must understand and be able to explain every part of your submission.</li>
+          <li>The final work must reflect your own understanding.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Late Submissions</h2>
+        <p>
+          Unless otherwise stated in the assignment, late submissions will incur a penalty.
+          Contact the instructor in advance if you have extenuating circumstances.
+        </p>
+      </section>
+
+      <section>
+        <h2>Content License</h2>
+        <p>
+          The course materials on this site (notes, exercises, exams, etc.) are licensed under
+          <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">
+            Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)
+          </a>.
+        </p>
+        <p>This means you are free to:</p>
+        <ul>
+          <li><strong>Share</strong> &mdash; copy and redistribute the material in any format.</li>
+          <li><strong>Adapt</strong> &mdash; remix, transform, and build upon the material.</li>
+        </ul>
+        <p>Under the following terms:</p>
+        <ul>
+          <li><strong>Attribution</strong> &mdash; You must give appropriate credit.</li>
+          <li><strong>NonCommercial</strong> &mdash; You may not use the material for commercial purposes.</li>
+          <li><strong>ShareAlike</strong> &mdash; You must distribute contributions under the same license.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Exam Materials</h2>
+        <p>
+          Past exams are provided to help students prepare. Solutions, when available, are released
+          at the instructor's discretion. Do not distribute exam solutions outside this site without
+          permission.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

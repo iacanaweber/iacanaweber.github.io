@@ -1,0 +1,124 @@
+---
+import { formatDate, url } from '../utils/helpers';
+
+interface Props {
+  title: string;
+  href: string;
+  date: Date;
+  tags?: string[];
+  description?: string;
+  pdfLink?: string;
+  sourceLink?: string;
+  solutionsAvailable?: boolean;
+  solutionsPublic?: boolean;
+  courseColor?: string;
+}
+
+const {
+  title, href, date, tags = [], description,
+  pdfLink, sourceLink, solutionsAvailable, solutionsPublic,
+  courseColor = 'var(--color-primary)',
+} = Astro.props;
+---
+
+<article class="card material-card" style={`--card-accent: ${courseColor}`}>
+  <div class="card-accent"></div>
+  <div class="card-body">
+    <h3 class="card-title">
+      <a href={href}>{title}</a>
+    </h3>
+    <time class="card-date" datetime={date.toISOString()}>{formatDate(date)}</time>
+    {description && <p class="card-desc">{description}</p>}
+    <div class="card-footer">
+      {tags.length > 0 && (
+        <div class="tag-list" data-tags>
+          {tags.map(tag => <span class="tag" data-tag={tag}>{tag}</span>)}
+        </div>
+      )}
+      <div class="card-actions">
+        {pdfLink && (
+          <a href={pdfLink.startsWith('http') ? pdfLink : url(pdfLink)} class="btn btn-sm" target={pdfLink.startsWith('http') ? '_blank' : undefined} rel={pdfLink.startsWith('http') ? 'noopener' : undefined}>
+            PDF
+          </a>
+        )}
+        {sourceLink && (
+          <a href={sourceLink} class="btn btn-sm" target="_blank" rel="noopener">
+            Source
+          </a>
+        )}
+        {solutionsAvailable && (
+          <span class:list={['badge', solutionsPublic ? 'badge-success' : 'badge-warning']}>
+            {solutionsPublic ? 'Solutions available' : 'Solutions on request'}
+          </span>
+        )}
+      </div>
+    </div>
+  </div>
+</article>
+
+<style>
+  .material-card {
+    display: flex;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .card-accent {
+    width: 4px;
+    flex-shrink: 0;
+    background: var(--card-accent);
+  }
+
+  .card-body {
+    padding: var(--space-4) var(--space-5);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-title {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-1);
+  }
+
+  .card-title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .card-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .card-date {
+    display: block;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .card-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-3);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+</style>

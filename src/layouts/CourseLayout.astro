@@ -1,0 +1,48 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import CourseSidebar from '../components/CourseSidebar.astro';
+import { url } from '../utils/helpers';
+
+interface Props {
+  title: string;
+  courseSlug: string;
+  courseTitle: string;
+  courseColor?: string;
+  currentSection: string;
+  description?: string;
+  math?: boolean;
+}
+
+const { title, courseSlug, courseTitle, courseColor, currentSection, description, math } = Astro.props;
+
+const breadcrumbItems = [
+  { label: 'Courses', href: url('/courses/') },
+  { label: courseTitle, href: url(`/courses/${courseSlug}/`) },
+];
+
+if (currentSection !== 'overview') {
+  const sectionLabels: Record<string, string> = {
+    notes: 'Notes', exercises: 'Exercises', homework: 'Homework',
+    tests: 'Tests & Exams', resources: 'Resources',
+  };
+  breadcrumbItems.push({ label: sectionLabels[currentSection] ?? currentSection });
+}
+---
+
+<BaseLayout title={`${title} - ${courseTitle}`} description={description} math={math}>
+  <div class="container page-content">
+    <Breadcrumb items={breadcrumbItems} />
+    <div class="two-column">
+      <CourseSidebar
+        courseSlug={courseSlug}
+        courseTitle={courseTitle}
+        courseColor={courseColor}
+        currentSection={currentSection}
+      />
+      <div class="course-content">
+        <slot />
+      </div>
+    </div>
+  </div>
+</BaseLayout>

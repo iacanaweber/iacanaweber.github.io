@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CourseCard from '../components/CourseCard.astro';
+import { getCollection } from 'astro:content';
+import { url } from '../utils/helpers';
+
+const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
+const allNotes = await getCollection('notes', ({ data }) => !data.draft);
+const allExercises = await getCollection('exercises', ({ data }) => !data.draft);
+const allHomework = await getCollection('homework', ({ data }) => !data.draft);
+const allTests = await getCollection('tests', ({ data }) => !data.draft);
+
+const recentItems = [...allNotes, ...allExercises, ...allHomework, ...allTests]
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 5);
+
+function getCourseTitle(courseSlug: string): string {
+  return courses.find(c => c.slug === courseSlug)?.data.shortName ?? courseSlug;
+}
+
+function getMaterialTypeLabel(item: typeof recentItems[0]): string {
+  if (allNotes.includes(item)) return 'Note';
+  if (allExercises.includes(item)) return 'Exercise';
+  if (allHomework.includes(item)) return 'Homework';
+  return 'Test';
+}
+
+function getMaterialPath(item: typeof recentItems[0]): string {
+  let type = 'notes';
+  if (allExercises.includes(item)) type = 'exercises';
+  else if (allHomework.includes(item)) type = 'homework';
+  else if (allTests.includes(item)) type = 'tests';
+  return url(`/courses/${item.data.course}/${type}/${item.slug}/`);
+}
+---
+
+<BaseLayout title="Teaching Hub" description="Course materials, notes, exercises, and resources for university courses.">
+  <div class="container page-content">
+    <!-- Hero -->
+    <section class="hero">
+      <h1>Teaching Hub</h1>
+      <p class="hero-subtitle">
+        Course materials, notes, exercises, and resources for my university courses.
+        Find everything you need to succeed in your studies.
+      </p>
+      <div class="hero-actions">
+        <a href={url('/courses/')} class="btn btn-primary">Browse Courses</a>
+        <a href={url('/search/')} class="btn">Search Materials</a>
+      </div>
+    </section>
+
+    <!-- Courses -->
+    <section class="home-section">
+      <h2>Courses</h2>
+      <div class="course-grid">
+        {courses.map(course => (
+          <CourseCard
+            slug={course.slug}
+            title={course.data.title}
+            shortName={course.data.shortName}
+            description={course.data.description}
+            semester={course.data.semester}
+            color={course.data.color}
+          />
+        ))}
+      </div>
+    </section>
+
+    <!-- Recent -->
+    {recentItems.length > 0 && (
+      <section class="home-section">
+        <h2>Recent Materials</h2>
+        <div class="recent-list">
+          {recentItems.map(item => (
+            <a href={getMaterialPath(item)} class="recent-item">
+              <div class="recent-meta">
+                <span class="tag">{getCourseTitle(item.data.course)}</span>
+                <span class="recent-type">{getMaterialTypeLabel(item)}</span>
+              </div>
+              <h3>{item.data.title}</h3>
+              <time datetime={item.data.date.toISOString()}>
+                {item.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </time>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding: var(--space-16) 0 var(--space-12);
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .hero-subtitle {
+    max-width: 600px;
+    margin: 0 auto var(--space-6);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .home-section {
+    margin-top: var(--space-12);
+  }
+
+  .home-section h2 {
+    margin-bottom: var(--space-6);
+  }
+
+  .recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .recent-item {
+    display: block;
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .recent-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+  }
+
+  .recent-item h3 {
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+  }
+
+  .recent-item time {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  .recent-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .recent-type {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>

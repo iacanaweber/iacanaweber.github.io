@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { url } from '../utils/helpers';
+---
+
+<BaseLayout title="About" description="About the instructor, office hours, and contact information.">
+  <div class="container page-content">
+    <Breadcrumb items={[{ label: 'About' }]} />
+
+    <div class="about-content prose">
+      <h1>About</h1>
+
+      <section>
+        <h2>Instructor</h2>
+        <!-- Replace with your information -->
+        <p>
+          I am a professor working in computer science and engineering. My research and teaching
+          interests span computer architecture, digital systems design, and software reliability.
+        </p>
+      </section>
+
+      <section>
+        <h2>Office Hours</h2>
+        <!-- Update with your actual office hours -->
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Time</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tuesday</td>
+              <td>14:00 - 16:00</td>
+              <td>Room TBD</td>
+            </tr>
+            <tr>
+              <td>Thursday</td>
+              <td>10:00 - 12:00</td>
+              <td>Room TBD</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>You can also schedule appointments via email.</p>
+      </section>
+
+      <section>
+        <h2>Contact</h2>
+        <!-- Replace with your actual contact info -->
+        <ul>
+          <li><strong>Email:</strong> professor@university.edu</li>
+          <li><strong>Office:</strong> Building TBD, Room TBD</li>
+          <li><strong>GitHub:</strong> <a href="https://github.com/iacanaw" target="_blank" rel="noopener">github.com/iacanaw</a></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>About This Site</h2>
+        <p>
+          This site serves as a central hub for course materials. All content is organized by
+          course and material type to help students quickly find what they need.
+        </p>
+        <p>
+          The site is built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+          and hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+          Content is written in Markdown for easy maintenance.
+        </p>
+        <p>
+          <a href={url('/courses/')}>Browse all courses</a> or use the
+          <a href={url('/search/')}>search</a> to find specific materials.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-content {
+    max-width: 720px;
+  }
+
+  .about-content section {
+    margin-bottom: var(--space-8);
+  }
+</style>

@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../utils/helpers';
+---
+
+<BaseLayout title="Page Not Found">
+  <div class="container page-content" style="text-align: center; padding-top: 4rem;">
+    <h1 style="font-size: 6rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">404</h1>
+    <p style="font-size: var(--font-size-xl); color: var(--color-text-secondary); margin-bottom: 2rem;">
+      Page not found. The page you're looking for doesn't exist or has been moved.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href={url('/')} class="btn btn-primary">Go Home</a>
+      <a href={url('/courses/')} class="btn">Browse Courses</a>
+      <a href={url('/search/')} class="btn">Search</a>
+    </div>
+  </div>
+</BaseLayout>
