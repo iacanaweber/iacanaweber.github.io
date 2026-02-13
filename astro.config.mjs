@@ -6,9 +6,9 @@ import rehypeKatex from 'rehype-katex';
 export default defineConfig({
   // Change this to your GitHub Pages URL:
   // For user/org site: https://<username>.github.io
-  // For project site: https://<username>.github.io/personal_site
-  site: 'https://iacanaw.github.io',
-  base: '/personal_site',
+  // For user site: https://iacanaweber.github.io
+  site: 'https://iacanaweber.github.io',
+  base: '/',
 
   integrations: [
     sitemap(),
