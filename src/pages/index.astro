@@ -15,6 +15,11 @@ const recentItems = [...allNotes, ...allExercises, ...allHomework, ...allTests]
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 5);
 
+const allPubs = await getCollection('publications');
+const recentPubs = allPubs
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order)
+  .slice(0, 3);
+
 function getCourseTitle(courseSlug: string): string {
   return courses.find(c => c.slug === courseSlug)?.data.shortName ?? courseSlug;
 }
@@ -33,29 +38,57 @@ function getMaterialPath(item: typeof recentItems[0]): string {
   else if (allTests.includes(item)) type = 'tests';
   return url(`/courses/${item.data.course}/${type}/${item.slug}/`);
 }
+
+const researchInterests = [
+  'Hardware Security',
+  'SoC Design',
+  'Cryptography',
+  'Digital Systems',
+  'Embedded Systems',
+  'TRNG',
+  'Side-Channel Attacks',
+  'Fault Injection',
+  'Post-Quantum Crypto',
+  'HW/SW Co-Design',
+];
 ---
 
-<BaseLayout title="Teaching Hub" description="Course materials, notes, exercises, and resources for university courses.">
+<BaseLayout title="Iaçanã Ianiski Weber" description="Personal academic site — courses, publications, and research in hardware security, SoC design, and cryptography.">
   <div class="container page-content">
     <!-- Hero -->
     <section class="hero">
-      <h1 data-i18n="home.title">Teaching Hub</h1>
-      <p class="hero-subtitle" data-i18n="home.subtitle">
-        Course materials, notes, exercises, and resources for my university courses.
-        Find everything you need to succeed in your studies.
-      </p>
-      <div class="hero-actions">
-        <a href={url('/courses/')} class="btn btn-primary" data-i18n="home.browseCourses">Browse Courses</a>
-        <a href={url('/search/')} class="btn" data-i18n="home.searchMaterials">Search Materials</a>
+      <div class="hero-logos">
+        <a href="https://www.pucrs.br" target="_blank" rel="noopener" aria-label="PUCRS">
+          <img src={`${import.meta.env.BASE_URL}images/pucrs-logo.svg`} alt="PUCRS" class="affiliation-logo" />
+        </a>
+        <a href="https://www.ensilica.com" target="_blank" rel="noopener" aria-label="EnSilica">
+          <img src={`${import.meta.env.BASE_URL}images/ensilica-logo.svg`} alt="EnSilica" class="affiliation-logo" />
+        </a>
+      </div>
+
+      <h1>Iaçanã Ianiski Weber</h1>
+      <p class="hero-role" data-i18n="home.role1">Professor Adjunto — Escola Politécnica, PUCRS</p>
+      <p class="hero-role" data-i18n="home.role2">Senior Systems Engineer — EnSilica</p>
+
+      <ProfileLinks inline={true} />
+    </section>
+
+    <!-- Research Interests -->
+    <section class="home-section">
+      <h2 data-i18n="home.researchInterests">Research Interests</h2>
+      <div class="pill-grid">
+        {researchInterests.map(interest => (
+          <span class="pill">{interest}</span>
+        ))}
       </div>
     </section>
 
-    <!-- Profile Links -->
-    <ProfileLinks />
-
     <!-- Courses -->
     <section class="home-section">
-      <h2 data-i18n="home.courses">Courses</h2>
+      <div class="section-header">
+        <h2 data-i18n="home.courses">Courses</h2>
+        <a href={url('/courses/')} class="see-all" data-i18n="home.seeAll">See all</a>
+      </div>
       <div class="course-grid">
         {courses.map(course => (
           <CourseCard
@@ -70,10 +103,13 @@ function getMaterialPath(item: typeof recentItems[0]): string {
       </div>
     </section>
 
-    <!-- Recent -->
+    <!-- Recent Materials -->
     {recentItems.length > 0 && (
       <section class="home-section">
-        <h2 data-i18n="home.recentMaterials">Recent Materials</h2>
+        <div class="section-header">
+          <h2 data-i18n="home.recentMaterials">Recent Materials</h2>
+          <a href={url('/courses/')} class="see-all" data-i18n="home.seeAll">See all</a>
+        </div>
         <div class="recent-list">
           {recentItems.map(item => (
             <a href={getMaterialPath(item)} class="recent-item">
@@ -90,41 +126,117 @@ function getMaterialPath(item: typeof recentItems[0]): string {
         </div>
       </section>
     )}
+
+    <!-- Recent Publications -->
+    {recentPubs.length > 0 && (
+      <section class="home-section">
+        <div class="section-header">
+          <h2 data-i18n="home.recentPublications">Recent Publications</h2>
+          <a href={url('/publications/')} class="see-all" data-i18n="home.seeAll">See all</a>
+        </div>
+        <div class="pub-list">
+          {recentPubs.map(pub => (
+            <div class="pub-entry">
+              <p class="pub-citation">
+                {pub.data.authors} ({pub.data.year}).
+                <strong>{pub.data.title}</strong>.
+                <em>{pub.data.venue}</em>.
+                {pub.data.doi && (
+                  <span> DOI: <a href={`https://doi.org/${pub.data.doi}`} target="_blank" rel="noopener">{pub.data.doi}</a></span>
+                )}
+              </p>
+              {pub.data.url && (
+                <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
   </div>
 </BaseLayout>
 
 <style>
   .hero {
     text-align: center;
-    padding: var(--space-16) 0 var(--space-12);
+    padding: var(--space-12) 0 var(--space-8);
   }
 
   .hero h1 {
     font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: var(--space-2);
   }
 
-  .hero-subtitle {
-    max-width: 600px;
-    margin: 0 auto var(--space-6);
-    font-size: var(--font-size-lg);
-    color: var(--color-text-secondary);
-  }
-
-  .hero-actions {
+  .hero-logos {
     display: flex;
     justify-content: center;
-    gap: var(--space-3);
-    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-8);
+    margin-bottom: var(--space-6);
+  }
+
+  .affiliation-logo {
+    height: 40px;
+    width: auto;
+    opacity: 0.85;
+    transition: opacity var(--transition-fast);
+  }
+
+  .affiliation-logo:hover {
+    opacity: 1;
+  }
+
+  .hero-role {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-lg);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .hero-role + .hero-role {
+    margin-bottom: var(--space-4);
   }
 
   .home-section {
     margin-top: var(--space-12);
   }
 
-  .home-section h2 {
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
     margin-bottom: var(--space-6);
   }
 
+  .section-header h2 {
+    margin-bottom: 0;
+  }
+
+  .see-all {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Research interest pills */
+  .pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .pill {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+    border-radius: 9999px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* Recent materials */
   .recent-list {
     display: flex;
     flex-direction: column;
@@ -169,5 +281,34 @@ function getMaterialPath(item: typeof recentItems[0]): string {
     color: var(--color-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  /* Publications */
+  .pub-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .pub-entry {
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .pub-citation {
+    margin-bottom: var(--space-2);
+    line-height: 1.6;
+  }
+
+  .pub-citation em {
+    color: var(--color-text-secondary);
+  }
+
+  .pub-link {
+    display: inline-block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
   }
 </style>
