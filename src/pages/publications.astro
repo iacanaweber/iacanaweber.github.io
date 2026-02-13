@@ -1,0 +1,321 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import { getCollection } from 'astro:content';
+import { url, formatDate } from '../utils/helpers';
+
+const allPubs = await getCollection('publications');
+
+const journals = allPubs
+  .filter(p => p.data.type === 'journal')
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+
+const conferences = allPubs
+  .filter(p => p.data.type === 'conference')
+  .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+
+const phd = allPubs
+  .filter(p => p.data.type === 'phd')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const masters = allPubs
+  .filter(p => p.data.type === 'masters')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const tcc = allPubs
+  .filter(p => p.data.type === 'tcc')
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout title="Publications" description="Research publications, theses, and academic work.">
+  <div class="container page-content">
+    <Breadcrumb items={[{ label: 'Publications' }]} />
+
+    <h1 data-i18n="publications.title">Publications</h1>
+    <p class="page-intro" data-i18n="publications.intro">Research publications, theses, and academic work.</p>
+
+    <!-- Journal Articles -->
+    {journals.length > 0 && (
+      <section class="pub-section">
+        <h2 data-i18n="publications.journals">Journal Articles</h2>
+        <div class="pub-list">
+          {journals.map(pub => (
+            <div class="pub-entry">
+              <p class="pub-citation">
+                {pub.data.authors} ({pub.data.year}).
+                <strong>{pub.data.title}</strong>.
+                <em>{pub.data.venue}</em>.
+                {pub.data.doi && (
+                  <span> DOI: <a href={`https://doi.org/${pub.data.doi}`} target="_blank" rel="noopener">{pub.data.doi}</a></span>
+                )}
+              </p>
+              {pub.data.url && (
+                <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
+              )}
+              {pub.data.tags.length > 0 && (
+                <div class="tag-list">
+                  {pub.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Conference Articles -->
+    {conferences.length > 0 && (
+      <section class="pub-section">
+        <h2 data-i18n="publications.conferences">Conference Articles</h2>
+        <div class="pub-list">
+          {conferences.map(pub => (
+            <div class="pub-entry">
+              <p class="pub-citation">
+                {pub.data.authors} ({pub.data.year}).
+                <strong>{pub.data.title}</strong>.
+                <em>{pub.data.venue}</em>.
+                {pub.data.doi && (
+                  <span> DOI: <a href={`https://doi.org/${pub.data.doi}`} target="_blank" rel="noopener">{pub.data.doi}</a></span>
+                )}
+              </p>
+              {pub.data.url && (
+                <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
+              )}
+              {pub.data.tags.length > 0 && (
+                <div class="tag-list">
+                  {pub.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- PhD Dissertation -->
+    {phd.length > 0 && (
+      <section class="pub-section">
+        <h2 data-i18n="publications.phd">PhD Dissertation</h2>
+        <div class="thesis-list">
+          {phd.map(pub => (
+            <div class="thesis-card">
+              {pub.data.defensePhoto && (
+                <div class="thesis-photo">
+                  <img src={pub.data.defensePhoto} alt={`Defense photo: ${pub.data.title}`} loading="lazy" />
+                </div>
+              )}
+              <div class="thesis-info">
+                <h3>{pub.data.title}</h3>
+                <p class="thesis-meta">
+                  {pub.data.authors} &mdash; {pub.data.venue} ({pub.data.year})
+                </p>
+                {pub.data.defenseDate && (
+                  <p class="thesis-defense">
+                    <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
+                  </p>
+                )}
+                {pub.data.abstract && (
+                  <p class="thesis-abstract">{pub.data.abstract}</p>
+                )}
+                {pub.data.tags.length > 0 && (
+                  <div class="tag-list">
+                    {pub.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Master's Thesis -->
+    {masters.length > 0 && (
+      <section class="pub-section">
+        <h2 data-i18n="publications.masters">Master's Thesis</h2>
+        <div class="thesis-list">
+          {masters.map(pub => (
+            <div class="thesis-card">
+              {pub.data.defensePhoto && (
+                <div class="thesis-photo">
+                  <img src={pub.data.defensePhoto} alt={`Defense photo: ${pub.data.title}`} loading="lazy" />
+                </div>
+              )}
+              <div class="thesis-info">
+                <h3>{pub.data.title}</h3>
+                <p class="thesis-meta">
+                  {pub.data.authors} &mdash; {pub.data.venue} ({pub.data.year})
+                </p>
+                {pub.data.defenseDate && (
+                  <p class="thesis-defense">
+                    <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
+                  </p>
+                )}
+                {pub.data.abstract && (
+                  <p class="thesis-abstract">{pub.data.abstract}</p>
+                )}
+                {pub.data.tags.length > 0 && (
+                  <div class="tag-list">
+                    {pub.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- TCC -->
+    {tcc.length > 0 && (
+      <section class="pub-section">
+        <h2 data-i18n="publications.tcc">Undergraduate Thesis (TCC)</h2>
+        <div class="thesis-list">
+          {tcc.map(pub => (
+            <div class="thesis-card">
+              {pub.data.defensePhoto && (
+                <div class="thesis-photo">
+                  <img src={pub.data.defensePhoto} alt={`Defense photo: ${pub.data.title}`} loading="lazy" />
+                </div>
+              )}
+              <div class="thesis-info">
+                <h3>{pub.data.title}</h3>
+                <p class="thesis-meta">
+                  {pub.data.authors} &mdash; {pub.data.venue} ({pub.data.year})
+                </p>
+                {pub.data.defenseDate && (
+                  <p class="thesis-defense">
+                    <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
+                  </p>
+                )}
+                {pub.data.abstract && (
+                  <p class="thesis-abstract">{pub.data.abstract}</p>
+                )}
+                {pub.data.tags.length > 0 && (
+                  <div class="tag-list">
+                    {pub.data.tags.map(tag => <span class="tag">{tag}</span>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-intro {
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    max-width: 600px;
+  }
+
+  .pub-section {
+    margin-bottom: var(--space-10);
+  }
+
+  .pub-section h2 {
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .pub-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .pub-entry {
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .pub-citation {
+    margin-bottom: var(--space-2);
+    line-height: 1.6;
+  }
+
+  .pub-citation em {
+    color: var(--color-text-secondary);
+  }
+
+  .pub-link {
+    display: inline-block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+  }
+
+  .thesis-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .thesis-card {
+    display: flex;
+    gap: var(--space-5);
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .thesis-photo {
+    flex-shrink: 0;
+    width: 200px;
+    height: 150px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .thesis-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .thesis-info h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .thesis-meta {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+  }
+
+  .thesis-defense {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .thesis-abstract {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-2);
+  }
+
+  @media (max-width: 768px) {
+    .thesis-card {
+      flex-direction: column;
+    }
+
+    .thesis-photo {
+      width: 100%;
+      height: 200px;
+    }
+  }
+</style>

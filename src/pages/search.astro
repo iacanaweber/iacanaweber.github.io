@@ -6,8 +6,8 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 <BaseLayout title="Search" description="Search across all course materials, notes, exercises, and exams.">
   <div class="container page-content">
     <Breadcrumb items={[{ label: 'Search' }]} />
-    <h1>Search</h1>
-    <p class="search-intro">Search across all course materials, notes, exercises, homework, and exams.</p>
+    <h1 data-i18n="search.title">Search</h1>
+    <p class="search-intro" data-i18n="search.intro">Search across all course materials, notes, exercises, homework, and exams.</p>
     <div id="search-container"></div>
   </div>
 </BaseLayout>

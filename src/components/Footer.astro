@@ -7,15 +7,16 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container footer-inner">
     <div class="footer-links">
-      <a href={url('/')}>Home</a>
-      <a href={url('/courses/')}>Courses</a>
-      <a href={url('/about/')}>About</a>
-      <a href={url('/policies/')}>Policies</a>
-      <a href={url('/rss.xml')}>RSS Feed</a>
+      <a href={url('/')} data-i18n="footer.home">Home</a>
+      <a href={url('/courses/')} data-i18n="footer.courses">Courses</a>
+      <a href={url('/publications/')} data-i18n="footer.publications">Publications</a>
+      <a href={url('/about/')} data-i18n="footer.about">About</a>
+      <a href={url('/policies/')} data-i18n="footer.policies">Policies</a>
+      <a href={url('/rss.xml')} data-i18n="footer.rss">RSS Feed</a>
     </div>
     <p class="footer-copy">
-      &copy; {year} Teaching Hub. Content licensed under
-      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>.
+      &copy; {year} <span data-i18n="footer.copy">Teaching Hub. Content licensed under</span>
+      <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener" data-i18n="footer.license">CC BY-NC-SA 4.0</a>.
     </p>
   </div>
 </footer>

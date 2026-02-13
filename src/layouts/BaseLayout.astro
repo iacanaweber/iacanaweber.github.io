@@ -49,10 +49,21 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
   <!-- Dark mode: apply saved preference before first paint to avoid flash -->
   <script is:inline>
     (function() {
-      const saved = localStorage.getItem('theme');
+      var saved = localStorage.getItem('theme');
       if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
+    })();
+  </script>
+
+  <!-- i18n: apply saved language before first paint -->
+  <script is:inline>
+    (function() {
+      var lang = localStorage.getItem('lang');
+      if (!lang) {
+        lang = (navigator.language || '').startsWith('pt') ? 'pt' : 'en';
+      }
+      document.documentElement.setAttribute('lang', lang);
     })();
   </script>
 </head>
@@ -68,6 +79,42 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
   <link href={`${import.meta.env.BASE_URL}pagefind/pagefind-ui.css`} rel="stylesheet" />
   <script is:inline define:vars={{ base: import.meta.env.BASE_URL }}>
     window.__pagefindBase = base;
+  </script>
+
+  <!-- i18n translation engine -->
+  <script>
+    import { translations } from '../i18n/translations';
+
+    function applyTranslations(lang: string) {
+      const dict = translations[lang] || translations['en'];
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (key && dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+      document.documentElement.setAttribute('lang', lang);
+      const label = document.getElementById('lang-label');
+      if (label) label.textContent = lang.toUpperCase();
+    }
+
+    function initI18n() {
+      const lang = localStorage.getItem('lang') || ((navigator.language || '').startsWith('pt') ? 'pt' : 'en');
+      applyTranslations(lang);
+    }
+
+    // Apply on page load
+    initI18n();
+
+    // Listen for language toggle
+    window.addEventListener('lang-change', ((e: CustomEvent) => {
+      applyTranslations(e.detail.lang);
+    }) as EventListener);
+
+    // Re-apply after Astro page transitions
+    document.addEventListener('astro:after-swap', () => {
+      initI18n();
+    });
   </script>
 </body>
 </html>

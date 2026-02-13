@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import CourseCard from '../components/CourseCard.astro';
+import ProfileLinks from '../components/ProfileLinks.astro';
 import { getCollection } from 'astro:content';
 import { url } from '../utils/helpers';
 
@@ -38,20 +39,23 @@ function getMaterialPath(item: typeof recentItems[0]): string {
   <div class="container page-content">
     <!-- Hero -->
     <section class="hero">
-      <h1>Teaching Hub</h1>
-      <p class="hero-subtitle">
+      <h1 data-i18n="home.title">Teaching Hub</h1>
+      <p class="hero-subtitle" data-i18n="home.subtitle">
         Course materials, notes, exercises, and resources for my university courses.
         Find everything you need to succeed in your studies.
       </p>
       <div class="hero-actions">
-        <a href={url('/courses/')} class="btn btn-primary">Browse Courses</a>
-        <a href={url('/search/')} class="btn">Search Materials</a>
+        <a href={url('/courses/')} class="btn btn-primary" data-i18n="home.browseCourses">Browse Courses</a>
+        <a href={url('/search/')} class="btn" data-i18n="home.searchMaterials">Search Materials</a>
       </div>
     </section>
 
+    <!-- Profile Links -->
+    <ProfileLinks />
+
     <!-- Courses -->
     <section class="home-section">
-      <h2>Courses</h2>
+      <h2 data-i18n="home.courses">Courses</h2>
       <div class="course-grid">
         {courses.map(course => (
           <CourseCard
@@ -69,7 +73,7 @@ function getMaterialPath(item: typeof recentItems[0]): string {
     <!-- Recent -->
     {recentItems.length > 0 && (
       <section class="home-section">
-        <h2>Recent Materials</h2>
+        <h2 data-i18n="home.recentMaterials">Recent Materials</h2>
         <div class="recent-list">
           {recentItems.map(item => (
             <a href={getMaterialPath(item)} class="recent-item">

@@ -28,9 +28,9 @@ const tags = collectTags(items);
   currentSection="homework"
   description={`Homework assignments for ${course.data.title}.`}
 >
-  <h1>Homework</h1>
+  <h1 data-i18n="materials.homework">Homework</h1>
   <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);">
-    {items.length} {items.length === 1 ? 'assignment' : 'assignments'} available.
+    {items.length} {items.length === 1 ? 'assignment' : 'assignments'} <span data-i18n="materials.available">available</span>.
   </p>
 
   <TagFilter tags={tags} />
@@ -53,6 +53,6 @@ const tags = collectTags(items);
       ))}
     </div>
   ) : (
-    <p>No homework assignments available yet. Check back soon.</p>
+    <p data-i18n="materials.noHomework">No homework assignments available yet. Check back soon.</p>
   )}
 </CourseLayout>

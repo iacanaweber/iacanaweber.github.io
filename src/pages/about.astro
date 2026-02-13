@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
+import ProfileLinks from '../components/ProfileLinks.astro';
 import { url } from '../utils/helpers';
 ---
 
@@ -9,47 +10,47 @@ import { url } from '../utils/helpers';
     <Breadcrumb items={[{ label: 'About' }]} />
 
     <div class="about-content prose">
-      <h1>About</h1>
+      <h1 data-i18n="about.title">About</h1>
 
       <section>
-        <h2>Instructor</h2>
-        <!-- Replace with your information -->
-        <p>
+        <h2 data-i18n="about.instructor">Instructor</h2>
+        <p data-i18n="about.instructorBio">
           I am a professor working in computer science and engineering. My research and teaching
           interests span computer architecture, digital systems design, and software reliability.
         </p>
       </section>
 
+      <!-- Profile Links -->
+      <ProfileLinks />
+
       <section>
-        <h2>Office Hours</h2>
-        <!-- Update with your actual office hours -->
+        <h2 data-i18n="about.officeHours">Office Hours</h2>
         <table>
           <thead>
             <tr>
-              <th>Day</th>
-              <th>Time</th>
-              <th>Location</th>
+              <th data-i18n="about.day">Day</th>
+              <th data-i18n="about.time">Time</th>
+              <th data-i18n="about.location">Location</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Tuesday</td>
+              <td data-i18n="about.tuesday">Tuesday</td>
               <td>14:00 - 16:00</td>
               <td>Room TBD</td>
             </tr>
             <tr>
-              <td>Thursday</td>
+              <td data-i18n="about.thursday">Thursday</td>
               <td>10:00 - 12:00</td>
               <td>Room TBD</td>
             </tr>
           </tbody>
         </table>
-        <p>You can also schedule appointments via email.</p>
+        <p data-i18n="about.officeHoursNote">You can also schedule appointments via email.</p>
       </section>
 
       <section>
-        <h2>Contact</h2>
-        <!-- Replace with your actual contact info -->
+        <h2 data-i18n="about.contact">Contact</h2>
         <ul>
           <li><strong>Email:</strong> professor@university.edu</li>
           <li><strong>Office:</strong> Building TBD, Room TBD</li>
@@ -58,19 +59,23 @@ import { url } from '../utils/helpers';
       </section>
 
       <section>
-        <h2>About This Site</h2>
-        <p>
+        <h2 data-i18n="about.aboutSite">About This Site</h2>
+        <p data-i18n="about.siteDesc1">
           This site serves as a central hub for course materials. All content is organized by
           course and material type to help students quickly find what they need.
         </p>
         <p>
-          The site is built with <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
-          and hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
-          Content is written in Markdown for easy maintenance.
+          <span data-i18n="about.siteDesc2">The site is built with</span>
+          <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+          <span data-i18n="about.siteDesc2b">and hosted on</span>
+          <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>.
+          <span data-i18n="about.siteDesc2c">Content is written in Markdown for easy maintenance.</span>
         </p>
         <p>
-          <a href={url('/courses/')}>Browse all courses</a> or use the
-          <a href={url('/search/')}>search</a> to find specific materials.
+          <a href={url('/courses/')} data-i18n="about.browseAll">Browse all courses</a>
+          <span data-i18n="about.orUse"> or use the</span>
+          <a href={url('/search/')} data-i18n="about.search">search</a>
+          <span data-i18n="about.toFind"> to find specific materials.</span>
         </p>
       </section>
     </div>

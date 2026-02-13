@@ -1,0 +1,58 @@
+---
+---
+
+<button class="lang-toggle" aria-label="Toggle language" title="Toggle language (EN/PT)">
+  <span class="lang-label" id="lang-label">EN</span>
+</button>
+
+<style>
+  .lang-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    cursor: pointer;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    min-width: 36px;
+    height: 32px;
+    transition: all var(--transition-fast);
+  }
+
+  .lang-toggle:hover {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+</style>
+
+<script is:inline>
+  (function initLangToggle() {
+    function setup() {
+      var btn = document.querySelector('.lang-toggle');
+      var label = document.getElementById('lang-label');
+      if (!btn || !label) return;
+
+      var lang = localStorage.getItem('lang');
+      if (!lang) {
+        lang = (navigator.language || '').startsWith('pt') ? 'pt' : 'en';
+      }
+      label.textContent = lang.toUpperCase();
+
+      btn.addEventListener('click', function() {
+        var current = localStorage.getItem('lang') || ((navigator.language || '').startsWith('pt') ? 'pt' : 'en');
+        var next = current === 'en' ? 'pt' : 'en';
+        localStorage.setItem('lang', next);
+        label.textContent = next.toUpperCase();
+        window.dispatchEvent(new CustomEvent('lang-change', { detail: { lang: next } }));
+      });
+    }
+    setup();
+    document.addEventListener('astro:after-swap', setup);
+  })();
+</script>

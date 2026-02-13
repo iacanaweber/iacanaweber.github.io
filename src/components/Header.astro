@@ -1,12 +1,14 @@
 ---
 import { url } from '../utils/helpers';
 import DarkModeToggle from './DarkModeToggle.astro';
+import LanguageToggle from './LanguageToggle.astro';
 
 const navLinks = [
-  { href: url('/'), label: 'Home' },
-  { href: url('/courses/'), label: 'Courses' },
-  { href: url('/search/'), label: 'Search' },
-  { href: url('/about/'), label: 'About' },
+  { href: url('/'), label: 'Home', i18nKey: 'nav.home' },
+  { href: url('/courses/'), label: 'Courses', i18nKey: 'nav.courses' },
+  { href: url('/publications/'), label: 'Publications', i18nKey: 'nav.publications' },
+  { href: url('/search/'), label: 'Search', i18nKey: 'nav.search' },
+  { href: url('/about/'), label: 'About', i18nKey: 'nav.about' },
 ];
 
 const currentPath = Astro.url.pathname;
@@ -24,9 +26,9 @@ const currentPath = Astro.url.pathname;
 
     <nav class="main-nav" aria-label="Main navigation">
       <ul>
-        {navLinks.map(({ href, label }) => (
+        {navLinks.map(({ href, label, i18nKey }) => (
           <li>
-            <a href={href} class:list={[{ active: currentPath.startsWith(href) && href !== url('/') || currentPath === href }]}>
+            <a href={href} data-i18n={i18nKey} class:list={[{ active: currentPath.startsWith(href) && href !== url('/') || currentPath === href }]}>
               {label}
             </a>
           </li>
@@ -35,6 +37,7 @@ const currentPath = Astro.url.pathname;
     </nav>
 
     <div class="header-actions">
+      <LanguageToggle />
       <DarkModeToggle />
       <button class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">

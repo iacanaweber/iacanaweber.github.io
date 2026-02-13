@@ -10,8 +10,8 @@ const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b
 <BaseLayout title="Courses" description="Browse all available courses and their materials.">
   <div class="container page-content">
     <Breadcrumb items={[{ label: 'Courses' }]} />
-    <h1>Courses</h1>
-    <p class="page-intro">Browse course materials, notes, exercises, and exams for all available courses.</p>
+    <h1 data-i18n="courses.title">Courses</h1>
+    <p class="page-intro" data-i18n="courses.intro">Browse course materials, notes, exercises, and exams for all available courses.</p>
     <div class="course-grid">
       {courses.map(course => (
         <CourseCard

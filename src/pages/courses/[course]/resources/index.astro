@@ -40,8 +40,8 @@ const grouped = items.reduce((acc, item) => {
   currentSection="resources"
   description={`Resources and references for ${course.data.title}.`}
 >
-  <h1>Resources</h1>
-  <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);">
+  <h1 data-i18n="materials.resources">Resources</h1>
+  <p style="color: var(--color-text-secondary); margin-bottom: var(--space-6);" data-i18n="materials.resourcesIntro">
     Recommended books, tools, and links for this course.
   </p>
 
@@ -71,7 +71,7 @@ const grouped = items.reduce((acc, item) => {
       </section>
     ))
   ) : (
-    <p>No resources listed yet. Check back soon.</p>
+    <p data-i18n="materials.noResources">No resources listed yet. Check back soon.</p>
   )}
 </CourseLayout>
 

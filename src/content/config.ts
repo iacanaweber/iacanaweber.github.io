@@ -48,4 +48,22 @@ const resources = defineCollection({
   }),
 });
 
-export const collections = { courses, notes, exercises, homework, tests, resources };
+const publications = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    type: z.enum(['journal', 'conference', 'tcc', 'masters', 'phd']),
+    authors: z.string(),
+    year: z.number(),
+    venue: z.string(),
+    url: z.string().optional(),
+    doi: z.string().optional(),
+    abstract: z.string().optional(),
+    defensePhoto: z.string().optional(),
+    defenseDate: z.date().optional(),
+    tags: z.array(z.string()).default([]),
+    order: z.number().default(0),
+  }),
+});
+
+export const collections = { courses, notes, exercises, homework, tests, resources, publications };
