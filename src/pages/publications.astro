@@ -114,6 +114,9 @@ const tcc = allPubs
                     <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
                   </p>
                 )}
+                {pub.data.url && (
+                  <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
+                )}
                 {pub.data.abstract && (
                   <p class="thesis-abstract">{pub.data.abstract}</p>
                 )}
@@ -151,6 +154,9 @@ const tcc = allPubs
                     <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
                   </p>
                 )}
+                {pub.data.url && (
+                  <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
+                )}
                 {pub.data.abstract && (
                   <p class="thesis-abstract">{pub.data.abstract}</p>
                 )}
@@ -187,6 +193,9 @@ const tcc = allPubs
                   <p class="thesis-defense">
                     <span data-i18n="publications.defenseDate">Defense date</span>: {formatDate(pub.data.defenseDate)}
                   </p>
+                )}
+                {pub.data.url && (
+                  <a href={pub.data.url} target="_blank" rel="noopener" class="pub-link" data-i18n="publications.viewPaper">View Paper</a>
                 )}
                 {pub.data.abstract && (
                   <p class="thesis-abstract">{pub.data.abstract}</p>
