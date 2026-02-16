@@ -292,7 +292,7 @@ Change the site title in:
 - `src/components/Footer.astro` — the copyright line
 
 ### Favicon
-Replace `public/favicon.svg` with your own.
+Replace `public/favicon.png` with your own.
 
 ## Troubleshooting
 

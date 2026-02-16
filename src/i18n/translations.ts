@@ -138,7 +138,7 @@ export const translations: Record<string, Record<string, string>> = {
     'publications.masters': 'Master\'s Thesis',
     'publications.tcc': 'Undergraduate Thesis (TCC)',
     'publications.defenseDate': 'Defense date',
-    'publications.viewPaper': 'View Paper',
+    'publications.viewPaper': 'View Document',
     'publications.doi': 'DOI',
 
     // Profile links
@@ -283,7 +283,7 @@ export const translations: Record<string, Record<string, string>> = {
     'publications.masters': 'Dissertação de Mestrado',
     'publications.tcc': 'Trabalho de Conclusão de Curso (TCC)',
     'publications.defenseDate': 'Data da defesa',
-    'publications.viewPaper': 'Ver Artigo',
+    'publications.viewPaper': 'Ver Documento',
     'publications.doi': 'DOI',
 
     // Profile links
