@@ -90,7 +90,7 @@ const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
       document.querySelectorAll('[data-i18n]').forEach((el) => {
         const key = el.getAttribute('data-i18n');
         if (key && dict[key]) {
-          el.textContent = dict[key];
+          el.innerHTML = dict[key];
         }
       });
       document.documentElement.setAttribute('lang', lang);

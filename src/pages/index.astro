@@ -57,18 +57,9 @@ const researchInterests = [
   <div class="container page-content">
     <!-- Hero -->
     <section class="hero">
-      <div class="hero-logos">
-        <a href="https://www.pucrs.br" target="_blank" rel="noopener" aria-label="PUCRS">
-          <img src={`${import.meta.env.BASE_URL}images/pucrs-logo.svg`} alt="PUCRS" class="affiliation-logo" />
-        </a>
-        <a href="https://www.ensilica.com" target="_blank" rel="noopener" aria-label="EnSilica">
-          <img src={`${import.meta.env.BASE_URL}images/ensilica-logo.svg`} alt="EnSilica" class="affiliation-logo" />
-        </a>
-      </div>
-
       <h1>Iaçanã Ianiski Weber</h1>
-      <p class="hero-role" data-i18n="home.role1">Professor Adjunto — Escola Politécnica, PUCRS</p>
-      <p class="hero-role" data-i18n="home.role2">Senior Systems Engineer — EnSilica</p>
+      <p class="hero-role" data-i18n="home.role1">Adjunct Professor — <a href="https://portal.pucrs.br/en/ensino/escola-politecnica/" target="_blank" rel="noopener">School of Technology</a>, PUCRS</p>
+      <p class="hero-role" data-i18n="home.role2">Senior Systems Engineer — <a href="https://www.ensilica.com/" target="_blank" rel="noopener">EnSilica</a></p>
 
       <ProfileLinks inline={true} />
     </section>
@@ -165,25 +156,6 @@ const researchInterests = [
   .hero h1 {
     font-size: clamp(2rem, 5vw, 3.5rem);
     margin-bottom: var(--space-2);
-  }
-
-  .hero-logos {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--space-8);
-    margin-bottom: var(--space-6);
-  }
-
-  .affiliation-logo {
-    height: 40px;
-    width: auto;
-    opacity: 0.85;
-    transition: opacity var(--transition-fast);
-  }
-
-  .affiliation-logo:hover {
-    opacity: 1;
   }
 
   .hero-role {

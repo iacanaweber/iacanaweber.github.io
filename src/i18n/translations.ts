@@ -18,8 +18,8 @@ export const translations: Record<string, Record<string, string>> = {
     'footer.license': 'CC BY-NC-SA 4.0',
 
     // Home page
-    'home.role1': 'Professor Adjunto — Escola Politécnica, PUCRS',
-    'home.role2': 'Senior Systems Engineer — EnSilica',
+    'home.role1': 'Adjunct Professor — <a href="https://portal.pucrs.br/en/ensino/escola-politecnica/" target="_blank" rel="noopener">School of Technology</a>, PUCRS',
+    'home.role2': 'Senior Systems Engineer — <a href="https://www.ensilica.com/" target="_blank" rel="noopener">EnSilica</a>',
     'home.researchInterests': 'Research Interests',
     'home.courses': 'Courses',
     'home.recentMaterials': 'Recent Materials',
@@ -29,7 +29,7 @@ export const translations: Record<string, Record<string, string>> = {
     // About page
     'about.title': 'About',
     'about.instructor': 'Instructor',
-    'about.instructorBio': 'Professor Adjunto at Escola Politécnica, PUCRS, and Senior Systems Engineer at EnSilica. My research focuses on hardware security, SoC design, cryptographic implementations, side-channel attacks, fault injection, and post-quantum cryptography. I teach courses on computer architecture, digital systems, cryptography, and embedded systems.',
+    'about.instructorBio': 'Adjunct Professor at <a href="https://portal.pucrs.br/en/ensino/escola-politecnica/" target="_blank" rel="noopener">School of Technology</a>, PUCRS, and Senior Systems Engineer at <a href="https://www.ensilica.com/" target="_blank" rel="noopener">EnSilica</a>. My research focuses on hardware security, SoC design, cryptographic implementations, side-channel attacks, fault injection, and post-quantum cryptography. I teach courses on computer architecture, digital systems, cryptography, and embedded systems.',
     'about.officeHours': 'Office Hours',
     'about.day': 'Day',
     'about.time': 'Time',
@@ -163,8 +163,8 @@ export const translations: Record<string, Record<string, string>> = {
     'footer.license': 'CC BY-NC-SA 4.0',
 
     // Home page
-    'home.role1': 'Professor Adjunto — Escola Politécnica, PUCRS',
-    'home.role2': 'Engenheiro de Sistemas Sênior — EnSilica',
+    'home.role1': 'Professor Adjunto — <a href="https://portal.pucrs.br/ensino/escola-politecnica/" target="_blank" rel="noopener">Escola Politécnica</a>, PUCRS',
+    'home.role2': 'Engenheiro de Sistemas Sênior — <a href="https://www.ensilica.com/" target="_blank" rel="noopener">EnSilica</a>',
     'home.researchInterests': 'Interesses de Pesquisa',
     'home.courses': 'Disciplinas',
     'home.recentMaterials': 'Materiais Recentes',
@@ -174,7 +174,7 @@ export const translations: Record<string, Record<string, string>> = {
     // About page
     'about.title': 'Sobre',
     'about.instructor': 'Professor',
-    'about.instructorBio': 'Professor Adjunto na Escola Politécnica da PUCRS e Engenheiro de Sistemas Sênior na EnSilica. Minha pesquisa concentra-se em segurança de hardware, projeto de SoCs, implementações criptográficas, ataques de canal lateral, injeção de falhas e criptografia pós-quântica. Leciono disciplinas de arquitetura de computadores, sistemas digitais, criptografia e sistemas embarcados.',
+    'about.instructorBio': 'Professor Adjunto na <a href="https://portal.pucrs.br/ensino/escola-politecnica/" target="_blank" rel="noopener">Escola Politécnica</a> da PUCRS e Engenheiro de Sistemas Sênior na <a href="https://www.ensilica.com/" target="_blank" rel="noopener">EnSilica</a>. Minha pesquisa concentra-se em segurança de hardware, projeto de SoCs, implementações criptográficas, ataques de canal lateral, injeção de falhas e criptografia pós-quântica. Leciono disciplinas de arquitetura de computadores, sistemas digitais, criptografia e sistemas embarcados.',
     'about.officeHours': 'Horário de Atendimento',
     'about.day': 'Dia',
     'about.time': 'Horário',
