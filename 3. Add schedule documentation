@@ -1,0 +1,11 @@
+# Class Schedule Format
+
+## Day Abbreviations
+- 4 = Thursday
+- 6 = Saturday
+- 3 = Wednesday
+
+## Time Block Format
+- Letters represent 45-minute blocks with 15-60 minute intervals between blocks
+- Morning blocks (A-D): 8:00-14:00
+- Afternoon blocks (E-P): 14:00-22:30
