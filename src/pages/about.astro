@@ -26,37 +26,93 @@ import { url } from '../utils/helpers';
       <ProfileLinks />
 
       <section>
-        <h2 data-i18n="about.officeHours">Office Hours</h2>
-        <table>
-          <thead>
-            <tr>
-              <th data-i18n="about.day">Day</th>
-              <th data-i18n="about.time">Time</th>
-              <th data-i18n="about.location">Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td data-i18n="about.tuesday">Tuesday</td>
-              <td>14:00 - 16:00</td>
-              <td>Room TBD</td>
-            </tr>
-            <tr>
-              <td data-i18n="about.thursday">Thursday</td>
-              <td>10:00 - 12:00</td>
-              <td>Room TBD</td>
-            </tr>
-          </tbody>
-        </table>
-        <p data-i18n="about.officeHoursNote">You can also schedule appointments via email.</p>
+        <h2 data-i18n="about.officeHours">Class Schedule</h2>
+        <div class="schedule-wrapper">
+          <div class="schedule-timetable" role="table">
+            <!-- Column headers -->
+            <div class="st-cell st-col-header"></div>
+            <div class="st-cell st-col-header" data-i18n="about.dayMon">Seg</div>
+            <div class="st-cell st-col-header" data-i18n="about.dayTue">Ter</div>
+            <div class="st-cell st-col-header" data-i18n="about.dayWed">Qua</div>
+            <div class="st-cell st-col-header" data-i18n="about.dayThu">Qui</div>
+            <div class="st-cell st-col-header" data-i18n="about.dayFri">Sex</div>
+
+            <!-- Row 1: Manhã — FSD Ter+Qui 08:00–09:30 -->
+            <div class="st-cell st-time-label" role="rowheader">
+              <span class="st-shift" data-i18n="about.shiftMorning">Manhã</span>
+              <span class="st-timerange">08:00 – 09:30</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #0d9488; --course-bg: rgba(13,148,136,0.08)" role="cell">
+              <b class="st-code">FSD</b>
+              <span class="st-name">Sist. Digitais</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #0d9488; --course-bg: rgba(13,148,136,0.08)" role="cell">
+              <b class="st-code">FSD</b>
+              <span class="st-name">Sist. Digitais</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+
+            <!-- Row 2: Tarde — CSS Qua+Sex 17:30–19:00 -->
+            <div class="st-cell st-time-label" role="rowheader">
+              <span class="st-shift" data-i18n="about.shiftAfternoon">Tarde</span>
+              <span class="st-timerange">17:30 – 19:00</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #dc2626; --course-bg: rgba(220,38,38,0.08)" role="cell">
+              <b class="st-code">CSS</b>
+              <span class="st-name">Seg. Software</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #dc2626; --course-bg: rgba(220,38,38,0.08)" role="cell">
+              <b class="st-code">CSS</b>
+              <span class="st-name">Seg. Software</span>
+            </div>
+
+            <!-- Row 3: Noite — FSC Ter+Qui 19:15–22:30 -->
+            <div class="st-cell st-time-label" role="rowheader">
+              <span class="st-shift" data-i18n="about.shiftNight">Noite</span>
+              <span class="st-timerange">19:15 – 22:30</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #2563eb; --course-bg: rgba(37,99,235,0.08)" role="cell">
+              <b class="st-code">FSC</b>
+              <span class="st-name">Sist. Computacionais</span>
+              <span class="st-note" data-i18n="about.scheduleBreak">int. 20:45</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+            <div class="st-cell st-course" style="--course-color: #2563eb; --course-bg: rgba(37,99,235,0.08)" role="cell">
+              <b class="st-code">FSC</b>
+              <span class="st-name">Sist. Computacionais</span>
+              <span class="st-note" data-i18n="about.scheduleBreak">int. 20:45</span>
+            </div>
+            <div class="st-cell st-empty" role="cell"></div>
+          </div>
+        </div>
+
+        <ul class="schedule-legend">
+          <li class="legend-item">
+            <span class="legend-pip" style="background:#0d9488"></span>
+            <span><strong>FSD</strong> — Fundamentos de Sistemas Digitais</span>
+          </li>
+          <li class="legend-item">
+            <span class="legend-pip" style="background:#dc2626"></span>
+            <span><strong>CSS</strong> — Confiabilidade e Segurança de Software</span>
+          </li>
+          <li class="legend-item">
+            <span class="legend-pip" style="background:#2563eb"></span>
+            <span><strong>FSC</strong> — Fundamentos de Sistemas Computacionais</span>
+          </li>
+        </ul>
       </section>
 
       <section>
         <h2 data-i18n="about.contact">Contact</h2>
         <ul>
-          <li><strong>Email:</strong> professor@university.edu</li>
-          <li><strong>Office:</strong> Building TBD, Room TBD</li>
-          <li><strong>GitHub:</strong> <a href="https://github.com/iacanaweber" target="_blank" rel="noopener">github.com/iacanaweber</a></li>
+          <li><strong>PUCRS:</strong> <a href="mailto:iacana.weber@pucrs.br">iacana.weber@pucrs.br</a></li>
+          <li><strong>EnSilica:</strong> <a href="mailto:iacana.weber@ensilica.com">iacana.weber@ensilica.com</a></li>
         </ul>
       </section>
 
@@ -91,5 +147,123 @@ import { url } from '../utils/helpers';
 
   .about-content section {
     margin-bottom: var(--space-8);
+  }
+
+  /* ===== Class Schedule Timetable ===== */
+  .schedule-wrapper {
+    overflow-x: auto;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-lg);
+  }
+
+  .schedule-timetable {
+    display: grid;
+    grid-template-columns: 6.5rem repeat(5, 1fr);
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    min-width: 380px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .st-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
+    min-height: 2.75rem;
+  }
+
+  .st-col-header {
+    background: var(--color-bg-tertiary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-secondary);
+    align-items: center;
+    min-height: 2rem;
+    text-align: center;
+  }
+
+  .st-time-label {
+    background: var(--color-bg-secondary);
+    gap: 2px;
+  }
+
+  .st-shift {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .st-timerange {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .st-empty {
+    background: var(--color-bg);
+  }
+
+  .st-course {
+    background: var(--course-bg, var(--color-bg-secondary));
+    border-left: 3px solid var(--course-color, var(--color-primary));
+    padding-left: calc(var(--space-3) - 3px);
+    gap: 2px;
+    min-height: 3.5rem;
+  }
+
+  .st-code {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--course-color, var(--color-primary));
+    line-height: 1.1;
+  }
+
+  .st-name {
+    font-size: 0.68rem;
+    color: var(--color-text-secondary);
+    line-height: 1.3;
+  }
+
+  .st-note {
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    margin-top: 1px;
+  }
+
+  /* Legend */
+  .schedule-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    margin-top: var(--space-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+  }
+
+  .legend-pip {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 </style>
