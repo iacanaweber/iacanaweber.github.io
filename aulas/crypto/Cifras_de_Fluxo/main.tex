@@ -1,0 +1,859 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Cifras de Fluxo]{Cifras de Fluxo}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{Cifras de Fluxo}}
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{Introdução às Cifras de Fluxo}
+\begin{frame}{Cifras de Fluxo no campo da Criptologia}
+\begin{itemize}
+    \item Cifras de Fluxo foram inventadas em 1917 por Gilbert Vernam.
+\end{itemize}
+
+\vspace{1em}
+\begin{minipage}{0.70\textwidth}
+\centering
+\scalebox{0.57}{
+\begin{tikzpicture}[
+  every node/.style={draw, ellipse, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+  ->, >=Stealth, thick,
+  node distance=0.8cm and 0.8cm
+  ]
+
+% Definição dos nós
+\node (root) {Criptologia};
+\node (crypto) [below left=of root] {Criptografia};
+\node (analysis) [below right=of root] {Criptoanálise};
+
+\node (sym) [below left=1.4cm and 1.2cm of crypto] {Cifras Simétricas};
+\node (asym) [below=1.8cm of crypto] {Cifras Assimétricas};
+\node (proto) [below right=1.4cm and 1.2cm of crypto] {Protocolos};
+
+\node (block) [below left=1.4cm and 0.8cm of sym] {Cifras de Bloco};
+\node (stream) [below right=1.4cm and 0.8cm of sym, fill=yellow] {Cifras de Fluxo};
+
+% Conexões
+\draw (root) -- (crypto);
+\draw (root) -- (analysis);
+\draw (crypto) -- (sym);
+\draw (crypto) -- (asym);
+\draw (crypto) -- (proto);
+\draw (sym) -- (block);
+\draw (sym) -- (stream);
+
+\end{tikzpicture}
+}
+\end{minipage}
+\hfill
+\begin{minipage}{0.25\textwidth}
+\centering
+\includegraphics[width=\linewidth]{img/Gilbert_Vernam.jpg}
+
+\vspace{0.5em}
+\footnotesize Gilbert Vernam (1890-1960)
+\end{minipage}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cifras de Fluxo — Por que usar? (Motivação)}
+\begin{itemize}
+    \small
+    \item \textbf{Baixa latência e streaming:} cifra bytes/bits conforme chegam; sem padding e sem conhecer o tamanho final. Ideal para tráfego interativo e telemetria.
+    \item \textbf{Simplicidade e tempo constante em software:} implementações como \textit{ChaCha20} evitam tabelas e \textit{branching on secret data}, reduzindo riscos de \textit{timing}/SCA.
+    \item \textbf{Pegada mínima em hardware:} LFSR/NLFSR (ex. Trivium) oferecem alta vazão por área e baixo consumo — perfeito para IoT/ASIC/FPGA.
+    \item \textbf{Modelo de erro adequado a links ruidosos:} um bit corrompido no \textit{ciphertext} afeta apenas o bit correspondente no \textit{plaintext} (sem efeito cascata); útil em rádio/satélite.
+    \item \textbf{Flexibilidade de segurança:} com MAC para AE ou usa-se AEAD (p.ex., \textit{ChaCha20-Poly1305})
+    \item \textbf{CSPRNG “de brinde”:} o gerador de \textit{keystream} funciona como PRG rápido e bom o suficiente para sistemas e protocolos.
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cifras de Fluxo — Onde são usadas (aplicações práticas)}
+\small
+\begin{itemize}
+  \item \textbf{Protocolos de Internet e aplicativos}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{TLS 1.3:} \textit{ChaCha20-Poly1305} como AEAD de primeira classe; muito usado em mobile/ARM sem AES-NI.
+        \item \textbf{SSH:} \texttt{chacha20-poly1305@openssh.com} amplamente implantado.
+        \item \textbf{VPNs:} \textit{WireGuard} usa \textit{ChaCha20-Poly1305} pela velocidade e simplicidade.
+    \end{itemize}
+    \small
+    \item \textbf{Celulares e redes sem fio}
+        \begin{itemize}
+        \footnotesize
+          \item \textbf{3G/4G/5G:} confidencialidade/integridade no ar com \textit{SNOW 3G} e família \textit{ZUC} (3GPP).
+          \item \textbf{Áudio/vídeo em tempo real (SRTP):} cifras em fluxo (ou modos de fluxo com blocos) para manter latência baixa.
+        \end{itemize}
+    \small
+    \item \textbf{Embarcados/IoT e dispositivos restritos}
+        \begin{itemize}
+            \footnotesize
+            \item \textbf{Baixa área:} \textit{Trivium} em FPGA/ASIC e MCUs compactos (medidores, sensores, atuadores).
+            \item \textbf{Atualização de firmware:} quando código pequeno e tempo constante importam; \textit{ChaCha20} é comum em MCUs sem AES acelerado.
+        \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Cifras de Fluxo — Onde são usadas (aplicações práticas)}
+\small
+\begin{itemize}
+    
+    \item \textbf{Satcom / enlaces de rádio}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Telemetria e comando contínuos:} erros de bit ficam localizados e a sobrecarga por pacote é muito baixa.
+    \end{itemize}
+    \small
+    \item \textbf{Sistemas operacionais / RNGs}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{CSPRNGs do SO e PRNGs de usuário:} projetos baseados em \textit{ChaCha20} pela velocidade e robustez.
+    \end{itemize}
+    \small
+    \vspace{3em}
+    \item \textbf{Nota de Legado (não usar em projetos novos)}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{RC4:} foi onipresente (TLS/WEP), mas está \textbf{obsoleto} devido a vieses e vulnerabilidades graves.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Cifra de Fluxo vs. Cifra de Bloco}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\scalebox{0.7}{
+\begin{tikzpicture}[thick, node distance=0.6cm and 0.6cm]
+  % Stream Cipher
+  % Texto de entrada
+    \node at (-3,1.8) {\scriptsize $x_0\ x_1\ \ldots\ x_n$};
+    % Fio de entrada
+    \draw[->] (-3,1.5) -- (-1.68,1.5) node[midway, below] {\scriptsize 1};
+    % Bloco de cifra de fluxo
+    \node[draw, minimum width=2.4cm, minimum height=1.2cm] (stream) at (-0.5,1.5) {Stream\\Cipher};
+    % Fio de saída
+    \draw[->] (0.7,1.5) -- (2,1.5) node[midway, below] {\scriptsize 1};
+    % Texto de saída
+    \node at (2.7,1.8) {\scriptsize $y_0\ y_1\ \ldots\ y_n$};
+    % Chave
+    \draw[->] (-0.5,3) -- (stream.north) node[midway, right=-1pt] {\scriptsize $k$};
+\end{tikzpicture}}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+\scalebox{0.7}{
+\begin{tikzpicture}[thick, node distance=0.6cm and 0.6cm]
+    % Block Cipher
+    % Entrada
+    \node at (-3.1,-0.3) {\scriptsize \begin{tabular}{c}$x_0$\\$x_1$\\$\vdots$\\$x_b$\end{tabular}};
+    % Fio de entrada
+    \draw[->] (-3,-0.4) -- (-1.68,-0.4) node[midway, below] {\scriptsize $b$};
+    % Bloco de cifra de bloco
+    \node[draw, minimum width=2.4cm, minimum height=1.2cm] (block) at (-0.5,-0.4) {Block\\Cipher};
+    % Fio de saída
+    \draw[->] (0.7,-0.4) -- (2,-0.4) node[midway, below] {\scriptsize $b$};
+    % Saída
+    \node at (2.7,-0.3) {\scriptsize \begin{tabular}{c}$y_0$\\$y_1$\\$\vdots$\\$y_b$\end{tabular}};
+    % Chave
+    \draw[->] (-0.5,1) -- (block.north) node[midway, right=-1pt] {\scriptsize $k$};
+\end{tikzpicture}}
+\end{minipage}
+\end{center}
+
+\vspace{1em}
+\begin{itemize}
+    \item \textbf{Cifras de Fluxo}
+    \begin{itemize}
+        \item Encriptam bits individualmente
+        \item Geralmente pequenas e rápidas → comuns em sistemas embarcados (ex.: A5/1 em celulares GSM)
+    \end{itemize}
+
+    \item \textbf{Cifras de Bloco}
+    \begin{itemize}
+        \item Sempre encriptam blocos completos (vários bits)
+        \item Comuns em aplicações de Internet
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Encryption and Decryption with Stream Ciphers}
+
+\textbf{O Plaintext $x_i$, ciphertext $y_i$ e o key stream $s_i$} são bits individuais.
+
+\vspace{1em}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.7, node distance=1.2cm and 1cm, thick]
+  % Plaintext xi
+  \node at (-5,0.3) {$x_i$};
+
+  % First XOR
+  \node[circle, draw=white, minimum size=0.7cm, inner sep=0pt] (xor1) at (-4,0) {$\oplus$};
+  \draw[->] (-5.5,0) -- (xor1.west);
+
+  % si to XOR
+  \node at (-4,1.3) {$s_i$};
+  \draw[->] (-4,1) -- (xor1.north);
+
+  % yi output
+  \node at (-2.5,0.3) {$y_i$};
+  \draw[->] (xor1.east) -- (-2,0);
+
+  % Insecure channel cloud
+  \node[cloud, cloud puffs=7.7, cloud ignores aspect, minimum width=2cm, minimum height=1.4cm, draw, align=center] (channel) at (1,0) {insecure channel\\(e.g., Internet)};
+  
+  % Output after channel
+  \node at (4.2,0.3) {$y_i$};
+
+  % Second XOR
+  \node[circle, draw=white, minimum size=0.7cm, inner sep=0pt] (xor2) at (6,0) {$\oplus$};
+  \draw[->] (3.9,0) -- (xor2.west);
+
+  % si again
+  \node at (6,1.3) {$s_i$};
+  \draw[->] (6,1) -- (xor2.north);
+
+  % Output xi
+  \node at (7,0.3) {$x_i$};
+  \draw[->] (xor2.east) -- (7.5,0);
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+  \item \textit{Encryption} e \textit{decryption} são simples adições em módulo 2 (aka XOR).
+  \item \textit{Encryption} e \textit{decryption} são a mesma função.
+\end{itemize}
+
+\begin{block}{\textbf{Encryption:}} 
+  $y_i = e_{s_i}(x_i) = x_i + s_i \mod 2$ \hfill $x_i, y_i, s_i \in \{0,1\}$
+\end{block}
+\vspace{-0.5em}
+\begin{block}{\textbf{Decryption:}} 
+  $x_i = e_{s_i}(y_i) = y_i + s_i \mod 2$ \hfill $x_i, y_i, s_i \in \{0,1\}$
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cifra de Fluxo Síncrona vs. Assíncrona}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.4\linewidth]{img/sync_vs_async.png}
+\end{figure}
+\vspace{-1.3em}
+\begin{itemize}
+    \item A segurança da cifra de fluxo depende inteiramente do fluxo de chave $s_i$:
+    \begin{itemize}
+        \item Deve ser \textbf{aleatório}, ou seja, $\Pr(s_i = 0) = \Pr(s_i = 1) = 0.5$
+        \item Deve ser \textbf{reproduzível} tanto pelo transmissor quanto pelo receptor
+    \end{itemize}
+
+    \item \textbf{Cifra de Fluxo Síncrona}
+    \begin{itemize}
+        \item O fluxo de chave depende apenas da chave (e possivelmente de um vetor de inicialização - IV)
+    \end{itemize}
+
+    \item \textbf{Cifras de Fluxo Assíncronas}
+    \begin{itemize}
+        \item O fluxo de chave também depende do texto cifrado (realimentação indicada pela linha tracejada)
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Por que a Adição Módulo 2 é uma Boa Função de Criptografia?}
+
+\begin{itemize}
+    \item A adição módulo 2 é equivalente à operação XOR.
+    
+    \item Para um fluxo de chave $s_i$ perfeitamente aleatório, cada bit de saída do ciphertext tem 50\% de chance de ser 0 ou 1.\\
+    $\Rightarrow$ Boa propriedade estatística para o ciphertext.
+    
+    \item Inverter um XOR é simples, pois é a mesma operação XOR.
+\end{itemize}
+
+\vspace{1em}
+
+\begin{center}
+\rowcolors{2}{graycell}{white}
+\begin{tabular}{|c|c|c|}
+\hline
+\rowcolor{graycell}
+\textbf{$x_i$} & \textbf{$s_i$} & \textbf{$y_i$} \\
+\hline
+0 & 0 & 0 \\
+0 & 1 & 1 \\
+1 & 0 & 1 \\
+1 & 1 & 0 \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cifra de Fluxo: Vazão (\textit{Throughput})}
+
+\begin{center}
+    Comparação de desempenho de cifras simétricas (Pentium4):
+\end{center}
+
+\vspace{1em}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{|>{\columncolor{red!30}}c|>{\columncolor{red!30}}c|>{\columncolor{red!30}}c|}
+\hline
+\textbf{Cifra} & \textbf{Tamanho da chave} & \textbf{Mbit/s} \\
+\hline
+\rowcolor{gray!10} DES & 56 & 36.95 \\
+\rowcolor{gray!30} 3DES & 112 & 13.32 \\
+\rowcolor{gray!10} AES & 128 & 51.19 \\
+\rowcolor{gray!30} RC4 (cifra de fluxo) & (escolhível) & 211.34 \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\tiny{Fonte: Zhao et al., Anatomy and Performance of SSL Processing, ISPASS 2005}
+\end{center}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{Geradores de Números Aleatórios (RNGs)}
+\begin{frame}{Geradores de Números Aleatórios}
+\begin{itemize}
+    \item Do inglês: random number generators - RNGs
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/rngs.png}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Geradores de Números Aleatórios Verdadeiros (TRNGs)}
+\begin{itemize}
+    \item Baseados em processos físicos aleatórios: cara ou coroa, rolagem de dados, ruído de semicondutor, decaimento radioativo, movimento do mouse, \textit{jitter} de clock em circuitos digitais
+    \item A saída $s_i$ deve ter boas propriedades estatísticas: \\
+    $\text{Pr}(s_i = 0) = \text{Pr}(s_i = 1) = 50\%$ \textit{(frequentemente alcançado com pós-processamento)}
+    \item A saída não pode ser prevista nem reproduzida
+\end{itemize}
+
+Usado tipicamente para geração de chaves, \textit{nonces} (valores de uso único) e muitos outros propósitos.
+
+\centering
+\includegraphics[width=0.85\textwidth]{img/rng_comic.jpg} 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Gerador de Números Pseudoaleatórios (PRNG)}
+\begin{itemize}
+    \item Gera sequências a partir de um valor inicial (seed)
+    \item Tipicamente, a saída tem boas propriedades estatísticas
+    \item A saída pode ser reproduzida e também pode ser prevista
+\end{itemize}
+
+Muitas vezes é computado de forma recursiva:
+\[
+s_0 = \text{seed}
+\quad\quad
+s_{i+1} = f(s_i, s_{i-1}, \ldots, s_{i-t})
+\]
+
+\begin{tcolorbox}[colback=white, colframe=red!50!black, title=Exemplo: função \texttt{rand()} em ANSI C]
+\[
+s_0 = 12345
+\quad\quad
+s_{i+1} = 1103515245 \cdot s_i + 12345 \mod 2^{31}
+\]
+\end{tcolorbox}
+
+\vspace{0.5em}
+\textbf{\textcolor{red}{A maioria dos PRNGs possui propriedades criptográficas ruins!}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Criptoanalisando um PRNG Simples}
+
+\begin{tcolorbox}[colback=white, colframe=red!50!black, title=PRNG Simples: \textbf{Gerador Congruente Linear}]
+\[
+S_0 = \text{seed}
+\quad\quad
+S_{i+1} = A S_i + B \mod m
+\]
+\end{tcolorbox}
+
+\textbf{Assuma:}
+\begin{itemize}
+    \item $A$, $B$ e $S_0$ desconhecidos (chave secreta)
+    \item Tamanho de $A$, $B$ e $S_i$ igual a 100 bits
+    \item 300 bits de saída são conhecidos, por exemplo: $S_1$, $S_2$ e $S_3$
+\end{itemize}
+
+\textbf{Solução:}
+\[
+S_2 = A S_1 + B \mod m
+\quad\quad
+S_3 = A S_2 + B \mod m
+\]
+
+\begin{itemize}
+    \item Isso revela diretamente $A$ e $B$. Todos os $S_i$ podem ser facilmente computados!
+\end{itemize}
+
+\small{\textbf{\textcolor{red}{PRNGs possuem propriedades criptográficas ruins devido à linearidade!}}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Gerador Pseudoaleatório Criptograficamente Seguro}
+
+\begin{itemize}
+    \item Do inglês: \textit{Cryptographically Secure Pseudorandom Number Generator} - \textbf{CSPRNG}
+    \item PRNG especial com a seguinte propriedade adicional:
+    \begin{itemize}
+        \item \textcolor{orange}{A saída deve ser \textbf{imprevisível}}
+    \end{itemize}
+
+    \item \textbf{Mais precisamente:} Dado $n$ bits consecutivos da saída $s_i$, os próximos bits de saída $s_{n+1}$ não podem ser previstos (em tempo polinomial).
+
+    \item Essencial para aplicações em criptografia, especialmente em cifras de fluxo.
+
+    \item \textbf{Observação:} Quase nenhuma outra aplicação exige imprevisibilidade, mas muitos (muitos!) outros sistemas computacionais dependem de PRNGs.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{One Time Pad (OTP)}
+\begin{frame}{\textbf{One-Time Pad (OTP)}}
+
+\textbf{Criptossistema de \underline{segurança perfeita}:}
+\begin{itemize}
+  \item \small{Um criptossistema é considerado de segurança perfeita se ele não puder ser quebrado mesmo com \textit{recursos computacionais infinitos}.}
+\end{itemize}
+
+\textbf{One-Time Pad}
+\begin{itemize}
+  \item \small{Um criptossistema desenvolvido por Mauborgne baseado na cifra de fluxo de Vernam.}
+  \item \textbf{Propriedades:}
+  \begin{itemize}
+    \item \small{Suponha que o texto claro, o texto cifrado e a chave consistam em bits individuais:}\\
+    \begin{center}
+        $x_i,\ y_i,\ k_i \in \{0,1\}$
+    \end{center}
+  \end{itemize}
+\end{itemize}
+\vspace{-0.5em}
+\begin{tcolorbox}[colframe=red!50!black, colback=white!95!white, title=Funções de Criptografia]
+\begin{center}
+    \text{Encriptação: } \quad $e_{k_i}(x_i) = x_i \oplus k_i$\\
+    \text{Decriptação: } \quad $d_{k_i}(y_i) = y_i \oplus k_i$    
+\end{center}
+\end{tcolorbox}
+
+\textbf{\textcolor{blue}{O OTP tem segurança perfeita se, e somente se, a chave $k_i$ for usada apenas uma vez!}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{\textbf{One-Time Pad (OTP)}}
+
+\textbf{Criptossistema incondicionalmente seguro:}
+\begin{center}
+        $y_0 = x_0 \oplus k_0$ \\
+        $y_1 = x_1 \oplus k_1$ \\
+        $\vdots$
+\end{center}
+\vspace{-1em}
+
+\begin{itemize}
+    \item Cada equação é uma equação linear com duas incógnitas.
+    \item \textcolor{blue}{$\Rightarrow$ Para cada $y_i$, os valores $x_i = 0$ e $x_i = 1$ são equiprováveis!}
+    \item \textcolor{blue}{$\Rightarrow$ Isso é verdade se, e somente se, $k_0, k_1, \ldots$ forem \textbf{independentes}, ou seja, todos os $k_i$ devem ser gerados verdadeiramente aleatórios.}
+    \item \textcolor{blue}{$\Rightarrow$ Pode-se demonstrar que tais sistemas não podem ser resolvidos.}
+\end{itemize}
+
+\vspace{1em}
+\textbf{Desvantagem:} Para quase todas as aplicações, o OTP é \textbf{impraticável}, pois a chave precisa ser tão longa quanto a mensagem! \\
+\small{\textit{(Imagine que você precise encriptar um anexo de e-mail de 1GB.)}}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Registradores de Deslocamento com Realimentação Linear}
+\vspace{-0.5em}
+\begin{center}
+    \includegraphics[width=0.75\linewidth]{img/lfsrs.png}
+\end{center}
+\vspace{-0.5em}
+\begin{itemize}
+    \small{
+    \item Do inglês: \textit{Linear Feedback Shift Registers} - LFSRs
+    \item Flip-flops (\textit{FF}) concatenados, formando um registrador de deslocamento com caminho de realimentação
+    \item A realimentação calcula uma nova entrada usando a operação XOR entre certos bits do estado
+    \item O grau $m$ é determinado pelo número de elementos de armazenamento
+    \item Se $p_i = 1$, a conexão de realimentação está presente (``chave fechada''); se $p_i = 0$, não há realimentação desse flip-flop (``chave aberta'')
+    \item A sequência de saída se repete periodicamente
+    \item Comprimento \textbf{máximo} da sequência de saída: $2^m - 1$
+    }
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Saída de um LFSR e Comprimento Máximo de Sequência}
+
+\begin{center}
+    \includegraphics[width=0.8\linewidth]{img/lfsr_example.png}
+\end{center}
+
+\vspace{1em}
+
+\begin{minipage}{0.55\textwidth}
+\begin{itemize}
+    \item A saída do LFSR é descrita por uma equação recursiva:
+    \begin{center}
+        $s_{i+3} = s_{i+1} + s_i \mod 2$
+    \end{center}
+    
+    \item O comprimento máximo da sequência (de $2^3 - 1 = 7$) só é alcançado para certas configurações de realimentação, como a mostrada aqui.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+\scriptsize
+\centering
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{clk} & \textbf{FF\textsubscript{2}} & \textbf{FF\textsubscript{1}} & \textbf{FF\textsubscript{0}=s\textsubscript{i}} \\
+\hline
+0 & 1 & 0 & 0 \\
+1 & 0 & 1 & 0 \\
+2 & 1 & 0 & 1 \\
+3 & 1 & 1 & 0 \\
+4 & 1 & 1 & 1 \\
+5 & 0 & 1 & 1 \\
+6 & 1 & 0 & 1 \\
+7 & 1 & 1 & 0 \\
+8 & 1 & 1 & 1 \\
+\hline
+\end{tabular}
+\end{minipage}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Segurança de LFSRs}
+
+\tcbset{colframe=red!70!black, colback=white, boxrule=0.8pt, arc=1mm, left=1mm, right=1mm, top=1mm, bottom=1mm}
+\begin{tcolorbox}
+    \textbf{LFSRs normalmente são descritos por polinômios:}
+    \[
+    P(x) = x^m + p_{m-1}x^{m-1} + \dots + p_1x + p_0
+    \]
+\end{tcolorbox}
+
+\vspace{1em}
+
+\begin{itemize}
+    \item Um único LFSR gera uma saída altamente previsível.
+    \item Se $2m$ bits de saída de um LFSR de grau $m$ forem conhecidos, os coeficientes de realimentação $p_i$ do LFSR podem ser encontrados resolvendo um sistema de equações lineares.
+    \item Por esse motivo, muitas cifras de fluxo utilizam \textbf{combinações} de LFSRs.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{Trivium: uma cifra de fluxo moderna}
+\begin{frame}{Uma Cifra de Fluxo Moderna – Trivium}
+
+\begin{center}
+    \includegraphics[width=0.65\linewidth]{img/trivium.png}
+\end{center}
+
+\vspace{0.8em}
+
+\begin{itemize}
+    \item Três LFSRs \textit{não-lineares} (NLFSR) de comprimento 93, 84 e 111.
+    \item A soma-XOR das saídas dos três NLFSRs gera o \textit{key stream} $s_i$.
+    \item Pequeno em hardware:
+    \begin{itemize}
+        \item Total de registradores: 288
+        \item Não-linearidade: 3 portas AND
+        \item 10 portas XOR (sendo 1 com três entradas)
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Trivium}
+
+\textbf{Inicialização:}
+\begin{itemize}
+    \item Carregar IV de 80 bits no registrador A
+    \item Carregar chave de 80 bits no registrador B
+    \item Definir $c_{109}$, $c_{110}$, $c_{111} = 1$, todos os outros bits em 0
+\end{itemize}
+
+\textbf{Pré-aquecimento:}
+\begin{itemize}
+    \item Ciclar a cifra $4 \times 288 = 1152$ vezes sem gerar saída
+\end{itemize}
+
+\textbf{Criptografia:}
+\begin{itemize}
+    \item A saída $s_i$ é a soma-XOR das saídas dos três NLFSRs
+\end{itemize}
+
+\vspace{0.5em}
+\small O projeto pode ser paralelizado para produzir até 64 bits por ciclo de clock.
+
+\vspace{1em}
+
+\begin{table}[]
+\scriptsize
+\centering
+\rowcolors{2}{gray!10}{white}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\rowcolor{red!20}
+\textbf{Registrador} & \textbf{Tamanho} & \textbf{Bit de Feedback} & \textbf{Bit de Feedforward} & \textbf{Entradas AND} \\
+\hline
+A & 93  & 69 & 66 & 91, 92 \\
+B & 84  & 78 & 69 & 82, 83 \\
+C & 111 & 87 & 66 & 109, 110 \\
+\hline
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Lições Aprendidas}
+
+\begin{itemize}
+    \small{
+    \item Cifras de fluxo são menos populares do que cifras de bloco na maioria dos domínios, como a segurança na Internet. Existem exceções em alguns contextos, como a cifra de fluxo RC4.
+
+    \item Cifras de fluxo às vezes requerem menos recursos (por exemplo, área de chip ou tamanho de código) para implementação do que cifras de bloco, sendo atrativas para ambientes restritos como embarcados.
+
+    \item Os requisitos para um \textit{gerador de números pseudorrandômicos criptograficamente seguro} são muito mais exigentes do que os de PRNGs usados em outras aplicações como testes ou simulações.
+
+    \item O \textit{One-Time Pad} é uma cifra simétrica com segurança perfeita. No entanto, é altamente impraticável para a maioria das aplicações, pois a chave precisa ter o mesmo tamanho da mensagem.
+
+    \item LFSRs únicos são fracos como cifras de fluxo, apesar de suas boas propriedades estatísticas. Porém, combinações cuidadosas de vários LFSRs podem gerar cifras robustas.}
+\end{itemize}
+
+\end{frame}
+
+\section{Exercícios}
+\begin{frame}{Exercício: Vulnerabilidade de OTP com Reuso de Chave}
+
+Considere uma cifra semelhante ao \textit{One-Time Pad} (OTP), mas com uma chave curta de 128 bits. A chave de 128 bits é reutilizada periodicamente para cifrar grandes volumes de dados.
+
+\textbf{Tarefa:} 
+\begin{itemize}
+    \item Descreva como um ataque pode quebrar esse esquema.
+\end{itemize}
+\vspace{0.75em}
+\textbf{Dicas:}
+\begin{itemize}
+    \item Analise o que acontece quando a mesma chave é usada para cifrar duas mensagens distintas.
+    \item Imagine que um atacante consegue o \textit{ciphertext} e também sabe o contexto do dado, por exemplo, protocolos padronizados (e.g. cabeçalhos IP, HTTP, JSON) ou arquivos com estruturas fixas (PDF, ZIP, etc.) que têm alta redundância.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Solução: Reutilização de Chave em OTP}
+
+Suponha duas mensagens distintas $m_1$ e $m_2$ cifradas com a mesma chave $k$:
+\begin{center}
+$ c_1 = m_1 \oplus k
+\qquad\quad
+c_2 = m_2 \oplus k $    
+\end{center}
+
+Um atacante que observa ambos os ciphertexts pode fazer:
+\begin{center}
+    $c_1 \oplus c_2 = (m_1 \oplus k) \oplus (m_2 \oplus k) = m_1 \oplus m_2$    
+\end{center}
+
+\textbf{Ou seja:} a operação cancela a chave, e o atacante obtém o XOR das mensagens originais.
+
+\textbf{Consequência:}
+\begin{itemize}
+    \item O XOR entre mensagens pode revelar padrões, estruturas repetidas ou até permitir adivinhar partes do conteúdo.
+    \item Isso é particularmente eficaz quando as mensagens têm formato previsível (ex: cabeçalhos, arquivos estruturados, padrões de linguagem natural).
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Conclusão:} O \textit{One-Time Pad} só é seguro se a chave nunca for reutilizada.
+
+\end{frame}
+
+\begin{frame}{Exercício: O Paradoxo da Busca Exaustiva no OTP}
+
+À primeira vista, parece que uma busca exaustiva de chave é possível contra um sistema OTP.
+
+\vspace{1em}
+
+\textbf{Cenário:}
+\begin{itemize}
+    \item Mensagem curta de 5 caracteres ASCII ($5 \times 8 = 40$ bits)
+    \item Chave OTP de 40 bits
+    \item Possibilidade de testar todas as $2^{40}$ chaves
+\end{itemize}
+
+\vspace{0.5em}
+
+\textbf{Tarefa:} Explique por que uma busca exaustiva \textbf{não} é bem-sucedida, mesmo que o atacante tenha capacidade computacional suficiente.
+
+\vspace{0.5em}
+
+\textbf{Dica:} Resolva o paradoxo: o OTP é \textit{incondicionalmente seguro}, mas o espaço de chaves é finito e pequeno. Então por que não conseguimos quebrá-lo com força bruta?
+
+\vspace{0.5em}
+\textit{Respostas do tipo “o OTP é seguro e por isso a força bruta não funciona” não são aceitáveis.}
+\end{frame}
+
+\begin{frame}{Exemplo para Ilustrar o Paradoxo do OTP}
+
+\textbf{Mensagem cifrada com OTP de 40 bits:} \\[0.5em]
+
+\textbf{Exemplo de palavras com 5 caracteres (40 bits):}
+\begin{itemize}
+    \item \texttt{PLANO} $\Rightarrow$ \texttt{01010000 01001100 01000001 01001110 01001111}
+    \vspace{1em}
+    \item \texttt{FUGIR} $\Rightarrow$ \texttt{01000110 01010101 01000111 01001001 01010010}
+    \item \texttt{PAZES} $\Rightarrow$ \texttt{01010000 01000001 01011010 01000101 01010011}
+\end{itemize}
+
+\vspace{1em}
+
+\textbf{Ideia:} Para qualquer \texttt{ciphertext} de 40 bits, existem várias chaves possíveis que produzem mensagens diferentes, todas com aparência plausível.
+
+\vspace{0.5em}
+\textit{Isso mostra que uma busca exaustiva revela todas as possíveis mensagens — mas nenhuma evidência de qual é a correta.}
+
+\end{frame}
+
+
+
+\end{document}

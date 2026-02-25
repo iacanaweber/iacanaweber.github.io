@@ -1,0 +1,637 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    %linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Criptografia de Chave-Pública]{Criptografia de Chave-Pública}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Introdução a}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{ Criptografia de Chave-Pública}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Criptografia Simétrica revisitada}
+
+\begin{frame}{Criptografia Simétrica revisitada}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{img/symetric.png}
+    \end{figure}
+
+    \vspace{0.5em}
+    Duas propriedades dos sistemas criptográficos simétricos (de chave secreta):
+    \begin{itemize}
+        \item A \textbf{mesma chave secreta $K$} é usada para a cifragem e a decifragem
+        \item As funções de cifragem e decifragem são muito semelhantes (ou até mesmo idênticas)
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Criptografia Simétrica: Analogia}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\linewidth]{parecido.png}
+    \end{figure}
+
+    \vspace{0.5em}
+    Cofre com uma fechadura forte: apenas Alice e Bob possuem uma cópia da chave
+    \begin{itemize}
+        \item Alice cifra $\Rightarrow$ tranca a mensagem no cofre usando sua chave
+        \item Bob decifra $\Rightarrow$ usa sua cópia da chave para abrir o cofre
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Criptografia Simétrica: Limitações}
+    \begin{itemize}
+        \item Algoritmos simétricos, como o AES, são muito seguros, rápidos e amplamente utilizados, \textbf{mas}:
+        \begin{itemize}
+            \item Problema de distribuição de chaves: a chave secreta deve ser \textbf{transportada com segurança}
+            \item Número de chaves: em uma rede, cada par de usuários precisa de uma chave individual
+        \end{itemize}
+    \end{itemize}
+\vspace{-0.25em}
+    \begin{block}{}
+        $\Rightarrow$ Uma rede com $n$ usuários requer $\frac{n \cdot (n - 1)}{2}$ chaves, e cada usuário armazena $(n - 1)$ chaves
+    \end{block}
+
+    \begin{columns}
+        \column{0.5\textwidth}
+        \textbf{Exemplo:} \\
+        6 usuários (nós) \\
+        $\frac{6 \cdot 5}{2} = 15$ chaves (arestas)
+
+        \column{0.5\textwidth}
+        \vspace{-0.8em}
+        \begin{figure}
+            \centering
+            \includegraphics[width=.3\linewidth]{img/figura.png}
+        \end{figure}
+        \end{columns}
+
+    \vspace{-0.4em}
+    \begin{itemize}
+        \item Alice e Bob podem tentar se fazer passar um pelo outro, pois possuem chaves idênticas.\\
+        Para evitar isso precisamos da propriedade de \textbf{``não-repúdio''}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Ideia por trás da Criptografia Assimétrica}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.4\linewidth]{img/caixa_correio.png}
+    \end{figure}
+    \textbf{Nova ideia:} \\
+    Usar o princípio da \textit{“caixa de correio”}:
+    \begin{itemize}
+        \item \textbf{Qualquer pessoa} pode inserir uma carta
+        \item Mas \textbf{apenas o dono} possui a chave correta para abrir a caixa
+    \end{itemize}
+
+    \vfill
+    \textit{1976: primeira publicação de um algoritmo desse tipo por Whitfield Diffie e Martin Hellman. Também houveram contribuições por Ralph Merkle.}
+\end{frame}
+
+\begin{frame}{Criptografia Assimétrica (Chave Pública)}
+    \textbf{Princípio:} “Dividir” a chave
+
+    \vspace{1em}
+    \begin{center}
+    \begin{tikzpicture}[>=stealth, thick]
+        \node at (0,0) {\Large $K$};
+        \draw[->] (0,-0.2) -- (-3,-1.5);
+        \draw[->] (0,-0.2) -- (3,-1.5);
+
+        \node[align=center, text=green!50!black] at (-3,-2.2) {\textbf{Chave Pública} ($K_{\textit{pub}}$)\\(Encrypt)};
+        \node[align=center, text=red!70!black] at (3,-2.2) {\textbf{Chave Secreta} ($K_{\textit{pr}}$)\\(Decrypt)};
+    \end{tikzpicture}
+    \end{center}
+
+    \vspace{1em}
+    $\Rightarrow$ Durante a geração de chaves, um par de chaves $K_{\textit{pub}}$ e $K_{\textit{pr}}$ é computado
+\end{frame}
+
+
+\begin{frame}{Criptografia Assimétrica: Analogia}
+    Cofre com fechadura pública e fechadura privada:
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{img/analogia_public.png}
+\end{figure}
+    \vspace{1em}
+    \begin{itemize}
+        \item Alice deposita (cifra) uma mensagem utilizando a \textit{chave pública} $K_{\textit{pub}}$ — que \textbf{não é secreta}
+        \item Somente Bob possui a \textit{chave privada} $K_{\textit{pr}}$ — que \textbf{é secreta} — para recuperar (decifrar) a mensagem
+    \end{itemize}
+\end{frame}
+
+\section{Aspectos Práticos da Criptografia de Chave Pública}
+
+\begin{frame}{Protocolo Básico de Criptografia com Chave Pública}
+    \begin{center}
+    \begin{tikzpicture}[>=stealth, node distance=2cm, scale=1, transform shape]
+
+        \node at (-4,1.5) {\Large \textbf{Alice}};
+        \node at (4,1.5) {\Large \textbf{Bob}};
+
+    \end{tikzpicture}
+    \end{center}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.85\linewidth]{img/esquemasimples.png}
+    \end{figure}
+
+    \vspace{1em}
+    $\Rightarrow$ Problema de Distribuição de Chaves resolvido
+\end{frame}
+
+
+\begin{frame}{Mecanismos de Segurança da Criptografia de Chave Pública}
+    Aqui estão os principais mecanismos que podem ser realizados com criptografia assimétrica:
+
+    \vspace{1em}
+    \begin{itemize}
+        \item \textbf{Distribuição de Chaves} (ex.: troca de chaves Diffie-Hellman, RSA) sem a necessidade de um segredo (chave) pré-compartilhado
+
+        \item \textbf{Não-repúdio e Assinaturas Digitais} (ex.: RSA, DSA ou ECDSA) para garantir a integridade da mensagem
+
+        \item \textbf{Identificação}, usando protocolos de desafio-resposta com assinaturas digitais
+
+        \item \textbf{Cifragem} (ex.: RSA) \\
+        Desvantagem: Computacionalmente muito intensiva \\
+        (\textit{1000 vezes mais lenta que algoritmos simétricos!})
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Protocolo Básico de Transporte de Chaves 1/2}
+    Na prática usamos \textbf{sistemas híbridos}, incorporando tanto algoritmos assimétricos quanto simétricos
+
+    \vspace{1em}
+    \begin{enumerate}
+        \item \textbf{Troca de chaves} (para esquemas simétricos) e \textbf{assinaturas digitais} são realizadas com algoritmos \textbf{assimétricos} (lentos)
+        \vspace{1em}
+        \item \textbf{Cifragem} dos dados é feita com cifras \textbf{simétricas} (rápidas), por exemplo, \textit{block ciphers} ou \textit{stream ciphers}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Protocolo Básico de Transporte de Key 2/2}
+\framesubtitle{Exemplo: Protocolo híbrido com AES como cifra simétrica}
+\vspace{-1em}
+\begin{columns}[T] % 'T' alinha o topo das colunas
+    \begin{column}{1.0\textwidth} % Coluna para o diagrama principal
+        \centering
+        % Substitua 'nome_do_arquivo_do_diagrama.png' pelo nome do seu arquivo de imagem.
+        \includegraphics[width=\linewidth]{schemeassymetricandsymetric.png}
+        \end{column}
+\end{columns}
+
+\end{frame}
+
+
+\section{Algorítmos de Chave-Pública Notórios}
+
+\begin{frame}
+\frametitle{Como construir Algoritmos de Chave Pública}
+
+Esquemas assimétricos são baseados em uma ``one-way function'' (função de mão única) $f()$:
+\begin{itemize}
+    \item Calcular $y = f(x)$ é computacionalmente fácil
+    \item Calcular $x = f^{-1}(y)$ é computacionalmente inviável
+\end{itemize}
+
+One-way functions são baseadas em problemas matematicamente difíceis.
+\color{blue}
+\textbf{Três famílias principais:}
+\color{black}
+\begin{itemize}
+    \item \textbf{Fatoração de inteiros} (RSA):
+    \begin{quote}
+        Dado um inteiro composto $n$, encontrar seus fatores primos \\
+        (Multiplicar dois primos: fácil)
+    \end{quote}
+    \item \textbf{Logaritmo Discreto} (Diffie-Hellman, DSA):
+    \begin{quote}
+        Dados $a, y$ e $m$, encontrar $x$ tal que $a^x \equiv y \pmod m$ \\
+        (Exponenciação $a^x$: fácil)
+    \end{quote}
+    \item \textbf{Curvas Elípticas (EC)} (ECDH, ECDSA): Generalização do logaritmo discreto
+\end{itemize}
+
+\tiny
+\textbf{Nota: }Os problemas são considerados matematicamente difíceis, mas não existe prova (até o momento).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Criptografia Pós-Quântica (PQC): Problemas Difíceis}
+
+A Criptografia Pós-Quântica (PQC) busca algoritmos resistentes a computadores quânticos, baseando-se em outros problemas matemáticos considerados difíceis:
+% A PQC é crucial para garantir a segurança futura contra a ameaça quântica.
+\color{blue}
+\textbf{Principais famílias de problemas para PQC:}
+\color{black}
+\begin{itemize}
+    \item \textbf{Baseada em Reticulados (Lattice-based)}:
+    Encontrar vetores específicos (e.g., o mais curto) em um reticulado.
+    \begin{itemize}
+        \item FIPS 203 - CRYSTALS - Kyber - \textbf{ML-KEM}
+        \item FIPS 204 - CRYSTALS - Dilithium - \textbf{ML-DSA}
+        \item FIPS 206 - FALCON - \textbf{FN-DSA}
+    \end{itemize}
+        
+    \item \textbf{Baseada em Códigos (Code-based)}:
+        Decodificar um código linear geral na presença de erros. 
+        \begin{itemize}
+            \item FIPS ? - Hamming Quasi-Cyclic (HQC) - \textbf{?-KEM}
+            
+        \end{itemize}
+        
+    \item \textbf{Baseada em Hashes (Hash-based Signatures)}:
+        Inverter uma função hash (achar pré-imagem) ou encontrar colisões. 
+        \begin{itemize}
+            \item FIPS 205 - SPHINCS+ - \textbf{SLH-DSA}
+            
+        \end{itemize}
+        
+       
+\end{itemize}
+\vspace{1em}
+\tiny
+\textbf{Nota: }Assim como na criptografia clássica, a intratabilidade destes problemas é conjecturada, mas não universalmente provada.
+% Esta é uma área de pesquisa ativa e em constante evolução.
+
+\end{frame}
+
+
+
+
+
+\begin{frame}
+\frametitle{Tamanhos de Chave e Níveis de Segurança}
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{cccp{5.5cm}} % Ajustada a largura da última coluna para acomodar o texto
+        \hline
+        \textit{Simétrico} & \textit{ECC} & \textit{RSA} & \textit{Observação} \\
+        \hline
+        128 Bit & 256 Bit & 3072 Bit & Segurança moderna padrão, adequada para proteção de dados por vários anos. \\
+        \hline
+        192 Bit & 384 Bit & 7680 Bit & Segurança elevada para dados sensíveis ou proteção de longo prazo. \\
+        \hline
+        256 Bit & 512 Bit & 15360 Bit & Segurança de muito longo prazo (computadores clássicos), para dados altamente sensíveis. \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\vspace{0.5em} 
+
+\begin{itemize}
+    \item A complexidade exata do RSA (fatoração) é difícil de estimar.
+    \item A existência de computadores quânticos provavelmente seria o fim para ECC, RSA \& DL (pelo menos daqui a 2-3 décadas, e algumas pessoas duvidam que CQs venham a existir).
+\end{itemize}
+
+\end{frame}
+
+\section{Essencial sobre Teoria Numérica para Algoritmos de Chave Pública}
+
+\begin{frame}
+\frametitle{Algoritmo de Euclides 1/2}
+
+\begin{itemize}
+    \item Calcule o máximo divisor comum mdc$(r_0, r_1)$ de dois inteiros $r_0$ e $r_1$.
+    \item mdc é fácil para números pequenos:
+    \begin{enumerate}
+        \item fatore $r_0$ e $r_1$
+        \item mdc = maior fator comum
+    \end{enumerate}
+    \item Exemplo:
+    \begin{align*}
+        r_0 &= 84 = 2^2 \cdot 3 \cdot 7 \\
+        r_1 &= 30 = 2 \cdot 3 \cdot 5
+    \end{align*}
+    $\rightarrow$ O mdc é o produto de todos os fatores primos comuns:
+    \[ 2 \cdot 3 = 6 = \text{mdc}(30, 84) \]
+    \item Mas \textbf{fatorar é complicado} (e frequentemente inviável) para números grandes.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo de Euclides 2/2}
+
+\begin{itemize}
+    \item Observação: \textbf{mdc($r_0, r_1$) = mdc($r_0 - r_1, r_1$)}
+\end{itemize}
+
+$\rightarrow$ Ideia central:
+\begin{itemize}
+    \item Reduzir o problema de encontrar o mdc de dois números dados ao do \textbf{mdc de dois números menores}
+    \item Repetir o processo recursivamente
+    \item O \textbf{mdc($r_i$, 0) = $r_i$} final é a resposta para o problema original !
+\end{itemize}
+
+\medskip
+\textbf{Exemplo:} mdc($r_0, r_1$) para $r_0 = 27$ e $r_1 = 21$
+    \begin{align*}
+        \text{mdc}(27, 21) &= \text{mdc}(1 \cdot 21 + 6, 21) = \text{mdc}(21, 6) \\
+        \text{mdc}(21, 6) &= \text{mdc}(3 \cdot 6 + 3, 6) = \text{mdc}(6, 3) \\
+        \text{mdc}(6, 3)  &= \text{mdc}(2 \cdot 3 + 0, 3) = \text{mdc}(3, 0) = 3
+    \end{align*}
+\vspace{-1em}
+\begin{itemize}
+    \item Nota: esse método é muito eficiente mesmo para números longos, pois a complexidade cresce \textbf{linearmente} com o número de bits.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Algoritmo Estendido de Euclides 1/2}
+
+\begin{itemize}
+    \item Estende o algoritmo de Euclides para encontrar o \textbf{inverso modular} de $r_1 \pmod{r_0}$.
+
+    \item O EEA (Algoritmo de Euclides Estendido) calcula $s, t,$ e o mdc:
+    \[ \text{mdc}(r_0, r_1) = s \cdot r_0 + t \cdot r_1 \]
+
+    \item Tome a relação mod $r_0$. Se $\text{mdc}(r_0, r_1)=1$, então $s \cdot r_0 + t \cdot r_1 = 1$:
+    \begin{align*}
+        s \cdot r_0 + t \cdot r_1 &= 1 \\
+        s \cdot 0 + t \cdot r_1 &\equiv 1 \pmod{r_0} \\
+        r_1 \cdot t &\equiv 1 \pmod{r_0}
+    \end{align*}
+
+    \item[] Desta forma, temos que: \textbf{t é o inverso de $r_1 \pmod{r_0}$}
+
+    \item Note que $\text{mdc}(r_0, r_1) = 1$ para que o inverso exista.
+
+    \item \textbf{Fórmulas recursivas} para calcular $s$ e $t$ em cada passo.
+    
+\end{itemize}
+
+\end{frame}
+
+%\begin{frame}
+%\frametitle{Algoritmo Estendido de Euclides 2/2}
+%\textbf{Exemplo:}
+%\begin{columns}[T] % T para alinhamento pelo topo
+%    \begin{column}{0.5\textwidth} % Coluna para os pontos
+%        \begin{itemize}
+%            \item Calcule o inverso modular de $12 \pmod{67}$:
+%            \item Da ``tabela mágica'' segue que:
+%                  \[ -5 \cdot 67 + 28 \cdot 12 = 1 \]
+%            \item Portanto, \textbf{28 é o inverso} de $12 \pmod{67}$.
+%            \item Verificação: $28 \cdot 12 = 336 \equiv 1 \pmod{67}$ \checkmark % Requer amssymb ou similar
+%        \end{itemize}
+%    \end{column}
+%    \begin{column}{0.5\textwidth} % Coluna para a tabela
+%        \centering
+%        \renewcommand{\arraystretch}{1.2} % Melhora o espaçamento entre linhas
+%        \begin{tabular}{c|c|c|c|c}
+%            $i$ & $q_{i-1}$ & $r_i$ & $s_i$ & $t_i$ \\
+%            \hline
+%            2 & 5     & 7  &  1 & -5 \\
+%            3 & 1     & 5  & -1 &  6 \\
+%            4 & 1     & 2  &  2 & -11 \\
+%            5 & 2     & 1  & -5 & \textbf{28} \\
+%        \end{tabular}
+%    \end{column}
+%\end{columns}
+%\end{frame}
+
+\begin{frame}
+\frametitle{Função Phi de Euler 1/2}
+
+\begin{itemize}
+    \item Novo problema, importante para sistemas de chave pública, ex.: RSA: \\
+    Dado o conjunto dos $m$ inteiros $\{0, 1, 2, \dots, m-1\}$, \\
+    \textbf{Quantos} números no conjunto são \textbf{primos relativos a $m$}?
+
+    \item Resposta: Função Phi de Euler $\Phi(m)$.
+
+    \item \textbf{Exemplo} para os conjuntos $\{0,1,2,3,4,5\}$ ($m=6$), e $\{0,1,2,3,4\}$ ($m=5$):
+    \vspace{-0.5em}
+        \begin{columns}[T] % Alinhar pelo topo
+            \begin{column}{0.5\textwidth}
+                \centering
+                \underline{$m=6$:}
+                \vspace{-1em}
+                \begin{align*}
+                    \text{mdc}(0,6) &= 6 \\
+                    \text{mdc}(1,6) &= 1 & \leftarrow \\
+                    \text{mdc}(2,6) &= 2 \\
+                    \text{mdc}(3,6) &= 3 \\
+                    \text{mdc}(4,6) &= 2 \\
+                    \text{mdc}(5,6) &= 1 & \leftarrow
+                \end{align*}
+                $\mathbf{\Phi(6) = 2}$.
+            \end{column}
+            \begin{column}{0.5\textwidth}
+                \centering
+                \underline{$m=5$:}
+                \vspace{-1em}
+                \begin{align*}
+                    \text{mdc}(0,5) &= 5 \\
+                    \text{mdc}(1,5) &= 1 & \leftarrow \\
+                    \text{mdc}(2,5) &= 1 & \leftarrow \\
+                    \text{mdc}(3,5) &= 1 & \leftarrow \\
+                    \text{mdc}(4,5) &= 1 & \leftarrow
+                \end{align*}
+                $\mathbf{\Phi(5) = 4}$.
+            \end{column}
+        \end{columns}
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Função Phi de Euler 2/2}
+
+\begin{itemize}
+   
+    \item Calcular Phi é especialmente fácil para $m = p \cdot q$ (onde $p, q$ são primos distintos):
+    \[ \Phi(m) = (p-1)(q-1) \]
+
+    \item Exemplo para $m = 899 = 29 \cdot 31$:
+    \[ \textbf{$\Phi(899)$} = (29-1) \cdot (31-1) = 28 \cdot 30 = \textbf{840} \]
+
+    \item Nota: Encontrar $\Phi(m)$ é computacionalmente fácil \textbf{se a fatoração de $m$ é conhecida} (caso contrário, o cálculo de $\Phi(m)$ torna-se computacionalmente inviável para números grandes).
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}<0>
+\frametitle{Pequeno Teorema de Fermat (1/2)}
+
+\begin{itemize}
+    \item Dado um primo $p$ e um inteiro $a$: \quad \boxed{a^p \equiv a \pmod p}
+
+    \item Pode ser reescrito como:
+    \begin{center}
+        $ a^{p-1} \equiv 1 \pmod p $
+    \end{center}
+    \tiny
+    (Isso é válido se $p$ não divide $a$, ou seja, $a \not\equiv 0 \pmod p$).
+    \normalsize
+
+    \item Uso: Encontrar o inverso modular, se $p$ é primo e $a \not\equiv 0 \pmod p$. \\
+    Reescrevemos $a^{p-1} \equiv 1 \pmod p$ como $a \cdot \textcolor{red}{\underline{a^{p-2}}} \equiv 1 \pmod p$.
+    % \textcolor e \underline requerem pacotes como xcolor e ulem (ou \underline padrão)
+
+    \item[] Comparando com a definição de inverso modular, $a \cdot \textcolor{red}{\underline{a^{-1}}} \equiv 1 \pmod m$:
+    \[ \rightarrow a^{-1} \equiv a^{p-2} \pmod p \]
+    Este é o inverso modular de $a$ módulo um primo $p$.
+
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}<0>
+\frametitle{Pequeno Teorema de Fermat (2/2)}
+
+\textbf{Exemplo:} $a=2, p=7$
+\begin{itemize}
+    \item Para encontrar o inverso de $a=2$ módulo $p=7$:
+          \[ a^{p-2} = 2^{7-2} = 2^5 = 32 \equiv 4 \pmod 7 \]
+          Portanto, $2^{-1} \equiv 4 \pmod 7$.
+    \item Verificar: $2 \cdot 4 = 8 \equiv 1 \pmod 7$. \checkmark % Requer amssymb ou similar
+\end{itemize}
+
+\begin{itemize}
+    \item O Pequeno Teorema de Fermat funciona apenas \textbf{módulo um primo $p$}.
+\end{itemize}
+    
+\end{frame}
+
+
+\begin{frame}<0>%[shrink]
+\frametitle{Teorema de Euler}
+
+\begin{itemize}
+\small
+    \item Generalização do Pequeno Teorema de Fermat para \textbf{qualquer módulo inteiro}.
+
+    \item Dados dois \textbf{inteiros primos relativos $a$ e $m$} (ou seja, $\text{mdc}(a,m)=1$):
+    \[ a^{\Phi(m)} \equiv 1 \pmod m \]
+
+    \item \textbf{Exemplo:} $m=12, a=5$. (Note que $\text{mdc}(5,12)=1$)
+    \begin{enumerate}
+        \item Calcule a Função Phi de Euler para $m=12$:
+        \[ \Phi(12) = \Phi(2^2 \cdot 3^1) = (2^2 - 2^{2-1})(3^1 - 3^{1-1}) = (4-2)(3-1) = 2 \cdot 2 = 4 \]
+        \item Verifique o Teorema de Euler para $a=5, m=12$:
+        \[ 5^{\Phi(12)} = 5^4 = (5^2)^2 = 25^2 = 625 \]
+        Para verificar $625 \equiv 1 \pmod{12}$:
+        $625 = 52 \cdot 12 + 1$, então $625 \equiv 1 \pmod{12}$.
+    \end{enumerate}
+
+    \item O Pequeno Teorema de Fermat é um caso especial do Teorema de Euler:
+    \begin{itemize}
+        \item Para um primo $p$, a Função Phi de Euler é:
+        \[ \Phi(p) = p^1 - p^{1-1} = p^1 - p^0 = p-1 \]
+        \item[] $\rightarrow$ Substituindo $m=p$ no Teorema de Euler (e $\Phi(p)=p-1$):
+        \[ a^{\Phi(p)} = a^{p-1} \equiv 1 \pmod p \]
+        (Este é o Pequeno Teorema de Fermat, válido quando $p$ é primo e não divide $a$).
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Lições Aprendidas}
+
+\begin{itemize}
+    \item Algoritmos de chave pública possuem \textbf{capacidades que cifras simétricas não têm}, em particular assinatura digital e funções de estabelecimento de chaves (key establishment).
+
+    \item Algoritmos de chave pública são \textbf{computacionalmente intensivos} (uma forma elegante de dizer que são \textit{lentos}), e portanto são pouco adequados para criptografia de grandes volumes de dados (bulk data encryption).
+
+    \item Apenas \textbf{três famílias de esquemas de chave pública} são amplamente utilizadas. Isto é consideravelmente menos do que no caso de algoritmos simétricos.
+
+    \item O \textbf{algoritmo Euclidiano estendido} nos permite calcular \textbf{inversos modulares} rapidamente, o que é importante para quase todos os esquemas de chave pública.
+
+    \item A \textbf{função phi de Euler} ($\Phi$) nos dá o número de elementos menores que um inteiro $n$ que são primos relativos a $n$. Isto é importante para o esquema de criptografia RSA.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

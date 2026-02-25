@@ -1,0 +1,805 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    %linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Mais sobre Cifras de Bloco]{Mais sobre Cifras de Bloco}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Mais Sobre}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Cifras de Bloco}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+
+\begin{frame}{Cifras de Bloco}
+
+\begin{itemize}
+    \item Uma cifra de bloco é muito mais do que apenas um algoritmo de criptografia, ela pode ser usada para:
+    \begin{itemize}
+        \item construir diferentes tipos de esquemas de criptografia baseados em blocos
+        \item implementar uma cifra de fluxo
+        \item construir funções hash
+        \item criar códigos de autenticação de mensagens
+        \item construir protocolos de estabelecimento de chave
+        \item criar um gerador de números pseudoaleatórios
+        \item \ldots
+    \end{itemize}
+
+    \item A segurança das cifras de bloco também pode ser aumentada por meio de:
+    \begin{itemize}
+        \item \textit{key whitening}
+        \item múltipla encriptação
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\section{Encriptando com Cifras de Bloco: Modos de Operação}
+
+\begin{frame}{Criptografia com Cifras de Bloco}
+
+\begin{itemize}
+    \item Existem diversas maneiras de criptografar textos longos, por exemplo, um e-mail ou um arquivo de computador, usando uma cifra de bloco (\textit{“modes of operation”}):
+    \begin{itemize}
+        \item Modo Electronic Code Book (ECB)
+        \item Modo Cipher Block Chaining (CBC)
+        \item Modo Output Feedback (OFB)
+        \item Modo Cipher Feedback (CFB)
+        \item Modo Counter (CTR)
+        \item Modo Galois Counter (GCM)
+    \end{itemize}
+
+    \item Todos os 6 modos têm um objetivo:
+    \begin{itemize}
+        \item Além da confidencialidade, eles fornecem autenticidade e integridade:
+        \begin{itemize}
+            \item A mensagem realmente veio do remetente original? (autenticidade)
+            \item O texto cifrado foi alterado durante a transmissão? (integridade)
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\subsection{Electronic Code Book mode (ECB)}
+
+\begin{frame}{Modo Electronic Code Book (ECB)}
+
+\begin{itemize}
+    \item $e_k(x_i)$ denota a encriptação de um bloco de texto claro $x_i$ de $b$ bits com a chave $k$
+    \item $e_k^{-1}(y_i)$ denota a decriptação de um bloco de texto cifrado $y_i$ de $b$ bits com a chave $k$
+    \item Mensagens que excedem $b$ bits são particionadas em blocos de $b$ bits
+    \item \textbf{Cada bloco é encriptado separadamente}
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/ecb.png}
+\end{figure}
+
+\begin{block}{}
+\textbf{Encriptação:} \quad $y_i = e_k(x_i), \quad i \geq 1$
+
+\textbf{Decriptação:} \quad $x_i = e_k^{-1}(y_i) = e_k^{-1}(e_k(x_i)), \quad i \geq 1$
+\end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{ECB: vantagens/desvantagens}
+
+\begin{itemize}
+    \item \textbf{Vantagens}
+    \begin{itemize}
+        \item não é necessária sincronização de blocos entre o remetente e o receptor
+        \item erros de bits causados por canais ruidosos afetam apenas o bloco correspondente, mas não os blocos seguintes
+        \item a operação da cifra de bloco pode ser paralelizada
+        \begin{itemize}
+            \item vantagem para implementações de alta velocidade
+        \end{itemize}
+    \end{itemize}
+
+    \vspace{0.5em}
+
+    \item \textbf{Desvantagens}
+    \begin{itemize}
+        \item ECB encripta de forma altamente determinística
+        \begin{itemize}
+            \item textos claros idênticos resultam em textos cifrados idênticos
+            \item um atacante pode reconhecer se a mesma mensagem foi enviada duas vezes
+        \end{itemize}
+        \item blocos de texto claro são encriptados independentemente dos blocos anteriores
+        \begin{itemize}
+            \item um atacante pode reordenar blocos cifrados, resultando em um texto claro válido
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Ataque de Substituição no ECB}
+
+\begin{itemize}
+    \item Uma vez que um mapeamento de um bloco de texto claro $x_i$ para um bloco de texto cifrado $y_i$ é conhecido, uma sequência de blocos cifrados pode ser facilmente manipulada.
+
+    \item Suponha uma \textit{transferência bancária eletrônica}:
+\end{itemize}
+
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|}
+    \hline
+    Bloco \# & 1 & 2 & 3 & 4 & 5 \\
+    \hline
+    & Banco A remetente & Conta \# remetente & Banco B destinatário & Conta \# destinatário & Valor \$ \\
+    \hline
+\end{tabular}
+}
+
+\begin{itemize}
+    \item a chave de encriptação entre os dois bancos não muda com muita frequência
+
+    \item O atacante envia transferências de \$1,00 da sua conta no banco A para sua conta no banco B repetidamente
+    \begin{itemize}
+        \tiny
+        \item Como o conteúdo da transação (remetente, destinatário, valores) não muda entre as transferências, alguns blocos cifrados são idênticos.
+        \item O atacante identifica quais blocos cifrados correspondem ao campo "conta de destino" (Bloco 4) porque ele sempre envia para a mesma conta.
+        \item Ele armazena os blocos cifrados 1, 3 e 4, que permanecem os mesmos em todas as transferências.
+    \end{itemize}
+
+    \item Ele intercepta ou modifica transferências de terceiros:
+        \begin{itemize}
+            \tiny
+            \item Outra pessoa está enviando dinheiro do Banco A para uma conta legítima no Banco B.
+            \item A transação deles gera os blocos cifrados originais: Bloco 1º, Bloco 2º, Bloco 3º, Bloco 4º, Bloco 5º.
+            \item O atacante substitui o Bloco 4º (conta de destino legítima) pelo Bloco 4 que ele armazenou antes:
+            \item Ele cria um novo conjunto: Bloco 1º, Bloco 2º, Bloco 3º, Bloco 4 (dele), Bloco 5º.
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB}
+
+\begin{itemize}
+    \item Textos claros idênticos são mapeados para textos cifrados idênticos
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.35\linewidth]{img/ecb_img.png}
+\end{center}
+
+\begin{itemize}
+    \item As propriedades estatísticas do texto claro são preservadas no texto cifrado
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB}
+
+\begin{itemize}
+    \item Textos claros idênticos são mapeados para textos cifrados idênticos
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{img/ecb_img2.png}
+\end{center}
+
+\begin{itemize}
+    \item As propriedades estatísticas do texto claro são preservadas no texto cifrado
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Cipher Block Chaining mode (CBC)}
+\begin{frame}{Modo Cipher Block Chaining (CBC)}
+
+\begin{itemize}
+    \item Há duas ideias principais por trás do modo CBC:
+    \begin{itemize}
+        \item A encriptação de todos os blocos está “encadeada”
+        \begin{itemize}
+            \item o texto cifrado $y_i$ depende não apenas do bloco $x_i$, mas também de todos os blocos de texto claro anteriores
+        \end{itemize}
+        \item A encriptação é randomizada usando um vetor de inicialização (IV)
+    \end{itemize}
+\end{itemize}
+
+\vspace{1em}
+
+\begin{block}{}
+\textbf{Encriptação (primeiro bloco):} $y_1 = e_k(x_1 \oplus IV)$
+
+\textbf{Encriptação (blocos gerais):} $y_i = e_k(x_i \oplus y_{i-1}), \quad i \geq 2$
+
+\textbf{Decriptação (primeiro bloco):} $x_1 = e_k^{-1}(y_1) \oplus IV$
+
+\textbf{Decriptação (blocos gerais):} $x_i = e_k^{-1}(y_i) \oplus y_{i-1}, \quad i \geq 2$
+\end{block}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Modo Cipher Block Chaining (CBC)}
+
+\begin{itemize}
+    \item Para o primeiro bloco de texto claro $x_1$, não existe texto cifrado anterior
+    \begin{itemize}
+        \item um IV é adicionado ao primeiro texto claro para tornar cada encriptação CBC não determinística
+        \item o primeiro texto cifrado $y_1$ depende do texto claro $x_1$ e do IV
+    \end{itemize}
+
+    \item O segundo texto cifrado $y_2$ depende do IV, $x_1$ e $x_2$
+
+    \item O terceiro texto cifrado $y_3$ depende do IV, $x_1$, $x_2$ e $x_3$, e assim por diante
+\end{itemize}
+
+\vspace{1em}
+
+\begin{center}
+    \includegraphics[width=0.75\linewidth]{img/cbc.png}
+\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Ataque de Substituição no CBC}
+
+\begin{itemize}
+    \item Suponha o exemplo anterior (\textit{transferência bancária eletrônica})
+    \item Se o IV for escolhido corretamente para cada transferência, o ataque não funcionará
+    \item Se o IV for mantido o mesmo em várias transferências, o atacante poderá reconhecer as transferências da sua conta no banco A para o banco B
+    \item Se escolhermos um novo IV a cada vez que encriptamos, o modo CBC se torna um esquema de encriptação probabilístico, ou seja, duas encriptações do mesmo texto claro parecerão completamente diferentes
+    \item Não é necessário manter o IV \textit{secreto}!
+    \item Normalmente, o IV deve ser um \textit{nonce} público (valor usado apenas uma vez)
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Output Feedback mode (OFB)}
+\begin{frame}{Modo Output Feedback (OFB)}
+
+\begin{itemize}
+    \item É usado para construir uma \textit{cifra de fluxo síncrona} a partir de uma cifra de bloco
+    \item O \textit{key stream} não é gerado bit a bit, mas sim em blocos
+    \item A saída da cifra nos fornece os bits do \textit{key stream} $S_i$, com os quais podemos encriptar os bits do texto claro usando a operação XOR
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.70\linewidth]{img/ofb.png}
+\end{center}
+\vspace{-1em}
+\begin{block}{}
+\small 
+\textbf{Encriptação (primeiro bloco):} $s_1 = e_k(IV)$ e $y_1 = s_1 \oplus x_1$\\[0.5em]
+\textbf{Encriptação (blocos gerais):} $s_i = e_k(s_{i-1})$ e $y_i = s_i \oplus x_i,\quad i \geq 2$\\[0.5em]
+\textbf{Decriptação (primeiro bloco):} $s_1 = e_k(IV)$ e $x_1 = s_1 \oplus y_1$\\[0.5em]
+\textbf{Decriptação (blocos gerais):} $s_i = e_k(s_{i-1})$ e $x_i = s_i \oplus y_i,\quad i \geq 2$
+\end{block}
+
+\end{frame}
+
+\subsection{Cipher Feedback mode (CFB)}
+\begin{frame}{Modo Cipher Feedback (CFB)}
+\vspace{-0.5em}
+\begin{itemize}
+    \small
+    \item Utiliza uma cifra de bloco como base para construir uma \textit{cifra de fluxo assíncrona} (semelhante ao modo OFB)
+    \item O \textit{key stream} $S_i$ é gerado em blocos e também depende do texto cifrado
+    \item Uso de IV faz a encriptação no modo CFB não determinística
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.75\linewidth]{img/cfb.png}
+\end{center}
+\vspace{-1em}
+\begin{block}{}
+\small
+    \textbf{Encriptação (primeiro bloco):} $y_1 = e_k(IV) \oplus x_1$\\
+    \textbf{Encriptação (blocos gerais):} $y_i = e_k(y_{i-1}) \oplus x_i,\quad i \geq 2$\\
+    \textbf{Decriptação (primeiro bloco):} $x_1 = e_k(IV) \oplus y_1$\\
+    \textbf{Decriptação (blocos gerais):} $x_i = e_k(y_{i-1}) \oplus y_i,\quad i \geq 2$
+\end{block}
+
+\small Pode ser usado em situações onde blocos curtos de texto claro precisam ser encriptados
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Counter mode (CTR)}
+\begin{frame}{Modo Counter (CTR)}
+
+\begin{itemize}
+\small
+    \item Utiliza uma cifra de bloco como uma \textit{cifra de fluxo} (como os modos OFB e CFB)
+    \item O \textit{key stream} é calculado em blocos
+    \item A entrada da cifra de bloco é um contador, que assume um valor diferente a cada vez que a cifra calcula um novo bloco do \textit{key stream}
+\end{itemize}
+\vspace{-0.5em}
+\begin{center}
+    \includegraphics[width=0.4\linewidth]{ctr.png}
+\end{center}
+\vspace{-0.5em}
+\begin{itemize}
+\small
+    \item Diferente dos modos CFB e OFB, o modo CTR pode ser paralelizado, pois a segunda encriptação pode começar antes da primeira terminar
+    \begin{itemize}
+        \item Desejável para implementações de alta velocidade, por exemplo, em roteadores de rede
+    \end{itemize}
+\end{itemize}
+
+\begin{block}{}
+\textbf{Encriptação:} $y_i = e_k(IV \,\|\, CTR_i) \oplus x_i,\quad i \geq 1$\\
+\textbf{Decriptação:} $x_i = e_k(IV \,\|\, CTR_i) \oplus y_i,\quad i \geq 1$
+\end{block}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Galois Counter Mode (GCM)}
+\begin{frame}{Modo Galois Counter (GCM)}
+
+\begin{itemize}
+    \item Também calcula um \textit{código de autenticação de mensagem} (MAC), ou seja, um ``\textit{checksum} criptográfico'' é calculado para uma mensagem
+    
+    \item Ao utilizar o GCM, dois serviços adicionais são fornecidos:
+    \begin{itemize}
+        \item \textbf{Autenticação de Mensagem}
+        \begin{itemize}
+            \item o receptor pode garantir que a mensagem foi realmente criada pelo remetente original
+        \end{itemize}
+        
+        \item \textbf{Integridade da Mensagem}
+        \begin{itemize}
+            \item o receptor pode garantir que ninguém alterou o texto cifrado durante a transmissão
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}{Modo Galois Counter (GCM)}
+
+\begin{itemize}
+    \item \textbf{Para encriptação}
+    \begin{itemize}
+        \item Um contador inicial é derivado de um IV e de um número de série
+        \item O valor inicial do contador é incrementado, então encriptado e aplicado um XOR com o primeiro bloco de texto claro
+        \item Para os textos claros subsequentes, o contador é incrementado e então encriptado
+    \end{itemize}
+
+    \item \textbf{Para autenticação}
+    \begin{itemize}
+        \item É realizada uma multiplicação encadeada no campo de Galois
+        \item Para cada texto claro, é derivado um parâmetro intermediário de autenticação $g_i$
+        \begin{itemize}
+            \item $g_i$ é calculado como o XOR do texto cifrado atual com o último $g_{i-1}$ e multiplicado pela constante $H$
+            \item $H$ é gerado pela encriptação da entrada zero com a cifra de bloco
+        \end{itemize}
+        \item Todas as multiplicações são feitas no campo de Galois de 128 bits $GF(2^{128})$
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Modo Galois Counter (GCM)}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.6\linewidth]{galoismode.png}
+\end{figure}
+\vspace{-1.5em}
+\small\textbf{Encriptação:}
+\begin{itemize}
+\tiny
+    \item Derivar um valor de contador $CTR_0$ a partir do IV e calcular $CTR_1 = CTR_0 + 1$
+    \item Calcular o texto cifrado: $y_i = e_k(CTR_i) \oplus x_i,\quad i \geq 1$
+\end{itemize}
+
+\small\textbf{Autenticação:}
+\begin{itemize}
+    \tiny
+    \item Gerar a subchave de autenticação $H = e_k(0)$
+    \item Calcular $g_0 = AAD \times H \quad$ (multiplicação no campo de Galois)
+    \item Calcular $g_i = (g_{i-1} \oplus y_i) \times H,\quad 1 \leq i \leq n \quad$ (multiplicação no campo de Galois)
+    \item Tag final de autenticação: $T = (g_n \times H) \oplus e_k(CTR_0)$
+\end{itemize}
+
+\end{frame}
+
+\section{Busca Exaustiva de Chave}
+
+\begin{frame}{Busca Exaustiva por Chave Revisitada}
+
+\begin{itemize}
+    \item Uma busca exaustiva simples por uma chave DES conhecendo um par $(x_1, y_1)$:
+    \[
+        DES_{k_i}(x_1)\overset{?}{=} y_1, \quad i = 0, 1, \ldots, 2^{56}-1
+    \]
+    
+    \item No entanto, para a maioria das outras cifras de bloco, a busca por chave é mais complicada
+
+    \item Um ataque de força bruta pode produzir \textit{falsos positivos}
+    \begin{itemize}
+        \item chaves $k_i$ encontradas podem não ser a chave real usada na encriptação
+    \end{itemize}
+    
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{img/keysearch.png}
+    \end{figure}
+    
+    \item A probabilidade disso ocorrer está relacionada ao tamanho relativo entre o espaço de chaves e o espaço de textos claros
+    
+    \item Um ataque de força bruta ainda é \textbf{possível}, mas requer diversos pares de texto claro–texto cifrado
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Um Exemplo de Busca Exaustiva por Chave}
+
+\begin{itemize}
+    \item Suponha uma cifra com largura de bloco de 64 bits e tamanho de chave de 80 bits
+    \item Se encriptarmos $x_1$ com todas as $2^{80}$ chaves possíveis, obtemos $2^{80}$ textos cifrados
+    \begin{itemize}
+        \item No entanto, existem apenas $2^{64}$ possíveis diferentes
+    \end{itemize}
+
+    \item Se testarmos todas as chaves para um par texto claro–texto cifrado, encontramos em média:
+    \[
+    \frac{2^{80}}{2^{64}} = 2^{16} \text{ chaves que realizam o mapeamento } e_k(x_1) = y_1
+    \]
+    \vspace{-0.5em}
+    \item \textbf{Fórmula geral:}
+    \vspace{-0.5em}
+    \begin{block}{}
+    \small Dada uma cifra de bloco com chave de $k$ bits e bloco de $n$ bits, e $t$ pares texto claro–texto cifrado $(x_1, y_1), \ldots, (x_t, y_t)$, o número esperado de \textit{falsas chaves} que cifram todos os textos claros corretamente é: $2^{k - tn}$
+    \end{block}
+
+    \item Neste exemplo, assumindo dois pares texto claro–texto cifrado, a probabilidade de falso positivo é:
+    \[
+    2^{80 - 2 \cdot 64} = 2^{-48}
+    \]
+
+    \begin{itemize}
+        \item Para quase todos os propósitos práticos, dois pares são suficientes
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\section{Aumentando a Segurança das Cifras de Bloco}
+
+\begin{frame}{Aumentando a Segurança de Cifras de Bloco}
+
+\begin{itemize}
+    \item Em algumas situações, desejamos aumentar a segurança de cifras de bloco, por exemplo, se uma cifra como o DES estiver disponível em hardware ou software por motivos de legado em uma aplicação específica
+
+    \item Duas abordagens são possíveis:
+    \begin{itemize}
+        \item \textbf{Múltiplas encriptações}
+        \begin{itemize}
+            \item teoricamente muito mais seguras, mas \textbf{às vezes} na prática aumentam muito pouco a segurança
+        \end{itemize}
+        
+        \item \textbf{Key whitening}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\subsection{Dupla Encriptação e Encontro no Meio do Caminho}
+
+
+\begin{frame}{Dupla Encriptação}
+
+\begin{itemize}
+    \item Um plaintext $x$ é primeiro encriptado com uma chave $k_L$, e o ciphertext resultante é encriptado novamente usando uma segunda chave $k_R$.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{double_encryption.png}
+\end{figure}
+
+\begin{itemize}
+    \item Assumindo um comprimento de chave de $k$ bits, uma busca exaustiva por chaves exigiria 
+    \[
+    2^k \cdot 2^k = 2^{2k}
+    \]
+    encriptações ou decriptações.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Ataque Meet-in-the-Middle (1)}
+
+\begin{itemize}
+    \item Um ataque \textbf{Meet-in-the-Middle} requer:
+    \[
+    2^k + 2^k = 2^{k+1} \text{ operações!}
+    \]
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{meet_in_the_middle.png}
+\end{figure}
+
+\vspace{-0.5em}
+\textbf{Fase I — Exploração da primeira camada de cifra (\(k_L\)):}
+\begin{itemize}
+    \item Para um par conhecido \( (x_1, y_1) \), o atacante testa todas as chaves \(k_{L,i}\), com \( i = 1, 2, \ldots, 2^k \).
+    \item Para cada chave, calcula:
+    \[
+    z_{L,i} = E_{k_{L,i}}(x_1)
+    \]
+    \item Os valores \(z_{L,i}\) e suas chaves associadas são armazenados em uma tabela.
+    \item A tabela é ordenada com base nos valores \(z_{L,i}\), facilitando buscas rápidas.
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}{Ataque Meet-in-the-Middle (2)}
+
+\begin{itemize}
+    \item Um ataque \textbf{Meet-in-the-Middle} requer:
+    \[
+    2^k + 2^k = 2^{k+1} \text{ operações!}
+    \]
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{meet_in_the_middle.png}
+\end{figure}
+
+\vspace{-0.5em}
+\textbf{Fase II — Verificação da segunda camada de cifra (\(k_R\)):}
+\begin{itemize}
+    \item O atacante testa todas as chaves \(k_{R,j}\) possíveis e calcula:
+    \[
+    z_{R,j} = D_{k_{R,j}}(y_1)
+    \]
+    \item Verifica se \(z_{R,j}\) existe na tabela da Fase I.
+    \item Se houver correspondência, o par de chaves \( (k_{L,i}, k_{R,j}) \) é um candidato à chave correta.
+\end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}{Ataque Meet-in-the-Middle (3)}
+    \textbf{Complexidade Computacional:}
+    
+    \begin{center}
+        \fbox{\parbox{0.85\textwidth}{
+        \centering
+        \textbf{número de encriptações e decriptações:} $2^k + 2^k = 2^{k+1}$\\
+        \textbf{número de posições de armazenamento:} $2^k$
+        }}
+    \end{center}
+    
+    \vspace{0.5em}
+    \begin{itemize}
+        \item \alert{Dupla encriptação não é muito mais segura que encriptação simples!}
+    \end{itemize}
+\end{frame}
+
+\subsection{Tripla Encriptação}
+
+\begin{frame}{Triple Encryption}
+  \begin{itemize}
+    \item A \textbf{encriptação de um bloco três vezes}:
+    \begin{center}
+        $y = e_{k_3}\left(e_{k_2}\left(e_{k_1}(x)\right)\right)$
+    \end{center}
+       
+    \item Na prática, uma variante chamada \textbf{EDE} (enc-dec-enc) é frequentemente usada:
+    \begin{center}
+      $y = e_{k_3}\left(e^{-1}_{k_2}\left(e_{k_1}(x)\right)\right)$  
+    \end{center}
+
+    \item \textbf{Vantagem}: escolhendo $k_1 = k_2 = k_3$ realiza apenas uma encriptação simples.
+
+    \item Ainda assim, é possível realizar um \textit{meet-in-the-middle attack}, que reduz o tamanho efetivo da chave da \textit{triple encryption} de $3K$ para $2K$
+
+  \end{itemize}
+  \begin{center}
+    \textbf{Triple encryption efetivamente dobra o tamanho da key}    
+  \end{center}
+  
+\end{frame}
+
+
+\subsection{\textit{Key Whitening}}
+
+\begin{frame}{Key Whitening}
+  \begin{itemize}
+    \item Torna \textit{block ciphers} mais resistentes a ataques de força bruta
+
+    \item Além da \textit{cipher key} regular $k$, duas \textit{whitening keys} $k_1$ e $k_2$ são usadas para aplicar XOR no \textit{plaintext} e no \textit{ciphertext}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{key_whitening.png}
+    \end{figure}
+
+    \item Não fortalece \textit{block ciphers} contra a maioria dos ataques analíticos, como criptoanálise linear e diferencial
+
+    \item Não é uma “cura” para cifradores fracos por natureza
+
+    \item A carga computacional adicional é desprezível
+
+    \item Sua principal aplicação é em cifradores que são relativamente fortes contra ataques analíticos, mas que possuem um espaço de \textit{key} muito pequeno — especialmente o DES
+    \begin{itemize}
+      \item Uma variante do DES que utiliza \textit{key whitening} é chamada \textbf{DESX}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Lições Aprendidas}
+  \begin{itemize}
+    \item Existem várias formas de encriptar com um \textit{block cipher}. Cada modo de operação possui vantagens e desvantagens
+
+    \item Diversos modos transformam um \textit{block cipher} em um \textit{stream cipher}
+
+    \item Há modos que realizam encriptação juntamente com autenticação, isto é, um \textit{checksum} criptográfico protege contra manipulação da mensagem
+
+    \item O modo ECB simples possui vulnerabilidades de segurança, independentemente do qual \textit{block cipher} for utilizada
+
+    \item O modo \textit{counter} permite paralelização da encriptação e, portanto, é adequado para implementações de alta velocidade
+
+    \item Dupla encriptação com um mesmo \textit{block cipher} apenas melhora marginalmente a resistência contra ataques de força bruta
+
+    \item Tripla encriptação com um mesmo \textit{block cipher} aproximadamente \textbf{dobra} o comprimento da \textit{key}
+
+    \item O \textit{key whitening} aumenta o comprimento da \textit{key} do DES sem sobrecarga computacional significativa
+  \end{itemize}
+\end{frame}
+
+\section{Exercícios}
+
+\begin{frame}{Exercício: Modos de Operação com um Cifrador Simples}
+  Considere um \textit{toy block cipher} $e()$ para encriptação de blocos de 5 bits. A função de encriptação é uma permutação de bits, que depende da \textit{key}. Assuma que, para uma dada \textit{key}, a encriptação (permutação) é a seguinte:
+  \[
+    e(b_1 b_2 b_3 b_4 b_5) = (b_2 b_5 b_4 b_1 b_3)
+  \]
+
+  \vspace{0.8em}
+  Encripte a mensagem $x = \texttt{01101 11011 11010 00110}$ utilizando os cinco diferentes modos de operação: ECB, CBC, CFB, OFB e CTR. Forneça os correspondentes \textit{ciphertexts} $y$.
+
+  \vspace{0.8em}
+  Use $IV = \texttt{11001}$ como vetor de inicialização.
+\end{frame}
+
+\begin{frame}{Exercício: Recuperação de Vetor de Inicialização (IV) em AES-CBC}
+  Em uma empresa, todos os arquivos enviados pela rede interna são automaticamente encriptados utilizando AES-128 no modo CBC. Uma \textit{key} fixa é utilizada, e o vetor de inicialização (IV) é alterado uma vez por dia. A encriptação na rede é feita por arquivo, de modo que o IV é utilizado no início de cada arquivo.
+
+  \vspace{0.5em}
+  Ao invadir o sistema, você conseguiu encontrar a \textit{key} fixa do AES-128, mas não conhece o IV atual. Hoje, você conseguiu interceptar dois arquivos diferentes: um com conteúdo desconhecido, e outro conhecido por ser um arquivo temporário gerado automaticamente, contendo apenas o valor $0{\times}\texttt{FF}$.
+
+  \vspace{0.5em}
+  Descreva brevemente como é possível obter o vetor de inicialização desconhecido (IV) e como você pode decifrar o conteúdo do arquivo desconhecido.
+\end{frame}
+
+
+\begin{frame}{Exercício: Reutilização de IV no Modo OFB}
+  O modo OFB (Output Feedback) utiliza o vetor de inicialização (IV) como ponto de partida para gerar a \textit{keystream} usada na encriptação. Se o IV não for diferente a cada execução da operação de encriptação, a segurança do esquema é comprometida.
+
+  \vspace{2.5em}
+  \textbf{Dica}: considere o uso de trechos conhecidos do \textit{plaintext}, como \href{https://en.wikipedia.org/wiki/List_of_file_signatures}{\textit{file signatures} (magic numbers)}.
+\end{frame}
+
+\begin{frame}{Exercício: Tamanho do IV em AES-CTR}
+  Estamos utilizando o AES no modo \textit{counter} (CTR) para encriptar um disco rígido com capacidade de \textbf{1 TB}.
+
+  \vspace{1em}
+  Qual é o comprimento máximo possível do vetor de inicialização (IV), considerando que cada bloco de 16 bytes deve ser encriptado com um valor único de contador?
+\end{frame}
+
+
+
+
+%\section{Aumentando a Segurança Usando Cifras de Bloco}
+
+\end{document}

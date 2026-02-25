@@ -1,0 +1,716 @@
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{booktabs} % Para tabelas com visual profissional
+\usepackage{tabularx} % Para tabelas com largura definida e colunas do tipo X
+
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    %linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Assinatura Digital]{Assinatura Digital}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.84\textwidth}
+    \begin{center}
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue} {\textbf{Assinatura Digital}}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introdução à Assinatura Digital}
+
+\begin{frame}{Motivação}
+    % Nota: Adicionei uma pausa e um bloco de notas para introduzir formalmente
+    % o conceito de "não repúdio", que é o ponto central deste exemplo.
+
+    \begin{itemize}
+        \item Alice encomenda um carro rosa com bancos alaranjados do vendedor Bob.
+        \item Após ver que o carro rosa não combinou com os bancos alaranjados, Alice alega que nunca o encomendou.
+        \item Como Bob pode provar a um juiz que Alice realmente encomendou o carro? (E que ele mesmo não forjou o pedido?)
+    \end{itemize}
+
+    \pause
+
+    \vspace{1em}
+
+    \begin{itemize}
+        \item[$\Rightarrow$] A criptografia simétrica falha porque tanto Alice quanto Bob podem ser maliciosos.
+        \item[$\Rightarrow$] O problema pode ser resolvido com criptografia de chave pública.
+    \end{itemize}
+
+    \pause
+
+    \vspace{1em}
+
+    \begin{block}{Conceito Central}
+        Este cenário ilustra a necessidade de uma propriedade de segurança chamada \textbf{não repúdio} (ou irretratabilidade).
+    \end{block}
+
+\end{frame}
+
+
+
+\begin{frame}{Princípio Básico da Assinatura Digital}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\linewidth]{img/basics_digital_sign.png}
+\end{figure}
+    
+\end{frame}
+
+\begin{frame}{Ideia Principal}
+    \begin{itemize}
+        \item Para uma dada mensagem $x$, uma assinatura digital é anexada à mensagem (de forma análoga a uma assinatura convencional).
+        \item Apenas a pessoa com a \textit{private key} (chave privada) deve ser capaz de gerar a assinatura.
+        \item A assinatura deve ser diferente para cada documento.
+    \end{itemize}
+
+    \vspace{1em}
+
+    \begin{itemize}
+        \item[$\Rightarrow$] A assinatura é gerada por uma função que tem como entradas a mensagem $x$ e a \textit{private key}.
+        \item[$\Rightarrow$] A \textit{public key} (chave pública) e a mensagem $x$ são as entradas para a função de verificação.
+    \end{itemize}
+\end{frame}
+
+
+\section{Serviços de Segurança}
+
+\begin{frame}{Serviços Essenciais de Segurança}
+    
+    \begin{alertblock}{}
+        Os objetivos de um sistema de segurança são chamados de \textit{serviços de segurança}.
+    \end{alertblock}
+
+    \vspace{1em}
+
+    \begin{enumerate}
+        \item<+-> \textbf{Confidencialidade:} Garante que a informação seja acessível apenas por partes autorizadas.
+        
+        \item<+-> \textbf{Integridade:} Garante que a mensagem não foi modificada em trânsito.
+        
+        \item<+-> \textbf{Autenticação de Mensagem:} Garante que o remetente de uma mensagem é autêntico. Um termo alternativo é \textit{autenticação de origem de dados}.
+        
+        \item<+-> \textbf{Não Repúdio (ou Irretratabilidade):} Garante que o remetente de uma mensagem não possa negar a autoria da mesma (vide o exemplo do carro rosa).
+    \end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Serviços de Segurança Adicionais}
+
+    \begin{enumerate}
+        % Continua a numeração do slide anterior
+        \setcounter{enumi}{4} 
+        
+        \item<+-> \textbf{Identificação/Autenticação de Entidade:} Estabelecimento e verificação da identidade de uma entidade (ex: uma pessoa, um computador, um cartão de crédito).
+        
+        \item<+-> \textbf{Controle de Acesso:} Restrição do acesso a recursos apenas para entidades privilegiadas.
+        
+        \item<+-> \textbf{Disponibilidade:} Garantia de que o sistema eletrônico esteja disponível de forma confiável.
+        
+        \item<+-> \textbf{Auditoria:} Fornecimento de evidências sobre atividades relevantes para a segurança, por exemplo, mantendo \textit{logs} sobre certos eventos.
+        
+        \item<+-> \textbf{Segurança Física:} Proteção contra adulteração física e/ou respostas a tentativas de adulteração física.
+        
+        \item<+-> \textbf{Anonimato:} Proteção contra a descoberta e o uso indevido da identidade.
+    \end{enumerate}
+
+\end{frame}
+
+\section{Esquema de Assinatura Digital baseado em RSA}
+
+\begin{frame}{Ideia Principal do Esquema de Assinatura RSA}
+    
+    \textbf{Para gerar a \textit{private key} e a \textit{public key}:}
+    \begin{itemize}
+        \item Usa-se o mesmo processo de geração de chaves da criptografia RSA.
+    \end{itemize}
+
+    \vspace{1em}
+    \pause
+
+    \textbf{Para gerar a assinatura:}
+    \begin{itemize}
+        \item ``Criptografa-se'' a mensagem $x$ com a \textit{private key} $(d, n)$.
+        
+        \begin{alertblock}{}
+            $ s = \text{sig}_{K_{priv}}(x) = x^d \pmod{n} $
+        \end{alertblock}
+        
+        \item Anexa-se a assinatura $s$ à mensagem $x$.
+    \end{itemize}
+
+    \vspace{1em}
+    \pause
+
+    \textbf{Para verificar a assinatura:}
+    \begin{itemize}
+        \item ``Decriptografa-se'' a assinatura $s$ com a \textit{public key} $(e, n)$.
+        
+        \begin{alertblock}{}
+            $ x' = \text{ver}_{K_{pub}}(s) = s^e \pmod{n} $
+        \end{alertblock}
+        
+        \item Se $x = x'$, a assinatura é válida.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{O Protocolo de Assinatura RSA}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{img/rsa_sign.png}
+\end{figure}
+    
+\end{frame}
+
+\begin{frame}{Segurança e Desempenho do Esquema de Assinatura RSA}
+
+    \textbf{Segurança (Recomendações Atuais do NIST):}
+    \begin{itemize}
+        \item A segurança do RSA depende do tamanho em bits do módulo $n$. As recomendações do NIST (SP 800-57) são:
+        \begin{itemize}
+            \item \textbf{Mínimo Aceitável:} Chave de \textbf{2048 bits} para um nível de segurança de 112 bits.
+            \item \textbf{Padrão Recomendado:} Chave de \textbf{3072 bits} para um nível de segurança de 128 bits.
+        \end{itemize}
+        \pause
+        \item[$\Rightarrow$] Consequentemente, a assinatura $s$ terá o mesmo tamanho do módulo $n$ (por exemplo, 2048 ou 3072 bits).
+    \end{itemize}
+
+    \vspace{1em}
+    \pause
+
+    \textbf{Desempenho:}
+    \begin{itemize}
+        \item O processo de assinatura é uma exponenciação com a \textit{private key} ($d$), e a verificação é uma exponenciação com a \textit{public key} ($e$).
+        \item[$\Rightarrow$] A verificação da assinatura é muito eficiente, pois um número pequeno pode ser escolhido para a \textit{public key} (um valor comum é $e=65537$).
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ataque de Falsificação Existencial contra a Assinatura RSA}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1\linewidth]{forgery_rsa_sign.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Falsificação Existencial e Padding}
+    \begin{itemize}
+        \item Um atacante pode gerar pares de mensagem-assinatura $(x,s)$ que são matematicamente válidos.
+        
+        \item Contudo, o atacante só pode escolher a assinatura $s$, e \textbf{NÃO} a mensagem $x$ que resulta dela.
+        \begin{itemize}
+            \item[$\Rightarrow$] Assim, o atacante não consegue forjar uma assinatura para uma mensagem de sua escolha (ex: \textit{``Transferir \$1000 para a conta de Oscar''}).
+        \end{itemize}
+    \end{itemize}
+
+    \pause
+    \vspace{1em}
+
+    \begin{block}{Solução: Esquemas de Padding}
+        Formatar a mensagem $x$ de acordo com um \textbf{esquema de padding} (como o PKCS\#1 v1.5 ou PSS) antes de assinar é a contramedida padrão para este ataque.
+    \end{block}
+    
+    \footnotesize Uma mensagem $x$ gerada pelo atacante a partir de uma assinatura aleatória $s$ terá um formato igualmente aleatório. A probabilidade de que este formato coincida com a estrutura exigida pelo esquema de padding é computacionalmente desprezível.
+\end{frame}
+
+\begin{frame}{Esquemas de Padding: PKCS\#1 v1.5}
+    \frametitle{O Padrão Clássico: PKCS\#1 v1.5}
+    \small
+    Este foi o primeiro padrão amplamente adotado para formatação de mensagens antes da assinatura RSA. Seu objetivo é criar um bloco de dados com uma estrutura fixa e previsível.\\
+    \vspace{-0.1em}
+    \textbf{Estrutura do Bloco a ser Assinado:}\\
+    \vspace{-0.2em}
+    \begin{center}
+    \texttt{\textcolor{red!60!black}{00 01} \textcolor{gray!80!black}{FF FF ... FF} \textcolor{red!60!black}{00} [ASN.1 HASH\_ID] [HASH(M)]}   
+    \end{center}
+    \vspace{-0.3em}
+    
+    \begin{itemize}
+        \item \texttt{\textcolor{red!60!black}{00 01}}: Bytes fixos que indicam o modo de assinatura.
+        \item \texttt{\textcolor{gray!80!black}{FF...FF}}: Uma série de bytes `0xFF` (padding) para preencher o espaço até o tamanho do módulo RSA (ex: 2048 bits).
+        \item \texttt{\textcolor{red!60!black}{00}}: Um byte separador.
+        \item \texttt{[ASN.1 HASH\_ID]}: Um identificador fixo para o algoritmo de hash usado (ex: SHA-256). Previne ataques onde o algoritmo de hash poderia ser trocado.
+        \item \texttt{[HASH(M)]}: O hash da mensagem original.
+    \end{itemize}
+    \textbf{Característica Principal:}\\
+    O processo é \textbf{determinístico}: a mesma mensagem sempre gera o mesmo bloco formatado. É funcional e amplamente compatível, mas considerado legado para novas aplicações.
+\end{frame}
+
+\begin{frame}{Esquemas de Padding: RSA-PSS}
+    \frametitle{O Padrão Moderno e Recomendado: PSS}
+    \small
+    O \textbf{P}robabilistic \textbf{S}ignature \textbf{S}cheme (PSS) foi projetado para ser mais robusto e possui uma prova de segurança formal, sendo a recomendação para todas as novas aplicações.\\
+    \textbf{Ideia Central: Introduzir Aleatoriedade}
+    O PSS utiliza dois componentes chave para tornar o padding não-determinístico:
+    \begin{itemize}
+        \small
+        \item \textbf{Sal (Salt):} Um valor aleatório gerado para cada nova assinatura. Garante que assinar a mesma mensagem duas vezes produza resultados completamente diferentes.
+        \item \textbf{MGF (Mask Generation Function):} Uma função (baseada em hash) que ``embaralha'' os dados, criando um bloco de aparência aleatória e escondendo a estrutura interna.
+    \end{itemize}
+    \textbf{Processo Simplificado:}
+    \texttt{MGF(HASH(M) | RNG Salt)} $\rightarrow$ \textbf{Bloco Final}
+    
+    \begin{alertblock}{Característica Principal}
+        O processo é \textbf{probabilístico}: graças ao ``sal'' aleatório, a mesma mensagem gera um bloco formatado diferente a cada assinatura. Isso elimina diversas vulnerabilidades teóricas.
+    \end{alertblock}
+\end{frame}
+
+
+\section{Digital Signature Algorithm}
+
+\begin{frame}{Fatos sobre o Digital Signature Algorithm (DSA)}
+
+    \begin{itemize}
+        \item<+-> É um padrão do Governo Federal dos EUA para assinaturas digitais, parte do \textbf{Digital Signature Standard (DSS)}.
+            \begin{itemize}
+                \item \footnotesize \textit{Nota: O padrão atual (FIPS 186-5) \textbf{descontinuou} a geração de novas assinaturas com DSA após 2023. A verificação ainda é permitida para legado.}
+            \end{itemize}
+        
+        \item<+-> Foi proposto pelo NIST (\textit{National Institute of Standards and Technology}).
+        
+        \item<+-> É baseado no esquema de assinatura ElGamal, que por sua vez depende da dificuldade do problema do logaritmo discreto.
+        
+        \item<+-> O tamanho da assinatura era de 320 bits em versões mais antigas do padrão.
+            \begin{itemize}
+                \item \footnotesize \textcolor{blue!80!black}{No padrão atual, os tamanhos são de \textbf{448 ou 512 bits}.}
+            \end{itemize}
+
+        \item<+-> A verificação da assinatura é geralmente mais lenta que a do RSA (especialmente quando o RSA usa um expoente público pequeno, como $e=65537$).
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Lições Aprendidas e Conclusões}
+
+    \begin{itemize}
+        \item<+-> Assinaturas digitais fornecem três serviços de segurança essenciais: \textbf{integridade}, \textbf{autenticação de mensagem} e \textbf{não repúdio}.
+        
+        \item<+-> Embora o RSA ainda seja amplamente utilizado, o \textbf{ECDSA (Elliptic Curve DSA)} tornou-se o padrão para a maioria das novas aplicações (web, blockchain, etc.) por oferecer a mesma segurança com chaves muito menores e mais eficientes.
+        
+        \item<+-> Os principais algoritmos de assinatura hoje são:
+            \begin{itemize}
+                \item \textbf{ECDSA}: O mais estabelecido e popular atualmente.
+                \item \textbf{EdDSA} (ex: Ed25519): Um algoritmo mais moderno, projetado para ser seguro, rápido e mais simples de implementar corretamente.
+                \item \textbf{DSA}: Um algoritmo legado, já descontinuado pelo NIST para novas implementações.
+            \end{itemize}
+        
+        \item<+-> No RSA, a \textbf{verificação} é computacionalmente mais rápida que a \textbf{assinatura}, pois o expoente público $e$ pode ser um número pequeno.
+        
+    \end{itemize}
+
+\end{frame}
+
+\section{ML-DSA}
+
+\begin{frame}{O Próximo Desafio: A Ameaça Quântica}
+    \frametitle{Introdução à Criptografia Pós-Quântica (PQC)}
+
+    \begin{itemize}
+        \item Os algoritmos que usamos hoje (RSA, ECDSA, DSA) baseiam-se em problemas matemáticos que seriam facilmente resolvidos por um computador quântico em larga escala.
+            \begin{itemize}
+                \item \textbf{Algoritmo de Shor:} Quebra o RSA e o ECDSA ao resolver a fatoração de inteiros e o logaritmo discreto de forma eficiente.
+            \end{itemize}
+        \vspace{1em}
+        \item A \textbf{Criptografia Pós-Quântica (PQC)} desenvolve novos algoritmos resistentes a ataques de computadores clássicos \textbf{e} quânticos.
+        \vspace{1em}
+        \item Em 2022, o NIST selecionou os primeiros algoritmos para padronização, incluindo:
+            \begin{itemize}
+                \item \textbf{ML-KEM (CRYSTALS-Kyber):} Para troca de chaves.
+                \item \textbf{ML-DSA (CRYSTALS-Dilithium):} Para assinaturas digitais.
+            \end{itemize}
+    \end{itemize}
+    
+    \vfill
+    \begin{alertblock}{O Lema da PQC}
+        Migre hoje, para não ter seus dados decifrados amanhã. (Harvest now, decrypt later)
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{O Novo Padrão: ML-DSA}
+    \frametitle{O que é o ML-DSA (CRYSTALS-Dilithium)?}
+    
+    \begin{itemize}
+        \item \textbf{ML-DSA} significa \textit{Module-Lattice-based Digital Signature Algorithm}.
+        \vspace{1em}
+        \item É o algoritmo de assinatura digital selecionado pelo NIST e padronizado no documento \textbf{FIPS 204}.
+        \vspace{1em}
+        \item Sua segurança não se baseia em fatoração ou logaritmos, mas sim na dificuldade de problemas em estruturas matemáticas chamadas \textbf{reticulados sobre módulos} (\textit{module lattices}).
+            \begin{itemize}
+                \item Problemas como o \textit{Shortest Vector Problem} (SVP) e \textit{Learning With Errors} (LWE) são considerados difíceis até mesmo para computadores quânticos.
+            \end{itemize}
+        \vspace{1em}
+        \item A ideia central é que o signatário prova conhecer uma informação secreta (um conjunto de vetores ``curtos'' em um reticulado), sem revelar essa informação.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Como o ML-DSA Funciona (Visão Geral)}
+
+    \textbf{1. Geração de Chaves:}
+    \begin{itemize}
+        \small
+        \item Gera-se uma grande matriz pública $\mathbf{A}$ e dois vetores secretos e ``curtos'' $\mathbf{s}_1, \mathbf{s}_2$ (a chave privada).
+        \item A chave pública é a matriz $\mathbf{A}$ e o vetor $\mathbf{t} = \mathbf{A}\mathbf{s}_1 + \mathbf{s}_2$.
+    \end{itemize}
+    \pause
+    
+    \textbf{2. Assinatura:}
+    \begin{itemize}
+        \small
+        \item Usa uma técnica chamada \textit{Fiat-Shamir with Aborts}.
+        \item O signatário gera um vetor aleatório (``máscara''), cria um ``compromisso'' público, e então usa um hash da mensagem e do compromisso para construir uma resposta.
+        \item A resposta (a assinatura) esconde a chave privada $\mathbf{s}_1, \mathbf{s}_2$, mas prova que o signatário a conhece. O processo pode ``abortar'' e recomeçar para evitar qualquer vazamento de informação.
+    \end{itemize}
+    \pause
+
+    \textbf{3. Verificação:}
+    \begin{itemize}
+        \small
+        \item O verificador usa a chave pública $(\mathbf{A}, \mathbf{t})$ e a assinatura para recalcular o ``compromisso''.
+        \item Se o valor recalculado corresponder ao que está na assinatura e a assinatura for ``curta'' o suficiente, ela é considerada válida.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{ML-DSA vs. Padrões Atuais: Trade-offs}
+    Comparação aproximada para nível de segurança de 128 bits.
+    \vspace{-0.5em}
+    \begin{table}[]
+        \centering
+        \resizebox{\textwidth}{!}{%
+            \renewcommand{\arraystretch}{1.5}
+            \begin{tabular}{|l|c|c|c|}
+                \hline
+                \textbf{Parâmetro} & \textbf{RSA-3072} & \textbf{ECDSA (P-256)} & \textbf{ML-DSA-2} \\ \hline
+                \textbf{Segurança Quântica} & \textcolor{red!80!black}{Não} & \textcolor{red!80!black}{Não} & \textcolor{green!70!black}{Sim} \\ \hline
+                Tam. Chave Pública & $\approx 384$ bytes & $\approx 64$ bytes & $\approx 1312$ bytes \\ \hline
+                Tam. da Assinatura & $\approx 384$ bytes & $\approx 64$ bytes & $\approx 2420$ bytes \\ \hline
+                Velocidade (Assinar) & Lenta & Rápida & \textbf{Muito Rápida} \\ \hline
+                Velocidade (Verificar) & \textbf{Muito Rápida} & Rápida & Rápida \\ \hline
+            \end{tabular}%
+        } % --- Fim do resizebox ---
+    \end{table}
+    
+    \vfill
+    \begin{alertblock}{Principal Conclusão}
+        ML-DSA oferece segurança quântica ao custo de chaves e assinaturas consideravelmente maiores que as do ECDSA, mas com excelente performance de assinatura.
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Exemplo Simplificado: ML-DSA}
+    \frametitle{Parte 1: Geração de Chaves}
+
+    \begin{columns}[T] % O [T] alinha as colunas pelo topo
+        
+        \begin{column}{0.35\textwidth}
+            \textbf{1. Parâmetros Públicos}
+            \vspace{1em}
+            
+            Definimos um módulo primo $q=17$ e uma matriz pública $\mathbf{A}$:
+            $$ \mathbf{A} = \begin{pmatrix} 10 & 3 \\ 5 & 9 \end{pmatrix} $$
+            
+            \vspace{1em}
+            \footnotesize{\textit{(Nota: No ML-DSA real, estes seriam objetos matemáticos mais complexos, como polinômios.)}}
+        \end{column}
+        
+        \begin{column}{0.65\textwidth}
+            \textbf{2. Geração de Chaves (Bob)}
+            \vspace{1em}
+            
+            Bob gera sua chave privada, um vetor $\mathbf{s}$ com componentes "pequenos":
+            $$ \mathbf{s} = \begin{pmatrix} 2 \\ -1 \end{pmatrix} $$
+            
+            \pause
+            Ele então calcula o vetor $\mathbf{t} = \mathbf{A}\mathbf{s} \pmod{q}$ para obter o restante de sua chave pública:
+            $$ \mathbf{t} = \begin{pmatrix} 10 & 3 \\ 5 & 9 \end{pmatrix} \begin{pmatrix} 2 \\ -1 \end{pmatrix} = \begin{pmatrix} 17 \\ 1 \end{pmatrix} \equiv \begin{pmatrix} 0 \\ 1 \end{pmatrix} \pmod{17} $$
+            
+        \end{column}
+        
+    \end{columns}
+    \pause
+    \vspace{1em}
+    \textbf{Chaves Finais:}
+    \begin{itemize}
+        \item \textbf{Pública:} $(\mathbf{A}, \mathbf{t})$
+        \item \textbf{Privada:} $\mathbf{s}$
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo Simplificado: ML-DSA}
+    \frametitle{Parte 2: Geração da Assinatura}
+    
+    Bob quer assinar uma mensagem $M$. Suponha que o hash da mensagem seja $H(M)=13$.
+
+    \begin{enumerate}
+        \small
+        \item<+-> \textbf{Gerar vetor efêmero:} Bob cria um vetor aleatório ``curto'' $\mathbf{y}$, que será usado apenas para esta assinatura.
+        $$ \mathbf{y} = \begin{pmatrix} 1 \\ 2 \end{pmatrix} $$
+        
+        \item<+-> \textbf{Calcular o ``compromisso'':} Bob calcula $\mathbf{w} = \mathbf{A}\mathbf{y} \pmod q$.
+        $$ \mathbf{w} = \begin{pmatrix} 10 & 3 \\ 5 & 9 \end{pmatrix} \begin{pmatrix} 1 \\ 2 \end{pmatrix} = \begin{pmatrix} 16 \\ 23 \end{pmatrix} \equiv \begin{pmatrix} 16 \\ 6 \end{pmatrix} \pmod{17} $$
+        
+        \item<+-> \textbf{Calcular o ``desafio'':} O desafio $c$ é um hash da mensagem junto com o compromisso $\mathbf{w}$.
+        $$ c = H(M \,||\, \mathbf{w}) = H(13\_16\_6) \rightarrow \text{Suponha que } c=3 $$
+        
+        \item<+-> \textbf{Construir a assinatura:} Bob calcula o vetor $\mathbf{z} = \mathbf{y} + c \cdot \mathbf{s} \pmod q$.
+        $$ \mathbf{z} = \begin{pmatrix} 1 \\ 2 \end{pmatrix} + 3 \cdot \begin{pmatrix} 2 \\ -1 \end{pmatrix} = \begin{pmatrix} 1 \\ 2 \end{pmatrix} + \begin{pmatrix} 6 \\ -3 \end{pmatrix} = \begin{pmatrix} 7 \\ -1 \end{pmatrix} \equiv \begin{pmatrix} 7 \\ 16 \end{pmatrix} \pmod{17} $$
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Conteúdo Público:}
+    \textbf{Mensagem: }$M$\\
+    \vspace{1em}
+    \textbf{Chaves Pública:} $(\mathbf{A}, \mathbf{t}) = (\begin{pmatrix} 10 & 3 \\ 5 & 9 \end{pmatrix}, \begin{pmatrix} 0 \\ 1 \end{pmatrix})$ \\ 
+    \vspace{1em}
+    \textbf{Assinatura Final:} $(c, \mathbf{z}) = (3, \begin{pmatrix} 7 \\ 16 \end{pmatrix})$.
+\end{frame}
+
+\begin{frame}{Exemplo Simplificado: ML-DSA}
+    \frametitle{Parte 3: Verificação da Assinatura}
+       
+    Para validar, Alice precisa verificar se Bob realmente usou a chave secreta $\mathbf{s}$ dele. Ela faz isso recalculando o compromisso $\mathbf{w}$ e checando se o hash bate com o $c$ recebido.
+    \begin{enumerate}
+        \item<+-> Alice calcula $\mathbf{w'} = \mathbf{A}\mathbf{z} - \mathbf{t}c \pmod q$.
+        
+        \item<+-> Primeiro, $\mathbf{A}\mathbf{z}$:
+        $ \mathbf{A}\mathbf{z} = \begin{pmatrix} 10 & 3 \\ 5 & 9 \end{pmatrix} \begin{pmatrix} 7 \\ 16 \end{pmatrix} = \begin{pmatrix} 118 \\ 179 \end{pmatrix} \equiv \begin{pmatrix} 16 \\ 9 \end{pmatrix} \pmod{17} $
+        
+        \item<+-> Depois, $\mathbf{t}c$:
+        $ \mathbf{t}c = \begin{pmatrix} 0 \\ 1 \end{pmatrix} \cdot 3 = \begin{pmatrix} 0 \\ 3 \end{pmatrix} \pmod{17} $
+        
+        \item<+-> Subtração para encontrar $\mathbf{w'}$:
+        $ \mathbf{w'} = \begin{pmatrix} 16 \\ 9 \end{pmatrix} - \begin{pmatrix} 0 \\ 3 \end{pmatrix} = \begin{pmatrix} 16 \\ 6 \end{pmatrix} \pmod{17} $
+        
+        \item<+-> \textbf{Verificação final:} Alice verifica se $c$ é igual ao \textit{hash} da mensagem com o $\mathbf{w'}$ que ela acabou de calcular.
+        \begin{center}
+            $ c \stackrel{?}{=} H(M \,||\, \mathbf{w'}) \rightarrow H(13\_16\_6) \rightarrow 3 $    
+        \end{center}
+               
+    \end{enumerate}
+    \pause
+    \begin{center}
+        \huge \textcolor{green!70!black}{Assinatura Válida!}
+    \end{center}
+\end{frame}
+
+\begin{frame}{Aspectos Práticos: O Polinômio}
+    \frametitle{Do Exemplo à Realidade: O Bloco de Construção}
+
+    No nosso exemplo, usamos inteiros simples. Na realidade, o ML-DSA opera sobre \textbf{polinômios}.
+    \vfill
+    \begin{itemize}
+        \item Um polinômio no ML-DSA tem 256 coeficientes:
+        $$ p(X) = a_{255}X^{255} + a_{254}X^{254} + \dots + a_1X + a_0 $$
+        
+        \item Cada coeficiente $a_i$ é um número inteiro módulo $q$, onde $q$ é um primo grande de 23 bits ($q = 8380417$).
+    \end{itemize}
+    \vfill
+    \pause
+    
+    \textbf{Como armazenar um polinômio em um computador?}
+    \begin{itemize}
+        \item De forma muito simples: como uma lista (ou array) de seus 256 coeficientes.
+    \end{itemize}
+    
+    \begin{center}
+    \large
+    $p(X) \quad \longrightarrow \quad [a_0, a_1, a_2, \dots, a_{255}]$
+    \end{center}
+    
+    \vfill
+    \begin{alertblock}{Ideia Central}
+        Todas as estruturas do ML-DSA (vetores e matrizes) são, na verdade, vetores e matrizes \textbf{de polinômios}.
+    \end{alertblock}
+\end{frame}
+
+\begin{frame}{Aspectos Práticos: O Tamanho Real}
+    \frametitle{Juntando as Peças: Matrizes de Polinômios}
+
+    Vamos usar o \textbf{ML-DSA-2} (Nível de Segurança 2 do NIST) como exemplo concreto.
+
+    \begin{itemize}
+        \item \textbf{A Matriz Pública $\mathbf{A}$:}
+            \begin{itemize}
+                \item No nosso exemplo, $\mathbf{A}$ era uma matriz 2x2 de inteiros.
+                \item No ML-DSA-2, $\mathbf{A}$ é uma matriz \textbf{4x4 de polinômios}.
+                \item \textbf{Tamanho total de $\mathbf{A}$:} $4 \times 4 = 16$ polinômios. Cada um com 256 coeficientes. São $16 \times 256 = 4096$ coeficientes no total!
+            \end{itemize}
+        \vspace{1em}
+        \item \textbf{Chaves e Assinatura:}
+            \begin{itemize}
+                \item A chave privada $\mathbf{s}$ e a pública $\mathbf{t}$ são \textbf{vetores de polinômios}.
+                \item A assinatura $\mathbf{z}$ também é um vetor de polinômios.
+            \end{itemize}
+    \end{itemize}
+    
+\end{frame}
+
+\begin{frame}{Aspectos Práticos: O Tamanho Real}
+    \begin{alertblock}{Compressão é a Chave!}
+        Os tamanhos finais em bytes são menores do que a matemática bruta sugere. O padrão usa técnicas de compressão inteligentes (descartando bits menos significativos) para reduzir o tamanho da chave pública e da assinatura.
+    \end{alertblock}
+
+    \begin{table}
+    \centering
+    \caption{Tamanhos Finais em Bytes (ML-DSA-2)}
+        \resizebox{0.8\textwidth}{!}{%
+            \renewcommand{\arraystretch}{1.4}
+            \begin{tabular}{|l|c|c|c|}
+            \hline
+            & \textbf{ECDSA (P-256)} & \textbf{ML-DSA-2} & \textbf{Diferença} \\ \hline
+            Tam. Chave Pública & 64 bytes & 1312 bytes & \textbf{20x Maior} \\ \hline
+            Tam. da Assinatura & 64 bytes & 2420 bytes & \textbf{37x Maior} \\ \hline
+            \end{tabular}%
+        }
+    \end{table}
+\end{frame}
+
+\section{Exercícios}
+
+\begin{frame}{Exercício: Serviços de Segurança}
+    \textbf{1)} Neste problema, consideramos alguns aspectos básicos dos serviços de segurança. Justifique todas as suas respostas.
+
+    \begin{enumerate}
+        \item Afirma-se que a autenticação do remetente (ou da mensagem) sempre implica em integridade dos dados. Por quê? A recíproca é verdadeira, ou seja, a integridade dos dados sempre implica em autenticação do remetente?
+        \vspace{1em}
+        \item A confidencialidade sempre garante a integridade?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solução: Serviços de Segurança}
+    \begin{enumerate}
+        \item \textbf{Autenticação implica em Integridade, mas o contrário não é verdadeiro.}
+        \begin{itemize}
+            \item \textbf{Por que sim?} A autenticação cria um ``selo'' criptográfico (MAC ou assinatura) que depende da chave secreta do remetente \textbf{e} do conteúdo exato da mensagem. Se a mensagem for alterada, o selo se quebra e a verificação falha, garantindo assim a integridade.
+            \item \textbf{Por que não o contrário?} Um mecanismo de integridade puro (como um Checksum/CRC) não usa segredos. Qualquer um, incluindo um invasor, pode criar um checksum válido para uma mensagem adulterada. Portanto, ele não prova quem enviou a mensagem.
+        \end{itemize}
+        \item \textbf{Não, confidencialidade não garante integridade.}
+        \begin{itemize}
+            \item A confidencialidade esconde o conteúdo da mensagem, mas não impede que ela seja alterada. Um invasor pode interceptar um texto cifrado e modificar alguns de seus bits. O destinatário, ao decifrar, obterá um texto simples corrompido e sem sentido, mas não terá um mecanismo para detectar que a alteração ocorreu. Alguns modos de operação de cifras de bloco (como o CBC) são vulneráveis a ataques de ``bit-flipping'' que exploram exatamente isso.
+        \end{itemize}
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exercício: Esquema de Assinatura RSA}
+    \textbf{2)} Neste problema, analisamos o esquema de assinatura RSA.
+
+    \begin{enumerate}
+        \item Calcule a assinatura RSA para a mensagem $x = 1234$ e o módulo $n = 11111$. Escolha o menor valor possível para o expoente $e$.
+        \vspace{1em}
+        \item Qual é o benefício de escolher um expoente público $e$ pequeno? Justifique sua resposta!
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Solução: Esquema de Assinatura RSA}
+    \scriptsize
+    \textbf{Cálculo da Assinatura RSA:}
+    \begin{itemize}
+        \item \textbf{Passo 1: Fatorar $n$ e calcular $\phi(n)$.} \\
+        $n = 11111 = 41 \cdot 271$. Ambos são primos. \\
+        $\phi(n) = (p-1)(q-1) = (40)(270) = 10800$.
+        \item \textbf{Passo 2: Encontrar o menor expoente $e$.} \\
+        $e$ deve ser um primo relativo a $\phi(n) = 10800$. O menor inteiro $e > 1$ que não divide $10800$ é $e=7$.
+        \item \textbf{Passo 3: Calcular a chave privada $d$.} \\
+        $d \equiv e^{-1} \pmod{\phi(n)} \rightarrow d \equiv 7^{-1} \pmod{10800}$. \\
+        Usando o Algoritmo Estendido de Euclides, encontramos $d = 1543$.
+        \item \textbf{Passo 4: Assinar a mensagem.} \\
+        A assinatura $s$ é calculada como $s \equiv x^d \pmod n$. \\
+        $s \equiv 1234^{1543} \pmod{11111}$. \\
+        Calculando a exponenciação modular, obtemos $s = 8182$.
+    \end{itemize}
+        
+    \textbf{Benefício de um expoente $e$ pequeno:}
+    \begin{itemize}
+        \item A principal vantagem é a \textbf{eficiência na verificação da assinatura}. A verificação requer o cálculo de $s^e \pmod n$. Se $e$ for um número pequeno (como 3, 7 ou 65537), esta exponenciação é extremamente rápida, pois envolve poucas multiplicações. Isso é ideal para dispositivos com pouca capacidade de processamento (como smart cards) ou para servidores que precisam verificar milhares de assinaturas por segundo.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Exercício: Verificação de Assinaturas RSA}
+    \textbf{3)} Dado um esquema de assinatura RSA com a chave pública $(n = 9797, e = 131)$, quais das seguintes assinaturas são válidas?
+
+    \begin{itemize}
+        \item 1. $(x = 123, \text{sig}(x) = 6292)$
+        \vspace{1em}
+        \item 2. $(x = 4333, \text{sig}(x) = 4768)$
+        \vspace{1em}
+        \item 3. $(x = 4333, \text{sig}(x) = 1424)$
+    \end{itemize}
+\end{frame}
+
+\end{document}
