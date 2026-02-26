@@ -429,29 +429,28 @@ const typeLabels: Record<string, string> = {
   .activity-evento .activity-badge { background: #7c3aed; }
 
   /* ── Row type colours — dark theme ──────────────────────────────────── */
-  /* Amber — clearly distinguishable against #0f172a */
-  [data-theme="dark"] .activity-exam td { background: #2d2200; }
-  [data-theme="dark"] .activity-exam .activity-badge { background: #b45309; }
+  /* :global() prevents Astro from adding the component scope hash to the
+     [data-theme="dark"] selector (which lives on <html>, not in this component).
+     Without it, Astro generates [data-theme="dark"][data-astro-cid-xxx] which
+     never matches, so dark overrides are silently ignored. */
 
-  /* Orange */
-  [data-theme="dark"] .activity-sub td { background: #2d1800; }
-  [data-theme="dark"] .activity-sub .activity-badge { background: #9a3412; }
+  :global([data-theme="dark"]) .activity-exam    td { background: #2d2200; }
+  :global([data-theme="dark"]) .activity-exam    .activity-badge { background: #b45309; }
 
-  /* Rose/red */
-  [data-theme="dark"] .activity-g2 td { background: #2d0016; }
-  [data-theme="dark"] .activity-g2 .activity-badge { background: #9f1239; }
+  :global([data-theme="dark"]) .activity-sub     td { background: #2d1800; }
+  :global([data-theme="dark"]) .activity-sub     .activity-badge { background: #9a3412; }
 
-  /* Yellow — work */
-  [data-theme="dark"] .activity-trabalho td { background: #2d2800; }
-  [data-theme="dark"] .activity-trabalho .activity-badge { background: #a16207; }
+  :global([data-theme="dark"]) .activity-g2      td { background: #2d0016; }
+  :global([data-theme="dark"]) .activity-g2      .activity-badge { background: #9f1239; }
 
-  /* Salmon — holiday */
-  [data-theme="dark"] .activity-feriado td { background: #2d1400; }
-  [data-theme="dark"] .activity-feriado .activity-badge { background: #c2410c; }
+  :global([data-theme="dark"]) .activity-trabalho td { background: #2d2800; }
+  :global([data-theme="dark"]) .activity-trabalho .activity-badge { background: #a16207; }
 
-  /* Indigo/purple — academic event */
-  [data-theme="dark"] .activity-evento td { background: #1e1040; }
-  [data-theme="dark"] .activity-evento .activity-badge { background: #6d28d9; }
+  :global([data-theme="dark"]) .activity-feriado  td { background: #2d1400; }
+  :global([data-theme="dark"]) .activity-feriado  .activity-badge { background: #c2410c; }
+
+  :global([data-theme="dark"]) .activity-evento   td { background: #1e1040; }
+  :global([data-theme="dark"]) .activity-evento   .activity-badge { background: #6d28d9; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }
