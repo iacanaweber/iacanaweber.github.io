@@ -1,7 +1,6 @@
 ---
 import CourseLayout from '../../../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url } from '../../../utils/helpers';
 import { fetchSchedule } from '../../../utils/parseSchedule';
 import type { GetStaticPaths } from 'astro';
 
@@ -27,37 +26,74 @@ if (hasSchedule) {
   defaultRoom = result.defaultRoom;
 }
 
-// Load all resources for this course from the content collection
+// Load all resources for this course
 const allResources = await getCollection('resources', ({ data }) => data.course === course.slug);
 
-// Resources linked to a specific class (appear in the schedule table)
-const resourcesByClass = allResources.reduce((acc, r) => {
-  if (r.data.class != null) {
-    const key = r.data.class;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(r);
+// General resources (no class) → collapsible section
+const generalResources = allResources
+  .filter(r => r.data.class == null)
+  .sort((a, b) => a.data.order - b.data.order);
+
+// ── Rowspan pre-processing ──────────────────────────────────────────────────
+type Column = 'materiais' | 'exercicios' | 'extra';
+
+function defaultColumn(type: string): Column {
+  if (['slides', 'pdf', 'link'].includes(type)) return 'materiais';
+  return 'extra';
+}
+
+function parseClassRange(val: string | number): { from: number; to: number } {
+  const s = String(val);
+  const parts = s.split('-').map(p => parseInt(p.trim(), 10));
+  if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+    return { from: Math.min(parts[0], parts[1]), to: Math.max(parts[0], parts[1]) };
   }
-  return acc;
-}, {} as Record<number, typeof allResources>);
+  const n = parseInt(s, 10);
+  return { from: n, to: n };
+}
 
-// General resources (no class association — appear on the Resources tab)
-const generalResources = allResources.filter(r => r.data.class == null);
+interface CellData {
+  resources: typeof allResources;
+  rowspan: number;
+  skip: boolean;
+}
 
-// --- Overview mode (no schedule URL) ---
-const notes = await getCollection('notes', ({ data }) => data.course === course.slug && !data.draft);
-const exercises = await getCollection('exercises', ({ data }) => data.course === course.slug && !data.draft);
-const homework = await getCollection('homework', ({ data }) => data.course === course.slug && !data.draft);
-const tests = await getCollection('tests', ({ data }) => data.course === course.slug && !data.draft);
+const cellMap = new Map<string, CellData>();
 
-const sections = [
-  { key: 'notes', count: notes.length },
-  { key: 'exercises', count: exercises.length },
-  { key: 'homework', count: homework.length },
-  { key: 'tests', count: tests.length },
-  { key: 'resources', count: generalResources.length },
-];
+for (const r of allResources) {
+  if (r.data.class == null) continue;
+  const col: Column = (r.data.column as Column | undefined) ?? defaultColumn(r.data.type);
+  const { from, to } = parseClassRange(r.data.class as string | number);
 
-// Activity type → CSS class
+  const startKey = `${from}:${col}`;
+  if (!cellMap.has(startKey)) {
+    cellMap.set(startKey, { resources: [], rowspan: to - from + 1, skip: false });
+  }
+  const cell = cellMap.get(startKey)!;
+  cell.resources.push(r);
+  cell.rowspan = Math.max(cell.rowspan, to - from + 1);
+
+  for (let c = from + 1; c <= to; c++) {
+    const skipKey = `${c}:${col}`;
+    if (!cellMap.has(skipKey)) {
+      cellMap.set(skipKey, { resources: [], rowspan: 1, skip: true });
+    }
+  }
+}
+
+// Sort resources inside each cell by order
+for (const cell of cellMap.values()) {
+  cell.resources.sort((a, b) => a.data.order - b.data.order);
+}
+
+// Group general resources by type (for the collapsible Recursos section)
+const generalResourcesByType: Record<string, typeof generalResources> = {};
+for (const r of generalResources) {
+  if (!generalResourcesByType[r.data.type]) generalResourcesByType[r.data.type] = [];
+  generalResourcesByType[r.data.type].push(r);
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
 function activityClass(activity: string): string {
   const a = activity.toLowerCase();
   if (a.includes('g2')) return 'activity-g2';
@@ -66,7 +102,6 @@ function activityClass(activity: string): string {
   return 'activity-class';
 }
 
-// Day abbreviation → short label
 function dayLabel(abbr: string): string {
   const map: Record<string, string> = {
     SEG: 'Seg', TER: 'Ter', QUA: 'Qua', QUI: 'Qui',
@@ -75,16 +110,27 @@ function dayLabel(abbr: string): string {
   return map[abbr.toUpperCase()] ?? abbr;
 }
 
-// "30/07/2025" → "30/07"
 function shortDate(date: string): string {
   const parts = date.split('/');
   return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : date;
 }
 
-// Resolve the href for a resource (pdfPath takes priority over url)
 function resourceHref(r: (typeof allResources)[number]): string {
   return r.data.pdfPath ?? r.data.url ?? '#';
 }
+
+const COLUMNS: Column[] = ['materiais', 'exercicios', 'extra'];
+const COL_LABELS: Record<Column, string> = {
+  materiais: 'Materiais',
+  exercicios: 'Exercícios',
+  extra: 'Extra',
+};
+
+// Type label mapping for resource types
+const typeLabels: Record<string, string> = {
+  book: 'Livros', tool: 'Ferramentas', link: 'Links',
+  video: 'Vídeos', slides: 'Slides', pdf: 'PDFs', other: 'Outros',
+};
 ---
 
 <CourseLayout
@@ -102,24 +148,43 @@ function resourceHref(r: (typeof allResources)[number]): string {
   </p>
 
   {hasSchedule ? (
-    <!-- Schedule-first layout -->
     <div class="schedule-view">
 
       {course.data.objectives && course.data.objectives.length > 0 && (
         <details class="collapsible-section">
           <summary>Objetivos da disciplina</summary>
-          <ul>
-            {course.data.objectives.map(obj => <li>{obj}</li>)}
-          </ul>
+          <ul>{course.data.objectives.map(obj => <li>{obj}</li>)}</ul>
         </details>
       )}
 
       {course.data.bibliography && course.data.bibliography.length > 0 && (
         <details class="collapsible-section">
           <summary>Bibliografia</summary>
-          <ul>
-            {course.data.bibliography.map(book => <li>{book}</li>)}
-          </ul>
+          <ul>{course.data.bibliography.map(b => <li>{b}</li>)}</ul>
+        </details>
+      )}
+
+      {generalResources.length > 0 && (
+        <details class="collapsible-section">
+          <summary>Recursos</summary>
+          {Object.entries(generalResourcesByType).map(([type, items]) => (
+            <div class="resource-group">
+              <h4>{typeLabels[type] ?? type}</h4>
+              <ul>
+                {items.map(r => {
+                  const href = r.data.pdfPath ?? r.data.url;
+                  return (
+                    <li>
+                      {href
+                        ? <a href={href} target="_blank" rel="noopener">{r.data.title}</a>
+                        : r.data.title}
+                      {r.data.description && <span class="res-desc"> — {r.data.description}</span>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </details>
       )}
 
@@ -136,12 +201,11 @@ function resourceHref(r: (typeof allResources)[number]): string {
                 <th class="col-date">Data</th>
                 <th class="col-topic">Tópico</th>
                 <th class="col-room">Sala</th>
-                <th class="col-materials">Materiais</th>
+                {COLUMNS.map(col => <th class={`col-${col}`}>{COL_LABELS[col]}</th>)}
               </tr>
             </thead>
             <tbody>
               {scheduleEntries.map(entry => {
-                const classResources = resourcesByClass[entry.number] ?? [];
                 const room = entry.resources || defaultRoom || '—';
                 const aClass = activityClass(entry.activity);
                 return (
@@ -158,24 +222,32 @@ function resourceHref(r: (typeof allResources)[number]): string {
                       )}
                     </td>
                     <td class="col-room">{room}</td>
-                    <td class="col-materials">
-                      {classResources.length > 0 && (
-                        <div class="material-links">
-                          {classResources
-                            .sort((a, b) => a.data.order - b.data.order)
-                            .map(r => (
-                              <a
-                                href={resourceHref(r)}
-                                class={`material-link type-${r.data.type}`}
-                                target={r.data.pdfPath ? '_blank' : '_blank'}
-                                rel="noopener"
-                              >
-                                {r.data.title}
-                              </a>
-                            ))}
-                        </div>
-                      )}
-                    </td>
+                    {COLUMNS.map(col => {
+                      const key = `${entry.number}:${col}`;
+                      const cell = cellMap.get(key) ?? { resources: [], rowspan: 1, skip: false };
+                      if (cell.skip) return null;
+                      return (
+                        <td
+                          rowspan={cell.rowspan > 1 ? cell.rowspan : undefined}
+                          class={`col-${col}`}
+                        >
+                          {cell.resources.length > 0 && (
+                            <div class="material-links">
+                              {cell.resources.map(r => (
+                                <a
+                                  href={resourceHref(r)}
+                                  class={`material-link type-${r.data.type}`}
+                                  target="_blank"
+                                  rel="noopener"
+                                >
+                                  {r.data.title}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               })}
@@ -185,35 +257,19 @@ function resourceHref(r: (typeof allResources)[number]): string {
       )}
     </div>
   ) : (
-    <!-- Overview layout (courses without a schedule URL) -->
     <div>
-      <div class="quick-stats">
-        {sections.filter(s => s.count > 0).map(s => (
-          <a href={url(`/courses/${course.slug}/${s.key}/`)} class="stat-item">
-            <span class="stat-count">{s.count}</span>
-            <span class="stat-label">{s.key}</span>
-          </a>
-        ))}
-      </div>
-
       {course.data.objectives && course.data.objectives.length > 0 && (
         <section class="overview-section">
           <h2>Objetivos</h2>
-          <ul>
-            {course.data.objectives.map(obj => <li>{obj}</li>)}
-          </ul>
+          <ul>{course.data.objectives.map(obj => <li>{obj}</li>)}</ul>
         </section>
       )}
-
       {course.data.bibliography && course.data.bibliography.length > 0 && (
         <section class="overview-section">
           <h2>Bibliografia</h2>
-          <ul>
-            {course.data.bibliography.map(book => <li>{book}</li>)}
-          </ul>
+          <ul>{course.data.bibliography.map(book => <li>{book}</li>)}</ul>
         </section>
       )}
-
       <section class="overview-section prose">
         <Content />
       </section>
@@ -222,7 +278,6 @@ function resourceHref(r: (typeof allResources)[number]): string {
 </CourseLayout>
 
 <style>
-  /* ---- Shared ---- */
   .course-subtitle {
     display: flex;
     align-items: center;
@@ -240,39 +295,15 @@ function resourceHref(r: (typeof allResources)[number]): string {
     border-radius: var(--radius-sm);
   }
 
-  /* ---- Overview layout ---- */
-  .quick-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-bottom: var(--space-8);
-  }
-
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: var(--space-3) var(--space-5);
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-    min-width: 100px;
-  }
-
-  .stat-item:hover { border-color: var(--color-primary); text-decoration: none; }
-  .stat-count { font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-primary); }
-  .stat-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
-
+  /* ── Overview layout ─────────────────────────────────────────────────── */
   .overview-section { margin-bottom: var(--space-8); }
   .overview-section h2 { border-top: none; margin-top: 0; padding-top: 0; }
 
-  /* ---- Schedule layout ---- */
+  /* ── Collapsible sections ────────────────────────────────────────────── */
   .collapsible-section {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    margin-bottom: var(--space-4);
+    margin-bottom: var(--space-3);
     padding: var(--space-3) var(--space-4);
   }
 
@@ -281,13 +312,27 @@ function resourceHref(r: (typeof allResources)[number]): string {
     font-weight: 600;
     list-style: none;
     color: var(--color-text);
+    user-select: none;
   }
 
   .collapsible-section summary::-webkit-details-marker { display: none; }
-  .collapsible-section summary::before { content: '▸ '; color: var(--color-text-secondary); }
+  .collapsible-section summary::before { content: '▸ '; color: var(--color-text-muted); }
   .collapsible-section[open] summary::before { content: '▾ '; }
+
   .collapsible-section ul { margin: var(--space-3) 0 0 var(--space-4); padding: 0; }
 
+  .resource-group { margin-top: var(--space-3); }
+  .resource-group h4 {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-1);
+  }
+  .res-desc { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
+
+  /* ── Schedule table ──────────────────────────────────────────────────── */
   .schedule-unavailable {
     padding: var(--space-8);
     text-align: center;
@@ -315,22 +360,31 @@ function resourceHref(r: (typeof allResources)[number]): string {
     font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    /* override global td border */
+    border: none;
+    border-bottom: 2px solid var(--color-border);
   }
 
   .schedule-table td {
     padding: var(--space-2) var(--space-3);
+    border: none;
     border-bottom: 1px solid var(--color-border);
     vertical-align: top;
   }
 
-  .col-num  { width: 2.5rem; text-align: center; color: var(--color-text-secondary); font-weight: 600; }
-  .col-date { width: 5rem; white-space: nowrap; }
-  .col-room { width: 6rem; white-space: nowrap; color: var(--color-text-secondary); }
-  .col-materials { width: 12rem; }
+  /* Column widths */
+  .col-num        { width: 2.5rem; text-align: center; color: var(--color-text-secondary); font-weight: 600; }
+  .col-date       { width: 5rem; white-space: nowrap; }
+  .col-room       { width: 6rem; white-space: nowrap; color: var(--color-text-secondary); }
+  .col-materiais  { width: 11rem; }
+  .col-exercicios { width: 10rem; }
+  .col-extra      { width: 10rem; }
 
+  /* Date cell */
   .date-day { display: block; font-weight: 600; font-size: var(--font-size-xs); color: var(--color-text-secondary); }
   .date-num { display: block; font-weight: 600; }
 
+  /* Topic + badge */
   .topic-text { display: block; }
   .activity-badge {
     display: inline-block;
@@ -341,26 +395,30 @@ function resourceHref(r: (typeof allResources)[number]): string {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+    color: #fff;
   }
 
+  /* ── Row type colours — light theme ─────────────────────────────────── */
   .activity-class:hover td { background: var(--color-bg-secondary); }
 
-  .activity-exam td { background: #fff8e7; }
-  .activity-exam .activity-badge { background: #f59e0b; color: #fff; }
+  /* Prova — light amber tint */
+  .activity-exam td { background: #fffbeb; }
+  .activity-exam .activity-badge { background: #d97706; }
 
-  .activity-sub td { background: #fff3e0; }
-  .activity-sub .activity-badge { background: #ea6c00; color: #fff; }
+  /* Prova de Substituição — light orange tint */
+  .activity-sub td { background: #fff7ed; }
+  .activity-sub .activity-badge { background: #c2410c; }
 
-  .activity-g2 td { background: #fef2f2; }
-  .activity-g2 .activity-badge { background: #dc2626; color: #fff; }
+  /* G2 — light rose tint */
+  .activity-g2 td { background: #fff1f2; }
+  .activity-g2 .activity-badge { background: #be123c; }
 
-  @media (prefers-color-scheme: dark) {
-    .activity-exam td { background: #2a2000; }
-    .activity-sub td { background: #2a1500; }
-    .activity-g2 td  { background: #2a0000; }
-  }
+  /* ── Row type colours — dark theme ──────────────────────────────────── */
+  [data-theme="dark"] .activity-exam td { background: #1c1400; }
+  [data-theme="dark"] .activity-sub td  { background: #1a0e00; }
+  [data-theme="dark"] .activity-g2 td   { background: #1a0008; }
 
-  /* Material links */
+  /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 
   .material-link {
@@ -382,10 +440,13 @@ function resourceHref(r: (typeof allResources)[number]): string {
     text-decoration: none;
   }
 
-  /* Optional: slightly different tint per type */
-  .material-link.type-pdf    { border-color: #ef4444; color: #ef4444; }
-  .material-link.type-pdf:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
-
-  .material-link.type-slides { border-color: #2563eb; color: #2563eb; }
-  .material-link.type-slides:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
+  .material-link.type-pdf {
+    border-color: #dc2626;
+    color: #dc2626;
+  }
+  .material-link.type-pdf:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+  }
 </style>

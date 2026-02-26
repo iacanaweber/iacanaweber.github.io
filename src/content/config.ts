@@ -46,8 +46,16 @@ const resources = defineCollection({
     url: z.string().optional(),
     /** Path to a local file in public/ (e.g. "/courses/css/slides-01.pdf"). */
     pdfPath: z.string().optional(),
-    /** Class number this resource belongs to. If set, appears in the schedule table. */
-    class: z.number().optional(),
+    /**
+     * Class number this resource belongs to. If set, appears in the schedule table.
+     * Use a number for a single class (e.g. 5) or a string range (e.g. "5-6") to span rows.
+     */
+    class: z.union([z.number(), z.string()]).optional(),
+    /**
+     * Which column of the schedule table this resource appears in.
+     * Defaults: slides/pdf/link → "materiais", everything else → "extra".
+     */
+    column: z.enum(['materiais', 'exercicios', 'extra']).optional(),
     description: z.string().optional(),
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
