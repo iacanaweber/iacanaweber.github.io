@@ -96,9 +96,12 @@ for (const r of generalResources) {
 // ── Helpers ─────────────────────────────────────────────────────────────────
 function activityClass(activity: string): string {
   const a = activity.toLowerCase();
-  if (a.includes('g2')) return 'activity-g2';
+  if (a.includes('g2'))                                          return 'activity-g2';
   if (a.includes('substituição') || a.includes('substituicao')) return 'activity-sub';
-  if (a.includes('prova') || a.includes('exame')) return 'activity-exam';
+  if (a.includes('prova') || a.includes('exame'))               return 'activity-exam';
+  if (a.includes('trabalho'))                                    return 'activity-trabalho';
+  if (a.includes('feriado'))                                     return 'activity-feriado';
+  if (a.includes('evento') || a.includes('acadêmico') || a.includes('academico')) return 'activity-evento';
   return 'activity-class';
 }
 
@@ -210,7 +213,7 @@ const typeLabels: Record<string, string> = {
                 const aClass = activityClass(entry.activity);
                 return (
                   <tr class={`schedule-row ${aClass}`}>
-                    <td class="col-num">{entry.number}</td>
+                    <td class="col-num">{entry.number ?? '—'}</td>
                     <td class="col-date">
                       <span class="date-day">{dayLabel(entry.day)}</span>
                       <span class="date-num">{shortDate(entry.date)}</span>
@@ -401,22 +404,54 @@ const typeLabels: Record<string, string> = {
   /* ── Row type colours — light theme ─────────────────────────────────── */
   .activity-class:hover td { background: var(--color-bg-secondary); }
 
-  /* Prova — light amber tint */
+  /* Prova — amber */
   .activity-exam td { background: #fffbeb; }
   .activity-exam .activity-badge { background: #d97706; }
 
-  /* Prova de Substituição — light orange tint */
+  /* Prova de Substituição — orange */
   .activity-sub td { background: #fff7ed; }
   .activity-sub .activity-badge { background: #c2410c; }
 
-  /* G2 — light rose tint */
+  /* G2 — rose */
   .activity-g2 td { background: #fff1f2; }
   .activity-g2 .activity-badge { background: #be123c; }
 
+  /* Trabalho — yellow */
+  .activity-trabalho td { background: #fefce8; }
+  .activity-trabalho .activity-badge { background: #ca8a04; }
+
+  /* Feriado — salmon/red-orange */
+  .activity-feriado td { background: #fff5f0; }
+  .activity-feriado .activity-badge { background: #ea580c; }
+
+  /* Evento Acadêmico — indigo/purple */
+  .activity-evento td { background: #f5f3ff; }
+  .activity-evento .activity-badge { background: #7c3aed; }
+
   /* ── Row type colours — dark theme ──────────────────────────────────── */
-  [data-theme="dark"] .activity-exam td { background: #1c1400; }
-  [data-theme="dark"] .activity-sub td  { background: #1a0e00; }
-  [data-theme="dark"] .activity-g2 td   { background: #1a0008; }
+  /* Amber — clearly distinguishable against #0f172a */
+  [data-theme="dark"] .activity-exam td { background: #2d2200; }
+  [data-theme="dark"] .activity-exam .activity-badge { background: #b45309; }
+
+  /* Orange */
+  [data-theme="dark"] .activity-sub td { background: #2d1800; }
+  [data-theme="dark"] .activity-sub .activity-badge { background: #9a3412; }
+
+  /* Rose/red */
+  [data-theme="dark"] .activity-g2 td { background: #2d0016; }
+  [data-theme="dark"] .activity-g2 .activity-badge { background: #9f1239; }
+
+  /* Yellow — work */
+  [data-theme="dark"] .activity-trabalho td { background: #2d2800; }
+  [data-theme="dark"] .activity-trabalho .activity-badge { background: #a16207; }
+
+  /* Salmon — holiday */
+  [data-theme="dark"] .activity-feriado td { background: #2d1400; }
+  [data-theme="dark"] .activity-feriado .activity-badge { background: #c2410c; }
+
+  /* Indigo/purple — academic event */
+  [data-theme="dark"] .activity-evento td { background: #1e1040; }
+  [data-theme="dark"] .activity-evento .activity-badge { background: #6d28d9; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }

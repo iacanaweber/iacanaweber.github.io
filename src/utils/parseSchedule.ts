@@ -1,5 +1,6 @@
 export interface ClassEntry {
-  number: number;
+  /** Class number. null for special entries without a number (e.g. Prova de G2). */
+  number: number | null;
   day: string;
   date: string;
   description: string;
@@ -48,19 +49,24 @@ export function parseScheduleHtml(html: string): ScheduleInfo {
 
     if (!rowContent.includes('_lblAula')) continue;
 
-    const colorMatch = rowAttrs.match(/background-color:(#[0-9A-Fa-f]+)/i);
-    const bgColor = colorMatch ? colorMatch[1].toUpperCase() : '#FFFFFF';
+    // Match both hex (#FFA500) and named (LightGrey, AliceBlue) colors
+    const colorMatch = rowAttrs.match(/background-color:(#[0-9A-Fa-f]+|[A-Za-z]+)/i);
+    const bgColor = colorMatch ? colorMatch[1] : '#FFFFFF';
 
     const numberStr = extractField(rowContent, 'Aula');
-    if (!numberStr) continue;
+    const activity   = extractField(rowContent, 'Atividade');
+    const description = extractField(rowContent, 'Descricao');
+
+    // Skip rows with no useful data (e.g. the header row)
+    if (!numberStr && !activity && !description) continue;
 
     entries.push({
-      number: parseInt(numberStr, 10),
+      number: numberStr ? parseInt(numberStr, 10) : null,
       day: extractField(rowContent, 'Dia'),
       date: extractField(rowContent, 'Data'),
-      description: extractField(rowContent, 'Descricao'),
-      activity: extractField(rowContent, 'Atividade'),
-      resources: extractField(rowContent, 'Recursos'), // non-empty → overrides default room
+      description,
+      activity,
+      resources: extractField(rowContent, 'Recursos'),
       bgColor,
     });
   }
