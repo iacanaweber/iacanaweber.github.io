@@ -18,29 +18,3 @@ export function url(path: string): string {
   return `${base}${cleanPath}`;
 }
 
-/**
- * Get the material type label for display.
- */
-export function materialTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    notes: 'Notes',
-    exercises: 'Exercises',
-    homework: 'Homework',
-    tests: 'Tests & Exams',
-    resources: 'Resources',
-  };
-  return labels[type] ?? type;
-}
-
-/**
- * Collect all unique tags from a list of items.
- */
-export function collectTags(items: { data: { tags?: string[] } }[]): string[] {
-  const tagSet = new Set<string>();
-  for (const item of items) {
-    for (const tag of item.data.tags ?? []) {
-      tagSet.add(tag);
-    }
-  }
-  return [...tagSet].sort();
-}

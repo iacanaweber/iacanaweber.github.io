@@ -16,26 +16,6 @@ const courses = defineCollection({
   }),
 });
 
-const materialSchema = z.object({
-  title: z.string(),
-  course: z.string(),
-  date: z.date(),
-  tags: z.array(z.string()).default([]),
-  description: z.string().optional(),
-  pdfLink: z.string().optional(),
-  sourceLink: z.string().optional(),
-  solutionsAvailable: z.boolean().default(false),
-  solutionsPublic: z.boolean().default(false),
-  lastUpdated: z.date().optional(),
-  math: z.boolean().default(false),
-  draft: z.boolean().default(false),
-});
-
-const notes = defineCollection({ type: 'content', schema: materialSchema });
-const exercises = defineCollection({ type: 'content', schema: materialSchema });
-const homework = defineCollection({ type: 'content', schema: materialSchema });
-const tests = defineCollection({ type: 'content', schema: materialSchema });
-
 const resources = defineCollection({
   type: 'content',
   schema: z.object({
@@ -80,4 +60,4 @@ const publications = defineCollection({
   }),
 });
 
-export const collections = { courses, notes, exercises, homework, tests, resources, publications };
+export const collections = { courses, resources, publications };

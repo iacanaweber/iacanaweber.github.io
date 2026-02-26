@@ -14,7 +14,7 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 
 <script>
   async function initSearch() {
-    const base = (window as any).__pagefindBase || '/teaching/';
+    const base = (window as any).__pagefindBase || '/';
     const pagefindPath = `${base}pagefind/pagefind-ui.js`;
     try {
       const mod = await import(/* @vite-ignore */ pagefindPath);

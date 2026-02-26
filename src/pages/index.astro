@@ -6,38 +6,11 @@ import { getCollection } from 'astro:content';
 import { url } from '../utils/helpers';
 
 const courses = (await getCollection('courses')).sort((a, b) => a.data.order - b.data.order);
-const allNotes = await getCollection('notes', ({ data }) => !data.draft);
-const allExercises = await getCollection('exercises', ({ data }) => !data.draft);
-const allHomework = await getCollection('homework', ({ data }) => !data.draft);
-const allTests = await getCollection('tests', ({ data }) => !data.draft);
-
-const recentItems = [...allNotes, ...allExercises, ...allHomework, ...allTests]
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 5);
 
 const allPubs = await getCollection('publications');
 const recentPubs = allPubs
   .sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order)
   .slice(0, 3);
-
-function getCourseTitle(courseSlug: string): string {
-  return courses.find(c => c.slug === courseSlug)?.data.shortName ?? courseSlug;
-}
-
-function getMaterialTypeLabel(item: typeof recentItems[0]): string {
-  if (allNotes.includes(item)) return 'Note';
-  if (allExercises.includes(item)) return 'Exercise';
-  if (allHomework.includes(item)) return 'Homework';
-  return 'Test';
-}
-
-function getMaterialPath(item: typeof recentItems[0]): string {
-  let type = 'notes';
-  if (allExercises.includes(item)) type = 'exercises';
-  else if (allHomework.includes(item)) type = 'homework';
-  else if (allTests.includes(item)) type = 'tests';
-  return url(`/courses/${item.data.course}/${type}/${item.slug}/`);
-}
 
 const researchInterests = [
   'Hardware Security',
@@ -93,30 +66,6 @@ const researchInterests = [
         ))}
       </div>
     </section>
-
-    <!-- Recent Materials -->
-    {recentItems.length > 0 && (
-      <section class="home-section">
-        <div class="section-header">
-          <h2 data-i18n="home.recentMaterials">Recent Materials</h2>
-          <a href={url('/courses/')} class="see-all" data-i18n="home.seeAll">See all</a>
-        </div>
-        <div class="recent-list">
-          {recentItems.map(item => (
-            <a href={getMaterialPath(item)} class="recent-item">
-              <div class="recent-meta">
-                <span class="tag">{getCourseTitle(item.data.course)}</span>
-                <span class="recent-type">{getMaterialTypeLabel(item)}</span>
-              </div>
-              <h3>{item.data.title}</h3>
-              <time datetime={item.data.date.toISOString()}>
-                {item.data.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </time>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
 
     <!-- Recent Publications -->
     {recentPubs.length > 0 && (
@@ -206,53 +155,6 @@ const researchInterests = [
     font-size: var(--font-size-sm);
     font-weight: 600;
     white-space: nowrap;
-  }
-
-  /* Recent materials */
-  .recent-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .recent-item {
-    display: block;
-    padding: var(--space-4) var(--space-5);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    transition: all var(--transition-fast);
-  }
-
-  .recent-item:hover {
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-sm);
-    text-decoration: none;
-  }
-
-  .recent-item h3 {
-    font-size: var(--font-size-base);
-    color: var(--color-text);
-    margin-bottom: var(--space-1);
-  }
-
-  .recent-item time {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-muted);
-  }
-
-  .recent-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
-  }
-
-  .recent-type {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   }
 
   /* Publications */
