@@ -13,7 +13,8 @@ objectives:
   - "Understand processor pipelines and performance implications"
   - "Grasp the hardware-software interface and its impact on system design"
 bibliography:
-  - "Patterson, D. & Hennessy, J. — Computer Organization and Design: RISC-V Edition"
-  - "Harris, D. & Harris, S. — Digital Design and Computer Architecture: RISC-V Edition"
-  - "Bryant, R. & O'Hallaron, D. — Computer Systems: A Programmer's Perspective"
+  - "**[Básica 1]** FLOYD, T. L. *Sistemas Digitais: fundamentos e aplicações*. 9 ed. Porto Alegre: Bookman, 2007. 888p."
+  - "**[Básica 2]** PATTERSON, D.; HENESSY, J. L. *Organização e projeto de computadores: a interface hardware/software*. 4. ed. Elsevier, 2014."
+  - "**[Básica 3]** STALLINGS, W. *Arquitetura e Organização de Computadores*. 8. ed. Prentice Hall, 2012. 624p."
+  - "**[Complementar 1]** TOCCI, R. J.; WIDMER, N. S.; MOSS, G. L. *Sistemas Digitais: princípios e aplicações*. 11 ed. São Paulo: Pearson Prentice Hall, 2011. 840p."
 ---

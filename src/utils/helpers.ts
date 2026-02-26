@@ -18,3 +18,12 @@ export function url(path: string): string {
   return `${base}${cleanPath}`;
 }
 
+/**
+ * Convert basic inline Markdown (**bold**, *italic*) to HTML.
+ */
+export function mdInline(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+

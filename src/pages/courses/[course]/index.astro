@@ -2,6 +2,7 @@
 import CourseLayout from '../../../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 import { fetchSchedule } from '../../../utils/parseSchedule';
+import { mdInline } from '../../../utils/helpers';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -163,7 +164,7 @@ const typeLabels: Record<string, string> = {
       {course.data.bibliography && course.data.bibliography.length > 0 && (
         <details class="collapsible-section">
           <summary>Bibliografia</summary>
-          <ul>{course.data.bibliography.map(b => <li>{b}</li>)}</ul>
+          <ul>{course.data.bibliography.map(b => <li set:html={mdInline(b)} />)}</ul>
         </details>
       )}
 
@@ -270,7 +271,7 @@ const typeLabels: Record<string, string> = {
       {course.data.bibliography && course.data.bibliography.length > 0 && (
         <section class="overview-section">
           <h2>Bibliografia</h2>
-          <ul>{course.data.bibliography.map(book => <li>{book}</li>)}</ul>
+          <ul>{course.data.bibliography.map(book => <li set:html={mdInline(book)} />)}</ul>
         </section>
       )}
       <section class="overview-section prose">

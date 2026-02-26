@@ -13,7 +13,8 @@ objectives:
   - "Entender os fundamentos de criptografia simétrica, assimétrica e funções hash"
   - "Compreender protocolos de segurança e infraestrutura de chave pública (PKI)"
 bibliography:
-  - "W. Stallings — Cryptography and Network Security: Principles and Practice"
-  - "A. Tanenbaum — Modern Operating Systems"
-  - "OWASP Foundation — OWASP Testing Guide"
+  - "**[Básica 1]** KOREN, I.; KRISHNA, C. M. *Fault-Tolerant Systems*. 1. ed. Cambridge: Morgan Kaufmann/Elsevier, 2007."
+  - "**[Básica 2]** PAAR, C.; PELZL, J. *Understanding Cryptography: A Textbook for Students and Practitioners*. 1. ed. Berlin: Springer, 2010."
+  - "**[Básica 3]** AMMANN, P.; OFFUTT, J. *Introduction to Software Testing*. 2. ed. Cambridge: Cambridge University Press, 2016."
+  - "**[Complementar 1]** SOMMERVILLE, I. *Engenharia de software*. 8. ed. São Paulo: Pearson Education do Brasil, 2010."
 ---
