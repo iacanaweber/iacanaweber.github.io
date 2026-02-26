@@ -97,6 +97,7 @@ export const translations: Record<string, Record<string, string>> = {
     // Courses listing
     'courses.title': 'Courses',
     'courses.intro': 'Browse course materials, notes, exercises, and exams for all available courses.',
+    'courses.viewCourse': 'View Course',
 
     // Course overview
     'course.objectives': 'Objectives',
@@ -245,6 +246,7 @@ export const translations: Record<string, Record<string, string>> = {
     // Courses listing
     'courses.title': 'Disciplinas',
     'courses.intro': 'Navegue pelos materiais de curso, notas de aula, exercícios e provas de todas as disciplinas disponíveis.',
+    'courses.viewCourse': 'Ver Disciplina',
 
     // Course overview
     'course.objectives': 'Objetivos',

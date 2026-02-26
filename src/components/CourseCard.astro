@@ -20,7 +20,7 @@ const { slug, title, shortName, description, semester, color = '#2563eb' } = Ast
   </h3>
   <p class="course-semester">{semester}</p>
   <p class="course-desc">{description}</p>
-  <a href={url(`/courses/${slug}/`)} class="btn btn-sm btn-primary">View Course</a>
+  <a href={url(`/courses/${slug}/`)} class="btn btn-sm btn-primary" data-i18n="courses.viewCourse">View Course</a>
 </article>
 
 <style>

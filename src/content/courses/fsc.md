@@ -5,7 +5,7 @@ description: "Fundamentals of computer systems: processor architecture, assembly
 semester: "2025/1"
 schedule: "Tuesday & Thursday, 08:00 - 10:00"
 color: "#2563eb"
-order: 1
+order: 3
 objectives:
   - "Apropriar-se dos conceitos teóricos e práticos mais importantes relacionados a fundamentos de sistemas computacionais."
   - "Compreender as características de circuitos digitais combinacionais e circuitos digitais sequenciais, juntamente com sua análise nos níveis de abstração lógico e de transferência entre registradores."
