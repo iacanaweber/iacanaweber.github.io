@@ -13,8 +13,8 @@ objectives:
   - "Model digital systems using finite state machines (FSMs)"
   - "Gain practical experience with hardware description languages (VHDL or Verilog)"
 bibliography:
-  - "**[Básica 1]** FLOYD, T. L. *Sistemas Digitais: fundamentos e aplicações*. 9 ed. Porto Alegre: Bookman, 2007. 888p."
-  - "**[Básica 2]** SUTHERLAND, S. *RTL Modeling with SystemVerilog for Simulation and Synthesis: Using SystemVerilog for ASIC and FPGA Design*. 2017. 488p."
-  - "**[Básica 3]** TOCCI, R. J.; WIDMER, N. S.; MOSS, G. L. *Sistemas Digitais: princípios e aplicações*. 11 ed. São Paulo: Pearson Prentice Hall, 2011. 840p."
-  - "**[Complementar 1]** VAHID, F. *Sistemas Digitais: Projeto, Otimização e HDLs*. Ed. Bookman, 2008. 560p."
+  - "**[Básica]** FLOYD, T. L. *Sistemas Digitais: fundamentos e aplicações*. 9 ed. Porto Alegre: Bookman, 2007. 888p."
+  - "**[Básica]** SUTHERLAND, S. *RTL Modeling with SystemVerilog for Simulation and Synthesis: Using SystemVerilog for ASIC and FPGA Design*. 2017. 488p."
+  - "**[Básica]** TOCCI, R. J.; WIDMER, N. S.; MOSS, G. L. *Sistemas Digitais: princípios e aplicações*. 11 ed. São Paulo: Pearson Prentice Hall, 2011. 840p."
+  - "**[Complementar]** VAHID, F. *Sistemas Digitais: Projeto, Otimização e HDLs*. Ed. Bookman, 2008. 560p."
 ---
