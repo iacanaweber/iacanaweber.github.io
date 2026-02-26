@@ -1,44 +1,19 @@
 ---
 title: "Confiabilidade e Segurança de Software"
 shortName: "CSS"
-description: "Software reliability and security: fault models, testing strategies, static analysis, vulnerability classes, secure coding practices, threat modeling, and software assurance techniques."
-semester: "2025/1"
-schedule: "Wednesday & Friday, 14:00 - 16:00"
+description: "Dependabilidade de software: disponibilidade, confiabilidade, segurança e resiliência. Teste de software, análise estática, criptografia e segurança de sistemas."
+semester: "2026/1"
+scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=c7210015-3bfe-4be0-bc1a-6b23884e7421&ano=2026&sem=1"
 color: "#dc2626"
-order: 3
+order: 1
 objectives:
-  - "Understand software fault models and failure classifications"
-  - "Apply testing strategies for reliability (unit, integration, mutation testing)"
-  - "Identify and mitigate common software vulnerability classes (OWASP Top 10)"
-  - "Perform threat modeling using STRIDE and similar frameworks"
-  - "Use static and dynamic analysis tools for security assessment"
-  - "Design software with reliability and security as first-class concerns"
+  - "Compreender os conceitos de dependabilidade (availability, reliability, safety, security e resilience)"
+  - "Aplicar técnicas de teste de software (caixa branca, caixa preta, teste de unidade)"
+  - "Utilizar ferramentas de análise estática e integração contínua"
+  - "Entender os fundamentos de criptografia simétrica, assimétrica e funções hash"
+  - "Compreender protocolos de segurança e infraestrutura de chave pública (PKI)"
 bibliography:
-  - "McGraw, G. — Software Security: Building Security In"
-  - "Chess, B. & West, J. — Secure Programming with Static Analysis"
-  - "Lyu, M. — Handbook of Software Reliability Engineering"
+  - "W. Stallings — Cryptography and Network Security: Principles and Practice"
+  - "A. Tanenbaum — Modern Operating Systems"
   - "OWASP Foundation — OWASP Testing Guide"
 ---
-
-## Schedule (Tentative)
-
-| Week | Topic |
-|------|-------|
-| 1-2 | Software faults, errors, and failures; reliability concepts |
-| 3-4 | Testing for reliability: coverage criteria, mutation testing |
-| 5-6 | Static analysis and code review |
-| 7 | Fault injection and resilience testing |
-| 8 | **Midterm exam** |
-| 9-10 | Security fundamentals: CIA triad, vulnerability classes |
-| 11-12 | Threat modeling (STRIDE, attack trees) |
-| 13 | Secure coding practices and common pitfalls |
-| 14 | Dynamic analysis: fuzzing, penetration testing basics |
-| 15 | Software assurance and secure development lifecycle |
-| 16 | **Final exam** |
-
-## Assessment
-
-- Midterm exam: 25%
-- Final exam: 30%
-- Course project: 25%
-- Homework assignments: 20%

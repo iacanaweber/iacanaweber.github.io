@@ -8,6 +8,7 @@ const courses = defineCollection({
     description: z.string(),
     semester: z.string(),
     schedule: z.string().optional(),
+    scheduleUrl: z.string().url().optional(),
     objectives: z.array(z.string()).optional(),
     bibliography: z.array(z.string()).optional(),
     color: z.string().default('#2563eb'),
@@ -40,9 +41,14 @@ const resources = defineCollection({
   schema: z.object({
     title: z.string(),
     course: z.string(),
-    type: z.enum(['book', 'tool', 'link', 'video', 'other']),
+    type: z.enum(['book', 'tool', 'link', 'video', 'slides', 'pdf', 'other']),
+    /** External URL (e.g. Google Drive, website). */
     url: z.string().optional(),
-    description: z.string(),
+    /** Path to a local file in public/ (e.g. "/courses/css/slides-01.pdf"). */
+    pdfPath: z.string().optional(),
+    /** Class number this resource belongs to. If set, appears in the schedule table. */
+    class: z.number().optional(),
+    description: z.string().optional(),
     tags: z.array(z.string()).default([]),
     order: z.number().default(0),
   }),

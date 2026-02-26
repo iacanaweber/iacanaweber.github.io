@@ -1,7 +1,8 @@
 ---
 import CourseLayout from '../../../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
-import { url, materialTypeLabel } from '../../../utils/helpers';
+import { url } from '../../../utils/helpers';
+import { fetchSchedule } from '../../../utils/parseSchedule';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -15,19 +16,75 @@ export const getStaticPaths: GetStaticPaths = async () => {
 const { course } = Astro.props;
 const { Content } = await course.render();
 
-const notes = (await getCollection('notes', ({ data }) => data.course === course.slug && !data.draft));
-const exercises = (await getCollection('exercises', ({ data }) => data.course === course.slug && !data.draft));
-const homework = (await getCollection('homework', ({ data }) => data.course === course.slug && !data.draft));
-const tests = (await getCollection('tests', ({ data }) => data.course === course.slug && !data.draft));
-const resources = (await getCollection('resources', ({ data }) => data.course === course.slug));
+// --- Schedule-first mode ---
+const hasSchedule = !!course.data.scheduleUrl;
+let scheduleEntries: Awaited<ReturnType<typeof fetchSchedule>>['entries'] = [];
+let defaultRoom = '';
+
+if (hasSchedule) {
+  const result = await fetchSchedule(course.data.scheduleUrl!);
+  scheduleEntries = result.entries;
+  defaultRoom = result.defaultRoom;
+}
+
+// Load all resources for this course from the content collection
+const allResources = await getCollection('resources', ({ data }) => data.course === course.slug);
+
+// Resources linked to a specific class (appear in the schedule table)
+const resourcesByClass = allResources.reduce((acc, r) => {
+  if (r.data.class != null) {
+    const key = r.data.class;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(r);
+  }
+  return acc;
+}, {} as Record<number, typeof allResources>);
+
+// General resources (no class association — appear on the Resources tab)
+const generalResources = allResources.filter(r => r.data.class == null);
+
+// --- Overview mode (no schedule URL) ---
+const notes = await getCollection('notes', ({ data }) => data.course === course.slug && !data.draft);
+const exercises = await getCollection('exercises', ({ data }) => data.course === course.slug && !data.draft);
+const homework = await getCollection('homework', ({ data }) => data.course === course.slug && !data.draft);
+const tests = await getCollection('tests', ({ data }) => data.course === course.slug && !data.draft);
 
 const sections = [
   { key: 'notes', count: notes.length },
   { key: 'exercises', count: exercises.length },
   { key: 'homework', count: homework.length },
   { key: 'tests', count: tests.length },
-  { key: 'resources', count: resources.length },
+  { key: 'resources', count: generalResources.length },
 ];
+
+// Activity type → CSS class
+function activityClass(activity: string): string {
+  const a = activity.toLowerCase();
+  if (a.includes('g2')) return 'activity-g2';
+  if (a.includes('substituição') || a.includes('substituicao')) return 'activity-sub';
+  if (a.includes('prova') || a.includes('exame')) return 'activity-exam';
+  return 'activity-class';
+}
+
+// Day abbreviation → short label
+function dayLabel(abbr: string): string {
+  const map: Record<string, string> = {
+    SEG: 'Seg', TER: 'Ter', QUA: 'Qua', QUI: 'Qui',
+    SEX: 'Sex', SAB: 'Sáb', DOM: 'Dom',
+  };
+  return map[abbr.toUpperCase()] ?? abbr;
+}
+
+// "30/07/2025" → "30/07"
+function shortDate(date: string): string {
+  const parts = date.split('/');
+  return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : date;
+}
+
+// Resolve the href for a resource (pdfPath takes priority over url)
+function resourceHref(r: (typeof allResources)[number]): string {
+  return r.data.pdfPath ?? r.data.url ?? '#';
+}
 ---
 
 <CourseLayout
@@ -44,43 +101,128 @@ const sections = [
     {course.data.semester}
   </p>
 
-  <!-- Quick Stats -->
-  <div class="quick-stats">
-    {sections.filter(s => s.count > 0).map(s => (
-      <a href={url(`/courses/${course.slug}/${s.key}/`)} class="stat-item">
-        <span class="stat-count">{s.count}</span>
-        <span class="stat-label">{materialTypeLabel(s.key)}</span>
-      </a>
-    ))}
-  </div>
+  {hasSchedule ? (
+    <!-- Schedule-first layout -->
+    <div class="schedule-view">
 
-  <!-- Objectives -->
-  {course.data.objectives && course.data.objectives.length > 0 && (
-    <section class="overview-section">
-      <h2 data-i18n="course.objectives">Objectives</h2>
-      <ul>
-        {course.data.objectives.map(obj => <li>{obj}</li>)}
-      </ul>
-    </section>
+      {course.data.objectives && course.data.objectives.length > 0 && (
+        <details class="collapsible-section">
+          <summary>Objetivos da disciplina</summary>
+          <ul>
+            {course.data.objectives.map(obj => <li>{obj}</li>)}
+          </ul>
+        </details>
+      )}
+
+      {course.data.bibliography && course.data.bibliography.length > 0 && (
+        <details class="collapsible-section">
+          <summary>Bibliografia</summary>
+          <ul>
+            {course.data.bibliography.map(book => <li>{book}</li>)}
+          </ul>
+        </details>
+      )}
+
+      {scheduleEntries.length === 0 ? (
+        <div class="schedule-unavailable">
+          <p>Cronograma não disponível no momento.</p>
+        </div>
+      ) : (
+        <div class="schedule-table-wrapper">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th class="col-num">#</th>
+                <th class="col-date">Data</th>
+                <th class="col-topic">Tópico</th>
+                <th class="col-room">Sala</th>
+                <th class="col-materials">Materiais</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scheduleEntries.map(entry => {
+                const classResources = resourcesByClass[entry.number] ?? [];
+                const room = entry.resources || defaultRoom || '—';
+                const aClass = activityClass(entry.activity);
+                return (
+                  <tr class={`schedule-row ${aClass}`}>
+                    <td class="col-num">{entry.number}</td>
+                    <td class="col-date">
+                      <span class="date-day">{dayLabel(entry.day)}</span>
+                      <span class="date-num">{shortDate(entry.date)}</span>
+                    </td>
+                    <td class="col-topic">
+                      <span class="topic-text">{entry.description || '—'}</span>
+                      {aClass !== 'activity-class' && (
+                        <span class={`activity-badge ${aClass}`}>{entry.activity}</span>
+                      )}
+                    </td>
+                    <td class="col-room">{room}</td>
+                    <td class="col-materials">
+                      {classResources.length > 0 && (
+                        <div class="material-links">
+                          {classResources
+                            .sort((a, b) => a.data.order - b.data.order)
+                            .map(r => (
+                              <a
+                                href={resourceHref(r)}
+                                class={`material-link type-${r.data.type}`}
+                                target={r.data.pdfPath ? '_blank' : '_blank'}
+                                rel="noopener"
+                              >
+                                {r.data.title}
+                              </a>
+                            ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  ) : (
+    <!-- Overview layout (courses without a schedule URL) -->
+    <div>
+      <div class="quick-stats">
+        {sections.filter(s => s.count > 0).map(s => (
+          <a href={url(`/courses/${course.slug}/${s.key}/`)} class="stat-item">
+            <span class="stat-count">{s.count}</span>
+            <span class="stat-label">{s.key}</span>
+          </a>
+        ))}
+      </div>
+
+      {course.data.objectives && course.data.objectives.length > 0 && (
+        <section class="overview-section">
+          <h2>Objetivos</h2>
+          <ul>
+            {course.data.objectives.map(obj => <li>{obj}</li>)}
+          </ul>
+        </section>
+      )}
+
+      {course.data.bibliography && course.data.bibliography.length > 0 && (
+        <section class="overview-section">
+          <h2>Bibliografia</h2>
+          <ul>
+            {course.data.bibliography.map(book => <li>{book}</li>)}
+          </ul>
+        </section>
+      )}
+
+      <section class="overview-section prose">
+        <Content />
+      </section>
+    </div>
   )}
-
-  <!-- Bibliography -->
-  {course.data.bibliography && course.data.bibliography.length > 0 && (
-    <section class="overview-section">
-      <h2 data-i18n="course.bibliography">Bibliography</h2>
-      <ul>
-        {course.data.bibliography.map(book => <li>{book}</li>)}
-      </ul>
-    </section>
-  )}
-
-  <!-- Markdown content from the course file (schedule, extra info, etc.) -->
-  <section class="overview-section prose">
-    <Content />
-  </section>
 </CourseLayout>
 
 <style>
+  /* ---- Shared ---- */
   .course-subtitle {
     display: flex;
     align-items: center;
@@ -98,6 +240,7 @@ const sections = [
     border-radius: var(--radius-sm);
   }
 
+  /* ---- Overview layout ---- */
   .quick-stats {
     display: flex;
     flex-wrap: wrap;
@@ -118,29 +261,131 @@ const sections = [
     min-width: 100px;
   }
 
-  .stat-item:hover {
+  .stat-item:hover { border-color: var(--color-primary); text-decoration: none; }
+  .stat-count { font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-primary); }
+  .stat-label { font-size: var(--font-size-sm); color: var(--color-text-secondary); }
+
+  .overview-section { margin-bottom: var(--space-8); }
+  .overview-section h2 { border-top: none; margin-top: 0; padding-top: 0; }
+
+  /* ---- Schedule layout ---- */
+  .collapsible-section {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .collapsible-section summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    color: var(--color-text);
+  }
+
+  .collapsible-section summary::-webkit-details-marker { display: none; }
+  .collapsible-section summary::before { content: '▸ '; color: var(--color-text-secondary); }
+  .collapsible-section[open] summary::before { content: '▾ '; }
+  .collapsible-section ul { margin: var(--space-3) 0 0 var(--space-4); padding: 0; }
+
+  .schedule-unavailable {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--color-text-secondary);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .schedule-table-wrapper { overflow-x: auto; margin-top: var(--space-4); }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+  }
+
+  .schedule-table th {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    font-weight: 600;
+    background: var(--color-bg-secondary);
+    border-bottom: 2px solid var(--color-border);
+    white-space: nowrap;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .schedule-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: top;
+  }
+
+  .col-num  { width: 2.5rem; text-align: center; color: var(--color-text-secondary); font-weight: 600; }
+  .col-date { width: 5rem; white-space: nowrap; }
+  .col-room { width: 6rem; white-space: nowrap; color: var(--color-text-secondary); }
+  .col-materials { width: 12rem; }
+
+  .date-day { display: block; font-weight: 600; font-size: var(--font-size-xs); color: var(--color-text-secondary); }
+  .date-num { display: block; font-weight: 600; }
+
+  .topic-text { display: block; }
+  .activity-badge {
+    display: inline-block;
+    margin-top: var(--space-1);
+    padding: 1px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .activity-class:hover td { background: var(--color-bg-secondary); }
+
+  .activity-exam td { background: #fff8e7; }
+  .activity-exam .activity-badge { background: #f59e0b; color: #fff; }
+
+  .activity-sub td { background: #fff3e0; }
+  .activity-sub .activity-badge { background: #ea6c00; color: #fff; }
+
+  .activity-g2 td { background: #fef2f2; }
+  .activity-g2 .activity-badge { background: #dc2626; color: #fff; }
+
+  @media (prefers-color-scheme: dark) {
+    .activity-exam td { background: #2a2000; }
+    .activity-sub td { background: #2a1500; }
+    .activity-g2 td  { background: #2a0000; }
+  }
+
+  /* Material links */
+  .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+
+  .material-link {
+    display: inline-block;
+    padding: 2px var(--space-2);
+    font-size: var(--font-size-xs);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-primary);
+    transition: all var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .material-link:hover {
+    background: var(--color-primary);
+    color: #fff;
     border-color: var(--color-primary);
     text-decoration: none;
   }
 
-  .stat-count {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--color-primary);
-  }
+  /* Optional: slightly different tint per type */
+  .material-link.type-pdf    { border-color: #ef4444; color: #ef4444; }
+  .material-link.type-pdf:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 
-  .stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-  }
-
-  .overview-section {
-    margin-bottom: var(--space-8);
-  }
-
-  .overview-section h2 {
-    border-top: none;
-    margin-top: 0;
-    padding-top: 0;
-  }
+  .material-link.type-slides { border-color: #2563eb; color: #2563eb; }
+  .material-link.type-slides:hover { background: #2563eb; color: #fff; border-color: #2563eb; }
 </style>
