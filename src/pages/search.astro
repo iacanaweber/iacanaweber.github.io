@@ -15,10 +15,23 @@ import Breadcrumb from '../components/Breadcrumb.astro';
 <script>
   async function initSearch() {
     const base = (window as any).__pagefindBase || '/';
-    const pagefindPath = `${base}pagefind/pagefind-ui.js`;
     try {
-      const mod = await import(/* @vite-ignore */ pagefindPath);
-      new mod.PagefindUI({
+      // Load CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = `${base}pagefind/pagefind-ui.css`;
+      document.head.appendChild(link);
+
+      // pagefind-ui.js is an IIFE that adds PagefindUI to window
+      await new Promise<void>((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = `${base}pagefind/pagefind-ui.js`;
+        script.onload = () => resolve();
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+
+      new (window as any).PagefindUI({
         element: '#search-container',
         showSubResults: true,
         showImages: false,
