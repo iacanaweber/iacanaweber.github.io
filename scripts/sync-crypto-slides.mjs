@@ -34,10 +34,18 @@ function runPdflatex(texDir, outDir) {
     const result = spawnSync(
       'pdflatex',
       ['-interaction=nonstopmode', '-halt-on-error', `-output-directory=${outDir}`, 'main.tex'],
-      { cwd: texDir, stdio: 'inherit' }
+      { cwd: texDir, stdio: 'pipe', encoding: 'utf8' }
     );
     if (result.status !== 0) {
-      throw new Error(`pdflatex failed in ${texDir}`);
+      const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+      const lines = output.split('\n');
+      const errorLine = lines.find(line => line.trim().startsWith('! '))?.trim();
+      const sourceLine = lines.find(line => /^\s*l\.\d+/.test(line))?.trim();
+      const message = errorLine
+        ? `${errorLine.replace(/^!\s*/, '')}${sourceLine ? ` (${sourceLine})` : ''}`
+        : `pdflatex failed with exit code ${result.status}`;
+      const logPath = join(outDir, 'main.log');
+      throw new Error(`LaTeX compile error in ${texDir}/main.tex: ${message}. See ${logPath}`);
     }
   }
 }
