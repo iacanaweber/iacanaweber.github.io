@@ -7,3 +7,24 @@ dist/
 .env
 .env.*
 .aider*
+AGENTS.md
+src/content/resources/_generated/
+
+# LaTeX build artifacts (keep sources/images/PDFs)
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.xdv
+*.dvi
+*.bbl
+*.blg
+*.lof
+*.lot
+*.lol

@@ -27,6 +27,16 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Install LaTeX dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-pictures \
+            texlive-lang-portuguese
+
       - name: Install dependencies
         run: npm ci
 

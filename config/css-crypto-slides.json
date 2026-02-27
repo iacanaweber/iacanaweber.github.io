@@ -1,0 +1,83 @@
+{
+  "slides": [
+    {
+      "id": "introducao-criptografia",
+      "title": "Introdução à Criptografia",
+      "texDir": "aulas/crypto/Introdução_a_Criptografia",
+      "pdfName": "introducao-a-criptografia.pdf",
+      "classes": ["9-10"],
+      "order": 90
+    },
+    {
+      "id": "cifras-fluxo",
+      "title": "Cifras de Fluxo",
+      "texDir": "aulas/crypto/Cifras_de_Fluxo",
+      "pdfName": "cifras-de-fluxo.pdf",
+      "classes": ["11-12"],
+      "order": 110
+    },
+    {
+      "id": "aes",
+      "title": "AES",
+      "texDir": "aulas/crypto/AES",
+      "pdfName": "aes.pdf",
+      "classes": ["13-14"],
+      "order": 130
+    },
+    {
+      "id": "modos-cifras-bloco",
+      "title": "Mais sobre Cifras de Bloco",
+      "texDir": "aulas/crypto/Mais_sobre_Cifras_de_Bloco",
+      "pdfName": "mais-sobre-cifras-de-bloco.pdf",
+      "classes": ["15-16"],
+      "order": 150
+    },
+    {
+      "id": "rsa",
+      "title": "Criptossistema RSA",
+      "texDir": "aulas/crypto/Rivest_Shamir_Adleman",
+      "pdfName": "rsa.pdf",
+      "classes": ["19-20"],
+      "order": 190
+    },
+    {
+      "id": "logaritmo-discreto",
+      "title": "Criptografia de Chave Pública Baseada no Logaritmo Discreto",
+      "texDir": "aulas/crypto/Discrete_Logarithm",
+      "pdfName": "logaritmo-discreto.pdf",
+      "classes": ["21-22", 24],
+      "order": 210
+    },
+    {
+      "id": "assinatura-digital",
+      "title": "Assinatura Digital",
+      "texDir": "aulas/crypto/Assinatura_Digital",
+      "pdfName": "assinatura-digital.pdf",
+      "classes": [25, "29-30"],
+      "order": 250
+    },
+    {
+      "id": "funcoes-hash",
+      "title": "Funções Hash",
+      "texDir": "aulas/crypto/Funções_Hash",
+      "pdfName": "funcoes-hash.pdf",
+      "classes": ["26-28", 31],
+      "order": 260
+    },
+    {
+      "id": "introducao-chave-publica",
+      "title": "Introdução à Criptografia de Chave Pública",
+      "texDir": "aulas/crypto/Introdução_à_Criptografia_de_Chave_Pública",
+      "pdfName": "introducao-criptografia-chave-publica.pdf",
+      "classes": [33],
+      "order": 330
+    },
+    {
+      "id": "des",
+      "title": "DES",
+      "texDir": "aulas/crypto/DES",
+      "pdfName": "des.pdf",
+      "order": 900
+    }
+  ]
+}
