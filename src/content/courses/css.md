@@ -3,7 +3,8 @@ title: "Confiabilidade e Segurança de Software"
 shortName: "CSS"
 description: "Dependabilidade de software: disponibilidade, confiabilidade, segurança e resiliência. Teste de software, análise estática, criptografia e segurança de sistemas."
 semester: "2026/1"
-scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=c7210015-3bfe-4be0-bc1a-6b23884e7421&ano=2026&sem=1"
+#scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=c7210015-3bfe-4be0-bc1a-6b23884e7421&ano=2026&sem=1"
+scheduleUrl: "src/cronogramas/cronograma_css.html"
 color: "#dc2626"
 order: 1
 objectives:

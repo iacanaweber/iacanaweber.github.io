@@ -8,7 +8,7 @@ const courses = defineCollection({
     description: z.string(),
     semester: z.string(),
     schedule: z.string().optional(),
-    scheduleUrl: z.string().url().optional(),
+    scheduleUrl: z.string().optional(),
     objectives: z.array(z.string()).optional(),
     bibliography: z.array(z.string()).optional(),
     color: z.string().default('#2563eb'),

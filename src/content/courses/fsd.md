@@ -3,7 +3,7 @@ title: "Fundamentos de Sistemas Digitais"
 shortName: "FSD"
 description: "Foundations of digital systems: Boolean algebra, combinational and sequential logic design, finite state machines, and introduction to HDL-based design with practical lab exercises."
 semester: "2025/1"
-schedule: "Monday & Wednesday, 10:00 - 12:00"
+scheduleUrl: "src/cronogramas/cronograma_fsd.html"
 color: "#0d9488"
 order: 2
 objectives:

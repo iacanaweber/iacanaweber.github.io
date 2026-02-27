@@ -74,19 +74,26 @@ export function parseScheduleHtml(html: string): ScheduleInfo {
   return { defaultRoom, entries };
 }
 
-export async function fetchSchedule(url: string): Promise<ScheduleInfo> {
+export async function fetchSchedule(urlOrPath: string): Promise<ScheduleInfo> {
   try {
-    const response = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TeachingHub/1.0)' },
-    });
-    if (!response.ok) {
-      console.warn(`[parseSchedule] fetch failed: ${response.status} ${response.statusText}`);
-      return { defaultRoom: '', entries: [] };
+    let html: string;
+    if (urlOrPath.startsWith('http://') || urlOrPath.startsWith('https://')) {
+      const response = await fetch(urlOrPath, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TeachingHub/1.0)' },
+      });
+      if (!response.ok) {
+        console.warn(`[parseSchedule] fetch failed: ${response.status} ${response.statusText}`);
+        return { defaultRoom: '', entries: [] };
+      }
+      html = await response.text();
+    } else {
+      const { readFileSync } = await import('fs');
+      const { resolve } = await import('path');
+      html = readFileSync(resolve(process.cwd(), urlOrPath), 'utf-8');
     }
-    const html = await response.text();
     return parseScheduleHtml(html);
   } catch (error) {
-    console.error('[parseSchedule] network error:', error);
+    console.error('[parseSchedule] error:', error);
     return { defaultRoom: '', entries: [] };
   }
 }

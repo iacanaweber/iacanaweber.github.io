@@ -2,8 +2,8 @@
 title: "Fundamentos de Sistemas Computacionais"
 shortName: "FSC"
 description: "Fundamentals of computer systems: processor architecture, assembly programming, memory hierarchy, and I/O systems. Emphasis on RISC-V architecture and the hardware-software interface."
-semester: "2025/1"
-schedule: "Tuesday & Thursday, 08:00 - 10:00"
+semester: "2026/1"
+schedule: "Monday & Wednesday, 10:00 - 12:00"
 color: "#2563eb"
 order: 3
 objectives:
