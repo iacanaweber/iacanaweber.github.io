@@ -62,7 +62,7 @@ Main scripts:
 `slides:sync` does three things automatically:
 1. Compiles all configured LaTeX decks.
 2. Writes PDFs to `public/assets/pdfs/css/crypto/`.
-3. Generates resource entries in `src/content/resources/_generated/`.
+3. Generates resource entries in `src/content/resources/generated/`.
 
 Notes:
 - Generated outputs are ignored by Git.

@@ -8,7 +8,8 @@ dist/
 .env.*
 .aider*
 AGENTS.md
-src/content/resources/_generated/
+CLAUDE.md
+src/content/resources/generated/
 
 # LaTeX build artifacts (keep sources/images/PDFs)
 *.aux

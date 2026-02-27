@@ -1,4 +1,13 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -9,7 +18,8 @@ const repoRoot = resolve(__dirname, '..');
 
 const configPath = join(repoRoot, 'config', 'css-crypto-slides.json');
 const pdfOutputDir = join(repoRoot, 'public', 'assets', 'pdfs', 'css', 'crypto');
-const generatedDir = join(repoRoot, 'src', 'content', 'resources', '_generated');
+const generatedDir = join(repoRoot, 'src', 'content', 'resources', 'generated');
+const legacyGeneratedDir = join(repoRoot, 'src', 'content', 'resources', '_generated');
 const texBuildRoot = join(tmpdir(), 'css-crypto-slides-build');
 
 function assert(condition, message) {
@@ -71,6 +81,62 @@ function cleanupDirectory(path) {
   mkdirSync(path, { recursive: true });
 }
 
+function ensureDirectory(path) {
+  mkdirSync(path, { recursive: true });
+}
+
+function isLatexArtifact(fileName) {
+  return [
+    '.aux',
+    '.log',
+    '.out',
+    '.toc',
+    '.nav',
+    '.snm',
+    '.vrb',
+    '.fls',
+    '.fdb_latexmk',
+    '.synctex.gz',
+    '.xdv',
+    '.dvi',
+    '.bbl',
+    '.blg',
+    '.lof',
+    '.lot',
+    '.lol',
+    '.pdf',
+  ].some(ext => fileName.endsWith(ext));
+}
+
+function latestSourceMtimeMs(dir) {
+  let latest = 0;
+  const stack = [dir];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    const entries = readdirSync(current, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(fullPath);
+        continue;
+      }
+      if (isLatexArtifact(entry.name)) continue;
+      const mtime = statSync(fullPath).mtimeMs;
+      if (mtime > latest) latest = mtime;
+    }
+  }
+
+  return latest;
+}
+
+function needsRebuild(texDir, outputPdfPath) {
+  if (!existsSync(outputPdfPath)) return true;
+  const sourceMtime = latestSourceMtimeMs(texDir);
+  const pdfMtime = statSync(outputPdfPath).mtimeMs;
+  return sourceMtime > pdfMtime;
+}
+
 function generateMarkdown(slide, classValue, suffixIndex) {
   const classSuffix = classValue == null ? 'general' : `class-${toSlug(classValue)}`;
   const fileName = `${String(slide.order).padStart(4, '0')}-${slide.id}-${classSuffix}-${suffixIndex}.md`;
@@ -106,9 +172,13 @@ function main() {
   assert(Array.isArray(slides) && slides.length > 0, 'Config must contain a non-empty slides array');
   verifyLatexEnvironment();
 
-  cleanupDirectory(pdfOutputDir);
+  ensureDirectory(pdfOutputDir);
   cleanupDirectory(generatedDir);
+  rmSync(legacyGeneratedDir, { recursive: true, force: true });
   cleanupDirectory(texBuildRoot);
+
+  let compiledCount = 0;
+  let skippedCount = 0;
 
   for (const slide of slides) {
     assert(slide.id, 'Slide id is required');
@@ -120,14 +190,20 @@ function main() {
     const texDir = resolve(repoRoot, slide.texDir);
     const texMain = join(texDir, 'main.tex');
     assert(existsSync(texMain), `Missing TeX source: ${texMain}`);
+    const finalPdfPath = join(pdfOutputDir, slide.pdfName);
 
-    const buildOutDir = join(texBuildRoot, slide.id);
-    cleanupDirectory(buildOutDir);
-    runPdflatex(texDir, buildOutDir);
+    if (needsRebuild(texDir, finalPdfPath)) {
+      const buildOutDir = join(texBuildRoot, slide.id);
+      cleanupDirectory(buildOutDir);
+      runPdflatex(texDir, buildOutDir);
 
-    const producedPdf = join(buildOutDir, 'main.pdf');
-    assert(existsSync(producedPdf), `PDF was not produced for ${slide.id}`);
-    copyFileSync(producedPdf, join(pdfOutputDir, slide.pdfName));
+      const producedPdf = join(buildOutDir, 'main.pdf');
+      assert(existsSync(producedPdf), `PDF was not produced for ${slide.id}`);
+      copyFileSync(producedPdf, finalPdfPath);
+      compiledCount += 1;
+    } else {
+      skippedCount += 1;
+    }
 
     if (Array.isArray(slide.classes) && slide.classes.length > 0) {
       slide.classes.forEach((classValue, index) => generateMarkdown(slide, classValue, index));
@@ -137,7 +213,9 @@ function main() {
   }
 
   const generatedFiles = readdirSync(generatedDir).filter(name => name.endsWith('.md')).length;
-  console.log(`Generated ${slides.length} PDFs and ${generatedFiles} resource entries.`);
+  console.log(
+    `Slide sync complete: ${compiledCount} compiled, ${skippedCount} up-to-date, ${generatedFiles} resource entries generated.`
+  );
 }
 
 main();
