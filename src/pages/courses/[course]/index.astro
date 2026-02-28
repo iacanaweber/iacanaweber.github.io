@@ -53,6 +53,11 @@ function parseClassRange(val: string | number): { from: number; to: number } {
   return { from: n, to: n };
 }
 
+interface ClassPoint {
+  classNumber: number;
+  rowIndex: number;
+}
+
 interface CellData {
   resources: typeof allResources;
   rowspan: number;
@@ -60,24 +65,67 @@ interface CellData {
 }
 
 const cellMap = new Map<string, CellData>();
+const rowIndexByClass = new Map<number, number>();
+
+scheduleEntries.forEach((entry, idx) => {
+  if (entry.number != null && !rowIndexByClass.has(entry.number)) {
+    rowIndexByClass.set(entry.number, idx);
+  }
+});
+
+function rangePoints(from: number, to: number): ClassPoint[] {
+  const points: ClassPoint[] = [];
+  for (let c = from; c <= to; c++) {
+    const rowIndex = rowIndexByClass.get(c);
+    if (rowIndex != null) points.push({ classNumber: c, rowIndex });
+  }
+  return points;
+}
+
+function splitIntoContiguousSegments(points: ClassPoint[]): ClassPoint[][] {
+  if (points.length === 0) return [];
+  const segments: ClassPoint[][] = [[points[0]]];
+
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const contiguousByClass = curr.classNumber === prev.classNumber + 1;
+    const contiguousByRow = curr.rowIndex === prev.rowIndex + 1;
+
+    if (contiguousByClass && contiguousByRow) {
+      segments[segments.length - 1].push(curr);
+    } else {
+      segments.push([curr]);
+    }
+  }
+
+  return segments;
+}
 
 for (const r of allResources) {
   if (r.data.class == null) continue;
   const col: Column = (r.data.column as Column | undefined) ?? defaultColumn(r.data.type);
   const { from, to } = parseClassRange(r.data.class as string | number);
+  const segments = splitIntoContiguousSegments(rangePoints(from, to));
+  if (segments.length === 0) continue;
 
-  const startKey = `${from}:${col}`;
-  if (!cellMap.has(startKey)) {
-    cellMap.set(startKey, { resources: [], rowspan: to - from + 1, skip: false });
-  }
-  const cell = cellMap.get(startKey)!;
-  cell.resources.push(r);
-  cell.rowspan = Math.max(cell.rowspan, to - from + 1);
+  for (const segment of segments) {
+    const startClass = segment[0].classNumber;
+    const span = segment.length;
+    const startKey = `${startClass}:${col}`;
 
-  for (let c = from + 1; c <= to; c++) {
-    const skipKey = `${c}:${col}`;
-    if (!cellMap.has(skipKey)) {
-      cellMap.set(skipKey, { resources: [], rowspan: 1, skip: true });
+    if (!cellMap.has(startKey)) {
+      cellMap.set(startKey, { resources: [], rowspan: span, skip: false });
+    }
+    const cell = cellMap.get(startKey)!;
+    cell.resources.push(r);
+    cell.rowspan = Math.max(cell.rowspan, span);
+
+    for (let i = 1; i < segment.length; i++) {
+      const skipKey = `${segment[i].classNumber}:${col}`;
+      if (!cellMap.has(skipKey)) {
+        cellMap.set(skipKey, { resources: [], rowspan: 1, skip: true });
+      }
     }
   }
 }
@@ -95,15 +143,21 @@ for (const r of generalResources) {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-function activityClass(activity: string): string {
+function activityClass(activity: string, description: string): string {
   const a = activity.toLowerCase();
+  const d = description.toLowerCase();
   if (a.includes('g2'))                                          return 'activity-g2';
   if (a.includes('substituição') || a.includes('substituicao')) return 'activity-sub';
   if (a.includes('prova') || a.includes('exame'))               return 'activity-exam';
   if (a.includes('trabalho'))                                    return 'activity-trabalho';
-  if (a.includes('feriado'))                                     return 'activity-feriado';
+  if (a.includes('feriado') || d.includes('feriado'))           return 'activity-feriado';
   if (a.includes('evento') || a.includes('acadêmico') || a.includes('academico')) return 'activity-evento';
   return 'activity-class';
+}
+
+function activityBadgeLabel(activityClassName: string, activity: string): string {
+  if (activityClassName === 'activity-feriado') return 'Feriado';
+  return activity;
 }
 
 function dayLabel(abbr: string): string {
@@ -211,9 +265,9 @@ const typeLabels: Record<string, string> = {
             <tbody>
               {scheduleEntries.map(entry => {
                 const room = entry.resources || defaultRoom || '—';
-                const aClass = activityClass(entry.activity);
+                const aClass = activityClass(entry.activity, entry.description);
                 return (
-                  <tr class={`schedule-row ${aClass}`}>
+                  <tr class={`schedule-row ${aClass}`} data-class-number={entry.number ?? undefined}>
                     <td class="col-num">{entry.number ?? '—'}</td>
                     <td class="col-date">
                       <span class="date-day">{dayLabel(entry.day)}</span>
@@ -222,7 +276,7 @@ const typeLabels: Record<string, string> = {
                     <td class="col-topic">
                       <span class="topic-text">{entry.description || '—'}</span>
                       {aClass !== 'activity-class' && (
-                        <span class={`activity-badge ${aClass}`}>{entry.activity}</span>
+                        <span class={`activity-badge ${aClass}`}>{activityBadgeLabel(aClass, entry.activity)}</span>
                       )}
                     </td>
                     <td class="col-room">{room}</td>
@@ -234,6 +288,8 @@ const typeLabels: Record<string, string> = {
                         <td
                           rowspan={cell.rowspan > 1 ? cell.rowspan : undefined}
                           class={`col-${col}`}
+                          data-span-start={cell.rowspan > 1 ? entry.number ?? undefined : undefined}
+                          data-span-end={cell.rowspan > 1 && entry.number != null ? entry.number + cell.rowspan - 1 : undefined}
                         >
                           {cell.resources.length > 0 && (
                             <div class="material-links">
@@ -280,6 +336,42 @@ const typeLabels: Record<string, string> = {
     </div>
   )}
 </CourseLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const table = document.querySelector('.schedule-table');
+    if (!table) return;
+
+    const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
+    const spanCells = Array.from(table.querySelectorAll('td[data-span-start][data-span-end]'));
+    let activeCells = [];
+
+    const clearHover = () => {
+      for (const cell of activeCells) cell.classList.remove('rowspan-hover');
+      activeCells = [];
+    };
+
+    const applyHoverForRow = row => {
+      clearHover();
+      const classNumber = Number(row.dataset.classNumber);
+      if (!Number.isFinite(classNumber)) return;
+
+      for (const cell of spanCells) {
+        const start = Number(cell.dataset.spanStart);
+        const end = Number(cell.dataset.spanEnd);
+        if (Number.isFinite(start) && Number.isFinite(end) && classNumber >= start && classNumber <= end) {
+          cell.classList.add('rowspan-hover');
+          activeCells.push(cell);
+        }
+      }
+    };
+
+    for (const row of bodyRows) {
+      row.addEventListener('mouseenter', () => applyHoverForRow(row));
+      row.addEventListener('mouseleave', clearHover);
+    }
+  });
+</script>
 
 <style>
   .course-subtitle {
@@ -404,6 +496,7 @@ const typeLabels: Record<string, string> = {
 
   /* ── Row type colours — light theme ─────────────────────────────────── */
   .activity-class:hover td { background: var(--color-bg-secondary); }
+  .schedule-table td.rowspan-hover { background: var(--color-bg-secondary); }
 
   /* Prova — amber */
   .activity-exam td { background: #fffbeb; }
@@ -421,13 +514,13 @@ const typeLabels: Record<string, string> = {
   .activity-trabalho td { background: #fefce8; }
   .activity-trabalho .activity-badge { background: #ca8a04; }
 
-  /* Feriado — salmon/red-orange */
-  .activity-feriado td { background: #fff5f0; }
-  .activity-feriado .activity-badge { background: #ea580c; }
+  /* Feriado — purple */
+  .activity-feriado td { background: #f5f3ff; }
+  .activity-feriado .activity-badge { background: #7c3aed; }
 
-  /* Evento Acadêmico — indigo/purple */
-  .activity-evento td { background: #f5f3ff; }
-  .activity-evento .activity-badge { background: #7c3aed; }
+  /* Evento Acadêmico — blue */
+  .activity-evento td { background: #eff6ff; }
+  .activity-evento .activity-badge { background: #2563eb; }
 
   /* ── Row type colours — dark theme ──────────────────────────────────── */
   /* :global() prevents Astro from adding the component scope hash to the
@@ -447,11 +540,11 @@ const typeLabels: Record<string, string> = {
   :global([data-theme="dark"]) .activity-trabalho td { background: #2d2800; }
   :global([data-theme="dark"]) .activity-trabalho .activity-badge { background: #a16207; }
 
-  :global([data-theme="dark"]) .activity-feriado  td { background: #2d1400; }
-  :global([data-theme="dark"]) .activity-feriado  .activity-badge { background: #c2410c; }
+  :global([data-theme="dark"]) .activity-feriado  td { background: #1e1040; }
+  :global([data-theme="dark"]) .activity-feriado  .activity-badge { background: #6d28d9; }
 
-  :global([data-theme="dark"]) .activity-evento   td { background: #1e1040; }
-  :global([data-theme="dark"]) .activity-evento   .activity-badge { background: #6d28d9; }
+  :global([data-theme="dark"]) .activity-evento   td { background: #0b1d40; }
+  :global([data-theme="dark"]) .activity-evento   .activity-badge { background: #2563eb; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }

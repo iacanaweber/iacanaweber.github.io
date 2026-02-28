@@ -53,7 +53,7 @@ if ! command -v kpsewhich >/dev/null 2>&1 || ! kpsewhich brazil.ldf >/dev/null 2
 fi
 
 npm run slides:sync
-git add public/assets/pdfs/css/crypto
+git add public/assets/pdfs/css
 `;
 
 writeFileSync(hookPath, hookContents, 'utf8');

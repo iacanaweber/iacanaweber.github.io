@@ -19,7 +19,7 @@ This repository powers a static website with:
 ```text
 .
 ├── aulas/crypto/                       # LaTeX slide sources
-├── config/css-crypto-slides.json       # Mapping slide -> class(es)
+├── config/css-slides.json              # Mapping slide -> class(es)
 ├── scripts/
 │   ├── sync-crypto-slides.mjs          # Compile LaTeX and generate resources
 │   └── setup-git-hooks.mjs             # Installs pre-commit hook

@@ -16,8 +16,7 @@ import { spawnSync } from 'node:child_process';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
 
-const configPath = join(repoRoot, 'config', 'css-crypto-slides.json');
-const pdfOutputDir = join(repoRoot, 'public', 'assets', 'pdfs', 'css', 'crypto');
+const configPath = join(repoRoot, 'config', 'css-slides.json');
 const generatedDir = join(repoRoot, 'src', 'content', 'resources', 'generated');
 const legacyGeneratedDir = join(repoRoot, 'src', 'content', 'resources', '_generated');
 const texBuildRoot = join(tmpdir(), 'css-crypto-slides-build');
@@ -147,7 +146,7 @@ function generateMarkdown(slide, classValue, suffixIndex) {
     `title: ${yamlQuote(slide.title)}`,
     'course: "css"',
     'type: "slides"',
-    `pdfPath: ${yamlQuote(`/assets/pdfs/css/crypto/${slide.pdfName}`)}`,
+    `pdfPath: ${yamlQuote(slide.outputPdfPath)}`,
     'column: "materiais"',
     `order: ${slide.order + suffixIndex}`,
   ];
@@ -172,7 +171,6 @@ function main() {
   assert(Array.isArray(slides) && slides.length > 0, 'Config must contain a non-empty slides array');
   verifyLatexEnvironment();
 
-  ensureDirectory(pdfOutputDir);
   cleanupDirectory(generatedDir);
   rmSync(legacyGeneratedDir, { recursive: true, force: true });
   cleanupDirectory(texBuildRoot);
@@ -184,13 +182,17 @@ function main() {
     assert(slide.id, 'Slide id is required');
     assert(slide.title, `Slide ${slide.id} is missing title`);
     assert(slide.texDir, `Slide ${slide.id} is missing texDir`);
-    assert(slide.pdfName, `Slide ${slide.id} is missing pdfName`);
+    assert(
+      typeof slide.outputPdfPath === 'string' && slide.outputPdfPath.startsWith('/'),
+      `Slide ${slide.id} is missing valid outputPdfPath`
+    );
     assert(Number.isFinite(slide.order), `Slide ${slide.id} has invalid order`);
 
     const texDir = resolve(repoRoot, slide.texDir);
     const texMain = join(texDir, 'main.tex');
     assert(existsSync(texMain), `Missing TeX source: ${texMain}`);
-    const finalPdfPath = join(pdfOutputDir, slide.pdfName);
+    const finalPdfPath = join(repoRoot, 'public', slide.outputPdfPath.replace(/^\/+/, ''));
+    ensureDirectory(dirname(finalPdfPath));
 
     if (needsRebuild(texDir, finalPdfPath)) {
       const buildOutDir = join(texBuildRoot, slide.id);

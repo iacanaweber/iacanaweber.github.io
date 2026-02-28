@@ -1,0 +1,722 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
+
+\tcbuselibrary{skins, breakable}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% --------- Macros úteis ----------
+\newcommand{\R}{\mathrm{R}}
+\newcommand{\A}{\mathrm{A}}
+\newcommand{\F}{\mathrm{F}}
+\newcommand{\fTTF}{\mathrm{f}}
+\newcommand{\haz}{\mathrm{h}}
+\newcommand{\MTTF}{\mathrm{MTTF}}
+\newcommand{\MTBF}{\mathrm{MTBF}}
+\newcommand{\MTTR}{\mathrm{MTTR}}
+\newcommand{\MDT}{\mathrm{MDT}}
+\newcommand{\TTT}{\mathrm{TTT}} % total time on test
+\newcommand{\SLO}{\mathrm{SLO}}
+\newcommand{\SLA}{\mathrm{SLA}}
+\newcommand{\SLI}{\mathrm{SLI}}
+
+\title[Dependabilidade: Confiabilidade e Disponibilidade]{Dependabilidade: Confiabilidade e Disponibilidade}
+\subtitle{Modelos, Métricas, Composição de Sistemas e Práticas de Engenharia}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4) -- Aula 2}
+
+\begin{document}
+
+% ---------------- Capa (mantida) ----------------
+\begin{frame}[plain]
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{../img/brasao_pucrs.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Dependabilidade:}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Confiabilidade e Disponibilidade}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{1.4cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+\begin{center}
+    \tiny \textit{Gancho para a próxima aula: Safety, Security e Resiliência (atributos e ameaças ampliadas).}
+\end{center}
+\end{frame}
+
+\begin{frame}{Índice}
+  \tableofcontents
+\end{frame}
+
+% =========================================================
+\section{Motivação e Taxonomia de Dependabilidade}
+
+\begin{frame}{Por que engenharia de dependabilidade?}
+\begin{itemize}
+  \item Sistemas reais falham por \textbf{causas acidentais} e \textbf{causas sistemáticas} (projeto/implementação).
+  \item Em ambientes modernos: \textbf{dependências} (serviços, bibliotecas, redes) dominam risco.
+  \item Engenharia precisa de:
+    \begin{itemize}
+      \item \textbf{Métricas} (quantificar), \textbf{modelos} (predizer/planejar),
+      \item \textbf{métodos} (prevenir, tolerar, remover, prever falhas).
+    \end{itemize}
+\end{itemize}
+% TALKING POINT: contraste entre "não falhar" (reliability) e "falhar pouco e recuperar rápido" (availability).
+% TODO: inserir exemplo real (case de outage conhecido) e discutir dependências.
+\end{frame}
+
+\begin{frame}{Dependabilidade (Dependability): definição e atributos}
+\begin{block}{Definição (visão clássica)}
+Dependabilidade é a \textbf{capacidade de entregar serviço correto e confiável} em que se pode \textbf{justificadamente confiar}.
+\end{block}
+\begin{itemize}
+  \item Atributos (exemplos): \textbf{confiabilidade}, \textbf{disponibilidade}, \textbf{segurança funcional (safety)}, \textbf{integridade}, \textbf{manutenibilidade}.
+  \item \textbf{Security} adiciona preocupações como \textbf{confidencialidade} além de disponibilidade/integridade.
+\end{itemize}
+\small
+\hfill\footnotesize{Fonte clássica: Avizienis et al., IEEE TDSC (2004).}
+% TODO: link (PDF): https://www.landwehr.org/2004-aviz-laprie-randell.pdf
+\end{frame}
+
+\begin{frame}{A cadeia: Fault \texorpdfstring{$\to$}{->} Error \texorpdfstring{$\to$}{->} Failure}
+\begin{columns}[T,onlytextwidth]
+\column{0.60\textwidth}
+\begin{itemize}
+  \item \textbf{Fault (defeito)}: causa interna/externa latente.
+  \item \textbf{Error (erro de estado)}: estado interno incorreto gerado por fault ativado.
+  \item \textbf{Failure (falha de serviço)}: erro chega à interface de serviço (desvio do especificado).
+\end{itemize}
+
+\column{0.40\textwidth}
+\centering
+\begin{tikzpicture}[
+  node distance=6mm,
+  box/.style={draw, rounded corners, align=center, inner sep=3mm},
+  arr/.style={-Latex, thick}
+]
+\node[box] (fault) {Fault\\(defeito)};
+\node[box, below=of fault] (error) {Error\\(estado incorreto)};
+\node[box, below=of error] (failure) {Failure\\(serviço incorreto)};
+\draw[arr] (fault) -- (error);
+\draw[arr] (error) -- (failure);
+\end{tikzpicture}
+\end{columns}
+% TALKING POINT: em Security, faults podem ser "maliciosamente injetados" (ataques) e não apenas acidentais.
+% TODO: referência de slide universitário: Univ. of Pisa (dep.) menciona explicitamente a cadeia.
+% TODO link: https://docenti.ing.unipi.it/~a008669/didattica/ANNO2015-16/DEP/BasicConceptsP3.pdf
+\end{frame}
+
+\begin{frame}{Reliability vs Availability: intuição correta}
+\begin{block}{Confiabilidade (Reliability)}
+Probabilidade de \textbf{não ocorrer falha} durante um intervalo: \(\R(t) = P(T>t)\).
+\end{block}
+\begin{block}{Disponibilidade (Availability)}
+Probabilidade de o sistema estar \textbf{operacional em um instante} ou em regime estacionário.
+\end{block}
+
+\begin{itemize}
+  \item Um sistema pode ser \textbf{pouco confiável} (falha com frequência) mas \textbf{muito disponível} (recupera rápido).
+  \item E o inverso: falha raramente, mas quando falha, fica indisponível por muito tempo.
+\end{itemize}
+% TALKING POINT: discutir exemplos (serviço web com autoscaling/rollback vs equipamento com reparo demorado).
+\end{frame}
+
+% =========================================================
+\section{Fundamentos Probabilísticos de Confiabilidade}
+
+\begin{frame}{TTF como variável aleatória}
+Seja \(T\) o \textbf{tempo até falha} (Time-To-Failure).
+\[
+\F(t)=P(T\le t), \quad \R(t)=P(T>t)=1-\F(t)
+\]
+Densidade:
+\[
+\fTTF(t)=\frac{d\F(t)}{dt}
+\]
+\textbf{Hazard rate} (taxa de risco/instantânea):
+\[
+\haz(t)=\frac{\fTTF(t)}{\R(t)}
+\]
+% TALKING POINT: hazard é "taxa condicional de falhar agora dado que sobreviveu até t".
+% TODO: inserir figura intuitiva de hazard (ex.: gráfico h(t) para Weibull beta<1,=1,>1).
+\end{frame}
+
+\begin{frame}{MTTF como área sob \texorpdfstring{$\R(t)$}{R(t)}}
+Para distribuições contínuas (não negativas):
+\[
+\MTTF = \mathbb{E}[T] = \int_0^{\infty} \R(t)\, dt
+\]
+\begin{itemize}
+  \item Esse resultado é muito útil: você não precisa da densidade explicitamente para obter \(\MTTF\).
+  \item Para modelos paramétricos, \(\MTTF\) vira função direta de parâmetros (ex.: \(1/\lambda\)).
+\end{itemize}
+% TALKING POINT: mostrar derivação curta em sala (integração por partes).
+\end{frame}
+
+\begin{frame}{Modelo exponencial: quando faz sentido?}
+\begin{block}{Hipótese-chave}
+\(\haz(t)=\lambda\) constante \(\Rightarrow\) \(\R(t)=e^{-\lambda t}\) (propriedade sem memória).
+\end{block}
+\begin{itemize}
+  \item Bom modelo \textbf{na região “útil”} da curva \textbf{bathtub} (taxa aproximadamente constante).
+  \item Muito usado em testes/planejamento por simplicidade (e por permitir ICs analíticos).
+\end{itemize}
+\small
+\hfill\footnotesize{Referência prática: NIST Reliability/Availability Handbook (exponencial/HPP).}
+% TODO link NIST: https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm
+\end{frame}
+
+\begin{frame}{Exponencial: métricas e estimação rápida}
+\[
+\R(t)=e^{-\lambda t},\quad \MTTF=\frac{1}{\lambda}
+\]
+Se em um teste observamos \(n\) falhas e \(\TTT\) = \textbf{tempo total em teste} (soma das exposições):
+\[
+\hat{\lambda}=\frac{n}{\TTT},\quad \widehat{\MTTF}=\frac{\TTT}{n}
+\]
+\begin{itemize}
+  \item \(\TTT\) funciona bem inclusive com \textbf{censura à direita} (itens que não falharam até o fim do teste).
+\end{itemize}
+% TALKING POINT: reforçar a diferença entre "contar falhas" e "tempo total de exposição".
+\end{frame}
+
+\begin{frame}{Intervalo de confiança para MTBF/MTTF (exponencial)}
+No modelo exponencial (HPP), o NIST fornece fatores/tabelas e forma fechada para IC (baseado em \(\chi^2\)).
+\begin{itemize}
+  \item Essencial para não vender “um número mágico” sem incerteza.
+  \item Caso “zero falhas” (muito comum em testes curtos) tem tratamento específico.
+\end{itemize}
+\small
+\hfill\footnotesize{Fonte: NIST APR 8.4.5.1 (MTBF e ICs).}
+% TODO link NIST: https://www.itl.nist.gov/div898/handbook/apr/section4/apr451.htm
+% TALKING POINT: em sala, fazer um mini-exemplo de "0 falhas em X horas" -> bound inferior de MTBF com 90% de confiança.
+\end{frame}
+
+\begin{frame}{Weibull: modelo mais realista para componentes físicos}
+\begin{block}{Weibull (2 parâmetros)}
+\[
+\R(t)=\exp\left(-\left(\frac{t}{\eta}\right)^{\beta}\right),
+\quad
+\haz(t)=\frac{\beta}{\eta}\left(\frac{t}{\eta}\right)^{\beta-1}
+\]
+\end{block}
+\begin{itemize}
+  \item \(\beta<1\): “infant mortality” (hazard decrescente).
+  \item \(\beta=1\): exponencial (hazard constante).
+  \item \(\beta>1\): desgaste/envelhecimento (hazard crescente).
+\end{itemize}
+\small
+\hfill\footnotesize{Referência didática: ETH Zürich (Reliability Distributions).}
+% TODO link ETH: https://www.ises.ethz.ch/content/dam/ethz/special-interest/mavt/imes/ises-dam/documents/Slides_Reliability_of_Technical_Systems/02-Reliability-Distributions.pdf
+\end{frame}
+
+\begin{frame}{Bathtub curve e interpretação de engenharia}
+\begin{itemize}
+  \item Três fases típicas:
+    \begin{enumerate}
+      \item \textbf{Mortalidade infantil}: falhas de fabricação/integração (hazard decrescente).
+      \item \textbf{Vida útil}: falhas aleatórias (hazard ~ constante).
+      \item \textbf{Desgaste}: envelhecimento (hazard crescente).
+    \end{enumerate}
+  \item Em \textbf{software}, a analogia muda:
+    \begin{itemize}
+      \item Sem mudanças: hazard pode ser aproximadamente constante.
+      \item Com correções/novas features: hazard varia e pode até piorar (regressões).
+    \end{itemize}
+\end{itemize}
+% TODO: inserir figura clássica bathtub (NIST/curso universitário).
+% TODO link (exemplo): material MIT/notes menciona bathtub e região útil.
+% TODO link: https://web.mit.edu/2.611/www/notes/BB.pdf
+% TALKING POINT: relacionar com "burn-in", testes de aceitação, e com práticas de release/rollback em software.
+\end{frame}
+
+% =========================================================
+\section{Disponibilidade: sistemas reparáveis e operação}
+
+\begin{frame}{MTTF, MTBF, MTTR, MDT (e por que MTTR é “decomponível”)}
+\begin{itemize}
+  \item \(\MTTF\): tempo médio até falha (não reparável).
+  \item \(\MTBF\): tempo médio entre falhas (reparável).
+  \item \(\MTTR\): tempo médio de reparo/recuperação.
+  \item \(\MDT\): downtime médio (pode incluir logística, espera, janela, aprovação).
+\end{itemize}
+\begin{block}{Decomposição útil (Ops/SRE)}
+\[
+\MTTR \approx \underbrace{\mathrm{MTTD}}_{\text{detectar}}
++
+\underbrace{\mathrm{MTTI}}_{\text{diagnosticar/decidir}}
++
+\underbrace{\mathrm{MTTM}}_{\text{mitigar/reparar}}
+\]
+\end{block}
+% TALKING POINT: mostrar como observabilidade reduz MTTD e automação reduz MTTM.
+\end{frame}
+
+\begin{frame}{Disponibilidade: instantânea vs estacionária}
+\begin{itemize}
+  \item \textbf{Disponibilidade instantânea}: \(\A(t)=P(\text{sistema operacional em } t)\).
+  \item \textbf{Disponibilidade estacionária}: \(\A_{\infty}=\lim_{t\to\infty}\A(t)\).
+\end{itemize}
+Para taxas exponenciais: falha \(\lambda\) e reparo \(\mu\),
+\[
+\A_{\infty}=\frac{\mu}{\lambda+\mu}
+\quad\Longleftrightarrow\quad
+\A_{\infty}=\frac{\MTBF}{\MTBF+\MTTR}
+\]
+% TALKING POINT: reforçar que a fórmula MTBF/(MTBF+MTTR) é um caso particular (assume expo/estacionário).
+% TODO: link ETH (Markov/availability) para embasamento.
+\end{frame}
+
+\begin{frame}{“N-nines” e orçamento de indisponibilidade}
+\small
+\centering
+\begin{tabular}{lcc}
+\toprule
+Meta (\%) & Downtime/mês (30d) & Downtime/ano (365d) \\
+\midrule
+99.0   & \(\approx\) 7h12m & \(\approx\) 3d15h \\
+99.9   & \(\approx\) 43m12s & \(\approx\) 8h45m \\
+99.99  & \(\approx\) 4m19s & \(\approx\) 52m \\
+99.999 & \(\approx\) 26s   & \(\approx\) 5m15s \\
+\bottomrule
+\end{tabular}
+
+\vspace{2mm}
+\begin{itemize}
+  \item A conta é direta: \(\text{downtime} = (1-\text{meta})\times \text{janela}\).
+\end{itemize}
+\footnotesize{Referência prática (error budget / janela mensal): Google SRE (Calculus of Service Availability).}
+% TODO link: https://sre.google/static/pdf/calculus_of.pdf
+% TALKING POINT: discutir diferença entre "calendar month" e "rolling window"; e entre downtime e erros de requisição (SLI).
+\end{frame}
+
+\begin{frame}{Disponibilidade percebida vs interna (o que você mede?)}
+\begin{itemize}
+  \item \textbf{Disponibilidade interna}: processo/host “up”.
+  \item \textbf{Disponibilidade do usuário}: requisições boas / total (\(\SLI\)).
+  \item \textbf{Erro parcial}: degradação (latência alta, funcionalidade limitada) pode ser “falha” do ponto de vista do SLO.
+\end{itemize}
+\begin{block}{Boa prática}
+Definir SLIs alinhados ao usuário e derivar \(\SLO\) e “error budget” (1-\(\SLO\)).
+\end{block}
+\footnotesize{Referência: Google SRE Workbook (alerting e SLOs).}
+% TODO link: https://sre.google/workbook/alerting-on-slos/
+% TALKING POINT: exemplo de SLI (p99 latência + taxa de sucesso) e como isso se conecta com disponibilidade.
+\end{frame}
+
+% =========================================================
+\section{Composição de Sistemas: RBD, redundância e dependências}
+
+\begin{frame}{Assunção de independência: útil, mas perigosa}
+\begin{itemize}
+  \item Muitas fórmulas clássicas assumem falhas \textbf{independentes}.
+  \item Na prática, falhas correlacionadas são comuns:
+    \begin{itemize}
+      \item bug em código compartilhado,
+      \item configuração errada propagada,
+      \item dependência externa (DNS, IdP, rede),
+      \item energia/temperatura/ambiente (hardware),
+      \item ataques (Security).
+    \end{itemize}
+\end{itemize}
+% TALKING POINT: introduzir "common-cause failures" e por que diversidade (design diversity) pode ser necessária.
+% TODO: link ETH (Dependent Failures / Common Cause).
+% TODO link: https://www.ises.ethz.ch/content/dam/ethz/special-interest/mavt/imes/ises-dam/documents/Slides_Reliability_of_Technical_Systems/07-Dependent-Failures.pdf
+\end{frame}
+
+\begin{frame}{RBD: sistema em série (dependências “AND”)}
+Se um serviço depende de \(n\) componentes independentes:
+\[
+\R_{sys}(t)=\prod_{i=1}^{n} \R_i(t)
+\]
+\begin{itemize}
+  \item Intuição: “uma falha derruba o serviço”.
+  \item Em microsserviços, dependências críticas podem dominar a confiabilidade global.
+\end{itemize}
+% TALKING POINT: relacionar com frase do Google SRE "you're only as available as your dependencies".
+\end{frame}
+
+\begin{frame}{RBD: paralelo ativo (redundância “OR”)}
+Para \(n\) componentes em paralelo ativo (1-out-of-n):
+\[
+\R_{sys}(t)=1-\prod_{i=1}^{n}\bigl(1-\R_i(t)\bigr)
+\]
+Caso idêntico exponencial (\(\R(t)=e^{-\lambda t}\)):
+\[
+\R_{sys}(t)=1-\bigl(1-e^{-\lambda t}\bigr)^n
+\]
+\begin{itemize}
+  \item Paralelo aumenta confiabilidade (e disponibilidade), \textbf{mas} depende de detecção/failover e da ausência de causa comum.
+\end{itemize}
+% TALKING POINT: custo/complexidade de redundância; introduzir "voter" e "N-modular redundancy".
+\end{frame}
+
+\begin{frame}{k-out-of-n e votação (ex.: TMR)}
+Para \(n\) componentes e o sistema operar se pelo menos \(k\) estiverem OK:
+\[
+\R_{k/n}(t)=\sum_{j=k}^{n}\binom{n}{j}\R(t)^j\bigl(1-\R(t)\bigr)^{n-j}
+\]
+\begin{itemize}
+  \item TMR (Triple Modular Redundancy): \(k=2, n=3\) com \textbf{votador}.
+  \item Atenção: o \textbf{votador} vira componente crítico (pode dominar série).
+\end{itemize}
+% TALKING POINT: apontar como isso aparece em hardware crítico (safety) e em sistemas distribuídos (quorum).
+\end{frame}
+
+\begin{frame}{Disponibilidade com redundância: exemplo numérico}
+Dois servidores idênticos, paralelo ativo, cada um com:
+\[
+\MTBF=500h,\quad \MTTR=1h \Rightarrow \A = \frac{500}{501}=0.9980
+\]
+Assumindo independência e failover “perfeito” (aprox.):
+\[
+\A_{par}\approx 1-(1-\A)^2
+\]
+\begin{itemize}
+  \item Compare o ganho com o caso em série (dependência “AND”) onde a disponibilidade cai.
+\end{itemize}
+% TALKING POINT: discutir por que "failover perfeito" raramente é real (detecção, split brain, dados).
+\end{frame}
+
+\begin{frame}{Common-cause failures (CCF): quando redundância não salva}
+\begin{itemize}
+  \item Um modelo simples: \textbf{$\beta$-factor}
+    \begin{itemize}
+      \item fração \(\beta\) das falhas é comum a todos os canais (derruba todos ao mesmo tempo);
+      \item fração \(1-\beta\) é independente.
+    \end{itemize}
+  \item Implicações:
+    \begin{itemize}
+      \item redundância sem diversidade pode ter ganho muito menor que o esperado.
+      \item práticas: diversidade de versão, zona/região, fornecedor, config, caminho de rede.
+    \end{itemize}
+\end{itemize}
+\footnotesize{Referência didática: ETH Zürich (Dependent Failures).}
+% TODO link: https://www.ises.ethz.ch/.../07-Dependent-Failures.pdf
+% TALKING POINT: ligar com Security: ataque explorando vulnerabilidade comum -> CCF intencional.
+\end{frame}
+
+% =========================================================
+\section{Modelos de Estado (Markov/CTMC) para reparo e failover}
+
+\begin{frame}{Quando RBD não basta}
+RBD é ótimo para estrutura “estática”, mas falha ao modelar:
+\begin{itemize}
+  \item \textbf{reparo} (volta do componente ao sistema),
+  \item \textbf{standby} (frio/morno/quente),
+  \item \textbf{cobertura de detecção} (coverage),
+  \item \textbf{tempos não desprezíveis} de failover, reboot, rollback.
+\end{itemize}
+\begin{block}{Ferramenta padrão}
+Cadeias de Markov (CTMC) para disponibilidade/confiabilidade em sistemas reparáveis.
+\end{block}
+% TALKING POINT: reforçar suposição Markoviana (tempos exponenciais) e como aproximar com fases.
+\end{frame}
+
+\begin{frame}{Exemplo CTMC: 1-out-of-2 com reparo}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+Estados:
+\begin{itemize}
+  \item \(S_2\): 2 operacionais
+  \item \(S_1\): 1 operacional
+  \item \(S_0\): 0 operacionais (down)
+\end{itemize}
+Transições (aprox.):
+\begin{itemize}
+  \item falhas: \(S_2 \to S_1\) taxa \(2\lambda\), \(S_1 \to S_0\) taxa \(\lambda\)
+  \item reparos: \(S_1 \to S_2\) taxa \(\mu\), \(S_0 \to S_1\) taxa \(2\mu\)
+\end{itemize}
+
+\column{0.48\textwidth}
+\centering
+\begin{tikzpicture}[
+  node distance=10mm,
+  st/.style={draw, circle, minimum size=8mm},
+  arr/.style={-Latex, thick}
+]
+\node[st] (S2) {$S_2$};
+\node[st, below=of S2] (S1) {$S_1$};
+\node[st, below=of S1] (S0) {$S_0$};
+
+\draw[arr] (S2) -- node[right] {$2\lambda$} (S1);
+\draw[arr] (S1) -- node[right] {$\lambda$} (S0);
+
+\draw[arr] (S1) -- node[left] {$\mu$} (S2);
+\draw[arr] (S0) -- node[left] {$2\mu$} (S1);
+\end{tikzpicture}
+
+\end{columns}
+\footnotesize{Referência de curso: ETH Zürich (Markov Models).}
+% TODO link: https://www.ises.ethz.ch/.../10-Markov-Models.pdf
+% TALKING POINT: cobertura imperfeita: adicionar transição S2->S0 com probabilidade (1-c) no failover.
+\end{frame}
+
+\begin{frame}{Como extrair disponibilidade estacionária do CTMC}
+\begin{itemize}
+  \item Resolva \(\pi Q = 0\) com \(\sum \pi_i=1\) (distribuição estacionária).
+  \item Disponibilidade: \(\A_\infty = 1 - \pi_{S_0}\).
+\end{itemize}
+\begin{block}{Mensagem prática}
+Modelos de estado permitem incorporar:
+\begin{itemize}
+  \item \textbf{tempo de failover}, \textbf{coverage}, \textbf{reparo limitado} (fila), \textbf{standby}.
+\end{itemize}
+\end{block}
+% TALKING POINT: se a turma já viu álgebra linear, dá para resolver um caso 3x3 em aula.
+\end{frame}
+
+% =========================================================
+\section{Software: práticas de engenharia para elevar dependabilidade}
+
+\begin{frame}{Meios para atingir dependabilidade (classificação clássica)}
+\begin{enumerate}
+  \item \textbf{Fault prevention}: evitar introduzir faults (processo, métodos formais, boas práticas).
+  \item \textbf{Fault removal}: encontrar e remover faults (testes, revisão, análise estática).
+  \item \textbf{Fault tolerance}: manter serviço correto apesar de faults (redundância, recuperação).
+  \item \textbf{Fault forecasting}: estimar incidência/consequências (modelagem, testes, dados de campo).
+\end{enumerate}
+\footnotesize{Fonte: Avizienis et al. (2004) e materiais de cursos europeus de dependability.}
+% TODO link Avizienis: https://www.landwehr.org/2004-aviz-laprie-randell.pdf
+% TODO link Pisa: https://docenti.ing.unipi.it/.../BasicConceptsP3.pdf
+\end{frame}
+
+\begin{frame}{Observabilidade e MTTR: o “ciclo” operacional}
+\begin{itemize}
+  \item \textbf{Detectar} rápido (reduz MTTD): métricas, logs estruturados, traces, alertas.
+  \item \textbf{Diagnosticar} (reduz MTTI): correlação, runbooks, grafos de dependência.
+  \item \textbf{Mitigar} (reduz MTTM): rollback automático, feature flags, auto-healing.
+\end{itemize}
+\begin{block}{Impacto direto}
+Mesmo com \(\MTBF\) igual, reduzir \(\MTTR\) melhora \(\A\) de forma significativa.
+\end{block}
+% TALKING POINT: relacionar com engenharia de confiabilidade (RE) e SRE; incident response e postmortems.
+\end{frame}
+
+\begin{frame}{SLO/Error Budget: “engenharia orientada a metas”}
+\begin{itemize}
+  \item Defina \(\SLI\): proporção de eventos bons / total.
+  \item Defina \(\SLO\) (meta interna) e \(\SLA\) (contratual).
+  \item \textbf{Error budget} \(= 1-\SLO\): “quanto você pode errar” na janela.
+\end{itemize}
+\begin{block}{Regra importante}
+Você é tão disponível quanto a soma do risco das suas dependências.
+\end{block}
+\footnotesize{Fonte: Google SRE (The Calculus of Service Availability; SRE Book/Workbook).}
+% TODO links:
+% https://sre.google/static/pdf/calculus_of.pdf
+% https://sre.google/workbook/alerting-on-slos/
+% TALKING POINT: discutir política de congelar mudanças quando estoura orçamento (exceto security fixes).
+\end{frame}
+
+\begin{frame}{Tolerância a falhas: padrões de software (com armadilhas)}
+\begin{itemize}
+  \item \textbf{Timeouts} e \textbf{retries} (com jitter/backoff) para falhas transientes.
+  \item \textbf{Circuit breaker} para evitar falha em cascata.
+  \item \textbf{Bulkheads} (isolamento) para conter propagação.
+  \item \textbf{Graceful degradation}: modos de serviço parcial.
+\end{itemize}
+% TALKING POINT: retry pode amplificar outage (thundering herd) — precisa rate limit e backoff.
+% TODO: inserir figura simples de cascata (link livre) ou desenhar com TikZ.
+\end{frame}
+
+% =========================================================
+\section{Modelos de confiabilidade em software (crescimento e limites)}
+
+\begin{frame}{Software Reliability Growth: por que difere de hardware?}
+\begin{itemize}
+  \item Em hardware, desgaste físico justifica hazard crescente (Weibull \(\beta>1\)).
+  \item Em software, falhas tendem a vir de \textbf{faults latentes} ativados por certos perfis de uso.
+  \item Em testes/campo, correções removem faults \(\Rightarrow\) taxa de falha pode \textbf{decrescer} ao longo do tempo.
+\end{itemize}
+% TALKING POINT: “software não desgasta”, mas pode piorar com mudanças, dependências e configuração.
+\end{frame}
+
+\begin{frame}{Exemplo clássico: NHPP (Goel--Okumoto)}
+\small
+Modelo assume que o número cumulativo de falhas segue um processo de Poisson não homogêneo:
+\[
+\mu(t)=N\left(1-e^{-bt}\right)
+\]
+onde \(N\) é o número esperado total de falhas “eventuais” e \(b\) controla a rapidez do decaimento.
+\begin{itemize}
+  \item Bom para dados de teste onde falhas vão diminuindo com correções.
+  \item Precisa cuidado: pressupõe condições relativamente estáveis e coleta consistente.
+\end{itemize}
+\footnotesize{Fonte: notas de aula universitárias (Software Reliability Estimation, Univ. of Denver).}
+% TODO link: https://www.cs.du.edu/~snarayan/sada/teaching/COMP3705/lecture/p1/W63.pdf
+% TALKING POINT: discutir quais dados são necessários (tempos entre falhas / contagens por intervalo).
+\end{frame}
+
+\begin{frame}{Musa--Okumoto (logarítmico) e leitura crítica}
+\small
+Intuição: consertos tardios produzem menor ganho; intensidade decresce com falhas acumuladas.
+\begin{itemize}
+  \item Modelos SRGMs são úteis para \textbf{planejamento} e \textbf{comparação}, não como “verdade absoluta”.
+  \item Sempre verifique:
+    \begin{itemize}
+      \item viés de coleta (mudança de carga/perfil),
+      \item mudanças arquiteturais,
+      \item qualidade do processo de correção (debugging imperfeito),
+      \item dependências externas (que mudam).
+    \end{itemize}
+\end{itemize}
+\footnotesize{Fonte: Univ. of Denver (W63) e literatura clássica de SRGM.}
+% TODO link: https://www.cs.du.edu/~snarayan/sada/teaching/COMP3705/lecture/p1/W63.pdf
+\end{frame}
+
+% =========================================================
+\section{Exemplos aplicados (mais realistas)}
+
+\begin{frame}{Exemplo 1: serviço embarcado de telemetria (com MTTR decomposto)}
+Dados:
+\[
+\MTBF=500h,\quad \mathrm{MTTD}=10min,\quad \mathrm{MTTI}=20min,\quad \mathrm{MTTM}=30min
+\]
+\[
+\MTTR\approx 60min = 1h \Rightarrow \A=\frac{500}{501}=99.80\%
+\]
+\begin{itemize}
+  \item Se automatizar detecção e rollback: \(\mathrm{MTTD}=1min\), \(\mathrm{MTTM}=5min\) \(\Rightarrow\) \(\MTTR\downarrow\) forte.
+\end{itemize}
+% TALKING POINT: o que reduz cada parcela (observabilidade vs automação vs processos).
+\end{frame}
+
+\begin{frame}{Exemplo 2: watchdog + estado seguro + perda de serviço}
+\begin{itemize}
+  \item Fault de firmware leva a deadlock.
+  \item Watchdog reinicia em 5s, mas:
+    \begin{itemize}
+      \item reinit de periféricos (mais 10s),
+      \item ressincronização de estado (mais 15s).
+    \end{itemize}
+  \item Downtime efetivo por evento: 30s.
+\end{itemize}
+\begin{block}{Pergunta de engenharia}
+O que é “falha” para o usuário? Reiniciar em 5s pode ser ótimo, mas perder estado pode ser inaceitável em alguns domínios.
+\end{block}
+% TALKING POINT: preparar gancho para Safety/Resiliência: fail-safe, fail-operational, degraded modes.
+\end{frame}
+
+\begin{frame}{Exemplo 3: SLO 99.9\% e dependências (orçamento por componente)}
+\begin{itemize}
+  \item SLO do serviço A: 99.9\% \(\Rightarrow\) budget = 0.1\% por janela.
+  \item Se A tem \(N\) dependências críticas, o budget precisa ser \textbf{particionado} (heurística comum).
+  \item Resultado prático: dependências precisam ter “mais 9s” de disponibilidade que o serviço final.
+\end{itemize}
+\footnotesize{Fonte: Google SRE (The Calculus of Service Availability).}
+% TODO link: https://sre.google/static/pdf/calculus_of.pdf
+% TALKING POINT: comparar com aproximação em série (produto) e mostrar por que dependências dominam.
+\end{frame}
+
+% =========================================================
+\section{Exercícios (nível engenharia)}
+
+\begin{frame}{Exercícios 1: confiabilidade e hazard}
+\begin{enumerate}
+  \item Para \(\lambda = 2\times10^{-4}\,h^{-1}\), calcule \(\R(100h)\) e \(\MTTF\).
+  \item Uma Weibull com \(\beta=2\), \(\eta=1000h\): calcule \(\R(500h)\) e interprete o hazard.
+  \item Mostre (algebricamente) que hazard constante implica \(\R(t)=e^{-\lambda t}\).
+\end{enumerate}
+% TALKING POINT: em sala, pedir que identifiquem em que tipo de componente \beta>1 é esperado.
+\end{frame}
+
+\begin{frame}{Exercícios 2: disponibilidade e trade-offs}
+\begin{enumerate}
+  \item Um sistema tem \(\MTBF=1200h\) e \(\MTTR=4h\). Qual \(\A\)?
+  \item Se você puder escolher entre:
+    \begin{itemize}
+      \item reduzir \(\lambda\) em 10\% (melhorando robustez), ou
+      \item reduzir \(\MTTR\) em 50\% (melhorando observabilidade/rollback),
+    \end{itemize}
+    qual ação dá maior ganho em \(\A\) neste caso?
+  \item Calcule o downtime mensal permitido para 99.95\% e compare com 99.9\%.
+\end{enumerate}
+% TALKING POINT: reforçar que MTTR é muitas vezes mais “barato” de reduzir do que MTBF.
+\end{frame}
+
+\begin{frame}{Exercícios 3: composição e dependências}
+\begin{enumerate}
+  \item Dois componentes em série com \(\A_1=0.999\) e \(\A_2=0.9995\). Aproxime \(\A_{sys}\).
+  \item Dois componentes em paralelo ativo (independentes) com \(\A=0.999\). Aproxime \(\A_{par}\).
+  \item Com causa comum \(\beta=0.05\), discuta qualitativamente por que o ganho do paralelo cai.
+\end{enumerate}
+% TALKING POINT: pedir uma discussão de engenharia: "o que você faria para reduzir beta?"
+\end{frame}
+
+% =========================================================
+\section{Resumo e gancho para Safety, Security e Resiliência}
+
+\begin{frame}{Resumo}
+\begin{itemize}
+  \item \textbf{Confiabilidade} modela “não falhar no intervalo”; \textbf{disponibilidade} inclui \textbf{reparo} e \textbf{recuperação}.
+  \item Exponencial é um \textbf{caso} (hazard constante); Weibull e hazard ajudam a capturar realidade.
+  \item Redundância melhora muito, mas \textbf{dependências} e \textbf{common-cause} podem dominar.
+  \item Em sistemas modernos, \textbf{MTTR} é alavanca enorme via observabilidade e automação.
+  \item Metas SLO/error budget conectam modelagem com operação contínua e trade-offs de mudança.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gancho: próxima aula (Safety, Security e Resiliência)}
+\begin{itemize}
+  \item A taxonomia de dependabilidade inclui \textbf{Safety} e \textbf{Security} como atributos/ameaças complementares.
+  \item \textbf{Safety}: falhas podem causar dano físico \(\Rightarrow\) foco em hazard, risco, estados seguros, certificação.
+  \item \textbf{Security}: faults podem ser \textbf{maliciosos} (ataques) \(\Rightarrow\) integridade/confidencialidade + disponibilidade sob ataque.
+  \item \textbf{Resiliência}: capacidade de \textbf{manter e recuperar} serviço sob falhas/ataques/degradação e dependências.
+\end{itemize}
+% TALKING POINT: antecipar que "resiliência" mistura engenharia + operação + resposta a incidentes (e também security fixes).
+\end{frame}
+
+\begin{frame}{Referências essenciais (para leitura e credibilidade)}
+\small
+\begin{itemize}
+  \item Avizienis, Laprie, Randell, Landwehr — \textit{Basic Concepts and Taxonomy of Dependable and Secure Computing} (IEEE TDSC, 2004).\\
+  \footnotesize{\url{https://www.landwehr.org/2004-aviz-laprie-randell.pdf}}
+  \item ETH Zürich — \textit{Reliability of Technical Systems} (distributions, dependent failures, Markov).\\
+  \footnotesize{\url{https://www.ises.ethz.ch/education/lectures/reliability-of-technical-systems.html}}
+  \item NIST — \textit{Reliability/Availability Handbook} (exponencial/HPP, MTBF e intervalos de confiança).\\
+  \footnotesize{\url{https://www.itl.nist.gov/div898/handbook/apr/}}
+  \item MIT (notes/OCW) — materiais de confiabilidade/bathtub e fundamentos.\\
+  \footnotesize{\url{https://web.mit.edu/2.611/www/notes/BB.pdf}}
+  \item University of Pisa — slides de Dependability (cadeia fault-error-failure, métodos).\\
+  \footnotesize{\url{https://docenti.ing.unipi.it/~a008669/}}
+  \item Google SRE — \textit{The Calculus of Service Availability} e Workbook (SLO/alerting).\\
+  \footnotesize{\url{https://sre.google/static/pdf/calculus_of.pdf}}
+\end{itemize}
+% TODO: se você quiser, posso adaptar essa lista para ABNT/Vancouver e gerar um slide "Bibliografia" formal.
+\end{frame}
+
+\end{document}

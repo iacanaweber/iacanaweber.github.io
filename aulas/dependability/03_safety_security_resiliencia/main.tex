@@ -1,0 +1,710 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, shapes.misc}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+  colorlinks=true,
+  urlcolor=blue,
+  linkcolor=blue
+}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\title[Safety, Security e Resiliência]{Safety, Security e Resiliência\\\small (Dependability / Trustworthiness em Sistemas Computacionais)}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4) -- Aula 3}
+
+% ------------------------------------------------------------
+% DICAS DE USO
+% - Este deck foi pensado para: Engenharia de Computação (sistemas embarcados/ciberfísicos + software).
+% - Fonte conceitual principal: Taxonomia de Dependability (Avizienis et al., IEEE TDSC 2004).
+% - Risk assessment: NIST SP 800-30 Rev.1; Operacionalização: NIST CSF 2.0.
+% - Safety avançado: STAMP/STPA (MIT OCW - Leveson).
+% - Resiliência/cyber resiliency: NIST SP 800-160 v2r1; CMU/SEI para práticas ao longo do ciclo de vida.
+% ------------------------------------------------------------
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{../img/brasao_pucrs.png}
+    % TODO: ajustar caminho do brasão, se necessário.
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Safety, Security}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{e Resiliência}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{1.6cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+\begin{center}
+    \tiny \textit{(Material com referências abertas; verificar licenças de figuras antes de incorporar.)}
+\end{center}
+\end{frame}
+
+\begin{frame}{Índice}
+  \tableofcontents
+\end{frame}
+
+% ============================================================
+\section{Motivação e mapa conceitual}
+
+\begin{frame}{Por que isso importa em Engenharia de Computação?}
+\begin{itemize}
+  \item Sistemas modernos são \textbf{ciberfísicos} e \textbf{conectados}: falhas + ataques podem gerar \textbf{danos físicos}.
+  \item Dependability (confiabilidade) não é ``só bug'': envolve \textbf{hardware, software, rede, humano, processo}.
+  \item \textbf{Convergência}: safety (acidental) + security (malicioso) + resiliência (sobrevivência e recuperação).
+\end{itemize}
+\vspace{0.4em}
+\small
+\textbf{Objetivo da aula:} fornecer um \textbf{framework} para identificar e justificar requisitos (safety/security) e decisões arquiteturais (resiliência).
+%% [AULA] Use 1-2 incidentes reais como motivação (ex.: ataque em veículo, ransomware em hospital, falha em sistema industrial).
+%% TODO: inserir figura de um sistema ciberfísico (camadas: sensores/atuadores, controle, rede, cloud).
+%% Link sugestão (genérico NIST CPS): https://www.nist.gov/programs-projects/cyber-physical-systems
+\end{frame}
+
+\begin{frame}{Dependability/Trustworthiness: visão unificadora (taxonomia clássica)}
+\begin{block}{Ideia-chave}
+\textbf{Dependability} é um conceito guarda-chuva que inclui atributos como:
+\textit{reliability, availability, safety, integrity, maintainability} (e, ao considerar security, entra \textit{confidentiality}).
+\end{block}
+
+\begin{itemize}
+  \item \textbf{Atributos (o que queremos)}: disponibilidade, confiabilidade, segurança funcional, integridade, etc.
+  \item \textbf{Ameaças (o que pode dar errado)}: \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}; e ataques.
+  \item \textbf{Meios (como alcançamos)}: prevenção, tolerância a falhas, remoção de falhas, previsão/estimativa.
+\end{itemize}
+
+\small
+\hfill \textit{Fonte-base: Avizienis et al., IEEE TDSC 2004.}
+%% [AULA] Reforce: “taxonomia” serve para organizar o pensamento e evitar checklist aleatório.
+\end{frame}
+
+\begin{frame}{Safety vs Security: definição e diferença operacional}
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
+\begin{tcolorbox}[title=Safety (acidental),colback=white]
+\begin{itemize}
+  \item Foco: \textbf{evitar dano} a pessoas/ambiente.
+  \item Causa típica: \textbf{falha não intencional} (bug, desgaste, erro humano).
+  \item Pergunta: ``\textit{o que pode causar um acidente?}'' (hazard analysis)
+\end{itemize}
+\end{tcolorbox}
+
+\column{0.48\textwidth}
+\begin{tcolorbox}[title=Security (malicioso),colback=white]
+\begin{itemize}
+  \item Foco: \textbf{proteger ativos} contra adversários.
+  \item Causa típica: \textbf{ação intencional} (exploit, engenharia social, supply chain).
+  \item Pergunta: ``\textit{como um atacante consegue isso?}'' (threat modeling)
+\end{itemize}
+\end{tcolorbox}
+\end{columns}
+
+\vspace{0.3em}
+\small
+\textbf{Interseção crítica:} ataques podem gerar \textbf{hazards} (ex.: sabotagem de controle).
+%% [AULA] Discuta “assets” em sistemas ciberfísicos: não só dados; inclui controle, tempo, continuidade, integridade de comando.
+\end{frame}
+
+\begin{frame}{Ameaças: falhas vs ataques (vocabulário mínimo rigoroso)}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\textbf{Mundo de falhas (dependability clássica)}
+\begin{itemize}
+  \item \textbf{Fault}: defeito/causa (HW/SW/humano).
+  \item \textbf{Error}: estado incorreto interno.
+  \item \textbf{Failure}: desvio observado do serviço esperado.
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Mundo de ataques (security)}
+\begin{itemize}
+  \item \textbf{Threat}: adversário + capacidade + intenção.
+  \item \textbf{Vulnerability}: fraqueza explorável.
+  \item \textbf{Exploit}: método para violar uma propriedade.
+\end{itemize}
+\end{columns}
+
+\vspace{0.4em}
+\begin{block}{Ponte entre os mundos}
+\textbf{Ataque} explora \textbf{vulnerabilidade} e induz \textbf{erro} (estado incorreto), resultando em \textbf{falha} (failure) que pode virar \textbf{acidente} (safety).
+\end{block}
+%% [AULA] Explique por que “bug” e “vuln” não são sinônimos: bug só vira vuln sob modelo de ameaça + superfície de ataque.
+\end{frame}
+
+\begin{frame}{Risco: por que ``Probabilidade $\times$ Impacto'' é só o começo}
+\begin{itemize}
+  \item Em prática, risco depende de: \textbf{ameaças}, \textbf{vulnerabilidades}, \textbf{condições predisponentes}, \textbf{probabilidade de ocorrência} e \textbf{impacto}.
+  \item Processos maduros usam: \textbf{framing} $\rightarrow$ \textbf{assessment} $\rightarrow$ \textbf{response} $\rightarrow$ \textbf{monitoring}.
+\end{itemize}
+
+\begin{block}{Modelo mental}
+\[
+\text{Risk} = f(\text{Threats},\ \text{Vulnerabilities},\ \text{Likelihood},\ \text{Impact},\ \text{Context})
+\]
+\end{block}
+
+\small
+\textit{Referência sugerida (security risk): NIST SP 800-30 Rev.1.}
+%% [AULA] Mostre um exemplo de como “mesma vulnerabilidade” muda de risco dependendo do contexto operacional e controles existentes.
+\end{frame}
+
+% ============================================================
+\section{Métricas e trade-offs de dependability}
+
+\begin{frame}{Métricas clássicas: Reliability e Availability}
+\begin{columns}[T,onlytextwidth]
+\column{0.52\textwidth}
+\textbf{Reliability} (sobrevivência até $t$)
+\[
+R(t)=P(T>t)
+\]
+Para taxa de falhas constante $\lambda$ (modelo exponencial):
+\[
+R(t)=e^{-\lambda t}
+\]
+
+\column{0.48\textwidth}
+\textbf{Availability} (tempo operacional)
+\[
+A \approx \frac{MTBF}{MTBF+MTTR}
+\]
+\begin{itemize}
+  \item MTBF: tempo médio entre falhas
+  \item MTTR: tempo médio de reparo/recuperação
+\end{itemize}
+\end{columns}
+
+\small
+\textit{Sugestão de leitura: notas de curso “Dependable Systems” (HPI) para definições e intuição.}
+%% [AULA] Reforce: disponibilidade pode ser alta com falhas frequentes se o reparo for rápido (MTTR baixo).
+\end{frame}
+
+\begin{frame}{Integridade, Safety e Security: métricas e “o que medir”}
+\begin{itemize}
+  \item \textbf{Integrity}: correção e não corrupção (dados/estado/comando).
+  \item \textbf{Safety}: probabilidade de \textbf{dano} + severidade (frequentemente via classes de risco).
+  \item \textbf{Security}: não há uma única métrica; use \textbf{objetivos} (CIA/AAA), risco, cobertura de controles, e métricas operacionais (MTTD/MTTR).
+\end{itemize}
+
+\vspace{0.3em}
+\begin{block}{Atenção}
+Métricas precisam ser \textbf{amarradas a um objetivo} e a um \textbf{modelo de ameaça/uso}. Sem isso viram ``números bonitos''.
+\end{block}
+%% [AULA] Discuta armadilhas: “contar CVEs” vs risco real; “coverage de teste” vs evidência de propriedade.
+\end{frame}
+
+\begin{frame}{Trade-offs típicos (e por que eles aparecem)}
+\begin{itemize}
+  \item \textbf{Autenticação} pode aumentar \textbf{latência} (impacto em controle em tempo real).
+  \item \textbf{Criptografia} aumenta custo/energia; pode afetar disponibilidade em HW fraco.
+  \item \textbf{Redundância} melhora \textbf{availability}, mas pode piorar \textbf{reliability} se introduzir mais componentes/falhas.
+  \item \textbf{Atualizações} melhoram security, mas podem impactar safety (certificação, regressões).
+\end{itemize}
+
+\begin{block}{Engenharia = justificar trade-offs}
+Não é “ter tudo”, é \textbf{definir o que é aceitável} e \textbf{provar com evidência}.
+\end{block}
+%% [AULA] Puxe o gancho para V&V: evidência vem de testes, análises, inspeções, revisões, medições e auditorias.
+\end{frame}
+
+% ============================================================
+\section{Safety engineering: de hazard a requisito e evidência}
+
+\begin{frame}{Safety: conceitos operacionais (não só definição)}
+\begin{itemize}
+  \item \textbf{Hazard}: condição/estado do sistema que, combinada com o ambiente, pode levar a dano.
+  \item \textbf{Accident/Loss}: dano efetivo (evento de perda).
+  \item \textbf{Safety constraint}: restrição que deve ser mantida para evitar hazards.
+\end{itemize}
+
+\begin{block}{Safety não é “zero risco”}
+É \textbf{reduzir risco a um nível aceitável} (e justificar isso).
+\end{block}
+
+%% [AULA] Diferencie “hazard” de “failure”: falha é desvio do serviço; hazard é estado perigoso (pode ocorrer sem falha “visível”).
+\end{frame}
+
+\begin{frame}{Ciclo de vida e padrões (o que a indústria exige)}
+\begin{itemize}
+  \item Safety-critical usa \textbf{ciclo de vida} + \textbf{gestão de configuração} + \textbf{rastreabilidade}.
+  \item Padrões variam por domínio: industrial (\textit{IEC 61508}), automotivo (\textit{ISO 26262}), aeronáutico (\textit{DO-178C/ED-12C}).
+\end{itemize}
+
+\begin{block}{Artefatos típicos}
+Hazard log, safety requirements, arquitetura de mitigação, V\&V plan, evidências, \textbf{safety case}.
+\end{block}
+
+%% [AULA] Explique “safety case” como argumento estruturado + evidências (puxar para GSN, sem entrar demais).
+%% TODO: inserir figura simples de V-model / safety lifecycle (preferir figura própria via TikZ).
+\end{frame}
+
+\begin{frame}{Caixa de ferramentas de Hazard Analysis (comparativo)}
+\begin{tabular}{p{2.5cm} p{5.6cm} p{2.2cm}}
+\toprule
+\textbf{Técnica} & \textbf{Uso típico} & \textbf{Quando brilha}\\
+\midrule
+FMEA / FMEDA & falhas por componente e efeitos & HW/SW com boas fronteiras\\
+FTA & combinações lógicas levando a evento topo & justificar mitigação e redundância\\
+ETA & consequências pós-evento & barreiras e escalonamento\\
+HAZOP & desvios de intenção (guidewords) & processos/indústria\\
+STPA & controle/feedback em sistemas complexos & software-intensivo/ciberfísico\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3em}
+\small
+\textit{STPA é central em cursos modernos de System Safety (ex.: MIT OCW).}
+%% [AULA] Dê um exemplo onde FMEA falha em capturar interações de controle/organização, e STPA capta.
+\end{frame}
+
+\begin{frame}{Exemplo de FMEA (template mínimo)}
+\small
+\begin{tabular}{p{2.1cm} p{2.5cm} p{2.5cm} p{2.1cm}}
+\toprule
+\textbf{Item} & \textbf{Modo de falha} & \textbf{Efeito} & \textbf{Mitigação}\\
+\midrule
+Sensor & saturação/leitura travada & controle recebe valor incorreto & plausibility check, redundância\\
+Firmware & overflow em cálculo & comando fora de faixa & saturação + testes + revisão\\
+Comunicação & perda/atraso & comando stale & timeout + fail-safe\\
+\bottomrule
+\end{tabular}
+
+\vspace{0.4em}
+\begin{block}{Ponto crítico}
+Mitigação vira \textbf{requisito verificável} (e entra no plano de V\&V).
+\end{block}
+%% [AULA] Mostre como um item vira requisito: “se sensor travar por X ms, então atuar em modo seguro Y”.
+\end{frame}
+
+\begin{frame}{Fault Tree Analysis (FTA): do acidente às causas}
+\centering
+\begin{tikzpicture}[node distance=7mm, >=Stealth, every node/.style={align=center}]
+\node[draw, rounded corners, fill=gray!10] (top) {Evento topo\\ \textbf{Dano ao equipamento/pessoa}};
+\node[draw, below=of top, fill=gray!5] (or1) {OR};
+\node[draw, below left=1.0cm and 1.2cm of or1, rounded corners] (a) {Atuador\\ comando indevido};
+\node[draw, below right=1.0cm and 1.2cm of or1, rounded corners] (b) {Falha de\\ contenção/limites};
+
+\node[draw, below=of a, fill=gray!5] (and1) {AND};
+\node[draw, below left=0.8cm and 1.2cm of and1, rounded corners] (c) {Erro de estado\\ no controle};
+\node[draw, below right=0.8cm and 1.2cm of and1, rounded corners] (d) {Ausência de\\ intertravamento};
+
+\draw[->] (top) -- (or1);
+\draw[->] (or1) -- (a);
+\draw[->] (or1) -- (b);
+\draw[->] (a) -- (and1);
+\draw[->] (and1) -- (c);
+\draw[->] (and1) -- (d);
+\end{tikzpicture}
+
+%% [AULA] Mostre como isso vira “requisitos de barreira”: interlock, limites, monitoramento independente, etc.
+\end{frame}
+
+\begin{frame}{STPA (STAMP): quando o sistema e controle + feedback}
+\begin{columns}[T,totalwidth=\textwidth]
+\begin{column}{0.56\textwidth}
+\begin{itemize}
+  \item Acidentes nao sao so cadeia de falhas; sao violacoes de restricoes em sistemas de controle.
+  \item STPA identifica acoes de controle inseguras e cenarios causais.
+  \item Causas tipicas: feedback inadequado, modelo mental incorreto, latencias e atrasos.
+\end{itemize}
+\begin{block}{Resumo pratico}
+Foco em restricoes de controle e em como validalas por projeto, monitoramento e operacao.
+\end{block}
+\end{column}
+\begin{column}{0.44\textwidth}
+\centering
+\begin{tikzpicture}[>=Stealth, node distance=7mm]
+\node[draw, rounded corners, align=center] (ctrl) {Controlador\\(SW/HW)};
+\node[draw, rounded corners, below=of ctrl, align=center] (proc) {Processo\\(planta)};
+\node[draw, rounded corners, right=1.2cm of ctrl, align=center] (act) {Acao de\\controle};
+\node[draw, rounded corners, right=1.2cm of proc, align=center] (fb) {Feedback\\sensores};
+\draw[->] (ctrl.east) -- (act.west);
+\draw[->] (act.south) |- (proc.east);
+\draw[->] (proc.east) -- (fb.west);
+\draw[->] (fb.north) |- (ctrl.east);
+\end{tikzpicture}
+\end{column}
+\end{columns}
+\end{frame}
+
+% ============================================================
+\section{Security engineering: de threat model a controles e verificação}
+
+\begin{frame}{Security: propriedades e fronteiras de confiança}
+\begin{itemize}
+  \item Objetivos clássicos: \textbf{CIA} (Confidentiality, Integrity, Availability) + \textbf{AAA} (AuthN, AuthZ, Accounting).
+  \item Em embarcados/ciberfísicos, \textbf{integridade de comando} e \textbf{tempo} (freshness) são críticos.
+  \item Segurança começa com \textbf{trust boundaries}: onde dados/comandos cruzam domínios.
+\end{itemize}
+
+%% [AULA] Mostre um diagrama simples de trust boundaries: ECU, barramento, gateway, cloud, app do usuário.
+%% TODO: inserir figura (pode ser feita em TikZ) com trust boundaries.
+\end{frame}
+
+\begin{frame}{Threat Modeling (visão além do STRIDE “tabela”)}
+\begin{block}{Artefatos úteis}
+\begin{itemize}
+  \item Diagrama de fluxo de dados (DFD) + fronteiras de confiança
+  \item STRIDE como \textbf{heurística} por componente/fluxo
+  \item \textbf{Attack Trees} para raciocínio “objetivo do atacante $\rightarrow$ caminhos”
+  \item Misuse/abuse cases (requisitos negativos)
+\end{itemize}
+\end{block}
+
+\begin{block}{Boa prática}
+Threat modeling é \textbf{iterativo}: atualiza com mudanças de arquitetura, incidentes e testes.
+\end{block}
+%% [AULA] Faça um mini-exemplo “attack tree” no quadro: objetivo = “injetar comando no atuador”.
+\end{frame}
+
+\begin{frame}{Risk Assessment em security: processo (NIST SP 800-30)}
+\begin{itemize}
+  \item Defina: escopo, ativos, missão, tolerância a risco (\textit{risk framing}).
+  \item Identifique: \textbf{threat sources/events}, \textbf{vulnerabilities}, \textbf{predisposing conditions}.
+  \item Estime: \textbf{likelihood} e \textbf{impact}.
+  \item Determine: \textbf{risk} e priorize respostas.
+\end{itemize}
+
+\begin{block}{Entrega típica}
+Registro de riscos + plano de tratamento (mitigar, transferir, aceitar, evitar) + monitoramento.
+\end{block}
+
+\small
+\textit{Referência sugerida: NIST SP 800-30 Rev.1.}
+%% [AULA] Discuta diferença entre “likelihood de exploração” e “likelihood de ocorrência de ameaça” no contexto do sistema.
+\end{frame}
+
+\begin{frame}{Operacionalizando: NIST Cybersecurity Framework (CSF) 2.0}
+\begin{itemize}
+  \item CSF 2.0 organiza práticas em 6 funções:
+  \textbf{Govern, Identify, Protect, Detect, Respond, Recover}.
+  \item Útil para mapear requisitos/controles e responsabilidades organizacionais.
+\end{itemize}
+
+\begin{block}{Uso em disciplina}
+Transformar ameaças/vulnerabilidades em \textbf{controles} e em \textbf{planos} (detecção, resposta, recuperação).
+\end{block}
+
+\small
+\textit{CSF 2.0 (inclui versão em português): NIST, 2024.}
+%% TODO: link PT-BR: https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.por.pdf
+\end{frame}
+
+\begin{frame}{Mecanismos típicos (embedded/IoT): o “mínimo profissional”}
+\begin{itemize}
+  \item \textbf{Secure boot} + cadeia de confiança (root of trust).
+  \item \textbf{Atualização segura} (assinatura, anti-rollback, A/B, recovery).
+  \item \textbf{Proteção de chaves} (HSM/secure element/TPM quando aplicável).
+  \item \textbf{Hardening}: superfície mínima, privilégios mínimos, isolamento (MPU/MMU).
+  \item \textbf{Observabilidade}: logs auditáveis, telemetria, detecção de anomalia.
+\end{itemize}
+
+%% [AULA] Explique por que “criptografia” não substitui arquitetura: ainda precisa isolamento, controle de acesso, boot seguro, etc.
+\end{frame}
+
+\begin{frame}{Verificação em security: do requisito ao teste}
+\begin{itemize}
+  \item Requisitos (ex.): “toda atualização deve ser autenticada e íntegra”.
+  \item Evidências:
+  \begin{itemize}
+    \item revisão de design + threat model atualizado
+    \item \textbf{testes} (fuzzing de parser, testes de downgrade/rollback)
+    \item \textbf{análise} (SAST/DAST, revisão de dependências, SBOM)
+    \item \textbf{pentest} orientado ao modelo de ameaça
+  \end{itemize}
+\end{itemize}
+
+%% [AULA] Gancho forte para a próxima aula: V&V, níveis de teste e planejamento para gerar evidência.
+\end{frame}
+
+% ============================================================
+\section{Integração Safety--Security (co-engineering)}
+
+\begin{frame}{Quando security vira safety (e vice-versa)}
+\begin{itemize}
+  \item Ataque $\Rightarrow$ violação de integridade/tempo $\Rightarrow$ estado perigoso (\textbf{hazard}).
+  \item Mitigações de safety podem criar riscos de security (ex.: portas de manutenção, bypass).
+  \item Mitigações de security podem piorar safety (ex.: DoS por autenticação mal projetada).
+\end{itemize}
+
+\begin{block}{Mensagem}
+Projetar separadamente é arriscado: o correto é \textbf{co-analisar} interações e trade-offs.
+\end{block}
+%% [AULA] Faça um exemplo: “bloquear comando não autenticado” pode impedir comando de emergência se credenciais falham.
+\end{frame}
+
+\begin{frame}{STPA-Sec / co-análise: um caminho moderno}
+\begin{itemize}
+  \item Extensões de STPA aplicam o raciocínio de \textbf{controle/feedback} também para \textbf{ameaças cibernéticas}.
+  \item Benefício: evidencia como vulnerabilidades impactam restrições de safety.
+\end{itemize}
+
+\begin{block}{Uso prático}
+Definir \textbf{constraints} (safety) e \textbf{constraints} (security) no mesmo modelo, derivando requisitos integrados.
+\end{block}
+
+\small
+\textit{Sugestões (fontes abertas): trabalhos e materiais do ecossistema MIT/Leveson sobre STPA e security.}
+%% TODO: inserir link exemplo MIT (paper/working paper): https://web.mit.edu/smadnick/www/wp/2018-03.pdf
+\end{frame}
+
+\begin{frame}{Fluxo de incidente (com safety + security): versão mais completa}
+\centering
+\begin{tikzpicture}[node distance=1.3cm, >=Stealth, every node/.style={draw, rounded corners, align=center}]
+\node (tb) {Trust boundary\\(entrada/integração)};
+\node[right=of tb] (vuln) {Vulnerabilidade\\(design/impl/config)};
+\node[right=of vuln] (expl) {Exploração\\(ataque)};
+\node[right=of expl] (err) {Erro de estado\\(estado interno)};
+\node[right=of err] (fail) {Falha de serviço\\(desvio)};
+\node[right=of fail] (haz) {Hazard\\(estado perigoso)};
+\node[right=of haz] (loss) {Loss/Acidente\\(dano)};
+
+\draw[->, thick] (tb) -- (vuln);
+\draw[->, thick] (vuln) -- (expl);
+\draw[->, thick] (expl) -- (err);
+\draw[->, thick] (err) -- (fail);
+\draw[->, thick] (fail) -- (haz);
+\draw[->, thick] (haz) -- (loss);
+\end{tikzpicture}
+
+\vspace{0.4em}
+\small
+\textbf{Pergunta de engenharia:} em quais setas você coloca controles? (prevent/detect/respond/recover)
+%% [AULA] Excelente para discutir camadas de mitigação e onde testar/validar cada uma.
+\end{frame}
+
+\begin{frame}{Assurance case: como justificar “está seguro o suficiente”?}
+\begin{itemize}
+  \item Ideia: \textbf{argumento estruturado} + \textbf{evidências} + \textbf{premissas/escopo}.
+  \item Em safety: safety case é comum; em security: security case é mais difícil (adversário muda).
+  \item Em sistemas conectados: ideal é \textbf{assurance contínua} (monitorar + atualizar evidência).
+\end{itemize}
+
+%% [AULA] Comente GSN (Goal Structuring Notation) só conceitualmente; detalhe pode ficar para outra aula.
+%% TODO: inserir figura de GSN simples (pode ser desenhada via TikZ para evitar copyright).
+\end{frame}
+
+% ============================================================
+\section{Resiliência (incl. cyber resiliency) como requisito arquitetural}
+
+\begin{frame}{Resiliência: definição operacional}
+\begin{block}{Definição (cyber resiliency)}
+Capacidade de \textbf{antecipar}, \textbf{resistir}, \textbf{recuperar} e \textbf{adaptar} a condições adversas, estresses, ataques ou compromissos envolvendo recursos cibernéticos.
+\end{block}
+
+\begin{itemize}
+  \item Resiliência não substitui safety/security: ela \textbf{complementa} quando a prevenção falha.
+  \item Entra como requisitos de: \textbf{degradação graciosa}, \textbf{fail-operational}, \textbf{reconfiguração}, \textbf{continuidade}.
+\end{itemize}
+
+\small
+\textit{Referência sugerida: NIST SP 800-160 v2r1 (Developing Cyber-Resilient Systems).}
+%% TODO: link: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-160v2r1.pdf
+\end{frame}
+
+\begin{frame}{Padrões arquiteturais de resiliência (mapa prático)}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\textbf{Antecipar/Resistir}
+\begin{itemize}
+  \item segmentação/zonas
+  \item least privilege / isolamento
+  \item diversidade (N-version, heterogeneidade)
+  \item rate limiting, circuit breakers
+  \item validação robusta (parsers)
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Recuperar/Adaptar}
+\begin{itemize}
+  \item rollback (A/B), recovery mode
+  \item checkpoints, reinicialização controlada
+  \item degradação graciosa (safe state)
+  \item reconfiguração/roteamento alternativo
+  \item observabilidade + aprendizado pós-incidente
+\end{itemize}
+\end{columns}
+
+%% [AULA] Discuta “diversidade” como defesa contra falhas correlacionadas e ataques replicáveis.
+\end{frame}
+
+\begin{frame}{Métricas de resiliência (operacionais e úteis)}
+\begin{itemize}
+  \item \textbf{MTTD} (Mean Time To Detect) e \textbf{MTTR} (Mean Time To Recover/Repair).
+  \item \textbf{RTO/RPO} (tempo/quantidade de perda aceitável) — mais comum em serviços.
+  \item \textbf{Taxa de sucesso de rollback}, \textbf{cobertura de telemetria}, \textbf{tempo em modo degradado}.
+\end{itemize}
+
+\begin{block}{Ponto crucial}
+Sem instrumentação (logs/telemetria), não há resiliência: você não detecta nem recupera.
+\end{block}
+%% [AULA] Traga exemplos: watchdogs, health checks, invariantes do sistema, detecção de anomalia de tráfego.
+\end{frame}
+
+\begin{frame}{Resiliência como “engenharia ao longo do ciclo de vida”}
+\begin{itemize}
+  \item Resiliência exige processos: governança, gestão de riscos, resposta a incidentes, melhorias contínuas.
+  \item Em organizações maduras, security/resiliência são tratadas como \textbf{práticas contínuas} (não “projeto fechado”).
+\end{itemize}
+
+\small
+\textit{Sugestão de leitura: relatórios do CMU/SEI sobre práticas de segurança/resiliência ao longo do ciclo de vida.}
+%% TODO: link exemplo (SEI, 2024): https://www.sei.cmu.edu/documents/6121/security-engineering-framework-sef-24sr022_cGH1oyZ.pdf
+\end{frame}
+
+% ============================================================
+\section{Modelagem aplicada (caso embarcado + OTA) com profundidade}
+
+\begin{frame}{Caso base: controlador embarcado (contexto e fronteiras)}
+\begin{itemize}
+  \item MCU + firmware; sensores/atuadores; barramento CAN/Ethernet; gateway; backend OTA.
+  \item \textbf{Hazards}:
+    \begin{itemize}
+      \item comando fora de faixa (atuador crítico)
+      \item operação fora do envelope (ex.: tempo/temperatura)
+    \end{itemize}
+  \item \textbf{Threats}:
+    \begin{itemize}
+      \item injeção de mensagens no barramento
+      \item comprometer pipeline de atualização (supply chain / servidor)
+    \end{itemize}
+\end{itemize}
+
+%% [AULA] Faça os alunos desenharem um DFD mínimo e marcarem trust boundaries.
+\end{frame}
+
+\begin{frame}{Do requisito ao mecanismo: exemplo de cadeia de confiança (OTA)}
+\begin{block}{Requisito (security + safety)}
+Atualização deve ser \textbf{autenticada} e \textbf{atômica}, com \textbf{rollback seguro} e sem permitir downgrades.
+\end{block}
+
+\begin{itemize}
+  \item Assinatura digital da imagem + verificação no bootloader
+  \item Esquema A/B (slot ativo + slot candidato)
+  \item Anti-rollback (monotonic counter / versão mínima)
+  \item Health check pós-boot; se falhar $\rightarrow$ rollback automático
+\end{itemize}
+
+%% [AULA] Discuta ataques: replay de firmware antigo, comprometimento de chave, falha de energia durante update.
+%% TODO: inserir diagrama de estados do boot A/B (pode ser TikZ).
+\end{frame}
+
+\begin{frame}{Exercício de engenharia (em grupo): hazard log + threat model}
+\begin{enumerate}
+  \item Liste \textbf{3 hazards} e classifique severidade (qual o dano?).
+  \item Liste \textbf{3 threats} e descreva pré-condições do atacante.
+  \item Para cada hazard, proponha \textbf{1 safety constraint}.
+  \item Para cada threat, proponha \textbf{1 controle} (prevent/detect/respond/recover).
+\end{enumerate}
+
+%% [AULA] Peça explicitamente para justificar trade-offs (custo, latência, energia, manutenção, certificação).
+\end{frame}
+
+\begin{frame}{Exercício avançado: FTA + Attack Tree para o mesmo evento}
+\begin{block}{Evento topo (comum)}
+\textbf{Comando indevido no atuador crítico} (causando hazard).
+\end{block}
+
+\begin{itemize}
+  \item Construa uma \textbf{FTA} (falhas acidentais) chegando a causas básicas.
+  \item Construa uma \textbf{Attack Tree} (ação intencional) chegando a caminhos de ataque.
+  \item Compare: \textbf{quais mitigações servem para ambos?} quais são específicas?
+\end{itemize}
+
+%% [AULA] Excelente para mostrar convergência e também lacunas (ex.: autenticação não resolve sensor travado; redundância não resolve spoofing).
+\end{frame}
+
+% ============================================================
+\section{Fechamento e gancho para o próximo deck (Teste de Software)}
+
+\begin{frame}{Resumo (com densidade)}
+\begin{itemize}
+  \item Use uma \textbf{taxonomia} para organizar atributos, ameaças e meios (dependability).
+  \item Safety: de hazard analysis $\rightarrow$ constraints $\rightarrow$ requisitos $\rightarrow$ evidência.
+  \item Security: threat modeling + risk assessment + controles + verificação contínua.
+  \item Resiliência: projetar para \textbf{falhar com segurança} e \textbf{recuperar} (antecipar, resistir, recuperar, adaptar).
+  \item Engenheiros justificam decisões via \textbf{trade-offs} e \textbf{evidência}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gancho: próxima aula --- Teste de software (V\&V, níveis e planejamento)}
+\begin{block}{Conexão direta}
+Tudo que discutimos hoje precisa virar \textbf{evidência}: e V\&V é o principal mecanismo para gerar evidência técnica.
+\end{block}
+
+\begin{itemize}
+  \item \textbf{Verification}: ``construímos certo?'' (conforme especificação/requisitos).
+  \item \textbf{Validation}: ``construímos a coisa certa?'' (necessidade/uso real).
+  \item Níveis: unitário, integração, sistema, aceitação; e testes não-funcionais (segurança, robustez, desempenho).
+  \item Planejamento: rastreabilidade requisito $\leftrightarrow$ teste, critérios de saída, cobertura e evidências.
+\end{itemize}
+
+%% [AULA] Promessa: na próxima aula, transformar hazards/threats em estratégia de teste (inclui testes de robustez e segurança).
+\end{frame}
+
+% ============================================================
+\section*{Referências abertas (seleção)}
+\begin{frame}[allowframebreaks]{Referências abertas (para aprofundar)}
+\footnotesize
+\begin{itemize}
+  \item Avizienis, Laprie, Randell, Landwehr. \textit{Basic Concepts and Taxonomy of Dependable and Secure Computing}. IEEE TDSC, 2004.
+  \item NIST SP 800-30 Rev.1. \textit{Guide for Conducting Risk Assessments}, 2012.
+  \item NIST CSF 2.0 (inclui versão PT-BR), 2024.
+  \item NIST SP 800-160 v2r1. \textit{Developing Cyber-Resilient Systems}, 2021.
+  \item MIT OpenCourseWare (Leveson). \textit{System Safety} (STPA e materiais correlatos).
+  \item University of Cambridge. \textit{Security Engineering} (notas de curso abertas).
+  \item HPI (Hasso Plattner Institute). \textit{Dependable Systems} (definições e métricas).
+  \item CMU/SEI. Relatórios sobre \textit{security/resilience} ao longo do ciclo de vida.
+\end{itemize}
+
+\vspace{0.4em}
+\scriptsize
+%% TODO: inserir URLs como \url{...} conforme tua preferência/estilo de citação no curso.
+%% Sugestões de links (verificar disponibilidade):
+%% - Avizienis 2004 (PDF): https://www.landwehr.org/2004-aviz-laprie-randell.pdf
+%% - NIST SP800-30: https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-30r1.pdf
+%% - NIST CSF 2.0 PT-BR: https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.por.pdf
+%% - NIST SP800-160v2r1: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-160v2r1.pdf
+%% - MIT OCW System Safety: https://ocw.mit.edu/courses/16-63j-system-safety-spring-2016/pages/lecture-notes/
+%% - Cambridge SSE notes: https://www.cl.cam.ac.uk/teaching/1819/SWSecEng/sse-notes-latest.pdf
+%% - HPI Dependability slides: https://osm.hpi.de/depend/2011/02_definitions.pdf
+%% - CMU/SEI exemplo: https://www.sei.cmu.edu/documents/6121/security-engineering-framework-sef-24sr022_cGH1oyZ.pdf
+\end{frame}
+
+\end{document}
