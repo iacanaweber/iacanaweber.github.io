@@ -13,7 +13,7 @@
 \usepackage{array}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usetikzlibrary{positioning, arrows.meta, calc}
+\usetikzlibrary{positioning, arrows.meta, calc, fit, shapes.geometric}
 \usepackage{tcolorbox}
 \tcbuselibrary{skins, breakable}
 \usepackage{listings}
@@ -40,29 +40,35 @@
   \end{frame}
 }
 
-\title[Dependabilidade]{Dependabilidade em Software e Sistemas Computacionais\\(Conceitos Básicos com Profundidade Técnica)}
+% ----------------- Macros úteis (Aula 1: sem matemáticas pesadas) -----------------
+\newcommand{\svc}{\textit{serviço}}
+\newcommand{\spec}{\textit{especificação}}
+\newcommand{\fail}{\textit{falha}}
+\newcommand{\err}{\textit{erro de estado}}
+\newcommand{\fault}{\textit{fault/defeito}}
+
+\title[Dependabilidade (Aula 1)]{Dependabilidade em Software e Sistemas Computacionais\\\small (Aula 1: Serviço, Semântica de Falhas, Contenção e Recuperação)}
 \author{Prof. Iaçanã Ianiski Weber}
 \institute{PUCRS}
 \date{CSS (98G08-4) -- Aula 1}
 
 \begin{document}
 
-% Slide de Capa Personalizado
+% =============================== CAPA ===============================
 \begin{frame}[plain]
-
-% Linha superior com logo e título
 \noindent
 \begin{minipage}[t]{0.15\textwidth}
     \includegraphics[width=\linewidth]{../img/brasao_pucrs.png}
+    % TODO: ajustar caminho do brasão, se necessário.
 \end{minipage}%
 \begin{minipage}[t]{0.75\textwidth}
     \begin{center}
         \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Dependabilidade}}}\\
-        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Conceitos Fundamentais}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Serviço, Falhas e Tolerância}}\\
     \end{center}
 \end{minipage}
 
-\vspace{2cm}
+\vspace{1.6cm}
 
 \begin{center}
     \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
@@ -73,11 +79,10 @@
 \end{center}
 
 \vfill
-
 \begin{center}
-    \tiny \textit{}
+\scriptsize
+\textit{Escopo desta aula: “antes” de métricas (Aula 2) e “antes” de safety/security/resiliência (Aula 3).}
 \end{center}
-
 \end{frame}
 
 \begin{frame}{Índice}
@@ -85,558 +90,525 @@
 \end{frame}
 
 % =========================================================
-\section{Objetivos e Motivação}
+\section{Escopo da disciplina: como os 3 decks se encaixam}
 
-\begin{frame}{Objetivos da Aula 1 (versão aprofundada)}
-\begin{itemize}
-  \item Definir dependabilidade com precisão: \textbf{serviço}, \textbf{estado}, \textbf{ameaças} e \textbf{atributos}.
-  \item Distinguir \textbf{fault}, \textbf{error} e \textbf{failure} e entender \textbf{ativação} e \textbf{latência}.
-  \item Introduzir \textbf{modelos de falha} (crash/omission/timing/value/Byzantine) e por que isso muda o projeto.
-  \item Conectar baixo nível (HW/FW/SW): concorrência, memória, temporização, ruído físico, configuração.
-  \item Usar métricas mínimas: \textbf{MTTF, MTTR, disponibilidade} e confiabilidade sob hipótese exponencial.
-\end{itemize}
+\begin{frame}{Mapa das 3 aulas (para evitar sobreposição)}
+\centering
+\begin{tikzpicture}[>=Stealth, node distance=8mm]
+  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, fill=blue!6] (a1)
+  {\textbf{Aula 1 (este deck)}\\
+   \small Serviço \& Especificação $\rightarrow$ Semântica de falhas $\rightarrow$ Contenção/Detecção/Recuperação\\
+   \small (ênfase em software + sistemas distribuídos + fronteiras/isolamento)
+  };
 
-%% Nota de aula: alinhar expectativas: “não é disciplina de ‘boa prática’ apenas”,
-%% é uma linguagem de engenharia para argumentar/quantificar risco e decidir mecanismos.
-\end{frame}
+  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, below=of a1, fill=green!6] (a2)
+  {\textbf{Aula 2 (deck 2)}\\
+   \small Confiabilidade e Disponibilidade: modelos probabilísticos, hazard, Weibull, composição (RBD/Markov), SLO/SLI
+  };
 
-\begin{frame}{Por que dependabilidade importa em Eng. de Computação?}
-\begin{itemize}
-  \item Sistemas reais são \textbf{heterogêneos}: hardware + firmware + RTOS/Linux + rede + serviços.
-  \item Falhas são \textbf{inevitáveis} (defeitos de projeto, envelhecimento, ruído, mudanças de contexto operacional).
-  \item O desafio não é “zero falhas”, mas \textbf{falhas aceitáveis}: frequência e severidade compatíveis com o risco.
-\end{itemize}
+  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, below=of a2, fill=red!6] (a3)
+  {\textbf{Aula 3 (deck 3)}\\
+   \small Safety, Security e Resiliência: hazard/risk, threat modeling, NIST CSF, STPA, cyber-resiliency, assurance
+  };
 
-\begin{alertblock}{Tese central}
-Dependabilidade é a engenharia de \textbf{evitar} (quando possível), \textbf{detectar}, \textbf{conter} e \textbf{recuperar} de condições anormais.
-\end{alertblock}
+  \draw[->, thick] (a1) -- (a2);
+  \draw[->, thick] (a2) -- (a3);
+\end{tikzpicture}
 
-%% Nota de aula: contrapor “confiabilidade” do componente vs “resiliência” do sistema.
-\end{frame}
-
-\begin{frame}{Dois acidentes clássicos (para ancorar conceitos)}
-\begin{itemize}
-  \item \textbf{Ariane 5 Flight 501 (1996)}: falha catastrófica ~40s após a decolagem por interação SW+reuso+condição numérica.
-  \item \textbf{Mars Climate Orbiter (1999)}: perda da missão associada a erro de unidades e falhas de processo/integração.
-\end{itemize}
-
-%% TODO: inserir imagem/linha do tempo.
-%% Ariane 5 report (PDF): https://ocw.mit.edu/courses/16-355j-software-engineering-concepts-fall-2005/91f1e550b30b00ad797293f430220f18_ari5fail_ful_rep.pdf
-%% NASA MCO report: https://llis.nasa.gov/llis_lib/pdf/1009464main1_0641-mr.pdf
-\end{frame}
-
-\begin{frame}{Mapeando Ariane 5: fault $\rightarrow$ error $\rightarrow$ failure}
-\begin{itemize}
-  \item \textbf{Fault (sistemático)}: suposição/decisão de projeto + reuso de SW do sistema inercial fora do envelope.
-  \item \textbf{Error (estado interno)}: exceção/estado inválido no software do sistema de referência inercial.
-  \item \textbf{Failure (serviço externo)}: perda de orientação/atitude percebida pelo sistema de guiagem $\Rightarrow$ comando incorreto $\Rightarrow$ perda do veículo.
-\end{itemize}
-
-\begin{block}{Lição}
-Uma falha sistêmica raramente é “um bug só”: é \textbf{fault técnico + fault de processo} (verificação, validação, hipóteses).
+\vspace{0.4em}
+\begin{block}{Mensagem}
+Se você não define \textbf{qual é o serviço} e \textbf{qual semântica de falha} você tolera, as métricas (Aula 2) e os requisitos de safety/security (Aula 3) ficam “soltos”.
 \end{block}
 
-%% Nota de aula: enfatizar “envelope operacional”, “assumptions”, “hazard analysis”.
+%% [AULA] Explicitar para a turma: “falha” é sempre relativa a uma especificação/contrato.
 \end{frame}
 
-\begin{frame}{Mapeando MCO: fault $\rightarrow$ error $\rightarrow$ failure}
+\begin{frame}{Objetivos técnicos da Aula 1 (revisados)}
+Ao final, o aluno deve conseguir:
 \begin{itemize}
-  \item \textbf{Fault}: inconsistência de unidades (imperial vs métrica) e ausência de barreiras de validação/integração.
-  \item \textbf{Error}: estimativas de trajetória incorretas (estado computacional divergente do real).
-  \item \textbf{Failure}: inserção orbital em altitude errada / perda da sonda.
+  \item Definir \textbf{serviço} e \textbf{especificação} e entender por que \textbf{falha} é desvio do contrato (não “bug”).
+  \item Usar a cadeia \fault $\rightarrow$ \err $\rightarrow$ \fail, mas com foco em:
+    \begin{itemize}
+      \item \textbf{semântica de falhas} (crash/omission/timing/value/Byzantine),
+      \item \textbf{semântica de execução} em RPC (at-least-once / at-most-once) e suas implicações.
+    \end{itemize}
+  \item Projetar \textbf{barreiras}: detecção, contenção (fault containment) e recuperação (restart/rollback/transação).
+  \item Identificar armadilhas clássicas: retries amplificando incidentes, idempotência, causa comum, observabilidade insuficiente.
 \end{itemize}
 
-%% TODO: figura simples “data pipeline” com checagens de unidade/contrato.
-%% Nota de aula: conectar com “contratos”, “tipos com unidade”, “testes de integração”.
+%% [AULA] Use um exemplo simples de API (ex.: “debitar saldo”) para motivar idempotência e deduplicação.
 \end{frame}
 
 % =========================================================
-\section{Modelo Conceitual (serviço, faults, errors, failures)}
+\section{Serviço, especificação e o que significa “falhar”}
 
-\begin{frame}{Definição de Dependabilidade (referência clássica)}
-\begin{block}{Dependabilidade}
-Capacidade de entregar \textbf{serviço} que pode ser \textbf{justificadamente confiável} (trusted), i.e., evitar falhas mais frequentes/severas do que o aceitável.
+\begin{frame}{Serviço é o que o mundo observa (e cobra)}
+\begin{block}{Definição operacional}
+\textbf{Serviço} (\svc) é o comportamento observável na interface com usuário/sistemas;\\
+\textbf{Estado interno} pode estar errado (\err) e mesmo assim o serviço não falhar (mas isso é risco!).
 \end{block}
 
 \begin{itemize}
-  \item \textbf{Serviço}: comportamento percebido na interface com o usuário/outros sistemas.
-  \item \textbf{Justificadamente}: exige evidência (processo, análise, testes, monitoramento, certificação, etc.).
+  \item A mesma implementação pode “falhar” ou “não falhar” dependendo da \spec:
+    \begin{itemize}
+      \item latência máxima (timing), valor correto (value), disponibilidade, consistência.
+    \end{itemize}
+  \item Em sistemas modernos, “falha” pode ser \textbf{parcial}:
+    \begin{itemize}
+      \item degradação (p99 explode), funcionalidade limitada, respostas inconsistentes.
+    \end{itemize}
 \end{itemize}
 
-%% Nota de aula: enfatizar “serviço percebido” vs “estado interno”; muita confusão nasce aqui.
+%% TALKING POINT: “estar up” não é “estar correto” (mas métricas detalhadas ficam para Aula 2).
 \end{frame}
 
-\begin{frame}{Sistema, serviço e estado: o triângulo que organiza tudo}
+\begin{frame}{Contrato mínimo: pré/pós-condições e invariantes}
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\begin{itemize}
+  \item \textbf{Pré-condições}: o que precisa ser verdade antes da operação (inputs válidos, permissões).
+  \item \textbf{Pós-condições}: o que deve ser verdade após (efeitos e retornos).
+  \item \textbf{Invariantes}: propriedades que não podem ser violadas (ex.: saldo nunca negativo).
+\end{itemize}
+
+\begin{block}{Por que isso é dependabilidade?}
+Porque dá \textbf{alvos explícitos} para detecção de \err e contenção antes da \fail.
+\end{block}
+
+\column{0.44\textwidth}
 \centering
-\begin{tikzpicture}[>=Stealth, node distance=2.6cm]
-  \node[draw, rounded corners, align=center, minimum width=3.5cm, minimum height=1.1cm] (sys) {Sistema\\(HW/FW/SW)};
-  \node[draw, rounded corners, align=center, minimum width=3.5cm, minimum height=1.1cm, right=of sys] (srv) {Serviço\\(observável)};
-  \node[draw, rounded corners, align=center, minimum width=3.5cm, minimum height=1.1cm, below=of $(sys)!0.5!(srv)$] (env) {Ambiente/Usuário\\(demanda, carga, distúrbios)};
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners, align=center, inner sep=3mm},
+  arr/.style={-Latex, thick},
+  node distance=7mm
+]
+\node[box] (pre)  {Pré\\condições};
+\node[box, below=of pre] (op)   {Operação};
+\node[box, below=of op]  (post) {Pós\\condições};
+\node[box, right=12mm of op] (inv) {Invariantes\\(sempre)};
 
-  \draw[->, thick] (sys) -- node[above]{entrega} (srv);
-  \draw[->, thick] (env) -- node[left]{perturba / demanda} (sys);
-  \draw[->, thick] (srv) -- node[right]{impacto / requisito} (env);
+\draw[arr] (pre) -- (op);
+\draw[arr] (op) -- (post);
+\draw[arr] (inv) -- (op);
 \end{tikzpicture}
+\end{columns}
 
-\vspace{0.3cm}
-\small Dependabilidade é sobre manter \textbf{serviço correto} sob condições reais, não sobre “nunca errar internamente”.
+%% [AULA] Exemplo rápido: “transferência bancária” (saldo, atomicidade, idempotência) sem entrar em transações ainda.
 \end{frame}
 
-\begin{frame}{Fault, Error, Failure (com precisão operacional)}
+\begin{frame}{Fault, Error, Failure (1 slide e seguimos adiante)}
 \begin{description}
-  \item[Fault] Causa potencial (defeito físico, bug, requisito incompleto, operação incorreta). Pode estar \textbf{dormente} por muito tempo.
-  \item[Error] Parte do \textbf{estado} que é incorreta e pode levar a falha (ex.: bit errado em registrador, estrutura corrompida).
-  \item[Failure] Desvio do \textbf{serviço} em relação à especificação (valor errado, atraso, indisponibilidade, comportamento perigoso).
+  \item[Fault] causa potencial (bug, requisito incompleto, config errada, desgaste, operador).
+  \item[Error] parte do estado incorreto (ex.: contador corrompido, ponteiro inválido, cache inconsistente).
+  \item[Failure] desvio do serviço frente à \spec (ex.: valor errado, timeout, indisponibilidade).
 \end{description}
 
-\begin{block}{Observação crítica}
-Nem todo \textbf{error} vira \textbf{failure}: pode ser sobrescrito, detectado, contido ou mascarado.
+\begin{block}{Ponto-chave desta aula}
+O projeto real gira em torno de: \textbf{onde} o error pode surgir, \textbf{como} detectar, \textbf{como} conter, \textbf{como} recuperar.
 \end{block}
 
-%% Nota de aula: introduzir “masking” e “barreiras”; preparar terreno para ECC, TMR, checks.
-\end{frame}
-
-\begin{frame}{Cadeia causal (com ativação e propagação)}
-\centering
-\resizebox{\textwidth}{!}{
-\begin{tikzpicture}[>=Stealth, node distance=2.3cm]
-  \node[draw, rounded corners, align=center, minimum width=2.9cm, minimum height=1cm] (fault) {Fault\\(dormente)};
-  \node[draw, rounded corners, align=center, minimum width=2.9cm, minimum height=1cm, right=of fault] (active) {Ativação\\do fault};
-  \node[draw, rounded corners, align=center, minimum width=2.9cm, minimum height=1cm, right=of active] (error) {Error\\(estado)};
-  \node[draw, rounded corners, align=center, minimum width=2.9cm, minimum height=1cm, right=of error] (failure) {Failure\\(serviço)};
-
-  \draw[->, thick] (fault) -- (active);
-  \draw[->, thick] (active) -- (error);
-  \draw[->, thick] (error) -- (failure);
-
-  \node[below=0.8cm of error, align=center] (barriers) {\small \textit{barreiras} típicas: detecção, contenção, recuperação};
-  \draw[->, dashed] (barriers) -- (error);
-\end{tikzpicture}
-}
-
-%% Nota de aula: “tempo” importa: latência, janelas críticas, condições de corrida e carga.
-\end{frame}
-
-\begin{frame}{Dois pontos onde alunos erram (e custam caro em projeto)}
-\begin{enumerate}
-  \item \textbf{Confundir falha com defeito}: “o sistema falhou” $\neq$ “há um bug” (às vezes é ambiente, operação, integração, requisito).
-  \item \textbf{Assumir determinismo}: em sistemas concorrentes/distribuídos, o fault pode aparecer só sob interleavings raros.
-\end{enumerate}
-
-%% Nota de aula: enfatizar “reprodutibilidade” e por que logging/tracing/telemetria é parte da engenharia.
+%% Nota: a taxonomia “clássica” (Avizienis et al.) fica como leitura; aqui a ênfase é na engenharia do mecanismo.
 \end{frame}
 
 % =========================================================
-\section{Atributos de Dependabilidade e Relação com Segurança}
+\section{Semântica de falhas: declarar o modelo muda tudo}
 
-\begin{frame}{Atributos: o que exatamente queremos garantir?}
-Dependabilidade integra atributos (cada um com “pergunta” típica):
-
-\begin{itemize}
-  \item \textbf{Disponibilidade}: “o serviço está pronto agora?” (readiness).
-  \item \textbf{Confiabilidade (reliability)}: “quanto tempo mantém serviço correto sem falhar?” (continuidade).
-  \item \textbf{Safety}: “quando falha, evita consequências catastróficas?”
-  \item \textbf{Integridade}: “estado/serviço não é corrompido indevidamente?”
-  \item \textbf{Mantenabilidade}: “quão rápido diagnostica, corrige e volta a operar?”
-  \item (Frequentemente junto) \textbf{Confidencialidade}: “não vaza informação?”
-\end{itemize}
-
-%% Nota de aula: exemplos: banco (avail), marcapasso (safety), storage (integridade).
-\end{frame}
-
-\begin{frame}{Disponibilidade $\neq$ Confiabilidade (exemplo intuitivo)}
-\begin{itemize}
-  \item Um sistema pode ser \textbf{pouco confiável} (falha com frequência), mas \textbf{muito disponível} (recupera rápido).
-  \item Um sistema pode ser \textbf{confiável} (falha raramente), mas \textbf{pouco disponível} (reparo demora muito).
-\end{itemize}
-
-\begin{block}{Métrica prática}
-Disponibilidade (regime estacionário): \[
-A \approx \frac{\text{MTTF}}{\text{MTTF}+\text{MTTR}}
-\]
-\end{block}
-
-%% Nota de aula: conectar com SRE: reduzir MTTR às vezes é “melhor ROI” do que reduzir fault rate.
-\end{frame}
-
-\begin{frame}{Dependabilidade e Segurança: onde se encontram e onde diferem}
-\begin{itemize}
-  \item Segurança adiciona adversário e objetivos como \textbf{confidencialidade} e \textbf{integridade contra ações maliciosas}.
-  \item Há interseção: disponibilidade e integridade importam para ambos.
-  \item Um “fault” pode ser \textbf{acidental} (bug) ou \textbf{malicioso} (exploit/fault injection).
-\end{itemize}
-
-%% Nota de aula: exemplo: Rowhammer (erro de memória induzido) conecta dependability+security.
-%% TODO: inserir figura “dependability & security taxonomy”.
-\end{frame}
-
-% =========================================================
-\section{Modelos de Falha (Failure Semantics) e Implicações}
-
-\begin{frame}{Por que “modelo de falha” é indispensável?}
-\begin{block}{Ideia}
-Projetar tolerância a falhas sem declarar \textbf{que tipo de falha} você tolera é como projetar criptografia sem declarar o \textbf{modelo de ameaça}.
-\end{block}
-
-\begin{itemize}
-  \item Em distribuídos, o que quebra não é “a máquina”, é a \textbf{assunção} (tempo, rede, consistência).
-  \item Protocolos mudam drasticamente entre \textbf{crash} e \textbf{Byzantine}.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Classes comuns de falhas (visão de sistemas distribuídos)}
+\begin{frame}{Falha não é única: classes que mudam a arquitetura}
 \begin{center}
 \begin{tabular}{@{}ll@{}}
 \toprule
-\textbf{Classe} & \textbf{Descrição resumida} \\
+\textbf{Classe} & \textbf{Exemplo de desvio de serviço} \\
 \midrule
-Crash & processo para (para de responder) \\
-Omission & perde envios/recebimentos (mensagens/ações) \\
-Timing & resposta fora da janela de tempo especificada \\
-Response/Value & responde, mas com valor incorreto \\
-Byzantine & comportamento arbitrário/inconsistente (pior caso) \\
+Crash & componente para de responder \\
+Omission & mensagens/ações “somem” (perda) \\
+Timing & resposta fora da janela (deadline estourado) \\
+Value/Response & responde com valor incorreto \\
+Byzantine & comportamento arbitrário/inconsistente \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-%% Nota de aula: relacionar “timing failure” com sistemas de controle e RT.
-\end{frame}
-
-\begin{frame}{Semântica de execução: “at most once” é uma promessa forte}
-\begin{block}{O que é RPC?}
-\textbf{RPC (Remote Procedure Call)} é um mecanismo em que um programa chama uma função/procedimento em outro processo ou máquina, como se fosse uma chamada local.
+\begin{block}{Regra de ouro}
+Você não “faz tolerância a falhas” em abstrato: você tolera \textbf{um modelo de falha declarado}.
 \end{block}
 
-Em sistemas distribuídos com RPC, após uma falha, pode ter ocorrido:
+%% TODO: inserir figura “failure spectrum” (crash -> byzantine) com custo de mitigação crescente.
+%% Sugestão de fonte (slides/notes distribuídos): Stanford/CMU distributed systems.
+\end{frame}
+
+\begin{frame}{Fail-silent, fail-stop, fail-fast (o vocabulário certo)}
 \begin{itemize}
-  \item chamada não executou,
-  \item executou uma vez,
+  \item \textbf{Fail-silent}: componente falha ficando “mudo” (sem sinais/saídas erradas).
+  \item \textbf{Fail-stop}: além de parar, outros componentes conseguem \textbf{detectar} que ele parou.
+  \item \textbf{Fail-fast}: ao detectar inconsistência, aborta rapidamente para evitar propagação de \err.
+\end{itemize}
+
+\begin{block}{Conexão com projeto}
+Assumir fail-stop quando o sistema é na prática value-failure é uma das raízes de incidentes difíceis (falha “falando coisa errada”).
+\end{block}
+
+%% [AULA] Dar exemplo: sensor com “valor congelado” (value failure) vs sensor desconectado (omission/crash).
+\end{frame}
+
+% =========================================================
+\section{Distribuídos: RPC, retries e o “mito do exactly-once”}
+
+\begin{frame}{RPC: onde a intuição do aluno quebra}
+\begin{block}{Problema}
+Em RPC (rede + processos), não dá para observar diretamente se o servidor executou a operação quando há falhas de comunicação.
+\end{block}
+
+Após um timeout, pode ter acontecido:
+\begin{itemize}
+  \item não executou,
+  \item executou 1 vez (mas a resposta se perdeu),
   \item executou múltiplas vezes (retries),
   \item executou parcialmente (efeitos colaterais).
 \end{itemize}
 
-\begin{block}{Implicação de engenharia}
-Para tolerar falhas com \textit{retries}, você precisa de \textbf{idempotência}, \textbf{deduplicação} e \textbf{logs transacionais} (dependendo do caso).
+%% [AULA] Base conceitual usada em cursos de distribuídos: Stanford/CMU (semântica de execução e retries).
+\end{frame}
+
+\begin{frame}{Semântica de execução: at-least-once vs at-most-once}
+\begin{columns}[T,onlytextwidth]
+\column{0.56\textwidth}
+\begin{tcolorbox}[title=at-least-once,colback=white]
+\begin{itemize}
+  \item Cliente reenvia até obter resposta.
+  \item Pode \textbf{executar múltiplas vezes}.
+  \item Exige: \textbf{idempotência} ou \textbf{deduplicação} para operações com efeitos colaterais.
+\end{itemize}
+\end{tcolorbox}
+
+\column{0.44\textwidth}
+\begin{tcolorbox}[title=at-most-once,colback=white]
+\begin{itemize}
+  \item Evita múltiplas execuções via \textbf{IDs} + \textbf{cache de respostas} / \textbf{tabelas de request}.
+  \item Pode falhar por \textbf{omissão} (não executar) sob certas perdas.
+  \item Requer \textbf{estado} e \textbf{coleta} (GC) desses registros.
+\end{itemize}
+\end{tcolorbox}
+\end{columns}
+
+\begin{block}{Mensagem}
+“Exactly-once” é, em geral, \textbf{uma promessa cara/delicada} e frequentemente substituída por idempotência + dedup + transações/compensação.
 \end{block}
 
-%% Nota de aula: conectar com “exactly-once” como mito prático; quando dá para aproximar.
+%% TALKING POINT: conectar com notas clássicas de distribuídos (Stanford/CMU/MIT).
+%% TODO: inserir link no slide de referência de distribuídos (CS244b/15-440/6.033).
 \end{frame}
 
-% =========================================================
-\section{Taxonomia de Faults com foco em baixo nível (HW/FW/SW)}
-
-\begin{frame}{Faults: classificação útil (para arquitetar mitigação)}
-\begin{itemize}
-  \item \textbf{Físicos} vs \textbf{Sistemáticos} (design/requirements/implementation).
-  \item \textbf{Internos} vs \textbf{Externos} (ambiente, operador, entrada).
-  \item \textbf{Permanentes} / \textbf{Transientes} / \textbf{Intermitentes}.
-  \item \textbf{Acidentais} vs \textbf{Maliciosos} (quando há adversário).
-\end{itemize}
-
-%% Nota de aula: dar exemplos curtos para cada eixo; mostrar que a mitigação “casa” com a classe.
-\end{frame}
-
-\begin{frame}{Baixo nível (HW): soft errors e falhas de memória existem “em produção”}
-\begin{itemize}
-  \item Erros de DRAM em datacenters foram medidos em larga escala; taxas e distribuição diferem de suposições comuns.
-  \item *Soft errors* (transientes) e *hard errors* (defeitos persistentes) afetam projeto de ECC, scrubbing e observabilidade.
-\end{itemize}
-
-%% TODO: inserir gráfico/figura de estudo de DRAM “in the wild”.
-%% Link (PDF Google research): https://research.google.com/pubs/archive/35162.pdf
-%% Link (soft error architectural perspective, MIT CSAIL): https://people.csail.mit.edu/emer/media/papers/2005.02.hpca.ser_problem.pdf
-\end{frame}
-
-\begin{frame}{Baixo nível (FW/SW): faults típicos que viram pesadelo}
-\begin{itemize}
-  \item \textbf{Concorrência}: data races, deadlocks, inversão de prioridade.
-  \item \textbf{Memória}: use-after-free, buffer overflow, stack corruption.
-  \item \textbf{Numéricos}: overflow, underflow, NaNs, saturação.
-  \item \textbf{Configuração}: flags, versões, permissões, “feature toggles”.
-\end{itemize}
-
-%% Nota de aula: pontuar que “config” é um dos maiores geradores de incidentes em produção.
-\end{frame}
-
-\begin{frame}[fragile]{Exemplo: data race (fault) que vira failure só em interleavings raros}
-\begin{lstlisting}[language=C]
-// Fault: acesso concorrente sem sincronizacao
-volatile int counter = 0;
-
-void isr() { counter++; }      // interrupcao
-int main_loop() { counter++; }  // loop principal
-\end{lstlisting}
-
-\begin{itemize}
-  \item \textbf{Error}: atualização perdida (read-modify-write não atômico).
-  \item \textbf{Failure}: decisão de controle errada (ex.: PWM/atuador fora do esperado).
-\end{itemize}
-
-%% Nota de aula: discutir mitigação: atômicos, seções críticas curtas, filas lock-free, design ISR-safe.
-\end{frame}
-
-\begin{frame}{Faults de temporização: “funciona no laboratório, falha no campo”}
-\begin{itemize}
-  \item Timing marginal: PVT (process/voltage/temperature) + envelhecimento + carga.
-  \item “Heisenbugs” de tempo: logs mudam a execução; depurar altera o sistema.
-  \item Em RT/controle, timing failure é tão grave quanto value failure.
-\end{itemize}
-
-%% Nota de aula: conectar com watchdog, deadlines, análise de pior caso (WCET), prioridades.
-\end{frame}
-
-% =========================================================
-\section{Meios para obter Dependabilidade (Prevenção, Remoção, Tolerância, Previsão)}
-
-\begin{frame}{Os “4 meios” clássicos para atingir dependabilidade}
-\begin{center}
-\begin{tabular}{@{}lp{8cm}@{}}
+\begin{frame}{Tabela mental: por que o cliente não sabe o que ocorreu}
+\small
+\centering
+\begin{tabular}{p{3.2cm} p{3.0cm} p{5.0cm}}
 \toprule
-\textbf{Meio} & \textbf{Como atua} \\
+\textbf{Evento de falha} & \textbf{Sintoma} & \textbf{Efeito possível} \\
 \midrule
-Fault prevention & evita introduzir faults (processo, arquitetura, restrições) \\
-Fault removal & remove faults existentes (verificação, testes, revisão, análise) \\
-Fault tolerance & entrega serviço mesmo com faults (detecção + recuperação) \\
-Fault forecasting & estima presença/impacto futuro (modelos, dados de campo) \\
+Request perdido & timeout & servidor \textbf{não} executa \\
+Response perdida & timeout & servidor executa, cliente \textbf{não sabe} \\
+Servidor crash após executar & timeout/erro & efeitos ocorreram, mas estado pode estar incerto \\
+Partição de rede & timeouts & retries podem amplificar carga (incidente em cascata) \\
 \bottomrule
 \end{tabular}
-\end{center}
 
-%% Nota de aula: mostrar que “tolerância” é só 1/4; maturidade vem do conjunto.
+\vspace{0.4em}
+\begin{block}{Conseqüência}
+Retries são mecanismo de tolerância \textbf{e} uma fonte comum de amplificação de falhas se não houver backoff/jitter e controle de explosão.
+\end{block}
+
+%% [AULA] Discuta “retry storm/thundering herd” e por que “timeout curto” pode piorar outage.
 \end{frame}
 
-\begin{frame}{Tolerância a falhas = detectar + conter + recuperar + tratar}
+\begin{frame}[fragile]{Idempotência: a alavanca mais importante (exemplo simples)}
+\begin{lstlisting}[language=Python]
+# Operacao NAO idempotente: "debitar" duas vezes = prejuizo
+def debit(account_id, amount):
+    balance[account_id] -= amount
+
+# Operacao idempotente por chave (idempotency key):
+# repetir a requisicao nao muda o efeito final.
+def debit_idempotent(account_id, amount, req_id):
+    if req_id in processed:        # deduplicacao
+        return processed[req_id]   # replay da resposta
+    balance[account_id] -= amount
+    processed[req_id] = "OK"
+    return "OK"
+\end{lstlisting}
+
+%% TALKING POINT: Onde guardar processed? (cache vs log durável) -> conecta com transações/recovery.
+%% TALKING POINT: Qual o horizonte de dedup? (janela) -> conecta com GC e custo.
+\end{frame}
+
+% =========================================================
+\section{Contenção: “onde” um erro pode se espalhar}
+
+\begin{frame}{Fault Containment: reduzir o “blast radius”}
+\begin{block}{Ideia}
+Uma arquitetura tolerante a falhas delimita \textbf{regiões de contenção}: onde um \err pode existir sem virar \fail sistêmica.
+\end{block}
+
 \begin{itemize}
-  \item \textbf{Error detection}: checks, invariantes, redundância, timeouts.
-  \item \textbf{Damage confinement}: isolar região/efeitos (particionamento, MPU/MMU, sandbox).
-  \item \textbf{Recovery}: rollback, restart, failover, recomputação.
-  \item \textbf{Fault treatment}: remover/neutralizar a causa (desabilitar módulo, substituir, reconfigurar).
+  \item Contenção é tão importante quanto recuperação:
+    \begin{itemize}
+      \item impede corrupção de estado global,
+      \item evita cascatas (um módulo derrubando outros),
+      \item facilita diagnóstico (localiza causa).
+    \end{itemize}
+  \item Em software: contenção aparece como \textbf{fronteiras}:
+    \begin{itemize}
+      \item processo, container, VM, domínio de privilégio, partição de barramento, sandbox.
+    \end{itemize}
 \end{itemize}
 
-%% Nota de aula: “detectar error (estado)” é mais viável do que “detectar fault (causa)”.
+%% TODO: inserir figura “camadas de contenção” (processo->container->VM) e um exemplo de falha propagando sem barreira.
+%% Sugestão: materiais de fault management (JPL) para linguagem de contenção/isolamento.
 \end{frame}
 
-\begin{frame}{Detecção: checks típicos (baixo nível e distribuídos)}
+\begin{frame}{Barreiras clássicas: detectar $\rightarrow$ conter $\rightarrow$ recuperar}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[>=Stealth, node distance=2.1cm]
+  \node[draw, rounded corners, align=center, minimum width=3.2cm, minimum height=1cm] (fault) {Fault\\(causa)};
+  \node[draw, rounded corners, align=center, minimum width=3.2cm, minimum height=1cm, right=of fault] (error) {Error\\(estado)};
+  \node[draw, rounded corners, align=center, minimum width=3.2cm, minimum height=1cm, right=of error] (failure) {Failure\\(serviço)};
+
+  \draw[->, thick] (fault) -- (error);
+  \draw[->, thick] (error) -- (failure);
+
+  \node[draw, rounded corners, fill=blue!7, align=center, below=0.9cm of error, minimum width=10.0cm]
+    (bar) {\textbf{Barreiras}\\
+    detecção (checks/timeouts) \quad|\quad contenção (isolamento) \quad|\quad recuperação (restart/rollback)};
+  \draw[->, dashed] (bar.north) -- (error.south);
+\end{tikzpicture}
+}
+
+%% [AULA] Enfatizar: detectar “fault” é difícil; detectar “error” (violação de invariantes) é viável.
+\end{frame}
+
+\begin{frame}{End-to-end argument (por que checks na borda importam)}
+\begin{block}{Princípio (intuição)}
+Algumas propriedades só podem ser garantidas \textbf{de ponta a ponta} na aplicação (ex.: integridade real do dado),
+então checks internos (rede/armazenamento) ajudam, mas \textbf{não substituem} o check end-to-end.
+\end{block}
+
 \begin{itemize}
-  \item \textbf{Checks semânticos}: range checks, sanity checks, invariantes, contratos.
-  \item \textbf{Checks estruturais}: CRC/paridade/ECC, checksums em buffers e mensagens.
+  \item Exemplo: checksum em cada hop vs checksum final no payload.
+  \item Em dependabilidade: isso define \textbf{onde} colocar detecção para impedir \err$\rightarrow$\fail.
+\end{itemize}
+
+%% TODO: inserir figura “end-to-end checksum” em pipeline de rede/armazenamento.
+%% Sugestão de leitura clássica (Saltzer/Reed/Clark e discussões posteriores): use como referência histórica.
+\end{frame}
+
+% =========================================================
+\section{Detecção e diagnosabilidade: projetar para encontrar o problema}
+
+\begin{frame}{Detecção prática: checks que pegam erros cedo}
+\begin{itemize}
+  \item \textbf{Checks semânticos}: range checks, sanity checks, contratos, invariantes.
+  \item \textbf{Checks estruturais}: CRC/checksum, paridade, ECC (onde aplicável).
   \item \textbf{Checks temporais}: timeouts, deadlines, heartbeats.
-  \item \textbf{Checks por redundância}: comparação (dual execution), votação (NMR/TMR).
+  \item \textbf{Checks por redundância}: dual execution, comparação, votação (quando necessário).
 \end{itemize}
 
-%% Nota de aula: discutir “false positive/false negative” e custo (latência/energia).
+\begin{block}{Escolha de engenharia}
+Checks bons são aqueles que:
+\begin{itemize}
+  \item detectam cedo,
+  \item têm baixa taxa de falso positivo,
+  \item e são verificáveis/testáveis.
+\end{itemize}
+\end{block}
+
+%% [AULA] “Detecção” sem ação (conter/recuperar) vira alarme inútil.
 \end{frame}
 
-\begin{frame}{Confinamento: a ideia de “fault containment region”}
+\begin{frame}{Diagnosabilidade: sem telemetria, MTTR explode (sem entrar em métricas)}
 \begin{itemize}
-  \item Definir domínios onde um fault pode causar dano (processo, container, partição, core).
-  \item Mecanismos: MMU/MPU, privilégios, watchdog por partição, isolamento de barramento.
-  \item Em microserviços: circuit breaker, bulkheads, rate limiting.
+  \item Logs estruturados e correlacionáveis (ex.: \textbf{request-id}).
+  \item Tracing distribuído (quando há microserviços).
+  \item “Black box vs white box”: o que você mede precisa apoiar hipótese causal.
+  \item Preserve evidência: dumps, snapshots, ring buffers, post-mortem.
 \end{itemize}
 
-%% Nota de aula: enfatizar que confinamento reduz “blast radius”.
+\begin{block}{Mensagem}
+Dependabilidade em software não é só “rodar sem falhar”: é \textbf{falhar de forma diagnosticável}.
+\end{block}
+
+%% [AULA] Exemplificar: “timeout genérico” vs “timeout com contexto + dependência + payload”.
+%% NOTE: conceitos de SLO/alerting entram na Aula 2.
 \end{frame}
 
 % =========================================================
-\section{Mecanismos (com exemplos HW/FW/SW)}
+\section{Recuperação: restart, rollback, transações e compensação}
 
-\begin{frame}{Redundância: três formas fundamentais}
-\begin{itemize}
-  \item \textbf{Redundância de hardware (espacial)}: replicar componentes (ex.: TMR).
-  \item \textbf{Redundância temporal}: repetir computação / reexecutar (ex.: lockstep, retry).
-  \item \textbf{Redundância de informação}: codificação (ex.: ECC, CRC).
-\end{itemize}
-
-%% Nota de aula: trade-offs: área/potência vs latência; e “common-mode failures”.
-\end{frame}
-
-\begin{frame}{Exemplo HW: ECC de memória como barreira error$\rightarrow$failure}
-\begin{itemize}
-  \item \textbf{Fault}: partícula/ruído/defeito altera bits (transiente ou persistente).
-  \item \textbf{Error}: palavra lida com bit errado (estado incorreto no datapath).
-  \item \textbf{Mitigação}: ECC SECDED corrige 1 bit, detecta 2 bits (dependendo do esquema).
-  \item \textbf{Failure evitada}: aplicação não vê dado errado (mas atenção: latência, eventos múltiplos, scrubbing).
-\end{itemize}
-
-%% TODO: inserir figura de ECC/SECDED.
-%% Sugestão de leitura introdutória de ECC: https://research.google.com/pubs/archive/35162.pdf (motivação por erros reais)
-\end{frame}
-
-\begin{frame}{Exemplo FW: watchdog + heartbeat (padrão de sistemas embarcados)}
-\begin{itemize}
-  \item Watchdog reinicia sistema/subsistema se não receber “kick” em janela de tempo.
-  \item Heartbeat monitora vitalidade (thread/processo/sensor).
-  \item Necessita projeto cuidadoso para evitar \textbf{reset loop} e para preservar logs de diagnóstico.
-\end{itemize}
-
-%% Nota de aula: falar de “two-stage watchdog”, “brown-out reset”, “post-mortem dump”.
-\end{frame}
-
-\begin{frame}{Exemplo SW: recovery blocks e N-version programming (diversidade)}
-\begin{itemize}
-  \item \textbf{Recovery block}: executar versão A; se teste de aceitação falhar, rollback e executar B.
-  \item \textbf{N-version}: múltiplas implementações em paralelo + votação.
-\end{itemize}
-
-\begin{block}{Risco clássico}
-Falhas de modo comum: se o requisito está errado, todas as versões podem “errar juntas”.
-\end{block}
-
-%% Nota de aula: discutir custo de diversidade real (equipes, linguagens, toolchains).
-\end{frame}
-
-\begin{frame}{Em distribuídos: replicação, consenso e limites fundamentais}
-\begin{itemize}
-  \item Replicação aumenta disponibilidade, mas exige coordenação (consenso/leader).
-  \item Sob assincronia, há limites teóricos (ex.: impossibilidades e compromissos de liveness/safety).
-  \item Diferença brutal: tolerar \textbf{crash} vs \textbf{Byzantine}.
-\end{itemize}
-
-%% Nota de aula: aqui você pode citar exemplos práticos: Raft/Paxos (crash) vs PBFT (Byz).
-%% TODO: inserir figura comparando crash vs byzantine (diagrama de severidade).
-\end{frame}
-
-% =========================================================
-\section{Modelagem e Métricas (o mínimo para engenheiros argumentarem)}
-
-\begin{frame}{Métricas essenciais (vocabulário de engenharia)}
-\begin{itemize}
-  \item \textbf{MTTF}: tempo médio até falhar (não reparável).
-  \item \textbf{MTTR}: tempo médio para reparar/recuperar.
-  \item \textbf{MTBF}: tempo médio entre falhas (reparável).
-  \item \textbf{ROCOF}: taxa de ocorrência de falhas (failures/time).
-\end{itemize}
-
-%% Nota de aula: deixar claro quando MTBF é apropriado e quando vira “marketing metric”.
-\end{frame}
-
-\begin{frame}{Disponibilidade: “novezinhos” e impacto prático}
-\begin{block}{Definição}
-Disponibilidade é a fração do tempo em que o sistema está operacional/“pronto para serviço”.
-\end{block}
-
-\begin{itemize}
-  \item 99{,}9\% (“três noves”) $\approx$ 8h45m de indisponibilidade/ano.
-  \item 99{,}99\% $\approx$ 52m/ano.
-  \item 99{,}999\% $\approx$ 5m/ano.
-\end{itemize}
-
-%% Nota de aula: discutir que indisponibilidade “concentrada” pode ser pior do que distribuída.
-\end{frame}
-
-\begin{frame}{Confiabilidade sob hipótese exponencial (modelo simples)}
-Se a taxa de falha é aproximadamente constante $\lambda$ (modelo exponencial):
-
-\[
-R(t) = e^{-\lambda t}
-\qquad
-\text{e}
-\qquad
-\text{MTTF} = \frac{1}{\lambda}
-\]
-
-\begin{itemize}
-  \item Útil como primeiro corte (eletrônica/“random failures”), mas \textbf{não} modela bem desgaste (\textit{wear-out}).
-\end{itemize}
-
-%% Nota de aula: mencionar Weibull (banheira) sem entrar nos detalhes nesta aula.
-\end{frame}
-
-\begin{frame}{Exemplo numérico rápido: disponibilidade via MTTF/MTTR}
-\begin{block}{Cenário}
-Um serviço tem MTTF = 200 horas e MTTR = 20 minutos.
-\end{block}
-
-\[
-A \approx \frac{200}{200 + \frac{20}{60}} = \frac{200}{200.333\dots} \approx 0.9983
-\]
-
-\begin{itemize}
-  \item Isso é $\approx$ 99{,}83\% (\textit{downtime} $\sim$ 15h/ano).
-\end{itemize}
-
-%% Nota de aula: usar como gancho para “reduzir MTTR” com observabilidade e automação.
-\end{frame}
-
-\begin{frame}{RBD (Reliability Block Diagram): série vs paralelo}
-\begin{itemize}
-  \item \textbf{Série}: falha de um bloco derruba o sistema $\Rightarrow R_{sys}(t)=\prod_i R_i(t)$
-  \item \textbf{Paralelo}: sistema falha só se todos falharem $\Rightarrow R_{sys}(t)=1-\prod_i(1-R_i(t))$
-\end{itemize}
-
-%% TODO: inserir diagramas simples série/paralelo.
-%% Nota de aula: conectar com redundância e “single point of failure (SPOF)”.
-\end{frame}
-
-% =========================================================
-\section{Exercícios (classificação + projeto + conta)}
-
-\begin{frame}{Exercícios (1/2) — classificação e raciocínio}
+\begin{frame}{Recuperação: quatro estratégias (com trade-offs)}
 \begin{enumerate}
-  \item Classifique (fault/error/failure): \textit{timeout no barramento SPI} (dica: pode ser failure; qual fault típico causa isso?).
-  \item Dê um exemplo de \textbf{fault transiente} em SoC e descreva a cadeia fault$\rightarrow$error$\rightarrow$failure (ou como seria mascarada).
-  \item Em um firmware com ISR, cite 2 técnicas para \textbf{interromper a cadeia} error$\rightarrow$failure.
+  \item \textbf{Restart} (reboot/restart de processo): simples, mas pode perder estado.
+  \item \textbf{Rollback} (checkpoint + voltar): requer pontos consistentes.
+  \item \textbf{Transação} (atomicidade/durabilidade): evita estados parciais, mas custa.
+  \item \textbf{Compensação} (sagas): desfaz efeitos em sistemas distribuídos quando transação global é inviável.
 \end{enumerate}
 
-%% Nota de aula: insistir em “várias respostas corretas” dependendo do modelo de falha e da especificação.
+\begin{block}{Ponto crítico}
+A estratégia depende de:
+\textbf{(i)} semântica do serviço, \textbf{(ii)} custo de estado inconsistente, \textbf{(iii)} latência aceitável.
+\end{block}
+
+%% [AULA] Conectar com o exemplo de RPC: retry + efeitos colaterais -> precisa idempotência ou transação/compensação.
 \end{frame}
 
-\begin{frame}{Exercícios (2/2) — métrica e arquitetura}
-\begin{enumerate}
-  \item Um sistema tem MTTF=1000h e MTTR=2h. Calcule a disponibilidade e estime downtime/ano.
-  \item Você precisa tolerar \textbf{crash} de 1 nó em um cluster de 3 nós. Que classe de protocolo/replicação faz sentido? Quais suposições?
-  \item Para um sensor crítico, você prefere: (a) TMR ou (b) dual execution + checks? Discuta custo/benefício e falhas de modo comum.
-\end{enumerate}
+\begin{frame}{Transações: o que você quer evitar (estado parcial)}
+\begin{itemize}
+  \item Problema: falha no meio de uma sequência deixa o sistema em estado “meio aplicado”.
+  \item Abordagens:
+  \begin{itemize}
+    \item \textbf{Write-ahead logging} (log durável antes do commit),
+    \item \textbf{two-phase commit} (quando aplicável; caro e frágil sob partições),
+    \item \textbf{sagas/compensações} em arquiteturas modernas.
+  \end{itemize}
+\end{itemize}
 
-%% Nota de aula: puxar discussão sobre requisitos (safety vs availability), custo e certificação.
+%% TODO: inserir diagrama simples de estados: BEGIN -> (APPLY) -> COMMIT / ABORT + recuperação.
+%% [AULA] Não aprofundar 2PC aqui; se quiser, deixe como leitura em distribuídos/bancos.
+\end{frame}
+
+\begin{frame}{Recuperação e contenção andam juntas (senão vira cascata)}
+\begin{itemize}
+  \item Se um serviço A falha e B faz retry agressivo:
+    \begin{itemize}
+      \item B aumenta carga em A,
+      \item A degrada mais,
+      \item A derruba dependências (cascata).
+    \end{itemize}
+  \item Mitigações típicas:
+    \begin{itemize}
+      \item backoff/jitter, rate limiting, circuit breaker, filas.
+    \end{itemize}
+\end{itemize}
+
+%% NOTE: padrões de SRE/microservices aparecem no deck 2; aqui a mensagem é “recovery sem contenção amplifica falhas”.
+%% [AULA] Excelente para perguntar: “onde colocar limite de retry?” (cliente? gateway? service mesh?).
 \end{frame}
 
 % =========================================================
-\section{Resumo e Leituras}
+\section{Estudos de caso (1 técnico + 1 aeroespacial) sem invadir safety/security}
 
-\begin{frame}{Resumo da Aula}
+\begin{frame}{Caso 1 (software/ops): Knight Capital (2012) como falha de mudança + contenção}
 \begin{itemize}
-  \item Dependabilidade é sobre \textbf{serviço correto} e \textbf{justificativa} de confiança.
-  \item \textbf{fault, error, failure} formam cadeia com ativação e propagação — e há barreiras possíveis.
-  \item Modelo de falha (crash/omission/timing/value/Byzantine) define \textbf{o que} significa “tolerar falhas”.
-  \item Métricas (MTTF/MTTR/Disponibilidade) permitem argumentar e comparar soluções.
+  \item Contexto: mudança em software de trading; ativação de código/feature em produção.
+  \item Efeitos: emissão de ordens inesperadas em alta escala em minutos.
+  \item Pontos de engenharia (dependability):
+    \begin{itemize}
+      \item controle de rollout/configuração,
+      \item isolamento e limites de dano (circuitos, rate limits),
+      \item observabilidade e “kill switch”.
+    \end{itemize}
 \end{itemize}
 
-%% Nota de aula: preparar gancho para Aula 2: “técnicas de engenharia” (testes, verificação, processos).
+%% TODO: inserir linha do tempo (minutos) e diagrama “deploy -> comportamento -> mitigação”.
+%% Sugestão de fonte primária: documentos/registros regulatórios (SEC) sobre o incidente e controles exigidos.
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Referências e leituras recomendadas}
-\tiny
+\begin{frame}{Caso 2 (integração e suposições): Ariane 5 (1996) como falha de envelope}
+\begin{itemize}
+  \item Reuso de software + hipótese inválida fora do envelope operacional.
+  \item Uma exceção em software se propagou para perda de orientação e perda do veículo.
+\end{itemize}
+
+\begin{block}{Lição focada (Aula 1)}
+\textbf{Semântica de falha + contenção:} quando um subsistema crítico falha, ele deve falhar de forma \textbf{contida} (não virar “saída plausível porém errada” para o controlador).
+\end{block}
+
+%% TODO: inserir figura simples “subsystem -> controller” com setas e ponto de contenção.
+%% Fonte clássica: relatório de investigação do Ariane 5 (documento público).
+\end{frame}
+
+% =========================================================
+\section{Exercícios (nível engenharia) e fechamento}
+
+\begin{frame}{Exercícios (1/3): semântica de falhas e especificação}
+\begin{enumerate}
+  \item Uma API de pagamento tem \spec: “debitar no máximo 1 vez por pedido”.
+    \begin{itemize}
+      \item Que semântica de execução você precisa?
+      \item Qual o mecanismo mínimo (idempotency key / dedup / transação)?
+    \end{itemize}
+  \item Um sistema de controle tem deadline de 10ms.
+    \begin{itemize}
+      \item Timing failure é \fail? Por quê?
+      \item Proponha 2 checks (temporal e semântico).
+    \end{itemize}
+\end{enumerate}
+
+%% [AULA] Forçar os alunos a escrever a “frase de especificação” antes de escolher mecanismo.
+\end{frame}
+
+\begin{frame}{Exercícios (2/3): contenção e recuperação}
+\begin{enumerate}
+  \item Identifique 3 fronteiras de contenção possíveis em um sistema IoT:
+    (processo, container, MCU+MPU, gateway, cloud).
+    Para cada uma, diga: \textbf{o que ela contém} e \textbf{o que não contém}.
+  \item Proponha uma estratégia de recuperação para:
+    \begin{itemize}
+      \item (a) deadlock de firmware (restart),
+      \item (b) corrupção de estado (rollback/checkpoint),
+      \item (c) efeitos distribuídos (compensação).
+    \end{itemize}
+\end{enumerate}
+
+%% [AULA] Pedir que identifiquem “efeitos colaterais” e “estado durável” explicitamente.
+\end{frame}
+
+\begin{frame}{Exercícios (3/3): armadilhas clássicas}
+\begin{enumerate}
+  \item Por que retries podem derrubar um sistema já degradado?
+  \item O que significa “cobertura de detecção” (coverage) e por que importa?
+  \item Dê um exemplo de “causa comum” que derrota redundância em software (mesma config/mesmo bug).
+\end{enumerate}
+
+%% NOTE: cálculo de disponibilidade/confiabilidade fica para Aula 2.
+%% NOTE: safety/security/resiliência e riscos/ameaças entram na Aula 3.
+\end{frame}
+
+\begin{frame}{Resumo da Aula 1 (sem sobrepor com Aula 2/3)}
+\begin{itemize}
+  \item Falha é desvio do \textbf{serviço} frente à \textbf{especificação}.
+  \item Semântica de falhas e de execução (RPC) define escolhas: idempotência, dedup, timeouts e retries.
+  \item Arquitetura tolerante a falhas = \textbf{detectar} cedo, \textbf{conter} dano, \textbf{recuperar} com estratégia apropriada.
+  \item Projetar para \textbf{diagnosticar} é parte da dependabilidade (sem isso, o reparo vira “arte”).
+\end{itemize}
+
+\begin{block}{Gancho}
+Na Aula 2, vamos quantificar (modelos/métricas) e compor sistemas; depois, na Aula 3, ampliamos para safety/security/resiliência.
+\end{block}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Referências abertas (seleção para este deck)}
+\footnotesize
 \begin{itemize}
   \item Avizienis, Laprie, Randell, Landwehr. \textit{Basic Concepts and Taxonomy of Dependable and Secure Computing}. IEEE TDSC, 2004.\\
   \url{https://www.landwehr.org/2004-aviz-laprie-randell.pdf}
 
-  \item Laprie. \textit{Fundamental Concepts of Dependability}. (PDF espelhado em CMU).\\
-  \url{https://course.ece.cmu.edu/~ece749/docs/laprie.pdf}
+  \item Stanford (CS244b / Distributed Systems). Notas sobre falhas, RPC e semântica de execução (materiais abertos variam por edição).\\
+  %% TODO: substituir pelo link exato que você preferir da edição/ano usada.
+  %% Exemplo (notas intro): https://www.scs.stanford.edu/17au-cs244b/notes/intro-print.pdf
 
-  \item ETH Zürich. \textit{Reliability of Technical Systems} (slides introdutórios).\\
-  \url{https://www.lsa.ethz.ch/education/vorl/rts/04_rts_introduction.pdf}
+  \item CMU (15-440 / Distributed Systems). Materiais de RPC, timeouts e semânticas (at-least/at-most once).\\
+  %% TODO: inserir link exato do semestre.
+  %% Exemplo: https://www.cs.cmu.edu/~dga/15-440/S14/lectures/
 
-  \item Univ. of Edinburgh (SEPP). \textit{Reliability, Availability} (lecture).\\
-  \url{https://opencourse.inf.ed.ac.uk/sites/default/files/https/opencourse.inf.ed.ac.uk/inf2-sepp/2024/lecture23reliabilityavailability.pdf}
+  \item MIT (6.033 / Computer Systems Engineering). Leituras/lectures sobre RPC, falhas parciais e trade-offs de semântica.\\
+  %% TODO: inserir link exato do semestre.
+  %% Exemplo (MIT OCW 6.033): https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/
 
-  \item Stanford CS244b. \textit{Distributed Systems notes} (failure modes, RPC semantics).\\
-  \url{https://www.scs.stanford.edu/17au-cs244b/notes/intro-print.pdf}
+  \item JPL/NASA (fault management). Linguagem útil sobre contenção/isolamento e estratégias de fault management.\\
+  %% TODO: inserir o PDF específico escolhido (há várias versões/palestras).
+  %% Exemplo (JPL presentation): https://trs.jpl.nasa.gov/bitstream/handle/2014/45469/13-0440.pdf
 
-  \item Schneider (Cornell). \textit{Failure models} (capítulo com crash/omission/link).\\
-  \url{https://www.cs.cornell.edu/fbs/publications/MullenderChptr2.pdf}
-
-  \item Ariane 5 Flight 501 Failure Report (Inquiry Board, 1996). (PDF via MIT OCW).\\
-  \url{https://ocw.mit.edu/courses/16-355j-software-engineering-concepts-fall-2005/91f1e550b30b00ad797293f430220f18_ari5fail_ful_rep.pdf}
-
-  \item NASA. \textit{Mars Climate Orbiter Mishap Investigation Board Phase I Report} (1999).\\
-  \url{https://llis.nasa.gov/llis_lib/pdf/1009464main1_0641-mr.pdf}
-
-  \item Schroeder et al. (Google). \textit{DRAM Errors in the Wild} (2009).\\
-  \url{https://research.google.com/pubs/archive/35162.pdf}
-
-  \item Mukherjee et al. \textit{The Soft Error Problem: An Architectural Perspective}. (PDF).\\
-  \url{https://people.csail.mit.edu/emer/media/papers/2005.02.hpca.ser_problem.pdf}
+  \item Knight Capital (2012). Documentos regulatórios/relatórios (SEC) sobre controles e falhas de tecnologia.\\
+  %% TODO: inserir a referência primária que você adotar (press release / order / report).
 \end{itemize}
 \end{frame}
 
