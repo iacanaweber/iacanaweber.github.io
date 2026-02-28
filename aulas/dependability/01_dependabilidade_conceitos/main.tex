@@ -64,7 +64,7 @@
 \begin{minipage}[t]{0.75\textwidth}
     \begin{center}
         \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Dependabilidade}}}\\
-        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Serviço, Falhas e Tolerância}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Conceitos Básicos}}\\
     \end{center}
 \end{minipage}
 
@@ -81,7 +81,7 @@
 \vfill
 \begin{center}
 \scriptsize
-\textit{Escopo desta aula: “antes” de métricas (Aula 2) e “antes” de safety/security/resiliência (Aula 3).}
+\textit{}
 \end{center}
 \end{frame}
 
@@ -90,32 +90,34 @@
 \end{frame}
 
 % =========================================================
-\section{Escopo da disciplina: como os 3 decks se encaixam}
+\section{Overview Dependabilidade}
 
-\begin{frame}{Mapa das 3 aulas (para evitar sobreposição)}
+\begin{frame}{Mapa das 3 aulas}
 \centering
-\begin{tikzpicture}[>=Stealth, node distance=8mm]
-  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, fill=blue!6] (a1)
-  {\textbf{Aula 1 (este deck)}\\
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[>=Stealth, node distance=6mm]
+  \node[draw, rounded corners, align=center, minimum width=0.86\textwidth, fill=blue!6] (a1)
+  {\textbf{Aula 1}\\
    \small Serviço \& Especificação $\rightarrow$ Semântica de falhas $\rightarrow$ Contenção/Detecção/Recuperação\\
    \small (ênfase em software + sistemas distribuídos + fronteiras/isolamento)
   };
 
-  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, below=of a1, fill=green!6] (a2)
-  {\textbf{Aula 2 (deck 2)}\\
+  \node[draw, rounded corners, align=center, minimum width=0.86\textwidth, below=of a1, fill=green!6] (a2)
+  {\textbf{Aula 2}\\
    \small Confiabilidade e Disponibilidade: modelos probabilísticos, hazard, Weibull, composição (RBD/Markov), SLO/SLI
   };
 
-  \node[draw, rounded corners, align=center, minimum width=0.90\textwidth, below=of a2, fill=red!6] (a3)
-  {\textbf{Aula 3 (deck 3)}\\
+  \node[draw, rounded corners, align=center, minimum width=0.86\textwidth, below=of a2, fill=red!6] (a3)
+  {\textbf{Aula 3}\\
    \small Safety, Security e Resiliência: hazard/risk, threat modeling, NIST CSF, STPA, cyber-resiliency, assurance
   };
 
   \draw[->, thick] (a1) -- (a2);
   \draw[->, thick] (a2) -- (a3);
 \end{tikzpicture}
+}
 
-\vspace{0.4em}
+\vspace{0.2em}
 \begin{block}{Mensagem}
 Se você não define \textbf{qual é o serviço} e \textbf{qual semântica de falha} você tolera, as métricas (Aula 2) e os requisitos de safety/security (Aula 3) ficam “soltos”.
 \end{block}
@@ -123,7 +125,7 @@ Se você não define \textbf{qual é o serviço} e \textbf{qual semântica de fa
 %% [AULA] Explicitar para a turma: “falha” é sempre relativa a uma especificação/contrato.
 \end{frame}
 
-\begin{frame}{Objetivos técnicos da Aula 1 (revisados)}
+\begin{frame}{Objetivos técnicos da aula}
 Ao final, o aluno deve conseguir:
 \begin{itemize}
   \item Definir \textbf{serviço} e \textbf{especificação} e entender por que \textbf{falha} é desvio do contrato (não “bug”).
@@ -164,7 +166,7 @@ Ao final, o aluno deve conseguir:
 
 \begin{frame}{Contrato mínimo: pré/pós-condições e invariantes}
 \begin{columns}[T,onlytextwidth]
-\column{0.56\textwidth}
+\column{0.46\textwidth}
 \begin{itemize}
   \item \textbf{Pré-condições}: o que precisa ser verdade antes da operação (inputs válidos, permissões).
   \item \textbf{Pós-condições}: o que deve ser verdade após (efeitos e retornos).
@@ -172,10 +174,10 @@ Ao final, o aluno deve conseguir:
 \end{itemize}
 
 \begin{block}{Por que isso é dependabilidade?}
-Porque dá \textbf{alvos explícitos} para detecção de \err e contenção antes da \fail.
+Porque dá \textbf{alvos explícitos} para detecção de \err~e contenção antes da \fail.
 \end{block}
 
-\column{0.44\textwidth}
+\column{0.54\textwidth}
 \centering
 \begin{tikzpicture}[
   box/.style={draw, rounded corners, align=center, inner sep=3mm},
@@ -196,11 +198,11 @@ Porque dá \textbf{alvos explícitos} para detecção de \err e contenção ante
 %% [AULA] Exemplo rápido: “transferência bancária” (saldo, atomicidade, idempotência) sem entrar em transações ainda.
 \end{frame}
 
-\begin{frame}{Fault, Error, Failure (1 slide e seguimos adiante)}
+\begin{frame}{Fault, Error, Failure}
 \begin{description}
   \item[Fault] causa potencial (bug, requisito incompleto, config errada, desgaste, operador).
   \item[Error] parte do estado incorreto (ex.: contador corrompido, ponteiro inválido, cache inconsistente).
-  \item[Failure] desvio do serviço frente à \spec (ex.: valor errado, timeout, indisponibilidade).
+  \item[Failure] desvio do serviço frente à \spec~(ex.: valor errado, timeout, indisponibilidade).
 \end{description}
 
 \begin{block}{Ponto-chave desta aula}
@@ -253,7 +255,7 @@ Assumir fail-stop quando o sistema é na prática value-failure é uma das raíz
 % =========================================================
 \section{Distribuídos: RPC, retries e o “mito do exactly-once”}
 
-\begin{frame}{RPC: onde a intuição do aluno quebra}
+\begin{frame}{Remote Procedure Call}
 \begin{block}{Problema}
 Em RPC (rede + processos), não dá para observar diretamente se o servidor executou a operação quando há falhas de comunicação.
 \end{block}
@@ -268,10 +270,10 @@ Após um timeout, pode ter acontecido:
 
 %% [AULA] Base conceitual usada em cursos de distribuídos: Stanford/CMU (semântica de execução e retries).
 \end{frame}
-
+\vspace{-2em}
 \begin{frame}{Semântica de execução: at-least-once vs at-most-once}
 \begin{columns}[T,onlytextwidth]
-\column{0.56\textwidth}
+\column{0.49\textwidth}
 \begin{tcolorbox}[title=at-least-once,colback=white]
 \begin{itemize}
   \item Cliente reenvia até obter resposta.
@@ -280,7 +282,7 @@ Após um timeout, pode ter acontecido:
 \end{itemize}
 \end{tcolorbox}
 
-\column{0.44\textwidth}
+\column{0.49\textwidth}
 \begin{tcolorbox}[title=at-most-once,colback=white]
 \begin{itemize}
   \item Evita múltiplas execuções via \textbf{IDs} + \textbf{cache de respostas} / \textbf{tabelas de request}.
@@ -289,6 +291,7 @@ Após um timeout, pode ter acontecido:
 \end{itemize}
 \end{tcolorbox}
 \end{columns}
+\vspace{-0.5em}
 
 \begin{block}{Mensagem}
 “Exactly-once” é, em geral, \textbf{uma promessa cara/delicada} e frequentemente substituída por idempotência + dedup + transações/compensação.
