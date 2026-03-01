@@ -11,7 +11,7 @@ schedules:
     label: "Turma 30 (NP)"
     url: "https://sarc.pucrs.br/Default/Export.aspx?id=435a8c94-ee49-42e9-8672-5a6d4de6e877&ano=2026&sem=1"
 color: "#2563eb"
-order: 3
+order: 2
 objectives:
   - "Apropriar-se dos conceitos teóricos e práticos mais importantes relacionados a fundamentos de sistemas computacionais."
   - "Compreender as características de circuitos digitais combinacionais e circuitos digitais sequenciais, juntamente com sua análise nos níveis de abstração lógico e de transferência entre registradores."

@@ -6,7 +6,7 @@ semester: "2026/1"
 scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=27ed33a5-ede6-4d8d-ab09-f703ad1b993b&ano=2026&sem=1"
 #scheduleUrl: "src/cronogramas/cronograma_css.html"
 color: "#dc2626"
-order: 1
+order: 3
 objectives:
   - "Compreender os conceitos fundamentais de dependabilidade, confiabilidade e segurança em software, discernindo entre os diferentes atributos e como eles impactam o desenvolvimento de sistemas."
   - "Identificar e analisar as ameaças à dependabilidade dos sistemas de software e aprender a aplicar estratégias eficazes para mitigar riscos e melhorar a robustez do software."

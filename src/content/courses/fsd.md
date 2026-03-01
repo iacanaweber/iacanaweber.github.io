@@ -5,7 +5,7 @@ description: "Foundations of digital systems: Boolean algebra, combinational and
 semester: "2025/1"
 scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=49ee7ca4-1e6a-4a33-abcb-b6742435711a&ano=2026&sem=1"
 color: "#0d9488"
-order: 2
+order: 1
 objectives:
   - "Ter habilidade para realizar operações utilizando lógica booleana."
   - "Dominar conceitos fundamentais de estrutura, representação e modelagem de sistemas digitais combinacionais e sequenciais, diferenciando-os quanto ao seu comportamento."
