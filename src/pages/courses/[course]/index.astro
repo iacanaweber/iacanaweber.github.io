@@ -475,7 +475,7 @@ const typeLabels: Record<string, string> = {
     const highlightNextClass = panel => {
       const rows = Array.from(panel.querySelectorAll('tbody .schedule-row'));
       for (const row of rows) row.classList.remove('schedule-next-row');
-      if (rows.length === 0) return;
+      if (rows.length === 0) return null;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -494,9 +494,27 @@ const typeLabels: Record<string, string> = {
       }
 
       if (selectedRow) selectedRow.classList.add('schedule-next-row');
+      return selectedDate;
     };
 
-    for (const panel of panels) highlightNextClass(panel);
+    const applyMaterialWindow = (panel, nextDate) => {
+      const rows = Array.from(panel.querySelectorAll('tbody .schedule-row'));
+      for (const row of rows) row.classList.remove('schedule-future-locked');
+
+      if (!nextDate) return;
+
+      for (const row of rows) {
+        const rawDate = row.getAttribute('data-class-date');
+        const classDate = parseBrDate(rawDate);
+        if (!classDate) continue;
+        if (classDate > nextDate) row.classList.add('schedule-future-locked');
+      }
+    };
+
+    for (const panel of panels) {
+      const nextDate = highlightNextClass(panel);
+      applyMaterialWindow(panel, nextDate);
+    }
 
     const tables = Array.from(root.querySelectorAll('.schedule-table'));
     for (const table of tables) {
@@ -689,6 +707,12 @@ const typeLabels: Record<string, string> = {
 
   .schedule-row.schedule-next-row td:first-child { border-left: 2px solid #2563eb; }
   .schedule-row.schedule-next-row td:last-child { border-right: 2px solid #2563eb; }
+
+  .schedule-row.schedule-future-locked td.col-materiais .material-links,
+  .schedule-row.schedule-future-locked td.col-exercicios .material-links,
+  .schedule-row.schedule-future-locked td.col-extra .material-links {
+    display: none;
+  }
 
   /* Prova — amber */
   .activity-exam td { background: #fffbeb; }
