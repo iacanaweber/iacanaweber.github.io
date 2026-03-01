@@ -392,6 +392,22 @@ const typeLabels: Record<string, string> = {
     const selector = document.getElementById('schedule-select');
     const courseSlug = root.getAttribute('data-course-slug') || 'default';
     const storageKey = `course-schedule:${courseSlug}`;
+    const validIds = new Set(panels.map(panel => panel.getAttribute('data-schedule-id')).filter(Boolean));
+
+    const getUrlScheduleId = () => {
+      const params = new URLSearchParams(window.location.search);
+      const fromTurma = params.get('turma');
+      const fromSchedule = params.get('schedule');
+      const candidate = fromTurma || fromSchedule;
+      return candidate && validIds.has(candidate) ? candidate : null;
+    };
+
+    const setUrlScheduleId = scheduleId => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('turma', scheduleId);
+      url.searchParams.delete('schedule');
+      window.history.replaceState({}, '', url);
+    };
 
     const showPanel = scheduleId => {
       for (const panel of panels) {
@@ -402,21 +418,26 @@ const typeLabels: Record<string, string> = {
 
     if (panels.length > 0) {
       let activeId = panels[0].getAttribute('data-schedule-id');
+      const urlScheduleId = getUrlScheduleId();
+      if (urlScheduleId) activeId = urlScheduleId;
 
       if (selector) {
-        try {
-          const savedId = localStorage.getItem(storageKey);
-          if (savedId && panels.some(p => p.getAttribute('data-schedule-id') === savedId)) {
-            activeId = savedId;
+        if (!urlScheduleId) {
+          try {
+            const savedId = localStorage.getItem(storageKey);
+            if (savedId && validIds.has(savedId)) {
+              activeId = savedId;
+            }
+          } catch {
+            // ignore storage errors (private browsing / restricted mode)
           }
-        } catch {
-          // ignore storage errors (private browsing / restricted mode)
         }
 
         if (activeId) selector.value = activeId;
         selector.addEventListener('change', () => {
           const selectedId = selector.value;
           showPanel(selectedId);
+          setUrlScheduleId(selectedId);
           try {
             localStorage.setItem(storageKey, selectedId);
           } catch {
@@ -425,7 +446,10 @@ const typeLabels: Record<string, string> = {
         });
       }
 
-      if (activeId) showPanel(activeId);
+      if (activeId) {
+        showPanel(activeId);
+        setUrlScheduleId(activeId);
+      }
     }
 
     const tables = Array.from(root.querySelectorAll('.schedule-table'));
