@@ -310,7 +310,11 @@ const typeLabels: Record<string, string> = {
                       const room = entry.resources || schedule.defaultRoom || '—';
                       const aClass = activityClass(entry.activity, entry.description);
                       return (
-                        <tr class={`schedule-row ${aClass}`} data-class-number={entry.number ?? undefined}>
+                        <tr
+                          class={`schedule-row ${aClass}`}
+                          data-class-number={entry.number ?? undefined}
+                          data-class-date={entry.date}
+                        >
                           <td class="col-num">{entry.number ?? '—'}</td>
                           <td class="col-date">
                             <span class="date-day">{dayLabel(entry.day)}</span>
@@ -451,6 +455,48 @@ const typeLabels: Record<string, string> = {
         setUrlScheduleId(activeId);
       }
     }
+
+    const parseBrDate = value => {
+      const match = String(value || '').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (!match) return null;
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      const year = Number(match[3]);
+      const date = new Date(year, month - 1, day);
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) return null;
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const highlightNextClass = panel => {
+      const rows = Array.from(panel.querySelectorAll('tbody .schedule-row'));
+      for (const row of rows) row.classList.remove('schedule-next-row');
+      if (rows.length === 0) return;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      let selectedRow = null;
+      let selectedDate = null;
+
+      for (const row of rows) {
+        const rawDate = row.getAttribute('data-class-date');
+        const classDate = parseBrDate(rawDate);
+        if (!classDate || classDate < today) continue;
+        if (!selectedDate || classDate < selectedDate) {
+          selectedDate = classDate;
+          selectedRow = row;
+        }
+      }
+
+      if (selectedRow) selectedRow.classList.add('schedule-next-row');
+    };
+
+    for (const panel of panels) highlightNextClass(panel);
 
     const tables = Array.from(root.querySelectorAll('.schedule-table'));
     for (const table of tables) {
@@ -634,6 +680,16 @@ const typeLabels: Record<string, string> = {
   .activity-class:hover td { background: var(--color-bg-secondary); }
   .schedule-table td.rowspan-hover { background: var(--color-bg-secondary); }
 
+  /* Next class highlight (today, or nearest upcoming date). */
+  .schedule-row.schedule-next-row td {
+    border-top: 2px solid #2563eb;
+    border-bottom: 2px solid #2563eb;
+    background: #eef5ff;
+  }
+
+  .schedule-row.schedule-next-row td:first-child { border-left: 2px solid #2563eb; }
+  .schedule-row.schedule-next-row td:last-child { border-right: 2px solid #2563eb; }
+
   /* Prova — amber */
   .activity-exam td { background: #fffbeb; }
   .activity-exam .activity-badge { background: #d97706; }
@@ -681,6 +737,15 @@ const typeLabels: Record<string, string> = {
 
   :global([data-theme="dark"]) .activity-evento   td { background: #0b1d40; }
   :global([data-theme="dark"]) .activity-evento   .activity-badge { background: #2563eb; }
+
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td {
+    background: #0e223f;
+    border-top-color: #60a5fa;
+    border-bottom-color: #60a5fa;
+  }
+
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:first-child { border-left-color: #60a5fa; }
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:last-child { border-right-color: #60a5fa; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }
