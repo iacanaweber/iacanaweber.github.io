@@ -202,6 +202,10 @@ function shortDate(date: string): string {
   return parts.length >= 2 ? `${parts[0]}/${parts[1]}` : date;
 }
 
+function shortRoomLabel(room: string): string {
+  return room.replace(/\bLaborat[oó]rio\b/gi, 'Lab');
+}
+
 function resourceHref(r: (typeof allResources)[number]): string {
   return r.data.pdfPath ?? r.data.url ?? '#';
 }
@@ -307,7 +311,7 @@ const typeLabels: Record<string, string> = {
                   </thead>
                   <tbody>
                     {schedule.entries.map(entry => {
-                      const room = entry.resources || schedule.defaultRoom || '—';
+                      const room = shortRoomLabel(entry.resources || schedule.defaultRoom || '—');
                       const aClass = activityClass(entry.activity, entry.description);
                       return (
                         <tr
