@@ -310,7 +310,11 @@ const typeLabels: Record<string, string> = {
                       const room = entry.resources || schedule.defaultRoom || '—';
                       const aClass = activityClass(entry.activity, entry.description);
                       return (
-                        <tr class={`schedule-row ${aClass}`} data-class-number={entry.number ?? undefined}>
+                        <tr
+                          class={`schedule-row ${aClass}`}
+                          data-class-number={entry.number ?? undefined}
+                          data-class-date={entry.date}
+                        >
                           <td class="col-num">{entry.number ?? '—'}</td>
                           <td class="col-date">
                             <span class="date-day">{dayLabel(entry.day)}</span>
@@ -384,14 +388,32 @@ const typeLabels: Record<string, string> = {
 </CourseLayout>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  const initScheduleEnhancements = () => {
     const root = document.querySelector('[data-schedule-root]');
     if (!root) return;
+    if (root.getAttribute('data-enhanced') === '1') return;
+    root.setAttribute('data-enhanced', '1');
 
     const panels = Array.from(root.querySelectorAll('.schedule-panel'));
     const selector = document.getElementById('schedule-select');
     const courseSlug = root.getAttribute('data-course-slug') || 'default';
     const storageKey = `course-schedule:${courseSlug}`;
+    const validIds = new Set(panels.map(panel => panel.getAttribute('data-schedule-id')).filter(Boolean));
+
+    const getUrlScheduleId = () => {
+      const params = new URLSearchParams(window.location.search);
+      const fromTurma = params.get('turma');
+      const fromSchedule = params.get('schedule');
+      const candidate = fromTurma || fromSchedule;
+      return candidate && validIds.has(candidate) ? candidate : null;
+    };
+
+    const setUrlScheduleId = scheduleId => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('turma', scheduleId);
+      url.searchParams.delete('schedule');
+      window.history.replaceState({}, '', url);
+    };
 
     const showPanel = scheduleId => {
       for (const panel of panels) {
@@ -402,21 +424,26 @@ const typeLabels: Record<string, string> = {
 
     if (panels.length > 0) {
       let activeId = panels[0].getAttribute('data-schedule-id');
+      const urlScheduleId = getUrlScheduleId();
+      if (urlScheduleId) activeId = urlScheduleId;
 
       if (selector) {
-        try {
-          const savedId = localStorage.getItem(storageKey);
-          if (savedId && panels.some(p => p.getAttribute('data-schedule-id') === savedId)) {
-            activeId = savedId;
+        if (!urlScheduleId) {
+          try {
+            const savedId = localStorage.getItem(storageKey);
+            if (savedId && validIds.has(savedId)) {
+              activeId = savedId;
+            }
+          } catch {
+            // ignore storage errors (private browsing / restricted mode)
           }
-        } catch {
-          // ignore storage errors (private browsing / restricted mode)
         }
 
         if (activeId) selector.value = activeId;
         selector.addEventListener('change', () => {
           const selectedId = selector.value;
           showPanel(selectedId);
+          setUrlScheduleId(selectedId);
           try {
             localStorage.setItem(storageKey, selectedId);
           } catch {
@@ -425,7 +452,75 @@ const typeLabels: Record<string, string> = {
         });
       }
 
-      if (activeId) showPanel(activeId);
+      if (activeId) {
+        showPanel(activeId);
+        setUrlScheduleId(activeId);
+      }
+    }
+
+    const parseBrDate = value => {
+      const normalized = String(value || '').trim();
+      const match = normalized.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2}|\d{4}))?$/);
+      if (!match) return null;
+      const day = Number(match[1]);
+      const month = Number(match[2]);
+      let year = new Date().getFullYear();
+      if (match[3]) {
+        const parsedYear = Number(match[3]);
+        year = match[3].length === 2 ? 2000 + parsedYear : parsedYear;
+      }
+      const date = new Date(year, month - 1, day);
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+      ) return null;
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const highlightNextClass = panel => {
+      const rows = Array.from(panel.querySelectorAll('tbody .schedule-row'));
+      for (const row of rows) row.classList.remove('schedule-next-row');
+      if (rows.length === 0) return null;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      let selectedRow = null;
+      let selectedDate = null;
+
+      for (const row of rows) {
+        const rawDate = row.getAttribute('data-class-date');
+        const classDate = parseBrDate(rawDate);
+        if (!classDate || classDate < today) continue;
+        if (!selectedDate || classDate < selectedDate) {
+          selectedDate = classDate;
+          selectedRow = row;
+        }
+      }
+
+      if (selectedRow) selectedRow.classList.add('schedule-next-row');
+      return selectedDate;
+    };
+
+    const applyMaterialWindow = (panel, nextDate) => {
+      const rows = Array.from(panel.querySelectorAll('tbody .schedule-row'));
+      for (const row of rows) row.classList.remove('schedule-future-locked');
+
+      if (!nextDate) return;
+
+      for (const row of rows) {
+        const rawDate = row.getAttribute('data-class-date');
+        const classDate = parseBrDate(rawDate);
+        if (!classDate) continue;
+        if (classDate > nextDate) row.classList.add('schedule-future-locked');
+      }
+    };
+
+    for (const panel of panels) {
+      const nextDate = highlightNextClass(panel);
+      applyMaterialWindow(panel, nextDate);
     }
 
     const tables = Array.from(root.querySelectorAll('.schedule-table'));
@@ -459,7 +554,11 @@ const typeLabels: Record<string, string> = {
         row.addEventListener('mouseleave', clearHover);
       }
     }
-  });
+  };
+
+  initScheduleEnhancements();
+  document.addEventListener('DOMContentLoaded', initScheduleEnhancements);
+  document.addEventListener('astro:after-swap', initScheduleEnhancements);
 </script>
 
 <style>
@@ -610,6 +709,22 @@ const typeLabels: Record<string, string> = {
   .activity-class:hover td { background: var(--color-bg-secondary); }
   .schedule-table td.rowspan-hover { background: var(--color-bg-secondary); }
 
+  /* Next class highlight (today, or nearest upcoming date). */
+  .schedule-row.schedule-next-row td {
+    border-top: 2px solid #2563eb;
+    border-bottom: 2px solid #2563eb;
+    background: #eef5ff;
+  }
+
+  .schedule-row.schedule-next-row td:first-child { border-left: 2px solid #2563eb; }
+  .schedule-row.schedule-next-row td:last-child { border-right: 2px solid #2563eb; }
+
+  .schedule-row.schedule-future-locked td.col-materiais .material-links,
+  .schedule-row.schedule-future-locked td.col-exercicios .material-links,
+  .schedule-row.schedule-future-locked td.col-extra .material-links {
+    display: none;
+  }
+
   /* Prova — amber */
   .activity-exam td { background: #fffbeb; }
   .activity-exam .activity-badge { background: #d97706; }
@@ -657,6 +772,15 @@ const typeLabels: Record<string, string> = {
 
   :global([data-theme="dark"]) .activity-evento   td { background: #0b1d40; }
   :global([data-theme="dark"]) .activity-evento   .activity-badge { background: #2563eb; }
+
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td {
+    background: #0e223f;
+    border-top-color: #60a5fa;
+    border-bottom-color: #60a5fa;
+  }
+
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:first-child { border-left-color: #60a5fa; }
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:last-child { border-right-color: #60a5fa; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }

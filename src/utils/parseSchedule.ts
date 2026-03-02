@@ -16,6 +16,45 @@ export interface ScheduleInfo {
   entries: ClassEntry[];
 }
 
+function decodeHtml(text: string): string {
+  return text
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function extractDefaultRoom(html: string): string {
+  const titleCandidates: string[] = [];
+
+  const spanTitleRegex = /id="[^"]*lblTitulo"[^>]*>([\s\S]*?)<\/span>/gi;
+  let spanMatch: RegExpExecArray | null;
+  while ((spanMatch = spanTitleRegex.exec(html)) !== null) {
+    titleCandidates.push(spanMatch[1]);
+  }
+
+  const h1TitleRegex = /<h1[^>]*>([\s\S]*?)<\/h1>/gi;
+  let h1Match: RegExpExecArray | null;
+  while ((h1Match = h1TitleRegex.exec(html)) !== null) {
+    titleCandidates.push(h1Match[1]);
+  }
+
+  for (const rawTitle of titleCandidates) {
+    const title = decodeHtml(rawTitle)
+      .replace(/<[^>]*>/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Supports rooms like "11/704", "32/410", and "30/D/303".
+    const roomMatch = title.match(/-\s*([A-Za-z0-9]+(?:\/[A-Za-z0-9]+)+)\s*$/);
+    if (roomMatch) return roomMatch[1];
+  }
+
+  return '';
+}
+
 function extractField(rowHtml: string, field: string): string {
   const regex = new RegExp(`_lbl${field}"[^>]*>([\\s\\S]*?)<\\/span>`, 'i');
   const match = rowHtml.match(regex);
@@ -31,13 +70,7 @@ function extractField(rowHtml: string, field: string): string {
 }
 
 export function parseScheduleHtml(html: string): ScheduleInfo {
-  // Extract default room from title: "98G08-4 Disciplina (30) - 32/314"
-  const titleMatch = html.match(/id="lblTitulo">([^<]+)<\/span>/i);
-  let defaultRoom = '';
-  if (titleMatch) {
-    const roomMatch = titleMatch[1].match(/- (\d+\/\d+)$/);
-    defaultRoom = roomMatch ? roomMatch[1] : '';
-  }
+  const defaultRoom = extractDefaultRoom(html);
 
   const entries: ClassEntry[] = [];
   const rowRegex = /<tr([^>]*)>([\s\S]*?)<\/tr>/gi;
