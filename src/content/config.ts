@@ -21,30 +21,45 @@ const courses = defineCollection({
   }),
 });
 
+const resourceType = z.enum(['book', 'tool', 'link', 'video', 'slides', 'pdf', 'other']);
+const resourceClass = z.union([z.number(), z.string()]);
+const resourceColumn = z.enum(['materiais', 'exercicios', 'extra']);
+
+const resourceItem = z.object({
+  title: z.string(),
+  type: resourceType,
+  /** External URL (e.g. Google Drive, website). */
+  url: z.string().optional(),
+  /** Path to a local file in public/ (e.g. "/courses/css/slides-01.pdf"). */
+  pdfPath: z.string().optional(),
+  /**
+   * Class number this resource belongs to. If set, appears in the schedule table.
+   * Use a number for a single class (e.g. 5) or a string range (e.g. "5-6") to span rows.
+   */
+  class: resourceClass.optional(),
+  /**
+   * Which column of the schedule table this resource appears in.
+   * Defaults: slides/pdf/link → "materiais", everything else → "extra".
+   */
+  column: resourceColumn.optional(),
+  description: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  order: z.number().default(0),
+});
+
 const resources = defineCollection({
   type: 'content',
-  schema: z.object({
-    title: z.string(),
-    course: z.string(),
-    type: z.enum(['book', 'tool', 'link', 'video', 'slides', 'pdf', 'other']),
-    /** External URL (e.g. Google Drive, website). */
-    url: z.string().optional(),
-    /** Path to a local file in public/ (e.g. "/courses/css/slides-01.pdf"). */
-    pdfPath: z.string().optional(),
-    /**
-     * Class number this resource belongs to. If set, appears in the schedule table.
-     * Use a number for a single class (e.g. 5) or a string range (e.g. "5-6") to span rows.
-     */
-    class: z.union([z.number(), z.string()]).optional(),
-    /**
-     * Which column of the schedule table this resource appears in.
-     * Defaults: slides/pdf/link → "materiais", everything else → "extra".
-     */
-    column: z.enum(['materiais', 'exercicios', 'extra']).optional(),
-    description: z.string().optional(),
-    tags: z.array(z.string()).default([]),
-    order: z.number().default(0),
-  }),
+  schema: z.union([
+    resourceItem.extend({
+      course: z.string(),
+      items: z.undefined().optional(),
+    }),
+    z.object({
+      course: z.string(),
+      column: resourceColumn.optional(),
+      items: z.array(resourceItem),
+    }),
+  ]),
 });
 
 const publications = defineCollection({

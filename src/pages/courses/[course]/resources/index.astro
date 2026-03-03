@@ -1,6 +1,7 @@
 ---
 import CourseLayout from '../../../../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
+import { flattenResources } from '../../../../utils/resources';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -15,9 +16,10 @@ const { course } = Astro.props;
 
 // Only show general resources (not linked to a specific class).
 // Class-linked resources (slides, PDFs) appear in the schedule table instead.
-const items = (await getCollection('resources', ({ data }) =>
-  data.course === course.slug && data.class == null
-)).sort((a, b) => a.data.order - b.data.order);
+const rawResources = await getCollection('resources', ({ data }) => data.course === course.slug);
+const items = flattenResources(rawResources)
+  .filter(item => item.data.class == null)
+  .sort((a, b) => a.data.order - b.data.order);
 
 const typeLabels: Record<string, string> = {
   book:   'Livros',

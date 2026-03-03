@@ -30,15 +30,6 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-function toSlug(value) {
-  return String(value)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
-}
-
 function yamlQuote(value) {
   return `"${String(value).replace(/"/g, '\\"')}"`;
 }
@@ -238,31 +229,63 @@ function convertPptx(converter, inputPptxPath, outputPdfPath) {
   throw new Error(`Unsupported PPTX converter type: ${converter.type}`);
 }
 
-function generateMarkdown(slide, classValue, suffixIndex) {
-  const classSuffix = classValue == null ? 'general' : `class-${toSlug(classValue)}`;
-  const fileName = `${String(slide.order).padStart(4, '0')}-${slide.id}-${classSuffix}-${suffixIndex}.md`;
-  const filePath = join(generatedDir, fileName);
+function groupKey(course, column) {
+  return `${course}::${column}`;
+}
 
-  const lines = [
-    '---',
-    `title: ${yamlQuote(slide.title)}`,
-    `course: ${yamlQuote(slide.course ?? 'css')}`,
-    'type: "slides"',
-    `pdfPath: ${yamlQuote(slide.outputPdfPath)}`,
-    'column: "materiais"',
-    `order: ${slide.order + suffixIndex}`,
-  ];
+function addGeneratedItem(groupedItems, slide, classValue, suffixIndex) {
+  const course = slide.course ?? 'css';
+  const column = 'materiais';
+  const key = groupKey(course, column);
 
-  if (classValue != null) {
-    if (typeof classValue === 'number') {
-      lines.push(`class: ${classValue}`);
-    } else {
-      lines.push(`class: ${yamlQuote(classValue)}`);
-    }
+  if (!groupedItems.has(key)) {
+    groupedItems.set(key, {
+      course,
+      column,
+      items: [],
+    });
   }
 
-  lines.push('---', '');
-  writeFileSync(filePath, `${lines.join('\n')}\n`, 'utf8');
+  const group = groupedItems.get(key);
+  const item = {
+    title: slide.title,
+    type: 'slides',
+    pdfPath: slide.outputPdfPath,
+    order: slide.order + suffixIndex,
+  };
+  if (classValue != null) item.class = classValue;
+  group.items.push(item);
+}
+
+function writeGroupedMarkdown(groupedItems) {
+  for (const group of groupedItems.values()) {
+    const filePath = join(generatedDir, `${group.course}-${group.column}.md`);
+    group.items.sort((a, b) => a.order - b.order);
+
+    const lines = [
+      '---',
+      `course: ${yamlQuote(group.course)}`,
+      `column: ${yamlQuote(group.column)}`,
+      'items:',
+    ];
+
+    for (const item of group.items) {
+      lines.push(`  - title: ${yamlQuote(item.title)}`);
+      lines.push(`    type: ${yamlQuote(item.type)}`);
+      lines.push(`    pdfPath: ${yamlQuote(item.pdfPath)}`);
+      lines.push(`    order: ${item.order}`);
+      if (item.class != null) {
+        if (typeof item.class === 'number') {
+          lines.push(`    class: ${item.class}`);
+        } else {
+          lines.push(`    class: ${yamlQuote(item.class)}`);
+        }
+      }
+    }
+
+    lines.push('---', '');
+    writeFileSync(filePath, `${lines.join('\n')}\n`, 'utf8');
+  }
 }
 
 function main() {
@@ -287,6 +310,7 @@ function main() {
 
   let compiledCount = 0;
   let skippedCount = 0;
+  const groupedItems = new Map();
 
   for (const slide of slides) {
     const sourceType = slide.sourceType ?? 'latex';
@@ -340,11 +364,13 @@ function main() {
     }
 
     if (Array.isArray(slide.classes) && slide.classes.length > 0) {
-      slide.classes.forEach((classValue, index) => generateMarkdown(slide, classValue, index));
+      slide.classes.forEach((classValue, index) => addGeneratedItem(groupedItems, slide, classValue, index));
     } else {
-      generateMarkdown(slide, null, 0);
+      addGeneratedItem(groupedItems, slide, null, 0);
     }
   }
+
+  writeGroupedMarkdown(groupedItems);
 
   const generatedFiles = readdirSync(generatedDir).filter(name => name.endsWith('.md')).length;
   console.log(

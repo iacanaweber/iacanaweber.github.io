@@ -3,6 +3,7 @@ import CourseLayout from '../../../layouts/CourseLayout.astro';
 import { getCollection } from 'astro:content';
 import { fetchSchedule } from '../../../utils/parseSchedule';
 import { mdInline } from '../../../utils/helpers';
+import { flattenResources } from '../../../utils/resources';
 import type { GetStaticPaths } from 'astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -33,7 +34,8 @@ const scheduleDefs: ScheduleDef[] =
 const hasSchedule = scheduleDefs.length > 0;
 
 // Load all resources for this course
-const allResources = await getCollection('resources', ({ data }) => data.course === course.slug);
+const rawResources = await getCollection('resources', ({ data }) => data.course === course.slug);
+const allResources = flattenResources(rawResources);
 
 // General resources (no class) → collapsible section
 const generalResources = allResources
