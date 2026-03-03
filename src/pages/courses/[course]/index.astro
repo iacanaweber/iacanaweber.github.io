@@ -771,9 +771,9 @@ const typeLabels: Record<string, string> = {
   .col-num        { width: 2.5rem; text-align: center; color: var(--color-text-secondary); font-weight: 600; }
   .col-date       { width: 5rem; white-space: nowrap; }
   .col-room       { width: 6rem; white-space: nowrap; color: var(--color-text-secondary); }
-  .col-materiais  { width: 11rem; }
-  .col-exercicios { width: 10rem; }
-  .col-extra      { width: 10rem; }
+  .col-materiais  { min-width: 11rem; }
+  .col-exercicios { min-width: 12rem; }
+  .col-extra      { min-width: 14rem; }
 
   /* Date cell */
   .date-day { display: block; font-weight: 600; font-size: var(--font-size-xs); color: var(--color-text-secondary); }
@@ -882,7 +882,9 @@ const typeLabels: Record<string, string> = {
     text-decoration: none;
     color: var(--color-primary);
     transition: all var(--transition-fast);
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
   }
 
   .material-link:hover {
