@@ -4,7 +4,7 @@ column: "materiais"
 items:
   - title: "Apresentacao da disciplina"
     type: "slides"
-    url: "/assets/slides/fsc/00-apresentacao-fsc.pptx"
+    pdfPath: "/assets/pdfs/fsc/00-apresentacao-fsc.pdf"
     class: 1
     order: 100
 ---
