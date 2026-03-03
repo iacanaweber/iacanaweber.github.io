@@ -804,8 +804,8 @@ const typeLabels: Record<string, string> = {
     background: #eef5ff;
   }
 
-  .schedule-row.schedule-next-row td:first-child { border-left: 2px solid #2563eb; }
-  .schedule-row.schedule-next-row td:last-child { border-right: 2px solid #2563eb; }
+  .schedule-row.schedule-next-row td:first-child { box-shadow: inset 2px 0 0 #2563eb; }
+  .schedule-row.schedule-next-row td:last-child { box-shadow: inset -2px 0 0 #2563eb; }
 
   .schedule-row.schedule-future-locked td.col-materiais .material-links,
   .schedule-row.schedule-future-locked td.col-exercicios .material-links,
@@ -867,8 +867,8 @@ const typeLabels: Record<string, string> = {
     border-bottom-color: #60a5fa;
   }
 
-  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:first-child { border-left-color: #60a5fa; }
-  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:last-child { border-right-color: #60a5fa; }
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:first-child { box-shadow: inset 2px 0 0 #60a5fa; }
+  :global([data-theme="dark"]) .schedule-row.schedule-next-row td:last-child { box-shadow: inset -2px 0 0 #60a5fa; }
 
   /* ── Material links ──────────────────────────────────────────────────── */
   .material-links { display: flex; flex-wrap: wrap; gap: var(--space-1); }
