@@ -22,8 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
 
 const configPath = join(repoRoot, 'config', 'css-slides.json');
-const generatedDir = join(repoRoot, 'src', 'content', 'resources', 'generated');
-const legacyGeneratedDir = join(repoRoot, 'src', 'content', 'resources', '_generated');
+const generatedDir = join(repoRoot, 'src', 'content', 'resources');
 const texBuildRoot = join(tmpdir(), 'css-crypto-slides-build');
 
 function assert(condition, message) {
@@ -304,8 +303,6 @@ function main() {
     );
   }
 
-  cleanupDirectory(generatedDir);
-  rmSync(legacyGeneratedDir, { recursive: true, force: true });
   cleanupDirectory(texBuildRoot);
 
   let compiledCount = 0;
