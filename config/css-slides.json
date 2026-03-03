@@ -102,6 +102,26 @@
       "texDir": "aulas/crypto/DES",
       "outputPdfPath": "/assets/pdfs/css/crypto/des.pdf",
       "order": 900
+    },
+    {
+      "id": "fsd-apresentacao",
+      "title": "Apresentacao da disciplina",
+      "course": "fsd",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsd/00-Apresentacao/Apresentacao.pptx",
+      "outputPdfPath": "/assets/pdfs/fsd/apresentacao-fsd.pdf",
+      "classes": [1],
+      "order": 100
+    },
+    {
+      "id": "fsd-portas-logicas",
+      "title": "Portas logicas",
+      "course": "fsd",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsd/01-PortasLogicas/Portas Logicas.pptx",
+      "outputPdfPath": "/assets/pdfs/fsd/portas-logicas-fsd.pdf",
+      "classes": [1],
+      "order": 110
     }
   ]
 }

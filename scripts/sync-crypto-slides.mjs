@@ -1,4 +1,13 @@
 import {
+  basename,
+  dirname,
+  join,
+  resolve,
+} from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
+import {
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -8,10 +17,6 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { tmpdir } from 'node:os';
-import { spawnSync } from 'node:child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '..');
@@ -36,6 +41,11 @@ function toSlug(value) {
 
 function yamlQuote(value) {
   return `"${String(value).replace(/"/g, '\\"')}"`;
+}
+
+function commandExists(command) {
+  const result = spawnSync(command, ['--version'], { stdio: 'ignore' });
+  return !result.error;
 }
 
 function runPdflatex(texDir, outDir) {
@@ -73,6 +83,15 @@ function verifyLatexEnvironment() {
       );
     }
   }
+}
+
+function pickPptxConverter() {
+  const canUsePowerPoint = commandExists('powershell.exe') && (process.platform === 'win32' || Boolean(process.env.WSL_DISTRO_NAME));
+  if (canUsePowerPoint) return { type: 'powershell', command: 'powershell.exe' };
+  if (commandExists('soffice')) return { type: 'soffice', command: 'soffice' };
+  if (commandExists('libreoffice')) return { type: 'soffice', command: 'libreoffice' };
+  if (commandExists('powershell.exe')) return { type: 'powershell', command: 'powershell.exe' };
+  return null;
 }
 
 function cleanupDirectory(path) {
@@ -129,11 +148,94 @@ function latestSourceMtimeMs(dir) {
   return latest;
 }
 
-function needsRebuild(texDir, outputPdfPath) {
+function needsLatexRebuild(texDir, outputPdfPath) {
   if (!existsSync(outputPdfPath)) return true;
   const sourceMtime = latestSourceMtimeMs(texDir);
   const pdfMtime = statSync(outputPdfPath).mtimeMs;
   return sourceMtime > pdfMtime;
+}
+
+function needsFileRebuild(sourceFilePath, outputPdfPath) {
+  if (!existsSync(outputPdfPath)) return true;
+  const sourceMtime = statSync(sourceFilePath).mtimeMs;
+  const pdfMtime = statSync(outputPdfPath).mtimeMs;
+  return sourceMtime > pdfMtime;
+}
+
+function quotePowerShell(value) {
+  return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+function toPowerPointPath(absPath) {
+  if (process.platform === 'win32') return absPath;
+  const distro = process.env.WSL_DISTRO_NAME;
+  if (distro) return `\\\\wsl.localhost\\${distro}${absPath.replace(/\//g, '\\')}`;
+  return absPath;
+}
+
+function convertPptxWithSoffice(sofficeCommand, inputPptxPath, outputPdfPath) {
+  const outputDir = dirname(outputPdfPath);
+  ensureDirectory(outputDir);
+  const result = spawnSync(
+    sofficeCommand,
+    ['--headless', '--convert-to', 'pdf', '--outdir', outputDir, inputPptxPath],
+    { stdio: 'pipe', encoding: 'utf8' }
+  );
+  if (result.status !== 0) {
+    const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+    throw new Error(`PPTX conversion failed for ${inputPptxPath}: ${output.trim()}`);
+  }
+
+  const defaultOut = join(outputDir, `${basename(inputPptxPath).replace(/\.[^.]+$/, '')}.pdf`);
+  if (defaultOut !== outputPdfPath && existsSync(defaultOut)) {
+    copyFileSync(defaultOut, outputPdfPath);
+    rmSync(defaultOut, { force: true });
+  }
+}
+
+function convertPptxWithPowerPoint(powershellCommand, inputPptxPath, outputPdfPath) {
+  const inputArg = quotePowerShell(toPowerPointPath(inputPptxPath));
+  const outputArg = quotePowerShell(toPowerPointPath(outputPdfPath));
+  const psScript = [
+    "$ErrorActionPreference = 'Stop'",
+    `$inPath = ${inputArg}`,
+    `$outPath = ${outputArg}`,
+    '$outDir = [System.IO.Path]::GetDirectoryName($outPath)',
+    'New-Item -ItemType Directory -Force -Path $outDir | Out-Null',
+    '$ppt = New-Object -ComObject PowerPoint.Application',
+    'try {',
+    '  $pres = $ppt.Presentations.Open($inPath, $false, $false, $false)',
+    '  try {',
+    '    $pres.SaveAs($outPath, 32)',
+    '  } finally {',
+    '    $pres.Close()',
+    '  }',
+    '} finally {',
+    '  $ppt.Quit()',
+    '}',
+  ].join('; ');
+
+  const result = spawnSync(
+    powershellCommand,
+    ['-NoProfile', '-Command', psScript],
+    { stdio: 'pipe', encoding: 'utf8' }
+  );
+  if (result.status !== 0) {
+    const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+    throw new Error(`PowerPoint conversion failed for ${inputPptxPath}: ${output.trim()}`);
+  }
+}
+
+function convertPptx(converter, inputPptxPath, outputPdfPath) {
+  if (converter.type === 'soffice') {
+    convertPptxWithSoffice(converter.command, inputPptxPath, outputPdfPath);
+    return;
+  }
+  if (converter.type === 'powershell') {
+    convertPptxWithPowerPoint(converter.command, inputPptxPath, outputPdfPath);
+    return;
+  }
+  throw new Error(`Unsupported PPTX converter type: ${converter.type}`);
 }
 
 function generateMarkdown(slide, classValue, suffixIndex) {
@@ -144,7 +246,7 @@ function generateMarkdown(slide, classValue, suffixIndex) {
   const lines = [
     '---',
     `title: ${yamlQuote(slide.title)}`,
-    'course: "css"',
+    `course: ${yamlQuote(slide.course ?? 'css')}`,
     'type: "slides"',
     `pdfPath: ${yamlQuote(slide.outputPdfPath)}`,
     'column: "materiais"',
@@ -169,7 +271,15 @@ function main() {
   const slides = parsed.slides;
 
   assert(Array.isArray(slides) && slides.length > 0, 'Config must contain a non-empty slides array');
-  verifyLatexEnvironment();
+  const hasLatexSlides = slides.some(slide => (slide.sourceType ?? 'latex') === 'latex');
+  const hasPptxSlides = slides.some(slide => slide.sourceType === 'pptx');
+  if (hasLatexSlides) verifyLatexEnvironment();
+  const pptxConverter = hasPptxSlides ? pickPptxConverter() : null;
+  if (hasPptxSlides && !pptxConverter) {
+    throw new Error(
+      'No PPTX converter found. Install LibreOffice (soffice) or run in an environment with powershell.exe + Microsoft PowerPoint.'
+    );
+  }
 
   cleanupDirectory(generatedDir);
   rmSync(legacyGeneratedDir, { recursive: true, force: true });
@@ -179,32 +289,48 @@ function main() {
   let skippedCount = 0;
 
   for (const slide of slides) {
+    const sourceType = slide.sourceType ?? 'latex';
     assert(slide.id, 'Slide id is required');
     assert(slide.title, `Slide ${slide.id} is missing title`);
-    assert(slide.texDir, `Slide ${slide.id} is missing texDir`);
+    assert(typeof slide.course === 'undefined' || typeof slide.course === 'string', `Slide ${slide.id} has invalid course`);
     assert(
       typeof slide.outputPdfPath === 'string' && slide.outputPdfPath.startsWith('/'),
       `Slide ${slide.id} is missing valid outputPdfPath`
     );
     assert(Number.isFinite(slide.order), `Slide ${slide.id} has invalid order`);
+    assert(sourceType === 'latex' || sourceType === 'pptx', `Slide ${slide.id} has invalid sourceType`);
 
-    const texDir = resolve(repoRoot, slide.texDir);
-    const texMain = join(texDir, 'main.tex');
-    assert(existsSync(texMain), `Missing TeX source: ${texMain}`);
     const finalPdfPath = join(repoRoot, 'public', slide.outputPdfPath.replace(/^\/+/, ''));
     ensureDirectory(dirname(finalPdfPath));
 
-    if (needsRebuild(texDir, finalPdfPath)) {
-      const buildOutDir = join(texBuildRoot, slide.id);
-      cleanupDirectory(buildOutDir);
-      runPdflatex(texDir, buildOutDir);
+    if (sourceType === 'latex') {
+      assert(slide.texDir, `Slide ${slide.id} is missing texDir`);
+      const texDir = resolve(repoRoot, slide.texDir);
+      const texMain = join(texDir, 'main.tex');
+      assert(existsSync(texMain), `Missing TeX source: ${texMain}`);
 
-      const producedPdf = join(buildOutDir, 'main.pdf');
-      assert(existsSync(producedPdf), `PDF was not produced for ${slide.id}`);
-      copyFileSync(producedPdf, finalPdfPath);
-      compiledCount += 1;
+      if (needsLatexRebuild(texDir, finalPdfPath)) {
+        const buildOutDir = join(texBuildRoot, slide.id);
+        cleanupDirectory(buildOutDir);
+        runPdflatex(texDir, buildOutDir);
+
+        const producedPdf = join(buildOutDir, 'main.pdf');
+        assert(existsSync(producedPdf), `PDF was not produced for ${slide.id}`);
+        copyFileSync(producedPdf, finalPdfPath);
+        compiledCount += 1;
+      } else {
+        skippedCount += 1;
+      }
     } else {
-      skippedCount += 1;
+      assert(slide.pptxPath, `Slide ${slide.id} is missing pptxPath`);
+      const pptxPath = resolve(repoRoot, slide.pptxPath);
+      assert(existsSync(pptxPath), `Missing PPTX source: ${pptxPath}`);
+      if (needsFileRebuild(pptxPath, finalPdfPath)) {
+        convertPptx(pptxConverter, pptxPath, finalPdfPath);
+        compiledCount += 1;
+      } else {
+        skippedCount += 1;
+      }
     }
 
     if (Array.isArray(slide.classes) && slide.classes.length > 0) {
