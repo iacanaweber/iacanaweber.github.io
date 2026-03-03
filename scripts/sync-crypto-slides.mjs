@@ -276,8 +276,8 @@ function main() {
   if (hasLatexSlides) verifyLatexEnvironment();
   const pptxConverter = hasPptxSlides ? pickPptxConverter() : null;
   if (hasPptxSlides && !pptxConverter) {
-    throw new Error(
-      'No PPTX converter found. Install LibreOffice (soffice) or run in an environment with powershell.exe + Microsoft PowerPoint.'
+    console.warn(
+      '[slides:sync] No PPTX converter found. Existing PPTX PDFs will be reused if present.'
     );
   }
 
@@ -325,7 +325,13 @@ function main() {
       assert(slide.pptxPath, `Slide ${slide.id} is missing pptxPath`);
       const pptxPath = resolve(repoRoot, slide.pptxPath);
       assert(existsSync(pptxPath), `Missing PPTX source: ${pptxPath}`);
-      if (needsFileRebuild(pptxPath, finalPdfPath)) {
+      if (!pptxConverter) {
+        assert(
+          existsSync(finalPdfPath),
+          `Missing prebuilt PPTX PDF for ${slide.id}: ${finalPdfPath}. Install LibreOffice (soffice) or run where PowerPoint automation is available.`
+        );
+        skippedCount += 1;
+      } else if (needsFileRebuild(pptxPath, finalPdfPath)) {
         convertPptx(pptxConverter, pptxPath, finalPdfPath);
         compiledCount += 1;
       } else {
