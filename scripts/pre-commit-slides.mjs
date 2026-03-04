@@ -18,13 +18,13 @@ function run(command, args, options = {}) {
 }
 
 function hasCompileTrigger(path) {
-  if (path === 'config/css-slides.json') return true;
+  if (path === 'config/slides.json') return true;
   if (!path.startsWith('aulas/')) return false;
   return /\.(pptx|tex)$/i.test(path);
 }
 
 function loadSlideMappings() {
-  const configPath = resolve(process.cwd(), 'config', 'css-slides.json');
+  const configPath = resolve(process.cwd(), 'config', 'slides.json');
   const parsed = JSON.parse(readFileSync(configPath, 'utf8'));
   const slides = Array.isArray(parsed.slides) ? parsed.slides : [];
 
@@ -63,9 +63,9 @@ function ensureSourcesAreMapped(staged) {
   }
 
   if (unmapped.length > 0) {
-    console.error('[pre-commit] Found slide source files not mapped in config/css-slides.json:');
+    console.error('[pre-commit] Found slide source files not mapped in config/slides.json:');
     for (const file of unmapped) console.error(`  - ${file}`);
-    console.error('[pre-commit] Add these files to config/css-slides.json before committing.');
+    console.error('[pre-commit] Add these files to config/slides.json before committing.');
     process.exit(1);
   }
 }

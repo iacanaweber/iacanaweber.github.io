@@ -1,12 +1,11 @@
 {
-  "name": "teaching-hub",
+  "name": "iacanaweber-site",
   "type": "module",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "slides:sync": "node scripts/sync-crypto-slides.mjs",
+    "slides:sync": "node scripts/sync-slides.mjs",
     "slides:precommit": "node scripts/pre-commit-slides.mjs",
-    "prebuild": "npm run slides:sync",
     "prepare": "node scripts/setup-git-hooks.mjs",
     "dev": "astro dev",
     "build": "astro build && npx pagefind --site dist",

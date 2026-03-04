@@ -1,0 +1,147 @@
+{
+  "slides": [
+    {
+      "id": "dep-conceitos",
+      "title": "Dependabilidade: Conceitos Básicos",
+      "texDir": "aulas/dependability/01_dependabilidade_conceitos",
+      "outputPdfPath": "/assets/pdfs/css/dependability/01-dependabilidade-conceitos.pdf",
+      "classes": [1],
+      "order": 10
+    },
+    {
+      "id": "dep-confiabilidade-disponibilidade",
+      "title": "Confiabilidade e Disponibilidade",
+      "texDir": "aulas/dependability/02_confiabilidade_disponibilidade_metricas",
+      "outputPdfPath": "/assets/pdfs/css/dependability/02-confiabilidade-disponibilidade.pdf",
+      "classes": [2],
+      "order": 20
+    },
+    {
+      "id": "dep-safety-security-resiliencia",
+      "title": "Safety, Security e Resiliência",
+      "texDir": "aulas/dependability/03_safety_security_resiliencia",
+      "outputPdfPath": "/assets/pdfs/css/dependability/03-safety-security-resiliencia.pdf",
+      "classes": [3],
+      "order": 30
+    },
+    {
+      "id": "introducao-criptografia",
+      "title": "Introdução à Criptografia",
+      "texDir": "aulas/crypto/Introdução_a_Criptografia",
+      "outputPdfPath": "/assets/pdfs/css/crypto/introducao-a-criptografia.pdf",
+      "classes": ["9-10"],
+      "order": 90
+    },
+    {
+      "id": "cifras-fluxo",
+      "title": "Cifras de Fluxo",
+      "texDir": "aulas/crypto/Cifras_de_Fluxo",
+      "outputPdfPath": "/assets/pdfs/css/crypto/cifras-de-fluxo.pdf",
+      "classes": ["11-12"],
+      "order": 110
+    },
+    {
+      "id": "aes",
+      "title": "AES",
+      "texDir": "aulas/crypto/AES",
+      "outputPdfPath": "/assets/pdfs/css/crypto/aes.pdf",
+      "classes": ["13-14"],
+      "order": 130
+    },
+    {
+      "id": "modos-cifras-bloco",
+      "title": "Mais sobre Cifras de Bloco",
+      "texDir": "aulas/crypto/Mais_sobre_Cifras_de_Bloco",
+      "outputPdfPath": "/assets/pdfs/css/crypto/mais-sobre-cifras-de-bloco.pdf",
+      "classes": ["15-16"],
+      "order": 150
+    },
+    {
+      "id": "rsa",
+      "title": "Criptossistema RSA",
+      "texDir": "aulas/crypto/Rivest_Shamir_Adleman",
+      "outputPdfPath": "/assets/pdfs/css/crypto/rsa.pdf",
+      "classes": ["19-20"],
+      "order": 190
+    },
+    {
+      "id": "logaritmo-discreto",
+      "title": "Criptografia de Chave Pública Baseada no Logaritmo Discreto",
+      "texDir": "aulas/crypto/Discrete_Logarithm",
+      "outputPdfPath": "/assets/pdfs/css/crypto/logaritmo-discreto.pdf",
+      "classes": ["21-22", 24],
+      "order": 210
+    },
+    {
+      "id": "assinatura-digital",
+      "title": "Assinatura Digital",
+      "texDir": "aulas/crypto/Assinatura_Digital",
+      "outputPdfPath": "/assets/pdfs/css/crypto/assinatura-digital.pdf",
+      "classes": [25, "29-30"],
+      "order": 250
+    },
+    {
+      "id": "funcoes-hash",
+      "title": "Funções Hash",
+      "texDir": "aulas/crypto/Funções_Hash",
+      "outputPdfPath": "/assets/pdfs/css/crypto/funcoes-hash.pdf",
+      "classes": ["26-28", 31],
+      "order": 260
+    },
+    {
+      "id": "introducao-chave-publica",
+      "title": "Introdução à Criptografia de Chave Pública",
+      "texDir": "aulas/crypto/Introdução_à_Criptografia_de_Chave_Pública",
+      "outputPdfPath": "/assets/pdfs/css/crypto/introducao-criptografia-chave-publica.pdf",
+      "classes": [33],
+      "order": 330
+    },
+    {
+      "id": "des",
+      "title": "DES",
+      "texDir": "aulas/crypto/DES",
+      "outputPdfPath": "/assets/pdfs/css/crypto/des.pdf",
+      "order": 900
+    },
+    {
+      "id": "fsd-apresentacao",
+      "title": "Apresentacao da disciplina",
+      "course": "fsd",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsd/00-Apresentacao/Apresentacao.pptx",
+      "outputPdfPath": "/assets/pdfs/fsd/apresentacao-fsd.pdf",
+      "classes": [1],
+      "order": 100
+    },
+    {
+      "id": "fsd-portas-logicas",
+      "title": "Portas logicas",
+      "course": "fsd",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsd/01-PortasLogicas/Portas Logicas.pptx",
+      "outputPdfPath": "/assets/pdfs/fsd/portas-logicas-fsd.pdf",
+      "classes": [1],
+      "order": 110
+    },
+    {
+      "id": "fsc-apresentacao",
+      "title": "Apresentacao da disciplina",
+      "course": "fsc",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsc/00-Apresentacao/00- Apresentacao.pptx",
+      "outputPdfPath": "/assets/pdfs/fsc/00-apresentacao-fsc.pdf",
+      "classes": [1],
+      "order": 100
+    },
+    {
+      "id": "fsc-sistemas-numeracao",
+      "title": "Sistemas de numeracao",
+      "course": "fsc",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsc/01-SistemasNumeracao/02-SistemasNumeracao.pptx",
+      "outputPdfPath": "/assets/pdfs/fsc/02-sistemas-numeracao-fsc.pdf",
+      "classes": [3],
+      "order": 120
+    }
+  ]
+}

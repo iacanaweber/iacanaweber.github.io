@@ -23,8 +23,12 @@ Thank you for your interest in improving this course website.
 2. Create a new branch: `git checkout -b fix/description-of-change`.
 3. Make your changes.
 4. Test locally with `npm run dev`.
-5. Commit with a descriptive message.
-6. Open a **Pull Request** against `main`.
+5. If you changed slide sources (`aulas/**/*.pptx` or `aulas/**/*.tex`):
+   - map them in `config/slides.json`,
+   - run `npm run slides:sync`,
+   - ensure generated PDFs and `src/content/resources/*-materiais.md` updates are committed.
+6. Commit with a descriptive message.
+7. Open a **Pull Request** against `main`.
 
 ## Content Guidelines
 
@@ -38,6 +42,7 @@ Thank you for your interest in improving this course website.
 - Follow the existing code style.
 - Test your changes with `npm run build` before submitting.
 - Keep component changes backward-compatible when possible.
+- Do not rely on CI to compile slides; slide PDFs must be generated locally and committed.
 
 ## Questions?
 

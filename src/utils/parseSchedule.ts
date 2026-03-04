@@ -112,7 +112,7 @@ export async function fetchSchedule(urlOrPath: string): Promise<ScheduleInfo> {
     let html: string;
     if (urlOrPath.startsWith('http://') || urlOrPath.startsWith('https://')) {
       const response = await fetch(urlOrPath, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TeachingHub/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; IacanaWeberSite/1.0)' },
       });
       if (!response.ok) {
         console.warn(`[parseSchedule] fetch failed: ${response.status} ${response.statusText}`);
