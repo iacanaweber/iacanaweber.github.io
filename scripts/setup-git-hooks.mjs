@@ -29,34 +29,10 @@ if [ "\${SKIP_SLIDES_SYNC:-0}" = "1" ]; then
   exit 0
 fi
 
-if ! command -v kpsewhich >/dev/null 2>&1 || ! kpsewhich brazil.ldf >/dev/null 2>&1; then
-  echo "[pre-commit] Missing LaTeX dependency (brazil.ldf)."
-  if [ "\${AUTO_INSTALL_LATEX_DEPS:-1}" = "1" ] && command -v apt-get >/dev/null 2>&1; then
-    echo "[pre-commit] Attempting automatic install via apt-get..."
-    sudo apt-get update
-    sudo apt-get install -y \
-      texlive-latex-recommended \
-      texlive-latex-extra \
-      texlive-fonts-recommended \
-      texlive-pictures \
-      texlive-lang-portuguese
-  else
-    echo "[pre-commit] Auto-install disabled/unavailable."
-    echo "[pre-commit] Set AUTO_INSTALL_LATEX_DEPS=1 and use a Debian/Ubuntu system with apt-get."
-    exit 1
-  fi
-
-  if ! command -v kpsewhich >/dev/null 2>&1 || ! kpsewhich brazil.ldf >/dev/null 2>&1; then
-    echo "[pre-commit] LaTeX dependencies are still missing after installation attempt."
-    exit 1
-  fi
-fi
-
-npm run slides:sync
-git add public/assets/pdfs/css
+node scripts/pre-commit-slides.mjs
 `;
 
 writeFileSync(hookPath, hookContents, 'utf8');
 chmodSync(hookPath, 0o755);
 
-console.log('Installed .git/hooks/pre-commit -> npm run slides:sync');
+console.log('Installed .git/hooks/pre-commit -> node scripts/pre-commit-slides.mjs');
