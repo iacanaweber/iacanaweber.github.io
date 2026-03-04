@@ -11,6 +11,6 @@ items:
     type: "slides"
     pdfPath: "/assets/pdfs/fsd/portas-logicas-fsd.pdf"
     order: 110
-    class: 1
+    class: 2
 ---
 
