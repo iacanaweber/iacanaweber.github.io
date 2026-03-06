@@ -57,7 +57,7 @@
       "sourceType": "pptx",
       "pptxPath": "aulas/css/dependability/01_conceitos_dependabilidade/Conceitos de Dependabilidade.pptx",
       "outputPdfPath": "/assets/pdfs/css/dependability/01-dependabilidade-conceitos.pdf",
-      "classes": [],
+      "classes": [1],
       "order": 10
     },
     {

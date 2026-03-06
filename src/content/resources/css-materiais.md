@@ -11,6 +11,7 @@ items:
     type: "slides"
     pdfPath: "/assets/pdfs/css/dependability/01-dependabilidade-conceitos.pdf"
     order: 10
+    class: 1
   - title: "Dependabilidade: Conceitos Básicos (LaTeX)"
     type: "slides"
     pdfPath: "/assets/pdfs/css/dependability/01-dependabilidade-conceitos-latex.pdf"
