@@ -1,0 +1,704 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Cifras de Bloco]{Cifras de Bloco}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{AES}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Cifras de Bloco}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{Introdução ao Advanced Encription Standard (AES)}
+\begin{frame}{AES no campo da Criptologia}
+
+\begin{center}
+\scalebox{0.75}{
+\begin{tikzpicture}[
+  every node/.style={draw, ellipse, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+  ->, >=Stealth, thick,
+  node distance=0.8cm and 0.8cm
+  ]
+
+% Definição dos nós
+\node (root) {Criptologia};
+\node (crypto) [below left=of root] {Criptografia};
+\node (analysis) [below right=of root] {Criptoanálise};
+
+\node (sym) [below left=1.4cm and 1.2cm of crypto] {Cifras Simétricas};
+\node (asym) [below=1.8cm of crypto] {Cifras Assimétricas};
+\node (proto) [below right=1.4cm and 1.2cm of crypto] {Protocolos};
+
+\node (block) [below left=1.4cm and 0.8cm of sym, fill=yellow] {Cifras de Bloco};
+\node (stream) [below right=1.4cm and 0.8cm of sym] {Cifras de Fluxo};
+
+% Conexões
+\draw (root) -- (crypto);
+\draw (root) -- (analysis);
+\draw (crypto) -- (sym);
+\draw (crypto) -- (asym);
+\draw (crypto) -- (proto);
+\draw (sym) -- (block);
+\draw (sym) -- (stream);
+
+\end{tikzpicture}
+}
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Fatos Básicos sobre o AES}
+
+\begin{itemize}
+    \item O AES é o cifrador simétrico mais utilizado atualmente.
+    
+    \item O algoritmo AES foi escolhido pelo \textit{National Institute of Standards and Technology} (NIST) dos EUA em um processo de seleção que durou vários anos.
+    
+    \item Os requisitos para todas as submissões candidatas ao AES eram:
+    \begin{itemize}
+        \item Cifra de bloco com \textbf{tamanho de bloco de 128 bits}.
+        \item \textbf{Três tamanhos de chave suportados}: 128, 192 e 256 bits.
+        \item Segurança relativa em comparação com outros algoritmos submetidos.
+        \item \textbf{Eficiência} em software e hardware.
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cronologia da Seleção do AES}
+
+\begin{itemize}
+    \item A necessidade de uma nova cifra de bloco foi anunciada pelo NIST em janeiro de 1997.
+    \item 15 algoritmos candidatos foram aceitos em agosto de 1998.
+    \item 5 finalistas foram anunciados em agosto de 1999:
+    \begin{itemize}
+        \item \textit{Mars} – IBM Corporation
+        \item \textit{RC6} – RSA Laboratories
+        \item \textit{Rijndael} – J. Daemen \& V. Rijmen
+        \item \textit{Serpent} – Eli Biham et al.
+        \item \textit{Twofish} – B. Schneier et al.
+    \end{itemize}
+    \item Em outubro de 2000, o \textit{Rijndael} foi escolhido como o AES.
+    \item O AES foi formalmente aprovado como padrão federal dos EUA em novembro de 2001.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{AES: Visão Geral}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.35\linewidth]{img/AES1.png}
+\end{figure}
+
+\vspace{0.5em}
+
+O número de rodadas depende do tamanho da chave escolhida:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|}
+    \hline
+    \textbf{Tamanho da chave (bits)} & \textbf{Número de rodadas} \\
+    \hline
+    128 & 10 \\
+    192 & 12 \\
+    256 & 14 \\
+    \hline
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{AES: Visão Geral}
+\vspace{-4.5em}
+\begin{minipage}[t]{0.4\textwidth}
+    \vspace{4.5em}
+    \begin{itemize}
+    \item Cifra iterada com 10/12/14 rodadas
+    \item Cada rodada consiste em “Camadas”
+\end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.59\textwidth}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.85\linewidth]{img/AES2.png}
+\end{figure}    
+\end{minipage}
+
+    
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estrutura interna do AES}
+\begin{frame}{Estrutura Interna do AES}
+
+\begin{itemize}
+    \item AES é um cifra orientada a bytes
+    \item O estado $A$ (isto é, o caminho de dados de 128 bits) pode ser organizado em uma matriz 4x4:
+\end{itemize}
+
+\[
+\begin{bmatrix}
+A_0 & A_4 & A_8 & A_{12} \\
+A_1 & A_5 & A_9 & A_{13} \\
+A_2 & A_6 & A_{10} & A_{14} \\
+A_3 & A_7 & A_{11} & A_{15}
+\end{bmatrix}
+\]
+
+\vspace{0.5em}
+com $A_0, \ldots, A_{15}$ denotando os 16 bytes de entrada do AES.
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Estrutura Interna do AES}
+\vspace{-1em}
+\begin{itemize}
+    \item Função de rodada para as rodadas $1, 2, \ldots, n_r - 1$:
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\linewidth]{img/AES3.png}
+\end{figure}
+\vspace{-1em}
+\begin{itemize}
+    \item Nota: Na última rodada, a transformação \textbf{MixColumn} é omitida
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Camada de Substituição de Byte}
+
+\begin{columns}[t] % alinhamento no topo
+
+    \begin{column}{0.7\textwidth}
+    \vspace{-7em}
+        \begin{itemize}
+            \item A camada Byte Substitution consiste em 16 \textbf{S-Boxes} com as seguintes propriedades:
+            \begin{itemize}
+                \item As S-Boxes são
+                \begin{itemize}
+                    \item \textbf{idênticas}
+                    \item o único elemento \textit{não linear} do AES, ou seja,
+                    \[
+                    \text{ByteSub}(A_i) + \text{ByteSub}(A_j) \neq \text{ByteSub}(A_i + A_j), \quad i,j = 0,\ldots,15
+                    \]
+                    
+                    \item \textbf{bijetivas}, isto é, existe uma correspondência um-para-um entre bytes de entrada e saída
+                    \[
+                    \Rightarrow \text{A S-Box pode ser invertida de forma única}
+                    \]
+                \end{itemize}
+            \end{itemize}
+            
+            \item Em implementações, a S-Box é geralmente realizada como uma \textit{lookup table}
+        \end{itemize}
+    \end{column}
+    \begin{column}{0.3\textwidth}
+        \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{img/byte_substitution.png}
+    \end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{AES GF($2^8$) Inverso Multiplicativo}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{image_sbox_ops.png}
+    \end{figure}
+    \vspace{-1em}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.65\linewidth]{image.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{AES S-Box}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\linewidth]{image_sbox.png}
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}{Camada de Difusão}
+%\vspace{7em}
+\begin{columns}[t]
+
+    \begin{column}{0.7\textwidth}
+        A camada de \textbf{Difusão}:
+        \begin{itemize}
+            \item fornece difusão sobre todos os bits do estado de entrada
+            \item consiste em duas subcamadas:
+            \begin{itemize}
+                \item \textbf{ShiftRows}: Permutação dos dados no nível de bytes
+                \item \textbf{MixColumn}: Operação matricial que combina (“mistura”) blocos de quatro bytes
+            \end{itemize}
+            \item realiza uma operação linear nas matrizes de estado $A$, $B$, ou seja,
+            \[
+            \text{DIFF}(A) + \text{DIFF}(B) = \text{DIFF}(A + B)
+            \]
+        \end{itemize}
+    \end{column}
+    \begin{column}{0.3\textwidth}
+        \vspace{5em}        \includegraphics[width=\linewidth,height=0.4\textheight,keepaspectratio]{img/diffusion.png}
+    \end{column}
+\end{columns}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Subcamada ShiftRows}
+
+\begin{itemize}
+    \item As linhas da matriz de estado são deslocadas ciclicamente:
+\end{itemize}
+
+\textbf{Matriz de entrada}
+\[
+\begin{bmatrix}
+B_0 & B_4 & B_8 & B_{12} \\
+B_1 & B_5 & B_9 & B_{13} \\
+B_2 & B_6 & B_{10} & B_{14} \\
+B_3 & B_7 & B_{11} & B_{15}
+\end{bmatrix}
+\]
+\textbf{Matriz de saída}
+\[
+\begin{bmatrix}
+B_0 & B_4 & B_8 & B_{12} \\
+B_5 & B_9 & B_{13} & B_1 \\
+B_{10} & B_{14} & B_2 & B_6 \\
+B_{15} & B_3 & B_7 & B_{11}
+\end{bmatrix}
+\]
+\begin{itemize}
+    \small
+    \item Primeira linha: nenhum deslocamento
+    \item Segunda linha: deslocamento de uma posição à esquerda
+    \item Terceira linha: deslocamento de duas posições à esquerda
+    \item Quarta linha: deslocamento de três posições à esquerda
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Subcamada MixColumn}
+
+\begin{itemize}
+    \item Transformação linear que mistura cada coluna da matriz de estado
+    \item Cada coluna de 4 bytes é considerada como um vetor e multiplicada por uma matriz fixa 4x4, por exemplo:
+\end{itemize}
+
+\[
+\begin{pmatrix}
+C_0 \\
+C_1 \\
+C_2 \\
+C_3
+\end{pmatrix}
+=
+\begin{pmatrix}
+02 & 03 & 01 & 01 \\
+01 & 02 & 03 & 01 \\
+01 & 01 & 02 & 03 \\
+03 & 01 & 01 & 02
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+B_0 \\
+B_5 \\
+B_{10} \\
+B_{15}
+\end{pmatrix}
+\]
+
+\vspace{1em}
+
+onde 01, 02 e 03 estão em notação hexadecimal.
+
+\begin{itemize}
+    \item Toda a aritmética é feita no campo de Galois $GF(2^8)$
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Camada de Adição de Chave}
+
+\begin{itemize}
+    \item Entradas:
+    \begin{itemize}
+        \item Matriz de estado $C$ de 16 bytes
+        \item Subchave $k_i$ de 16 bytes
+    \end{itemize}
+
+    \item Saída: $C \oplus k_i$
+
+    \item As subchaves são geradas no \textit{key schedule}
+\end{itemize}
+
+\vspace{1em}
+
+\begin{figure}
+    \hfill
+    \includegraphics[width=0.5\linewidth]{img/key_addition.png}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Key Schedule}
+
+\begin{itemize}
+    \item As subchaves são derivadas recursivamente da chave de entrada original de 128/192/256 bits
+    \item Cada rodada possui 1 subchave, mais 1 subchave no início do AES
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{|c|c|}
+    \hline
+    Comprimento da chave (bits) & Número de subchaves \\
+    \hline
+    128 & 11 \\
+    192 & 13 \\
+    256 & 15 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\begin{itemize}
+    \item Existem diferentes \textit{key schedules} para os diferentes tamanhos de chave
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Key Schedule}
+
+\begin{minipage}{0.55\textwidth}
+    \small Exemplo: \textit{Key schedule} para chave AES de 128 bits\\
+    \vspace{-2em}
+    \begin{center}
+        \includegraphics[width=0.75\linewidth]{img/key_schedule.png}    
+    \end{center}
+\end{minipage}
+\hfill
+\begin{minipage}{0.44\textwidth}
+    \begin{itemize}
+        \item Orientado a palavras: 1 palavra = 32 bits
+        \item 11 subchaves são armazenadas em $W[0]\ldots W[3]$, $W[4]\ldots W[7]$, $\ldots$, $W[40]\ldots W[43]$
+        \item Primeira subchave $W[0]\ldots W[3]$ é a chave AES original
+    \end{itemize}
+\end{minipage}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Key Schedule}
+
+\begin{minipage}{0.74\textwidth}
+    \begin{itemize}
+        \item A função $g$ rotaciona seus quatro bytes de entrada e realiza uma substituição \textit{bytewise} usando a S-Box $\Rightarrow \text{não linearidade.}$
+        
+        \item O coeficiente de rodada $RC$ é adicionado apenas ao byte mais à esquerda e varia a cada rodada:
+        \[
+        RC[1] = x^0 = (00000001)_2
+        \]
+        \[
+        RC[2] = x^1 = (00000010)_2
+        \]
+        \[
+        RC[3] = x^2 = (00000100)_2
+        \]
+        \[
+        \ldots
+        \]
+        \[
+        RC[10] = x^9 = (00110110)_2
+        \]
+        \item $x^i$ representa um elemento em um campo de Galois
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.25\textwidth}
+    \includegraphics[width=\linewidth]{img/key_schedule2.png}
+\end{minipage}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Decryption}
+
+\begin{minipage}{0.55\textwidth}
+    \includegraphics[width=0.9\linewidth]{img/decyption.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.44\textwidth}
+\vspace{-1em}
+    \begin{itemize}
+        \item AES não é baseado em uma rede de Feistel $\Rightarrow$ \textit{todas as camadas devem ser invertidas para decriptação:}
+        \item Camada MixColumn $\rightarrow$\\
+        \textbf{Inv MixColumn layer}
+        \item Camada ShiftRows $\rightarrow$\\
+        \textbf{Inv ShiftRows layer}
+        \item Camada de SubBytes $\rightarrow$\\
+        \textbf{Inv SubBytes layer}
+        \item Camada de Adição de Chave é sua própria inversa
+    \end{itemize}
+\end{minipage}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Decryption}
+
+\begin{itemize}
+    \item \textbf{Inv MixColumn layer:}
+    \begin{itemize}
+        \item Para reverter a operação MixColumn, cada coluna da matriz de estado $C$ deve ser multiplicada pela \textbf{inversa da matriz 4x4}, por exemplo:
+    \end{itemize}
+\end{itemize}
+
+\[
+\begin{pmatrix}
+B_0 \\
+B_1 \\
+B_2 \\
+B_3
+\end{pmatrix}
+=
+\begin{pmatrix}
+0E & 0B & 0D & 09 \\
+09 & 0E & 0B & 0D \\
+0D & 09 & 0E & 0B \\
+0B & 0D & 09 & 0E
+\end{pmatrix}
+\cdot
+\begin{pmatrix}
+C_0 \\
+C_1 \\
+C_2 \\
+C_3
+\end{pmatrix}
+\]
+
+\vspace{0.5em}
+onde 09, 0B, 0D e 0E estão em notação hexadecimal.
+
+\begin{itemize}
+    \item Toda a aritmética é realizada no campo de Galois $GF(2^8)$
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Decryption}
+
+\begin{itemize}
+    \item \textbf{Inv ShiftRows layer:}
+    \begin{itemize}
+        \item Todas as linhas da matriz de estado $B$ são deslocadas na direção oposta:
+    \end{itemize}
+\end{itemize}
+\textbf{Matriz de entrada}
+\[
+\begin{bmatrix}
+B_0 & B_4 & B_8 & B_{12} \\
+B_1 & B_5 & B_9 & B_{13} \\
+B_2 & B_6 & B_{10} & B_{14} \\
+B_3 & B_7 & B_{11} & B_{15}
+\end{bmatrix}
+\]
+\textbf{Matriz de saída}
+\[
+\begin{bmatrix}
+B_0 & B_4 & B_8 & B_{12} \\
+B_{13} & B_1 & B_5 & B_9 \\
+B_{10} & B_{14} & B_2 & B_6 \\
+B_7 & B_{11} & B_{15} & B_3
+\end{bmatrix}
+\]
+\begin{itemize}
+    \small
+    \item Primeira linha: nenhum deslocamento
+    \item Segunda linha: deslocamento de uma posição à direita
+    \item Terceira linha: deslocamento de duas posições à direita
+    \item Quarta linha: deslocamento de três posições à direita
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Decryption}
+
+\begin{itemize}
+    \item \textbf{Inv Byte Substitution layer:}
+    \begin{itemize}
+        \item Como a S-Box é bijetiva, é possível construir um inverso, tal que:
+        \[
+        A_i = S^{-1}(B_i) = S^{-1}(S(A_i))
+        \]
+        $\Rightarrow$ A S-Box inversa é usada para decriptação. Normalmente é implementada como uma \textit{lookup table}.
+    \end{itemize}
+
+    \vspace{1em}
+
+    \item \textbf{Decryption key schedule:}
+    \begin{itemize}
+        \item As subchaves são necessárias em ordem inversa (comparado com a encriptação)
+        \item Na prática, para encriptação e decriptação, o mesmo \textit{key schedule} é usado.\\
+        \item Isso requer que todas as subchaves sejam computadas antes que a encriptação do primeiro bloco possa começar.
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problemas Práticos}
+
+\begin{frame}{Implementação em Software}
+
+\begin{itemize}
+    \item Um dos requisitos do AES foi a possibilidade de uma implementação eficiente em software
+
+    \item A implementação direta é bem adequada para processadores de 8 bits (por exemplo, \textit{smart cards}), mas ineficiente em processadores de 32 ou 64 bits
+
+    \item Uma abordagem mais sofisticada: unir todas as funções de rodada (exceto a adição de chave) em uma única \textit{look-up table}
+    \begin{itemize}
+        \item Isso resulta em quatro tabelas com 256 entradas, onde cada entrada tem 32 bits
+        \item Uma rodada pode ser computada com 16 \textit{table look-ups}
+    \end{itemize}
+
+    \item As velocidades típicas de software são superiores a 1,6 Gbit/s em processadores modernos de 64 bits
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Segurança}
+
+\begin{itemize}
+    \item \textbf{Brute-force attack:} Devido ao comprimento da chave de 128, 192 ou 256 bits, um ataque de força bruta não é viável
+    \vspace{1em}
+    \item \textbf{Analytical attacks:} Não existe nenhum ataque analítico conhecido que seja melhor do que a força bruta
+    \vspace{1em}
+    \item \textbf{Side-channel attacks:}
+    \begin{itemize}
+        \item Diversos \textit{side-channel attacks} já foram publicados
+        \color{red}\item Note que os \textit{side-channel attacks} não atacam o algoritmo em si, mas a sua implementação
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Lições Aprendidas}
+
+\begin{itemize}
+    \item O AES é uma cifra de bloco moderna que suporta três tamanhos de chave: 128, 192 e 256 bits. Proporciona excelente segurança a longo prazo contra ataques de força bruta.
+    
+    \item O AES tem sido estudado intensivamente desde o final da década de 1990 e nenhum ataque melhor que a força bruta foi encontrado.
+    
+    \item O AES não é baseado em redes de Feistel. Suas operações básicas utilizam aritmética em campos de Galois e proporcionam forte difusão e confusão.
+    
+    \item O AES faz parte de diversos padrões abertos, como IPsec ou TLS, além de ser o algoritmo de criptografia obrigatório para aplicações do governo dos EUA. É provável que a cifra continue sendo o algoritmo de criptografia dominante por muitos anos.
+    
+    \item O AES é eficiente tanto em software quanto em hardware.
+\end{itemize}
+
+\end{frame}
+
+\end{document}

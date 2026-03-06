@@ -1,0 +1,736 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[Cifras de Bloco]{Cifras de Bloco}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{DES}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Cifras de Bloco}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Seções principais
+\section{Introdução ao Data Encryption Standard (DES)}
+\begin{frame}{DES no campo da Criptologia}
+
+\begin{center}
+\scalebox{0.75}{
+\begin{tikzpicture}[
+  every node/.style={draw, ellipse, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\footnotesize},
+  ->, >=Stealth, thick,
+  node distance=0.8cm and 0.8cm
+  ]
+
+% Definição dos nós
+\node (root) {Criptologia};
+\node (crypto) [below left=of root] {Criptografia};
+\node (analysis) [below right=of root] {Criptoanálise};
+
+\node (sym) [below left=1.4cm and 1.2cm of crypto] {Cifras Simétricas};
+\node (asym) [below=1.8cm of crypto] {Cifras Assimétricas};
+\node (proto) [below right=1.4cm and 1.2cm of crypto] {Protocolos};
+
+\node (block) [below left=1.4cm and 0.8cm of sym, fill=yellow] {Cifras de Bloco};
+\node (stream) [below right=1.4cm and 0.8cm of sym] {Cifras de Fluxo};
+
+% Conexões
+\draw (root) -- (crypto);
+\draw (root) -- (analysis);
+\draw (crypto) -- (sym);
+\draw (crypto) -- (asym);
+\draw (crypto) -- (proto);
+\draw (sym) -- (block);
+\draw (sym) -- (stream);
+
+\end{tikzpicture}
+}
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Fatos sobre o DES}
+
+\begin{itemize}
+    \item \textbf{Data Encryption Standard (DES)} cifra blocos de tamanho \textbf{64 bits}.
+    \item Desenvolvido pela \textbf{IBM} com base na cifra \textit{Lucifer}, sob influência da \textbf{\textit{National Security Agency} (NSA)}. 
+    \item Os critérios de projeto do DES nunca foram publicados.
+    \item \textbf{Padronizado em 1977} pelo \textbf{\textit{National Bureau of Standards} (NBS)}, hoje chamado de \textbf{\textit{National Institute of Standards and Technology} (NIST)}.
+    \item Foi a cifra de bloco mais popular durante cerca de 30 anos.
+    \item É o algoritmo simétrico mais estudado até hoje.
+    \item Atualmente é considerado inseguro devido ao pequeno \textbf{tamanho de chave: 56 bits}.
+    \item \textbf{3DES foi uma evolução que foi considerada segura} até 2019.
+    \item Foi substituído em 2000 pelo \textbf{Advanced Encryption Standard (AES)}.
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Primitivas de Cifras em Bloco: Confusão e Difusão}
+
+\begin{itemize}
+    \item Claude Shannon identificou duas operações primitivas a partir das quais algoritmos de criptografia fortes podem ser construídos:
+    
+    \vspace{1em}
+    \item
+    \textbf{\textcolor{blue}{1. Confusão}:} Uma operação de criptografia na qual a \textbf{relação entre a chave e o ciphertext é obscurecida}.\\
+    Hoje, um elemento comum para atingir a confusão é a \textbf{substituição}, encontrada tanto no AES quanto no DES.
+    
+    \vspace{1em}
+    \item
+    \textbf{\textcolor{blue}{2. Difusão}:} Uma operação de criptografia na qual a \textbf{influência de um símbolo do plaintext se espalha por muitos símbolos do ciphertext}, com o objetivo de esconder propriedades estatísticas do plaintext.\\
+    Um exemplo simples de difusão é a \textbf{permutação de bits}, amplamente utilizada no DES.
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Cifras de Produto}
+
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \begin{tikzpicture}[node distance=0.3cm]
+        \node[draw, rectangle, minimum width=1.5cm, minimum height=0.4cm] (d1) {Diffusion 1};
+        \node[draw, rectangle, below=of d1, minimum width=1.5cm, minimum height=0.4cm] (c1) {Confusion 1};
+        \node[draw, rectangle, below=of c1, minimum width=1.5cm, minimum height=0.4cm] (d2) {Diffusion 2};
+        \node[draw, rectangle, below=of d2, minimum width=1.5cm, minimum height=0.4cm] (c2) {Confusion 2};
+        \node[below=of c2, minimum width=1.5cm] (dots) {\vdots};
+        \node[draw, rectangle, below=of dots, minimum width=1.5cm, minimum height=0.4cm] (dN) {Diffusion N};
+        \node[draw, rectangle, below=of dN, minimum width=1.5cm, minimum height=0.4cm] (cN) {Confusion N};
+
+        \draw[->] (0,1) -- (d1.north);
+        \draw[->] (d1) -- (c1);
+        \draw[->] (c1) -- (d2);
+        \draw[->] (d2) -- (c2);
+        \draw[->] (c2) -- (dots);
+        \draw[->] (dots) -- (dN);
+        \draw[->] (dN) -- (cN);
+        \draw[->] (cN.south) -- ++(0,-0.6);
+    \end{tikzpicture}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.64\textwidth}
+    \begin{itemize}
+        \item A maioria das cifras de bloco modernas são compostas por rodadas repetidas de confusão e difusão.
+        \item Podem alcançar excelente difusão: \\
+        \textit{alterar um único bit do plaintext muda, em média, metade dos bits de saída}.
+    \end{itemize}
+
+    \vspace{1em}
+    \textbf{Exemplo:}
+    
+    \includegraphics[width=\linewidth]{img/blockciphercomparison.png}
+\end{minipage}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Visão Geral do Algoritmo DES}
+\begin{frame}{Visão Geral do Algoritmo DES}
+
+\begin{minipage}{0.65\textwidth}
+    \includegraphics[width=\linewidth]{img/DES1.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.34\textwidth}
+    \begin{itemize}
+        \item \textbf{Cifra de Bloco:} cifra blocos de 64 bits.
+        \item \textbf{Chave de 56 bits.}
+        \item \textbf{Cifra simétrica}: mesma chave para cifrar e decifrar.
+        \item Utiliza 16 rodadas idênticas de transformação.
+        \item Em cada rodada, é utilizada uma subchave (chave da rodada) derivada da chave principal.
+    \end{itemize}
+\end{minipage}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Rede Feistel do DES (1)}
+
+\begin{center}
+    \includegraphics[width=0.65\linewidth]{img/DES2.png}
+\end{center}
+
+\begin{itemize}
+    \item A estrutura do DES é uma \textit{rede Feistel}.
+    \item Vantagem: cifragem e decifragem diferem apenas na geração das chaves da rodada.
+    \item Permutação inicial bit a bit, seguida de 16 rodadas.
+\end{itemize}
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Rede Feistel do DES (2)}
+
+\begin{center}
+    \includegraphics[width=0.5\linewidth]{img/DES2.png}
+\end{center}
+
+\textbf{Etapas por rodada:}
+\begin{enumerate}
+    \item Divide-se o \textit{plaintext} em duas metades de 32 bits: $L_i$ e $R_i$
+    \item $R_i$ entra na função $f$, cujo resultado é combinado com $L_i$ via XOR
+    \item As metades esquerda e direita são trocadas
+\end{enumerate}
+
+\textbf{Expressão das rodadas:}
+\begin{center}
+    $L_i = R_{i-1}, \quad R_i = L_{i-1} \oplus f(R_{i-1}, k_i)$ 
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Rede Feistel do DES (3)}
+
+\begin{itemize}
+    \item No final da cifra, as metades $L$ e $R$ são trocadas novamente
+    \item Isso ocorre após a 16ª rodada da função Feistel
+    \item Em seguida, aplica-se a \textbf{Permutação Final} $IP^{-1}$
+    \item O resultado é o \textbf{ciphertext final} $y = \text{DES}_k(x)$
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=0.85\linewidth]{img/DES3.png}    
+\end{center}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Estruturas Internas do DES}
+
+\begin{frame}{Permutação Inicial e Final}
+
+\begin{itemize}
+    \item Permutações bit a bit aplicadas sobre o bloco de entrada.
+    \item Operações inversas entre si.
+    \item Definidas pelas tabelas $IP$ e $IP^{-1}$.
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/DES_initial_final.png}
+\end{figure}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{A função \textit{f} do DES}
+
+\begin{minipage}{0.54\textwidth}
+    \begin{itemize}
+        \item \textbf{Operação principal} do algoritmo DES.
+        \item Entradas da função \( f \):\\
+        \( R_{i-1} \) e a chave da rodada \( k_i \).
+        \vspace{1em}
+        \item \textbf{4 etapas:}
+        \begin{enumerate}
+            \item Expansão \( E \)
+            \item Operação XOR com a chave de rodada
+            \item Substituição via caixas-S (\textit{S-boxes})
+            \item Permutação \( P \)
+        \end{enumerate}
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \begin{center}
+        \includegraphics[width=1.0\linewidth]{img/DES4.png}
+    \end{center}
+\end{minipage}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Função de Expansão \(E\)}
+
+\begin{itemize}
+    \item \textbf{1. Expansão $E$}
+    \begin{itemize}
+        \item \textbf{Objetivo principal:} aumentar a difusão
+    \end{itemize}
+\end{itemize}
+\vspace{-2em}
+\begin{center}
+    \includegraphics[width=0.95\linewidth]{img/DES5.png}
+\end{center}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{Adicionar Chave da Rodada}
+
+\begin{minipage}{0.54\textwidth}
+    \begin{enumerate}
+        \setcounter{enumi}{1}
+        \item \textbf{\textit{XOR com a Chave da Rodada}}
+    \end{enumerate}
+
+    \begin{itemize}
+        \item XOR bit a bit da chave da rodada com a saída da função de expansão \textit{E}.
+        \item As chaves de rodada são derivadas da chave principal no processo de geração de chaves do DES (será mostrado em alguns slides).
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\linewidth]{img/DES6.png}
+    \end{figure}
+\end{minipage}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{As S-Boxes do DES}
+\begin{minipage}{0.54\textwidth}
+    \begin{enumerate}
+        \setcounter{enumi}{2}
+        \item \textbf{\textit{Substituição S-Box}}
+    \end{enumerate}
+
+    \begin{itemize}
+        \item Oito tabelas de substituição.
+        \item 6 bits de entrada, 4 bits de saída.
+        \item Não-linear e resistente à criptoanálise diferencial.
+        \item Elemento crucial para a segurança do DES!
+    \end{itemize}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\linewidth]{img/s-box.png}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\linewidth]{img/DES7.png}
+    \end{figure}
+\end{minipage}
+        
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{A permutação P}
+\begin{minipage}{0.54\textwidth}
+     \begin{enumerate}
+        \setcounter{enumi}{3}
+        \item \textbf{\textit{Permutação P}}
+    \end{enumerate}
+
+    \begin{itemize}
+        \item Permutação bit a bit.
+        \item Introduz difusão.
+        \item Os bits de saída de uma S-Box afetam várias S-Boxes na próxima rodada.
+        \item A difusão pelas funções \( E \), S-Boxes e \( P \) garante que, após a quinta rodada, cada bit depende de cada bit da chave e de cada bit do texto claro.
+    \end{itemize}
+
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \begin{tabular}{|c c c c c c c c|}
+            \hline
+            \multicolumn{8}{|c|}{\textbf{P}} \\
+            \hline
+            16 & 7  & 20 & 21 & 29 & 12 & 28 & 17 \\
+            1  & 15 & 23 & 26 & 5  & 18 & 31 & 10 \\
+            2  & 8  & 24 & 14 & 32 & 27 & 3  & 9  \\
+            19 & 13 & 30 & 6  & 22 & 11 & 4  & 25 \\
+            \hline
+        \end{tabular}
+    \end{minipage}%
+    
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}
+        \centering
+        \includegraphics[width=1.0\linewidth]{img/DES8.png}
+    \end{figure}
+\end{minipage}
+        
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{Chave da Rodada (1)}
+
+    \begin{itemize}
+        \item Deriva 16 chaves de rodada (ou \textit{subchaves}) \( k_i \) de 48 bits cada a partir da chave original de 56 bits.
+        \item O tamanho da chave de entrada do DES é de 64 bits: \textbf{56 bits de chave} e 8 bits de paridade:
+    \end{itemize}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{DES9.png}
+    \end{figure}
+    
+    \begin{itemize}
+        \item \textbf{Os bits de paridade são removidos} na primeira permutação \( PC\!-\!1 \): 8, 16, 24, 32, 40, 48, 56 e 64 não são usados.
+    \end{itemize}
+
+    \begin{center}
+        \resizebox{0.30\textwidth}{!}{%
+        \begin{tabular}{|c c c c c c c c|}
+            \hline
+            \multicolumn{8}{|c|}{\textbf{PC-1}} \\
+            \hline
+            57 & 49 & 41 & 33 & 25 & 17 & 9  & 1  \\
+            58 & 50 & 42 & 34 & 26 & 18 & 10 & 2  \\
+            59 & 51 & 43 & 35 & 27 & 19 & 11 & 3  \\
+            60 & 52 & 44 & 36 & 28 & 20 & 12 & 4  \\
+            61 & 53 & 45 & 37 & 29 & 21 & 13 & 5  \\
+            62 & 54 & 46 & 38 & 30 & 22 & 14 & 6  \\
+            63 & 55 & 47 & 39 & 31 & 23 & 15 & 7  \\
+            \hline
+        \end{tabular}}
+    \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{Chave da Rodada (2)}
+
+    \begin{minipage}{0.45\textwidth}
+        \begin{itemize}
+        \tiny
+            \item  Divide a chave em metades de 28 bits \( C_0 \) e \( D_0 \).
+            \item Nas rodadas \( i = 1, 2, 9, 16 \), as duas metades são rotacionadas à esquerda por \textbf{um bit}.
+            \item Em todas as outras rodadas, as duas metades são rotacionadas à esquerda por \textbf{dois bits}.
+            \item \textit{Em cada rodada \( i \)}, a escolha permutada \( PC\!-\!2 \) seleciona um subconjunto permutado de 48 bits de \( C_i \) e \( D_i \) como chave da rodada \( k_i \), ou seja, \textbf{cada \( k_i \) é uma permutação de \( k \)!}
+    \end{itemize}
+        \centering
+        \resizebox{0.6\textwidth}{!}{%
+            \begin{tabular}{|c c c c c c|}
+                \hline
+                \multicolumn{6}{|c|}{\textbf{PC-2}} \\
+                \hline
+                14 & 17 & 11 & 24 & 1  & 5  \\
+                3  & 28 & 15 & 6  & 21 & 10 \\
+                23 & 19 & 12 & 4  & 26 & 8  \\
+                16 & 7  & 27 & 20 & 13 & 2  \\
+                41 & 52 & 31 & 37 & 47 & 55 \\
+                30 & 40 & 51 & 45 & 33 & 48 \\
+                44 & 49 & 39 & 56 & 34 & 53 \\
+                46 & 42 & 50 & 36 & 29 & 32 \\
+                \hline
+            \end{tabular}
+        }
+    \begin{itemize}
+        \tiny 
+        \item \textbf{Nota:} O número total de rotações: \\
+            \( 4 \times 1 + 12 \times 2 = 28 \quad \Rightarrow \quad D_0 = D_{16}, C_0 = C_{16}! \)
+    \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.54\textwidth}
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.8\linewidth]{DES10.png}
+        \end{figure}
+    \end{minipage}
+    
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Descriptografia}
+\begin{frame}
+    \frametitle{Descriptografia}
+
+    \begin{itemize}
+        \item Em cifras que usam a Rede de \textit{Feistel}, apenas a geração da chave da rodada precisa ser modificada para a descriptografia.
+        \item Gerar as mesmas 16 chaves de rodada, mas em ordem inversa.
+    \end{itemize}
+    \vspace{1em}
+    \begin{itemize}
+        \item \textbf{Agendamento de chaves invertido:} \\
+        Como \( D_0 = D_{16} \) e \( C_0 = C_{16} \), a primeira chave de rodada pode ser gerada aplicando \( PC\!-\!2 \) logo após \( PC\!-\!1 \) (sem rotação aqui!).
+        \item Todas as outras rotações de \( C \) e \( D \) podem ser revertidas para reproduzir as demais chaves de rodada, resultando em:
+        \begin{itemize}
+            \item Nenhuma rotação na rodada 1.
+            \item Uma rotação de 1 bit para a direita nas rodadas 2, 9 e 16.
+            \item Duas rotações de 2 bits para a direita em todas as outras rodadas.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Segurança do DES}
+
+\begin{frame}
+    \frametitle{Segurança do DES}
+
+    \begin{itemize}
+        \item \textbf{Após a proposta do DES, surgiram duas críticas principais:}
+        \begin{enumerate}
+            \item O espaço de chaves é muito pequeno (\( 2^{56} \) chaves).
+            \item Os critérios de projeto das S-Boxes foram mantidos em segredo: haveria algum ataque analítico oculto (\textit{backdoors}), conhecido apenas pela NSA?
+        \end{enumerate}
+    \end{itemize}
+
+    \begin{itemize}
+        \item \textbf{Ataques Analíticos:} O DES é altamente resistente tanto à \textit{criptoanálise diferencial} quanto à \textit{criptoanálise linear}, publicadas anos depois do DES. 
+        \begin{itemize}
+            \item Isso indica que a IBM e a NSA já conheciam esses ataques 15 anos antes!
+            \item Até hoje, não há ataque analítico conhecido que quebre o DES em cenários realistas.
+        \end{itemize}
+    \end{itemize}
+
+    \begin{itemize}
+        \item \textbf{Busca exaustiva de chaves:} Dado um par texto-claro/texto-cifrado \((x, y)\), testa-se todas as \( 2^{56} \) chaves até encontrar \( DES_k^{-1}(x) = y \). \\
+        \(\Rightarrow\) Relativamente fácil com a tecnologia computacional atual!
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+    \frametitle{Histórico de Ataques ao DES}
+    \vspace{-1.5em}
+    \begin{center}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|c|p{12cm}|}
+            \hline
+            \textbf{Ano} & \textbf{Ataque Proposto/Implementado ao DES} \\
+            \hline
+            1977 & Diffie \& Hellman estimam (subestimam) os custos de uma máquina de busca por chave \\
+            \hline
+            1990 & Biham \& Shamir propõem a criptoanálise diferencial (\( 2^{47} \) textos-cifrados escolhidos) \\
+            \hline
+            1993 & Mike Wiener propõe o design de uma máquina de busca por chave muito eficiente: busca média requer 36h. Custo: \$1.000.000 \\
+            \hline
+            1993 & Matsui propõe a criptoanálise linear (\( 2^{43} \) textos-cifrados escolhidos) \\
+            \hline
+            Jun. 1997 & DES Challenge I quebrado em 4,5 meses de busca distribuída \\
+            \hline
+            Fev. 1998 & DES Challenge II--1 quebrado em 39 dias (busca distribuída) \\
+            \hline
+            Jul. 1998 & DES Challenge II--2 quebrado, máquina de busca por chave \textit{Deep Crack} construída pela Electronic Frontier Foundation (EFF): 1800 ASICs com 24 motores de busca cada; Custo: \$250.000, média de busca: 15 dias (levou 56h no desafio) \\
+            \hline
+            Jan. 1999 & DES Challenge III quebrado em 22h 15min (busca distribuída assistida por \textit{Deep Crack}) \\
+            \hline
+            2006--2008 & Máquina reconfigurável de busca por chave \textit{COPACOBANA} desenvolvida nas Universidades de Bochum e Kiel (Alemanha), usa 120 FPGAs para quebrar o DES em 6,4 dias (média) com custo de \$10.000 \\
+            \hline
+        \end{tabular}
+    }
+    \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{frame}
+    \frametitle{Triple DES -- 3DES}
+
+    \begin{itemize}
+        \item A cifra \textit{triple-DES} é frequentemente utilizada na prática para estender o comprimento efetivo da chave do DES para 112 bits.
+    \end{itemize}
+
+    \begin{center}
+        $y = DES_{k_3}(DES_{k_2}(DES_{k_1}(x)))$
+    \end{center}
+    \vspace{-1em}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{3DES.png}
+    \end{figure}
+    \vspace{-1em}
+    \begin{itemize}
+        \item Versão alternativa do \textbf{3DES:}
+            $y = DES_{k_3}(DES^{-1}_{k_2}(DES_{k_1}(x)))$
+        \item Vantagem: escolher \( k_1 = k_2 = k_3 \) equivale a realizar uma única cifragem DES.
+        \item Usado em muitas aplicações legadas, por exemplo, em sistemas bancários.
+        \item O NIST baniu o uso do 3DES para novos sistemas a partir de 2017.
+        \item AES substituiu o 3DES na maioria dos sistemas modernos.
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{Alternativas ao DES}
+
+    \begin{table}[h!]
+        \centering
+        \resizebox{\textwidth}{!}{%
+        \begin{tabular}{|l|c|c|l|}
+            \hline
+            \textbf{Algoritmo} & \textbf{I/O (bits)} & \textbf{Tamanho da chave (bits)} & \textbf{Observações} \\
+            \hline
+            AES / Rijndael & 128 & 128/192/256 & Substituto oficial do DES (padrão NIST) \\
+            Triple DES & 64 & 112 (efetivo) & Uso desaconselhado pelo NIST (\textit{deprecated}) \\
+            ChaCha20 & 512 & 256 & Utilizado em TLS 1.3, Google, OpenSSH \\
+            Mars & 128 & 128/192/256 & Finalista do AES \\
+            RC6 & 128 & 128/192/256 & Finalista do AES \\
+            Serpent & 128 & 128/192/256 & Finalista do AES \\
+            Twofish & 128 & 128/192/256 & Finalista do AES \\
+            IDEA & 64 & 128 & Algoritmo patenteado \\
+            Camellia & 128 & 128/192/256 & Padrão ISO/IEC, amplamente usado na Ásia \\
+            \hline
+        \end{tabular}
+        }
+    \end{table}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+    \frametitle{Lições Aprendidas}
+
+    \begin{itemize}
+        \item O DES foi o algoritmo de criptografia simétrica dominante de meados da década de 1970 até meados da década de 1990. Como as chaves de 56 bits não são mais seguras, foi definido o \textit{Advanced Encryption Standard} (AES).
+        
+        \item O DES padrão, com chave de 56 bits, pode ser quebrado relativamente fácil hoje em dia por meio de uma busca exaustiva de chaves.
+        
+        \item O DES é bastante robusto contra ataques analíticos conhecidos: na prática, é muito difícil quebrar o cifrador usando criptoanálise diferencial ou linear.
+        
+        \item Ao cifrar com o DES três vezes consecutivas, cria-se o Triple DES (3DES), que possui uma segurança maior.
+        
+        \item O cifrador simétrico “padrão” atualmente é geralmente o AES. Além disso, os outros quatro finalistas do AES também são considerados muito seguros e eficientes.
+    \end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Exercícios}
+
+\begin{frame}
+    \frametitle{Exercício: Não-linearidade das S-Boxes}
+
+    Conforme apresentado, uma propriedade importante que garante a segurança do DES é que as S-Boxes são não-lineares. Neste exercício, verificamos essa propriedade computando a saída da \( S_1 \) para alguns pares de entradas.
+
+    Mostre que:
+    \[
+        S_1(x_1) \oplus S_1(x_2) \neq S_1(x_1 \oplus x_2)
+    \]
+    onde "\(\oplus\)" denota o XOR bit a bit, para os seguintes casos:
+
+    \begin{enumerate}
+        \item \( x_1 = 000000,\ x_2 = 000001 \)
+        \item \( x_1 = 111111,\ x_2 = 100000 \)
+        \item \( x_1 = 101010,\ x_2 = 010101 \)
+    \end{enumerate}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.5\linewidth]{SBOX_S1.png}\\
+        \vspace{-0.3em}
+        S-BOX $S_1$
+    \end{figure}
+
+
+\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{Exercícios: Primeira Rodada do DES}
+
+    \begin{enumerate}
+        \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por zeros?
+        \vspace{0.5cm}
+        \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por uns?
+    \end{enumerate}
+
+    \vspace{0.5cm}
+    \textit{Dica: considere o efeito das permutações iniciais, expansão, XOR com a chave e as S-Boxes.}
+\end{frame}
+
+
+
+
+
+\end{document}

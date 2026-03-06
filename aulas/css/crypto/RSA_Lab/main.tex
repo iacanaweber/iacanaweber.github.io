@@ -1,0 +1,537 @@
+\documentclass[12pt,a4paper]{article} % Ou a classe que você utiliza no seu header
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{comment}
+% Basic Packages (Exemplo, ajuste conforme seu header)
+\usepackage[utf8]{inputenc} % Essencial para acentuação no LaTeX
+\usepackage[T1]{fontenc}    % Essencial para correta renderização de fontes com acentos
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage[brazil]{babel} % Para hifenização e termos em português
+\usepackage{graphicx} 
+\usepackage[margin=2.5cm]{geometry} 
+
+% For code listings (Exemplo, ajuste conforme seu header)
+\usepackage{listings}
+\usepackage{xcolor} 
+
+% Hyperlinks (Exemplo, ajuste conforme seu header)
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={RSA do Zero: Um Workshop Prático}, 
+    pdfpagemode=FullScreen,
+}
+
+% Define colors for code highlighting (Exemplo, mantenha ou ajuste)
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95} 
+
+% Define C++ style for listings (Exemplo, mantenha ou ajuste)
+\lstdefinestyle{cppstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single, 
+    rulecolor=\color{black}, 
+    title=\lstname,
+    literate= % Para exibir acentos corretamente NOS COMENTARIOS DO CODIGO se necessario,
+              % mas a recomendacao eh nao usar acentos DENTRO DO CODIGO LITERAL.
+              % Esta opcao 'literate' eh poderosa mas pode ser complexa.
+              % Para o codigo C++ em si, eh melhor manter sem acentos.
+              {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+              {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+              {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+              {À}{{\`A}}1 {È}{{\'E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+              {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+              {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+              {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+              {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+              {ã}{{\~a}}1 {õ}{{\~o}}1 {ñ}{{\~n}}1
+              {Ã}{{\~A}}1 {Õ}{{\~O}}1 {Ñ}{{\~N}}1
+              {ç}{{\c c}}1 {Ç}{{\c C}}1 
+}
+% % Instrutor: A opcao 'literate' acima no \lstdefinestyle eh uma forma de permitir acentos
+% % em strings ou comentarios DENTRO do codigo listado, mapeando-os para comandos LaTeX.
+% % Contudo, para o codigo C++ em si (variaveis, funcoes, etc.), a pratica padrao eh
+% % nao usar acentos. Se a restricao eh "sem acentos DENTRO do conteudo do lstlisting",
+% % entao os comentarios e strings no codigo C++ tambem nao deveriam ter acentos.
+% % O codigo C++ fornecido originalmente (primegen.cpp) ja seguia essa pratica para
+% % strings e comentarios (ex: "Metodo", "numero"), o que eh bom.
+% % Se voce deseja que NEM MESMO AS LEGENDAS (captions) tenham acentos, voce tera que
+% % remove-los manualmente das legendas abaixo. Porem, legendas sao texto LaTeX normal.
+\lstset{style=cppstyle} 
+
+%\pagestyle{fancy}
+%\fancyhf{}
+%\rfoot{\textit{Página \thepage \hspace{1pt} de \pageref{LastPage}}}
+
+% Document Title
+\author{%\textit{Substitua pelo seu Nome/Instituição}
+Seu Nome/Instituição Aqui} % Instrutor: Ajuste esta linha
+\date{\today} 
+
+\begin{document}
+
+%------ Encabezado -------- %
+
+\begin{center}
+    \begin{minipage}{3cm}
+    	\begin{center}
+    		\includegraphics[height=4.4cm]{Logo_PUCRS2.png}
+    	\end{center}
+    \end{minipage}\hfill
+    \begin{minipage}{10cm}
+    	\begin{center}
+    	\textbf{\large Pontifícia Universidade Católica do \\Rio Grande do Sul}\\[0.1cm]
+        \textbf{Escola Politécnica}\\[0.1cm]
+        \textbf{Sistemas Digitais $|$ 98G02-04}\\[0.3cm]
+        %\\[0.1cm]
+        Prof. Iaçanã Ianiski Weber\\[0.3cm]
+        \textit{\large{\textbf{Laboratório}}}\\
+        \textbf{\large{Implementação do RSA}}\\[0.3cm] 
+    	\end{center}
+    \end{minipage}\hfill
+    \begin{minipage}{3cm}
+    	\begin{center}
+    		%\includegraphics[height=3.4cm]{Logo_PUCRS.png}
+    	\end{center}
+    \end{minipage}
+\end{center}
+
+\rule{17cm}{0.1mm}
+
+% ---- Cabeçalho ---- %
+
+\hspace*{0pt}\hfill\textbf{\today}
+%\begin{center}
+%\color{red}
+%\textbf{\large{Deadline: 21/06/2024 - 17:30 - Moodle}}
+%\end{center}
+%\color{black}
+
+\section*{Objetivo Geral}
+Ao final destas sessões, você terá implementado os componentes centrais do criptossistema RSA em C++ utilizando a biblioteca GMP e terá usado sua implementação para decriptar uma imagem criptografada.
+
+\section*{Pré-requisitos}
+\begin{itemize}
+    \item Conhecimento básico de programação em C++ (variáveis, loops, funções, entrada/saída de arquivos).
+    \item Um compilador C++ (como g++) e a biblioteca GMP instalada.
+    \item Para compilar programas com GMP, tipicamente:
+    \begin{center}
+        \texttt{g++ programa.cpp -o programa -lgmp -lgmpxx -std=c++11}    
+    \end{center}
+    A \textit{flag} \texttt{-lgmpxx} é para as classes C++ da GMP, \texttt{-lgmp} para a interface C.
+    \item Familiaridade com operações básicas de linha de comando.
+\end{itemize}
+
+\hrulefill
+\vspace{1em}
+
+\newpage
+
+\section{Números Grandes e Geração de Primos}
+
+\subsection*{Objetivo}
+Entender como trabalhar com números grandes utilizando a GMP e como gerar números primos grandes.
+
+\subsection{Introdução à GMP \small(GNU Multiple Precision Arithmetic Library)}
+\normalsize
+Para construirmos algoritmos criptográficos como o RSA, precisaremos trabalhar com números inteiros gigantescos, que podem ter centenas ou até milhares de bits. Os tipos de dados padrão do C/C++ (\texttt{int}, \texttt{long long}, etc.) são muito pequenos para isso.
+
+É aqui que entra a GMP (\textit{GNU Multiple Precision Arithmetic Library}). A GMP é uma biblioteca especializada que nos permite realizar cálculos com "precisão arbitrária", ou seja, com números inteiros tão grandes quanto a memória do seu computador permitir. Sem ela, implementar o RSA de forma segura seria muito mais difícil.
+
+O principal tipo de dado que usaremos da GMP para esses "super inteiros" é o \texttt{mpz\_t}. Em nosso laboratório, vocês aprenderão o essencial sobre como:
+\begin{multicols}{2} % Inicia o ambiente de duas colunas
+\begin{itemize}[leftmargin=5pt]
+    \item \textbf{Inicialização:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_init(var)}
+        \item \texttt{mpz\_init\_set\_ui(var, ulong)}
+        \item \texttt{mpz\_init\_set\_str(var, "str", base)}
+    \end{itemize}    
+    \item \textbf{Atribuição:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_set(rop, op)}
+        \item \texttt{mpz\_set\_ui(rop, ulong)}
+        \item \texttt{mpz\_set\_str(rop, "str", base)}
+    \end{itemize}
+    \item \textbf{Aritmética:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_add}
+        \item \texttt{mpz\_sub}
+        \item \texttt{mpz\_mul}
+        \item \texttt{mpz\_fdiv\_q} 
+    \end{itemize}    
+    \item \textbf{Comparação:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_cmp(op1, op2)}
+        \item \texttt{mpz\_cmp\_ui(op1, ulong)}
+    \end{itemize}
+    \item \textbf{Exponenciação modular:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_powm(rop, base, exp, mod)}
+    \end{itemize}
+    \item \textbf{Máximo Divisor Comum (MDC):}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_gcd(rop, op1, op2)}
+    \end{itemize}
+    \item \textbf{Inverso modular:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_invert(rop, op1, op2)} calcula $op1^{-1} \pmod{op2}$
+    \end{itemize}
+    \item \textbf{Números aleatórios:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{gmp\_randstate\_t}
+        \item \texttt{gmp\_randinit\_default}
+        \item \texttt{gmp\_randseed\_ui}
+        \item \texttt{mpz\_urandomb(rop, state, nbits)}
+    \end{itemize}
+    \item \textbf{Saída:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{gmp\_printf("\%Zd$\backslash$n", var)} % Escapado para LaTeX
+    \end{itemize}
+    \item \textbf{Liberação de memória:}
+    \begin{itemize}[leftmargin=6pt]
+        \item \texttt{mpz\_clear(var)} 
+    \end{itemize}    
+\end{itemize}
+\end{multicols} % Termina o ambiente de duas colunas
+\newpage
+
+\subsection{Analisando o Código \texttt{primegen.cpp} Fornecido}
+Vamos analisar o código que foi fornecido:
+
+\begin{lstlisting}[language=C++, basicstyle=\ttfamily\scriptsize]
+#include <iostream>
+#include <time.h> 
+#include <gmp.h>  
+#include <stdio.h> 
+
+int main(int argc, char* argv[]){
+    if(argc <= 1){
+        std::cout << "Uso do primegen: \n > ./primegen <numero de bits> " << std::endl;
+        return 1;
+    }
+
+    unsigned int size = atoi(argv[1]); 
+    
+    mpz_t the_number;
+    mpz_t the_number_minus_one;
+    mpz_t the_two;
+    mpz_t the_result; 
+
+    gmp_randstate_t state;
+    gmp_randinit_default(state);
+    gmp_randseed_ui(state, time(NULL)); 
+
+    mpz_init_set_ui(the_two, 2);
+    mpz_init(the_number);
+    mpz_init(the_number_minus_one);
+    mpz_init(the_result);
+    
+    std::cout << "Metodo de Fermat - buscando numero primo de " << size << " bits." << std::endl;
+    
+    int flag = 0, tentativa = 0; 
+    do{
+        tentativa++;
+        std::cout << "\rTentativa: " << tentativa << std::flush; 
+
+        mpz_urandomb(the_number, state, size); 
+        
+        mpz_setbit(the_number, 0); 
+        if (size > 1) { 
+             mpz_setbit(the_number, size - 1); 
+        }
+
+        mpz_sub_ui(the_number_minus_one, the_number, 1); 
+        mpz_powm(the_result, the_two, the_number_minus_one, the_number); 
+
+        flag = mpz_cmp_ui(the_result, 1); 
+
+    } while(flag != 0); 
+    
+    gmp_printf("\nPrimo encontrado: %Zd\n", the_number);
+
+    mpz_clear(the_two);
+    mpz_clear(the_number);
+    mpz_clear(the_number_minus_one);
+    mpz_clear(the_result);
+    gmp_randclear(state); 
+
+    return 0;
+}
+\end{lstlisting}
+\newpage
+
+\textbf{Pontos de Discussão sobre o \texttt{primegen.cpp}:}
+\begin{enumerate}
+    \item \textbf{Propósito:} Gerar um número provavelmente primo com um tamanho de bits especificado.
+    \item \textbf{Teste de Primalidade:} Utiliza o \textbf{Pequeno Teorema de Fermat}: se $N$ é primo, então para qualquer inteiro $a$ não divisível por $N$, $a^{N-1} \equiv 1 \pmod N$. O código usa $a=2$.
+    \item \textbf{Natureza Probabilística:}
+    \begin{itemize}
+        \item \textbf{Importante:} Este é um teste probabilístico. Se $2^{N-1} \equiv 1 \pmod N$, $N$ é \textit{provavelmente} primo.
+        \item \textbf{Números de Carmichael:} Existem números compostos $N$ para os quais $a^{N-1} \equiv 1 \pmod N$ para todos os inteiros $a$ que são coprimos com $N$. Portanto, este teste não é infalível.
+        \item Para testes de primalidade mais robustos, o teste de Miller-Rabin é comumente usado.
+    \end{itemize}
+    \item \textbf{Geração de Números Aleatórios:} \texttt{mpz\_urandomb} gera um número aleatório.
+\end{enumerate}
+
+\subsection*{Exercício 1: Gerando Dois Primos ($p$ e $q$)}
+\begin{itemize}
+    \item \textbf{Tarefa:} Crie um novo arquivo C++ (ex: \texttt{generate\_pq.cpp}).
+    \item Adapte a lógica do \texttt{primegen.cpp} para gerar dois números primos grandes \textit{distintos}, $p$ e $q$.
+    \item Garanta que $p \neq q$.
+    \item Imprima $p$ e $q$ no console usando \texttt{gmp\_printf}.
+    \item Compile e execute seu programa.
+\end{itemize}
+
+\hrulefill
+
+\section{Geração de Chaves RSA (Conceito Chave)}
+\subsection*{Objetivo}
+Implementar o algoritmo de geração de chaves RSA usando os primos $p$ e $q$.
+
+\subsection{Passos para Geração de Chaves RSA (Recapitulando)}
+\begin{enumerate}
+    \item Escolha dois números primos grandes distintos, $p$ e $q$.
+    \item Calcule $n = p \cdot q$. Este é o \textbf{módulo (modulus)}.
+    \begin{itemize}
+        \item \texttt{mpz\_mul(n, p, q);}
+    \end{itemize}
+    \newpage
+    \item Calcule a função Phi de Euler: $\phi(n) = (p-1)(q-1)$.
+    \begin{itemize}
+        \item \texttt{mpz\_sub\_ui(p\_m1, p, 1);}
+        \item \texttt{mpz\_sub\_ui(q\_m1, q, 1);}
+        \item \texttt{mpz\_mul(phi\_n, p\_m1, q\_m1);}
+    \end{itemize}
+    \item Escolha um inteiro $e$ (o \textbf{expoente público}) tal que $1 < e < \phi(n)$ e $\text{gcd}(e, \phi(n)) = 1$.
+    \begin{itemize}
+        \item Uma escolha comum para $e$ é $65537$.
+        \item \texttt{mpz\_gcd(gcd\_val, e, phi\_n);}
+        \item Verifique se \texttt{mpz\_cmp\_ui(gcd\_val, 1) == 0}.
+    \end{itemize}
+    \item Calcule $d$ (o \textbf{expoente privado}) tal que $d \cdot e \equiv 1 \pmod{\phi(n)}$. ($d$ é o inverso multiplicativo modular de $e$ módulo $\phi(n)$).
+    \begin{itemize}
+        \item \texttt{mpz\_invert(d, e, phi\_n);}.
+    \end{itemize}
+\end{enumerate}
+\textbf{Chave Pública (Public Key):} $(n, e)$ \\
+\textbf{Chave Privada (Private Key):} $(n, d)$ 
+
+\subsection*{Exercício 2: \texttt{rsakeygen.cpp}}
+\begin{itemize}
+    \item \textbf{Tarefa:} Crie um programa C++ \texttt{rsakeygen.cpp}.
+    \item Este programa deve:
+    \begin{enumerate}
+        \item Receber um tamanho de bits como argumento de linha de comando.
+        \item Gerar $p$ e $q$.
+        \item Calcular $n$ e $\phi(n)$.
+        \item Definir $e$ (ex: 65537) e verificar $\text{gcd}(e, \phi(n))=1$.
+        \item Calcular $d$.
+        \item Exibir $p$, $q$, $n$, $e$, $d$.
+    \end{enumerate}
+    \item Lembre-se de inicializar \texttt{mpz\_init} e limpar \texttt{mpz\_clear} as variáveis.
+    \item Use \texttt{mpz\_get\_str} para converter \texttt{mpz\_t} para string.
+    \item \textbf{Saída:} Exiba o resultado no console ou em arquivos: \\\texttt{public\_key.txt}, \texttt{private\_key.txt} 
+\end{itemize}
+\hrulefill
+\newpage
+
+\section{Funções de Criptografia e Decriptografia}
+\subsection*{Objetivo}
+Implementar as operações matemáticas de criptografia e decriptografia RSA.
+
+\subsection{Operações RSA}
+Seja $M$ a mensagem em texto claro (plaintext), $0 \le M < n$.
+\begin{itemize}
+    \item \textbf{Criptografia (Encryption):} $C = M^e \pmod n$
+    \begin{itemize}
+        \item \texttt{mpz\_powm(C, M, e, n);}
+    \end{itemize}
+    \item \textbf{Decriptografia (Decryption):} $M = C^d \pmod n$
+    \begin{itemize}
+        \item \texttt{mpz\_powm(M, C, d, n);}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Exercício 3: Implementando funções \texttt{encrypt} e \texttt{decrypt}}
+\begin{itemize}
+    \item \textbf{Tarefa:} Crie duas funções C++ (ex: em \texttt{rsa\_test.cpp}).
+\end{itemize}
+
+\begin{lstlisting}[language=C++]
+// Funcao para criptografar uma mensagem M
+void rsa_encrypt(mpz_t C, const mpz_t M, const mpz_t e, const mpz_t n) {
+    mpz_powm(C, M, e, n);
+}
+
+// Funcao para decriptar um texto cifrado C
+void rsa_decrypt(mpz_t M_decrypted, const mpz_t C, const mpz_t d, const mpz_t n) {
+    mpz_powm(M_decrypted, C, d, n);
+}
+\end{lstlisting}
+\vspace{-1em}
+\begin{itemize}
+    \item No seu \texttt{main} para \texttt{rsa\_test.cpp}:
+    \begin{enumerate}
+        \item Inicialize $n, e, d$ e uma mensagem $M$ (ex: \texttt{mpz\_init\_set\_ui(M, 12345UL);}).
+        \item Chame \texttt{rsa\_encrypt} para obter $C$. Imprima $C$.
+        \item Chame \texttt{rsa\_decrypt} em $C$ para obter $M'$. Imprima $M'$.
+        \item Verifique se $M' = M$.
+        \item Exemplo de saída (textos aqui podem ter acentos, pois é saída de console, não código):
+\begin{verbatim}
+Mensagem Original: 12345
+Texto Cifrado (Ciphertext): <algum numero grande>
+Mensagem Decriptada: 12345
+\end{verbatim}
+    \end{enumerate}
+\end{itemize}
+
+\hrulefill
+\newpage   
+
+\section{Aplicação em Criptografia/Decriptografia de Texto} 
+\subsection*{Objetivo}
+Aplicar sua implementação RSA para criptografar e decriptar uma string de texto curta.
+
+\subsection{Convertendo Texto para Números para o RSA}
+O RSA opera sobre números.
+\begin{itemize}
+    \item \textbf{Abordagem simples (Caractere por Caractere):}
+    \begin{itemize}
+        \item Tratar cada caractere como seu valor inteiro ASCII.
+        \item Criptografar/decriptar este inteiro. Requer $n > 255$.
+        \item Exemplo: "OI" $\rightarrow$ O (ASCII 79), I (ASCII 73). Criptografa 79, depois 73.
+    \end{itemize}
+    \item \textbf{Para este exercício, usaremos criptografia caractere por caractere.}
+\end{itemize}
+
+\subsection*{Exercício 4: \texttt{rsatext.cpp}}
+\begin{itemize}
+    \item \textbf{Tarefa:} Crie um programa C++ \texttt{rsatext.cpp}.
+    \item Este programa deve:
+    \begin{enumerate}
+        \item \textbf{Carregar Chaves:} Ler $n, e, d$ de arquivos.
+        \item \textbf{Entrada (Input):} Receber uma string curta (\texttt{std::getline}).
+        \item \textbf{Criptografia (Encryption):}
+        \begin{itemize}
+            \item Para cada caractere, converta para \texttt{mpz\_t} (valor ASCII).
+            \item Criptografe com \texttt{rsa\_encrypt}.
+            \item Imprima cada número criptografado (use \texttt{mpz\_get\_str} e \texttt{free}).
+        \end{itemize}
+        \item \textbf{Decriptografia (Decryption):}
+        \begin{itemize}
+            \item Para cada número criptografado (string), converta para \texttt{mpz\_t}.
+            \item Decripte com \texttt{rsa\_decrypt}.
+            \item Converta o \texttt{mpz\_t} decriptado para \texttt{unsigned long} (\texttt{mpz\_get\_ui}), depois para \texttt{char}.
+            \item Monte a string original.
+        \end{itemize}
+        \item \textbf{Saída (Output):} Imprimir string original, números criptografados, string recuperada.
+    \end{enumerate}
+\end{itemize}
+
+\hrulefill
+
+\begin{comment}
+\newpage
+
+\section{O Desafio da Decriptografia de Imagem!}
+\subsection*{Objetivo}
+Usar sua implementação RSA para decriptar uma imagem criptografada.
+
+\subsection{Cenário de Criptografia da Imagem}
+\begin{itemize}
+    \item O instrutor fornecerá:
+    \begin{enumerate}
+        \item Arquivo de imagem criptografada (ex: \texttt{image\_encrypted.txt}).
+        \item Chave privada RSA $(n, d)$.
+        \item Dimensões da imagem (largura, altura) e valor máximo do pixel.
+    \end{enumerate}
+    \item \textbf{Como a imagem foi criptografada (ex: formato PGM P2):}
+    \begin{itemize}
+        \item Arquivo PGM P2:
+\begin{verbatim}
+P2
+<largura> <altura>
+<max_valor_cinza>
+<pixel1> <pixel2> ... <pixelN>
+\end{verbatim}
+        \item Cada valor de pixel (inteiro) $M$ foi criptografado: $C = M^e \pmod n$.
+        \item \texttt{image\_encrypted.txt} contém os valores $C$.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Exercício 5: \texttt{rsaimage\_decrypt.cpp} (Exercício de Programação)}
+\begin{itemize}
+    \item \textbf{Tarefa:} Escreva \texttt{rsaimage\_decrypt.cpp}.
+    \item Este programa deve:
+    \begin{enumerate}
+        \item \textbf{Carregar Chave Privada:} Ler $n$ e $d$.
+        \item \textbf{Ler Infos da Imagem:} Largura, altura, max\_valor\_cinza.
+        \item \textbf{Ler Dados Criptografados:} De \texttt{image\_encrypted.txt}.
+        \item \textbf{Loop de Decriptografia:} Para cada $C_{str}$ do arquivo:
+        \begin{itemize}
+            \item Converta $C_{str}$ para \texttt{mpz\_t C\_pixel}.
+            \item Decripte para \texttt{mpz\_t M\_pixel}.
+            \item Converta \texttt{M\_pixel} para \texttt{unsigned long pixel\_val = mpz\_get\_ui(M\_pixel);}.
+            \item Armazene \texttt{pixel\_val}.
+        \end{itemize}
+        \item \textbf{Escrever Imagem PGM Decriptada} (\texttt{image\_decrypted.pgm}):
+        \begin{itemize}
+            \item Escrever cabeçalho PGM:
+            \newpage
+
+\begin{lstlisting}[language=C++]
+#include <fstream> 
+
+// ...
+std::ofstream outfile("image_decrypted.pgm");
+if (!outfile.is_open()) { 
+    // Em C++, melhor usar std::cerr para erros
+    std::cerr << "Erro ao abrir arquivo de saida!" << std::endl;
+    return 1; 
+}
+outfile << "P2\n";
+outfile << image_width << " " << image_height << "\n";
+outfile << max_gray_value << "\n";
+// ... continuacao da escrita dos pixels
+\end{lstlisting}
+\vspace{-0.75em}
+            \item Escrever os valores de pixel decriptados.
+            \item Fechar o arquivo.
+        \end{itemize}
+    \end{enumerate}
+    \item \textbf{Visualizar a Imagem:} Use um visualizador PGM.
+\end{itemize}
+
+
+\hrulefill
+\bigskip
+\end{comment}
+
+\begin{center}
+    Boa sorte e divirta-se construindo o RSA!
+\end{center}
+
+\end{document}

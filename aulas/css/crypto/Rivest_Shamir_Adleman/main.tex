@@ -1,0 +1,677 @@
+\documentclass{beamer}
+
+
+
+\usepackage{amsmath}
+\usepackage{booktabs} % Para tabelas com visual profissional
+\usepackage{tabularx} % Para tabelas com largura definida e colunas do tipo X
+
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    %linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[RSA]{RSA}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.75\textwidth}
+    \begin{center}
+        \raisebox{5ex}{\LARGE\bfseries\textcolor{blue}{\textbf{Criptosistema}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{RSA}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{O Criptosistema RSA}
+\begin{frame}{O Criptossistema RSA}
+    \begin{itemize}
+        \item Martin Hellman e Whitfield Diffie publicaram seu artigo sobre public-key em 1976.
+        \vspace{0.5em}
+        \item Ronald Rivest, Adi Shamir e Leonard Adleman propuseram o criptossistema assimétrico RSA em 1977.
+        \vspace{0.5em}
+        \item Até hoje, o RSA é o criptossistema assimétrico mais utilizado, embora a criptografia de curva elíptica (ECC) esteja se tornando cada vez mais popular.
+        \vspace{0.5em}
+        \item O RSA é usado principalmente para duas aplicações:
+        \begin{itemize}
+            \item Troca de chaves para uso de cifras simétricas.
+            \item Assinaturas digitais.
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Cifragem e Decifragem}
+    \begin{itemize}
+        \item As operações RSA são realizadas sobre o anel de inteiros $Z_n$ (i.e., aritmética módulo n), onde $n = p \cdot q$, com p, q sendo primos grandes.
+        \item Cifragem e decifragem são simplesmente exponenciações no anel.
+    \end{itemize}
+
+    \begin{block}{Definição}
+        Dada a public key $(n,e) = k_{\text{pub}}$ e a private key $d = k_{\text{pr}}$ escrevemos:
+        \vspace{-0.3em}
+        \begin{center}
+            $y = e_{k_{pub}}(x) \equiv x^e \pmod{n}$ \\
+            $x = d_{k_{pr}}(y) \equiv y^d \pmod{n}$
+        \end{center}
+        \vspace{-0.3em}
+        onde $x, y \in Z_n$. \\
+        Chamamos $e_{k_{\text{pub}}}()$ a operação de cifragem e $d_{k_{\text{pr}}}()$ a operação de decifragem.
+    \end{block}
+
+    \begin{itemize}
+        \item Na prática $x, y, n$ e $d$ são números inteiros muito longos ($\ge 1024$ bits).
+        \item A segurança do esquema reside no fato de que é difícil derivar o 'expoente privado' $d$ dada a public-key $(n, e)$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Geração de Keys}
+    \begin{itemize}
+        \item Como todos os esquemas assimétricos, o RSA possui uma fase de set-up durante a qual as private e public keys são computadas.
+    \end{itemize}
+
+    \begin{block}{Algoritmo: Geração de Keys RSA}
+        \tiny % Reduces font size for the content below within this block
+        \textbf{Saída:} public key $k_{\text{pub}} = (n, e)$ e private key $k_{\text{pr}} = d$
+        \begin{enumerate}
+            \item Escolha dois primos grandes p, q.
+            \item Compute $n = p \cdot q$.
+            \item Compute $\Phi(n) = (p-1)(q-1)$.
+            \item Selecione o expoente público $e \in \{1, 2, \dots, \Phi(n)-1\}$ tal que $mdc(e, \Phi(n)) = 1$.
+            \item Computa uma chave privada $d$ tal que $d \cdot e \equiv 1 \pmod{\Phi(n)}$.
+            \item \textbf{RETORNE} $k_{\text{pub}} = (n, e), k_{\text{pr}} = d$.
+        \end{enumerate}
+    \end{block}
+
+    \textbf{Observações:}
+    \begin{itemize}
+        \item Escolher dois primos grandes e distintos $p$, $q$ (no Passo 1) não é trivial.
+        \item $mdc(e, \Phi(n)) = 1$ assegura que $e$ possui um inverso e, assim, que sempre existe uma chave privada $d$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo: RSA com números pequenos}
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{img/RSA.png}
+    \end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Aspectos de Implementação}
+
+\begin{frame}{Aspectos de Implementação}
+    \begin{itemize}
+        \item O criptossistema RSA usa apenas uma operação aritmética (exponenciação modular), o que o torna conceitualmente um esquema assimétrico simples.
+        \vspace{0.5em}
+        \item Embora conceitualmente simples, devido ao uso de números muito longos, o RSA é ordens de magnitude mais lento que esquemas simétricos, como o AES.
+        \vspace{0.5em}
+        \item Ao implementar o RSA (especialmente em um dispositivo com restrições, como smartcards ou celulares), atenção especial deve ser dada à escolha correta de algoritmos aritméticos.
+        \vspace{0.5em}
+        \item O algoritmo \color{blue}\textit{square-and-multiply}\color{black}$ $ permite exponenciação rápida, mesmo com números muito longos\dots
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Square-and-Multiply}
+    \begin{itemize}
+        \item Princípio básico: Varrer os bits do expoente da esquerda para a direita e eleve ao quadrado/multiplique o operando de acordo.
+    \end{itemize}
+\vspace{-0.5em}
+    \begin{block}{Algoritmo: Square-and-Multiply para $x^H \pmod n$}
+        \tiny
+        \textbf{Entrada:} Expoente $H$, elemento base $x$, Módulo $n$. \\
+        \textbf{Saída:} $y = x^H \pmod n$.
+        \begin{enumerate}
+            \item Determine a representação binária $H = (h_t, h_{t-1}, \dots, h_0)_2$. \\(Assuma $H > 0$ e que $h_t=1$ é o bit mais significativo).
+            \item $y \leftarrow x$.
+            \item \textbf{PARA} $i$ de $t-1$ \textbf{ATÉ} $0$ \textbf{FAÇA}
+            \item \quad $y \leftarrow y^2 \pmod n$.
+            \item \quad \textbf{SE} $h_i = 1$ \textbf{ENTÃO}
+            \item \quad \quad $y \leftarrow y \cdot x \pmod n$.
+            \item \textbf{RETORNE} $y$.
+        \end{enumerate}
+    \end{block}
+\vspace{-0.5em}
+    \begin{itemize}
+        \item \textbf{Regra}: Elevar ao quadrado em cada iteração (conforme a operação $y \leftarrow y^2 \pmod n$ no laço) e multiplicar o resultado atual por $x$ se o bit do expoente $h_i = 1$ (conforme a operação $y \leftarrow y \cdot x \pmod n$).
+        \item A redução modular após cada passo mantém o operando $y$ pequeno.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Exemplo: \textit{Square-and-Multiply}}
+    \begin{itemize}
+        \item Calcula $x^{26}$ sem redução modular.
+        \item Representação binária do expoente: $26 = (1,1,0,1,0)_2 = (h_4, h_3, h_2, h_1, h_0)_2$.
+    \end{itemize}
+    \begin{center}
+        
+        \vspace{0.5em}
+        \begingroup % Para manter as alterações locais
+        \footnotesize % Tamanho da fonte menor para a tabela
+        \setlength{\tabcolsep}{4pt} % Reduz o espaçamento entre colunas (padrão é 6pt)
+        % \centering % Descomente se quiser centralizar a tabela mais estreita
+        \begin{tabular}{cllc} % Removida a coluna X e o ambiente mudou para tabular
+            \toprule
+            Passo & Valor computado         & Expoente binário             & Op  \\ % Removido o cabeçalho "Comentário"
+            \midrule
+            1   & $y = x = x^1$           & $(\textcolor{red}{1})_2$      & -   \\ % Removido o conteúdo da última coluna
+            \addlinespace % Adiciona um pequeno espaço vertical (do booktabs)
+            1a  & $(x^1)^2 = x^2$         & $(\textcolor{red}{10})_2$     & SQ  \\
+            1b  & $x^2 \cdot x = x^3$     & $(\textcolor{red}{11})_2$     & MUL \\
+            \addlinespace
+            2a  & $(x^3)^2 = x^6$         & $(\textcolor{red}{110})_2$    & SQ  \\
+            2b  & -                       & $(\textcolor{red}{110})_2$    & -   \\
+            \addlinespace
+            3a  & $(x^6)^2 = x^{12}$      & $(\textcolor{red}{1100})_2$   & SQ  \\
+            3b  & $x^{12} \cdot x = x^{13}$ & $(\textcolor{red}{1101})_2$   & MUL \\
+            \addlinespace
+            4a  & $(x^{13})^2 = x^{26}$   & $(\textcolor{red}{11010})_2$ & SQ  \\
+            4b  & -                       & $(\textcolor{red}{11010})_2$ & -   \\
+            \bottomrule
+        \end{tabular}
+        \endgroup
+        \vspace{-0.5em}
+    \end{center}
+
+    \begin{itemize}
+        \item Observe como o expoente evolui para $x^{26} = x^{(11010)_2}$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Complexidade do Algoritmo \textit{Square-and-Multiply}}
+    \begin{itemize}
+        \item O algoritmo \textit{square-and-multiply} possui complexidade logarítmica, ou seja, seu tempo de execução é proporcional ao comprimento em bits (em vez do valor absoluto) do expoente.
+        \vspace{0.5em}
+        \item Dado um expoente com $t+1$ bits $H = (h_t, h_{t-1}, \dots, h_0)_2$ com $h_t=1$, necessitamos das seguintes operações:
+        \begin{itemize}
+            \item Número de SQ (elevações ao quadrado) $= t$
+            \item Número médio de MUL (multiplicações) $= 0.5t$
+            \item Complexidade total: Nº SQ + Nº MUL $= 1.5t$
+        \end{itemize}
+        \vspace{0.5em}
+        \item Expoentes são frequentemente escolhidos aleatoriamente, então $1.5t$ é uma boa estimativa para o número médio de operações.
+        \vspace{0.5em}
+        \item Note que cada SQ (elevação ao quadrado) e cada MUL (multiplicação) é uma operação com números muito longos, e.g., inteiros de 2048 bits.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Técnicas de Aceleração}
+    \begin{itemize}
+        \item A exponenciação modular é computacionalmente intensiva.
+        \vspace{0.5em}
+        \item Mesmo com o algoritmo square-and-multiply, o RSA pode ser bastante lento em dispositivos com restrições, como smart cards.
+        \vspace{0.5em}
+        \item Alguns truques importantes:
+        \begin{itemize}
+            \item Expoente público $e$ curto
+            \vspace{0.5em}
+            \item Teorema Chinês do Resto (CRT)
+            \vspace{0.5em}
+            \item Exponenciação com pré-computação (\textit{não abordado aqui})
+        \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Criptografia rápida com expoente público pequeno}
+
+\begin{itemize}
+    \item Escolher um expoente público $e$ pequeno não enfraquece a segurança do RSA
+    \item Um expoente público pequeno melhora significativamente a velocidade da criptografia RSA
+\end{itemize}
+
+\vspace{0.5em} % Adiciona um pequeno espaço vertical antes da tabela
+\begin{center}
+\begin{tabularx}{1\textwidth}{X X X} % Define a largura da tabela e usa colunas do tipo X para ajuste automático
+
+\toprule
+\textbf{Chave Pública ($e$)} & \textbf{$e$ como string binária} & \textbf{\#mul + \#quad} \\
+\midrule
+$3$ & $(11)_2$ & $1+1=2$ \\
+$17$ & $(10001)_2$ & $4+1=5$ \\
+$2^{16}+1$ & $(10000000000000001)_2$ & $16+1=17$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\vspace{0.5em} % Adiciona um pequeno espaço vertical depois da tabela
+
+\begin{itemize}
+    \item Este é um truque comumente usado (ex.: SSL/TLS, etc.) e torna o RSA o esquema assimétrico mais rápido em relação ao processo de encriptação!
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Decriptografia Rápida com o Teorema Chinês do Resto}
+
+\begin{itemize}
+    \item A escolha de uma chave privada $d$ pequena resulta em fraquezas de segurança!
+    \begin{itemize}
+        \item De fato, $d$ deve ter pelo menos $0.3t$ bits, onde $t$ é o comprimento em bits do módulo $n$.
+    \end{itemize}
+    \item No entanto, o \textbf{Teorema Chinês do Resto (CRT)} pode ser usado para acelerar (de certa forma) a exponenciação com a chave privada $d$.
+    \item Baseado no \textbf{CRT}, podemos substituir a computação de:
+    \[ x^d \pmod{\Phi(n)} \pmod n \]
+    por duas computações:
+    \[ x^d \pmod{p-1} \pmod p \quad \text{e} \quad x^d \pmod{q-1} \pmod q \]
+    onde $q$ e $p$ são "pequenos" em comparação com $n$.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Princípio Básico da Exponenciação Baseada em CRT}
+
+
+\vspace{-2em}
+\begin{center}
+    \begin{minipage}{0.8\textwidth}
+      \centering
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.9\linewidth]{img/crt.png}
+        \end{figure}
+    \end{minipage} 
+\end{center}
+
+
+\begin{itemize}
+    \item O \textbf{CRT} envolve três etapas distintas:
+    \begin{itemize}
+        \item[(1)] Transformação do operando para o domínio CRT
+        \item[(2)] Exponenciação modular no domínio CRT
+        \item[(3)] Transformação inversa para o domínio do problema
+    \end{itemize}
+    \vspace{0.3cm} % Pequeno espaço antes do próximo item principal
+    \item Essas etapas são equivalentes a uma exponenciação modular no domínio do problema.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}<0>
+\frametitle{CRT: Etapa 1 – Transformação}
+
+\begin{itemize}
+    \item A transformação para o domínio CRT requer o conhecimento de $p$ e $q$.
+    \vspace{0.5em}
+    \item $p$ e $q$ são conhecidos apenas pelo proprietário da chave privada, portanto o CRT não pode ser aplicado para acelerar a etapa de encriptação.
+    \vspace{0.5em}
+    \item A transformação calcula $(x_p, x_q)$, que é a representação de $x$ no domínio CRT. Eles podem ser encontrados facilmente calculando-se:
+    \[ x_p \equiv x \pmod p \quad \text{e} \quad x_q \equiv x \pmod q \]
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}<0>
+\frametitle{CRT: Etapa 2 – Exponenciação}
+
+\begin{itemize}
+    \item Dados $d_p$ e $d_q$ tais que:
+    \[ d_p \equiv d \pmod{(p-1)} \quad \text{e} \quad d_q \equiv d \pmod{(q-1)} \]
+    uma exponenciação no domínio do problema requer duas exponenciações no domínio CRT:
+    \[ y_p \equiv x_p^{d_p} \pmod p \quad \text{e} \quad y_q \equiv x_q^{d_q} \pmod q \]
+    \vspace{0.3cm} % Adiciona um pequeno espaço vertical antes do próximo item
+    \vspace{0.5em}
+    \item Na prática, $p$ e $q$ são escolhidos para terem metade do comprimento em bits de $n$, ou seja:
+    \[ |p| \approx |q| \approx |n|/2 \]
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}<0>
+\frametitle{CRT: Etapa 3 – Transformação Inversa}
+
+\begin{itemize}
+    \item A transformação inversa requer duas inversões modulares, o que é computacionalmente custoso:
+    \[ c_p \equiv q^{-1} \pmod p \quad \text{e} \quad c_q \equiv p^{-1} \pmod q \]
+    
+    \item A transformação inversa combina $y_p, y_q$ para o resultado final $y \pmod n$ no domínio do problema:
+    \[ y \equiv [q * c_p] * y_p + [p * c_q] * y_q \pmod n \]
+    
+    \item Os primos $p$ e $q$ normalmente mudam com pouca frequência, portanto o custo da inversão pode ser negligenciado porque as duas expressões $[q * c_p]$ e $[p * c_q]$ podem ser pré-calculadas e armazenadas.
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Complexidade do CRT}
+
+\begin{itemize}
+    \item Ignoramos as etapas de transformação e transformação inversa, pois seus custos podem ser negligenciados sob premissas razoáveis.
+    \item Assumindo que $n$ tem $t+1$ bits, tanto $p$ quanto $q$ têm aproximadamente $t/2$ bits de comprimento.
+    \item A complexidade é determinada pelas duas exponenciações no domínio CRT. Os operandos têm apenas $t/2$ bits de comprimento. Para as exponenciações, usamos o algoritmo \textit{square-and-multiply}:
+    \begin{itemize}
+        \item \# quadrados (uma exp.): \#QUAD = $0.5t$
+        \item \# mult. médias (uma exp.): \#MULT = $0.25t$
+        \item Complexidade total: $2 * (\#\text{MULT} + \#\text{QUAD}) = 1.5t$
+    \end{itemize}
+    \item Isso parece o mesmo que exponenciações regulares, mas como os operandos têm metade do comprimento de bits em comparação com exponenciações regulares, cada operação (ou seja, multiplicação e quadratura) é \textbf{4 vezes mais rápida!}
+    \item Portanto, o CRT é \textbf{4 vezes mais rápido} que a exponenciação direta.
+\end{itemize}
+
+\end{frame}
+
+
+\section{Encontrar Números Primos Grandes}
+
+\begin{frame}
+\frametitle{Encontrando Primos Grandes}
+
+\begin{itemize}
+    \item A geração de chaves para o RSA requer encontrar dois primos grandes $p$ e $q$ tal que $n = p * q$ seja suficientemente grande.
+    \item O tamanho de $p$ e $q$ é tipicamente metade do tamanho desejado de $n$.
+    \item Para encontrar primos, inteiros aleatórios são gerados e testados para primalidade:
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{img/primegen.png}
+\end{figure}
+
+\begin{itemize}
+    \item O gerador de números aleatórios (RNG) deve ser não-previsível, caso contrário um atacante poderia adivinhar a fatoração de $n$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Testes de Primalidade}
+
+\begin{itemize}
+    \item Fatorar $p$ e $q$ para testar a primalidade geralmente não é factível.
+    \vspace{0.5em}
+    \item No entanto, não estamos interessados na fatoração, apenas queremos saber se $p$ e $q$ são compostos ou não.
+    \vspace{0.5em}
+    \item Testes de primalidade típicos são probabilísticos, ou seja, não são 100\% precisos, mas sua saída é correta com probabilidade muito alta.
+    \vspace{0.5em}
+    \item Um teste probabilístico tem duas saídas:
+    \begin{itemize}
+        \item $p'$ é composto – sempre verdadeiro
+        \item $p'$ é primo – verdadeiro apenas com uma certa probabilidade
+    \end{itemize}
+    \vspace{0.5em}
+    \item Entre os testes de primalidade bem conhecidos estão os seguintes:
+    \begin{itemize}
+        \item Teste de Primalidade de Fermat
+        \item Teste de Primalidade de Miller-Rabin
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Teste de Primalidade de Fermat}
+
+\begin{itemize}
+    \item Ideia básica: O Pequeno Teorema de Fermat é válido para todos os primos, i.e., se um número $p'$ é encontrado para o qual $a^{p'-1} \not\equiv 1 \pmod{p'}$, ele não é primo.
+\end{itemize}
+
+\begin{block}{Algoritmo: Teste de Primalidade de Fermat}
+\tiny
+    Entrada: Candidato a primo $p'$, parâmetro de segurança $s$ \\
+    Saída: "$p'$ é composto" ou "$p'$ é provavelmente primo"
+    
+    \vspace{0.2cm} 
+    
+    \begin{enumerate}[1.]
+        \item \textbf{PARA} $i=1$ \textbf{ATÉ} $s$
+        \item \hspace{0.5cm} Escolha $a \in \{2, 3, \dots, p'-2\}$ aleatoriamente
+        \item \hspace{0.5cm} \textbf{SE} $a^{p'-1} \not\equiv 1 \pmod{p'}$ \textbf{ENTÃO}
+        \item \hspace{1cm} \textbf{RETORNE} "$p'$ é composto"
+        \item \textbf{RETORNE} "$p'$ é provavelmente primo"
+    \end{enumerate}
+\end{block}
+
+\begin{itemize}
+    \item Para certos números ("números de Carmichael"), este teste retorna ``$p'$ é provavelmente primo'' frequentemente – embora esses números sejam compostos.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Teorema para o Teste de Miller-Rabin}
+
+\begin{itemize}
+    \item O Teste de Miller-Rabin, mais poderoso, é baseado no seguinte teorema:
+\end{itemize}
+
+\begin{block}{Teorema}
+    Dada a decomposição de um candidato a primo ímpar $p'$
+    \vspace{-0.5em}
+    \begin{center}
+        $ p' - 1 = 2^u \cdot r $    
+    \end{center}
+    \vspace{-0.5em}
+    onde $r$ é ímpar.
+
+    Se pudermos encontrar um inteiro $a$ tal que
+    \vspace{-0.5em}
+    \begin{center}
+        $a^r \not\equiv 1 \pmod{p'} \quad \text{e} \quad a^{2^j \cdot r} \not\equiv p' - 1 \pmod{p'}$
+    \end{center}
+    \vspace{-0.5em}
+    Para todo $j \in \{0, 1, \dots, u-1\}$, então $p'$ é composto.
+
+    Caso contrário, ele é provavelmente primo.
+\end{block}
+
+\begin{itemize}
+    \item Este teorema pode ser transformado em um algoritmo.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Teste de Primalidade de Miller-Rabin}
+
+\begin{block}{Algoritmo: Teste de Primalidade de Miller-Rabin}
+    Entrada: Candidato a primo $p'$ com $p'-1 = 2^u \cdot r$, parâmetro de segurança $s$ \\
+    Saída: ``$p'$ é composto'' ou ``$p'$ é provavelmente primo''
+    
+    \vspace{0.2cm} 
+    
+    \begin{enumerate}[1.]
+    \tiny
+        \item \textbf{PARA} $i=1$ \textbf{ATÉ} $s$
+        \item \hspace{0.5cm} Escolha $a \in \{2, 3, \dots, p'-2\}$ aleatoriamente
+        \item \hspace{0.5cm} $z \equiv a^r \pmod{p'}$
+        \item \hspace{0.5cm} \textbf{SE} $z \neq 1$ \textbf{E} $z \neq p'-1$ \textbf{ENTÃO}
+        \item \hspace{1.0cm} \textbf{PARA} $j=1$ \textbf{ATÉ} $u-1$
+        \item \hspace{1.5cm} $z \equiv z^2 \pmod{p'}$
+        \item \hspace{1.5cm} \textbf{SE} $z=1$ \textbf{ENTÃO}
+        \item \hspace{2.0cm} \textbf{RETORNE} "$p'$ é composto"
+        \item \hspace{1.0cm} \textbf{SE} $z \neq p'-1$ \textbf{ENTÃO}
+        \item \hspace{1.5cm} \textbf{RETORNE} "$p'$ é composto"
+        \item \textbf{RETORNE} "$p'$ é provavelmente primo"
+    \end{enumerate}
+\end{block}
+
+\end{frame}
+
+\section{Ataques e Contramedidas}
+
+\begin{frame}{Ataques e Contramedidas 1/3}
+
+\begin{itemize}
+    \item Existem dois tipos distintos de ataques a criptossistemas.
+    \vspace{0.5em}
+    \item \textbf{Ataques analíticos} tentam quebrar a estrutura matemática do problema subjacente do RSA.
+    \vspace{0.5em}
+    \item \textbf{Ataques de implementação} tentam atacar uma implementação do mundo real explorando fraquezas inerentes à forma como o RSA é implementado em software ou hardware.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ataques e Contramedidas 2/3}
+
+O RSA está tipicamente exposto a estes vetores de ataque analíticos.
+
+\begin{itemize}
+    \item \textbf{Ataques matemáticos}
+    \begin{itemize}
+        \item O ataque mais conhecido é a fatoração de $n$ a fim de obter $\Phi(n)$.
+        \item Podem ser prevenidos utilizando um módulo $n$ suficientemente grande.
+        \item O recorde atual de fatoração é de 829 bits. Portanto, é recomendado que $n$ possua um comprimento em bits maior que 2048.
+    \end{itemize}
+    \item \textbf{Ataques de protocolo}
+    \begin{itemize}
+        \item Exploram a maleabilidade do RSA, i.e., a propriedade de que um ciphertext pode ser transformado em outro ciphertext que decifra para um plaintext relacionado – sem conhecer a private key.
+        \item Podem ser prevenidos por padding adequado.
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ataques e Contramedidas 3/3}
+
+\begin{itemize}
+    \item Ataques de implementação podem ser um dos seguintes:
+    \begin{itemize}
+        \vspace{0.5em}
+        \item \textbf{Análise de canal lateral}
+        \begin{itemize}
+            \item Explora o vazamento físico da implementação RSA (e.g., consumo de energia, emanação EM, etc.).
+        \end{itemize}
+        \vspace{0.5em}
+        \item \textbf{Ataques de injeção de falhas}
+        \begin{itemize}
+            \item Induzir falhas no dispositivo enquanto o CRT é executado pode levar a um vazamento completo da private key.
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\section{Conclusão}
+
+\begin{frame}{Lições Aprendidas}
+
+\begin{itemize}
+    \item O RSA é o criptossistema de chave pública mais amplamente utilizado.
+    \item O RSA é usado principalmente para transporte de chaves (key transport) e assinaturas digitais.
+    \item Uma chave pública `$e$' pode ser um inteiro curto, já a private key $d$ precisa ter o comprimento total do módulo $n$.
+    \item O RSA baseia-se no fato de que é difícil fatorar $n$.
+    \item O recorde de fatoração é de 829 bits (RSA-250). Chaves de 1024 bits não são mais consideradas seguras para uso a longo prazo. Recomenda-se, no mínimo, chaves RSA de 2048 bits, e chaves de 3072 bits (NIST level 1) ou superiores (e.g., 7680 bits, 15360 bits para NIST level 2 e 3) para maior longevidade ou para novos sistemas.
+    \item Uma implementação ingênua do RSA permite diversos ataques.
+\end{itemize}
+
+\end{frame}
+
+\section{Exercícios}
+
+\begin{frame}{Exercício: Parâmetros RSA}
+
+\textbf{1.} Sejam os primos $p=41$ e $q=17$ dados como parâmetros de configuração para o RSA.
+\vspace{1em}
+\begin{enumerate}
+    \item Qual dos parâmetros $e_1 = 32, e_2 = 49$ é um expoente RSA válido? Justifique sua escolha.
+    \vspace{1em}
+    \item Calcule a private key $k_{pr} = (p,q,d)$ correspondente. Use o algoritmo de Euclides estendido para a inversão e mostre cada passo do cálculo.
+\end{enumerate}
+
+\end{frame}
+
+\begin{frame}{Exercício: Exponenciação Modular com Square-and-Multiply}
+
+\textbf{2.} A computação eficiente da exponenciação modular é fundamental para o uso prático do RSA. 
+Calcule as seguintes exponenciações $x^e \pmod m$ usando o algoritmo de elevação ao quadrado e multiplicação:
+\vspace{1em}
+\begin{enumerate}
+    \item $x=2, e=79, m=101$
+    \item $x=3, e=197, m=101$
+    \item $x=5, e=54, m=151$
+    \item $x=8, e=127, m=151$
+\end{enumerate}
+\vspace{1em}
+Após cada passo de iteração, mostre o expoente do resultado intermediário em notação binária.
+
+\end{frame}
+
+
+\begin{frame}{Exercício: Criptografia e Decriptografia RSA}
+
+\textbf{3.} Cifre e decifre utilizando o algoritmo RSA com os seguintes parâmetros de sistema:
+\vspace{1em}
+\begin{enumerate}
+    \item $p = 3; \quad q = 11; \quad d = 7; \quad x = 5$
+    \item $p = 5; \quad q = 11; \quad e = 3; \quad x = 9$
+\end{enumerate}
+\vspace{1em}
+Utilize apenas uma calculadora simples.
+
+\end{frame}
+
+\end{document}

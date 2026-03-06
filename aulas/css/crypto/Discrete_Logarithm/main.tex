@@ -1,0 +1,389 @@
+\documentclass{beamer}
+
+
+
+\usepackage{amsmath}
+\usepackage{booktabs} % Para tabelas com visual profissional
+\usepackage{tabularx} % Para tabelas com largura definida e colunas do tipo X
+
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl} % para sombrear células da tabela
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows.meta, positioning}
+\usepackage{array} 
+
+\usepackage{tcolorbox}     % Para caixas coloridas e formatadas
+\tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{graphicx}      % Necessário para \scalebox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    %linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+
+\urlstyle{same}
+
+
+\definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% Informações da apresentação
+\title[RSA]{RSA}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa Personalizado
+\begin{frame}[plain]
+
+% Linha superior com logo e título
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.84\textwidth}
+    \begin{center}
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue} {\textbf{Criptosistemas de Chave Pública}}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Baseados no Problema do}}\\
+        \raisebox{2ex}{\LARGE\bfseries\textcolor{blue}{Logaritmo Discreto}}\\
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar e Jan Pelzl pelo material.}
+\end{center}
+
+\end{frame}
+
+% Slide de Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Troca de Chaves de Diffie–Hellman}
+
+\begin{frame}{Troca de Chaves Diffie-Hellman: Visão Geral}
+    \begin{itemize}
+        \item Proposto em 1976 por Whitfield Diffie e Martin Hellman
+        \vspace{0.5em}
+        \item Amplamente utilizado, e.g., em Secure Shell (SSH), Transport Layer Security (TLS) e Internet Protocol Security (IPSec)
+        \vspace{0.5em}
+        \item O Diffie-Hellman Key Exchange (DHKE) é um protocolo de troca de chaves e \textbf{não} utilizado para criptografia
+        
+        \item[] (Para fins de criptografia baseada no DHKE, o ElGamal pode ser utilizado.)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Troca de Chaves Diffie-Hellman: Configuração Inicial}
+    \begin{enumerate}
+        \item Escolha um primo grande $p$.
+        \vspace{1em}
+        \item Escolha um inteiro $\alpha \in \{2, 3, \ldots, p-2\}$.
+        \vspace{1em}
+        \item Publique $p$ e $\alpha$.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Troca de Chaves Diffie-Hellman: Protocolo}
+\centering
+\vspace*{-0.5em} % Reduce top margin a bit if necessary
+\small % Use smaller font for the table content
+
+% The \resizebox command will scale the table to \linewidth.
+% \usepackage{graphicx} is required for \resizebox.
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{p{0.42\textwidth} c p{0.42\textwidth}}
+    \multicolumn{1}{c}{\textbf{Alice}} & & \multicolumn{1}{c}{\textbf{Bob}} \\
+    \\[1ex]
+    Escolhe key privada aleatória \newline $k_{prA} = a \in \{1, 2, \ldots, p-1\}$ & & Escolhe key privada aleatória \newline $k_{prB} = b \in \{1, 2, \ldots, p-1\}$ \\
+    \\[2ex]
+    Calcula key pública correspondente \newline $k_{pubA} = A = \alpha^a \text{ mod } p$ & $\xrightarrow{\hspace*{2em}A\hspace*{2em}}$ & \\
+    \\[2ex]
+    & $\xleftarrow{\hspace*{2em}B\hspace*{2em}}$ & Calcula key pública correspondente \newline $k_{pubB} = B = \alpha^b \text{ mod } p$ \\
+    \\[2ex]
+    Calcula segredo comum \newline $k_{AB} = B^a = (\alpha^b)^a \text{ mod } p$ & & Calcula segredo comum \newline $k_{AB} = A^b = (\alpha^a)^b \text{ mod } p$ \\
+\end{tabular}%
+} % End of \resizebox
+
+\centerline{\makebox[0.85\linewidth]{\dotfill}} % Dotted 
+\vspace{-0.3em}
+
+\begin{center}
+    Podemos agora usar a key conjunta $k_{AB}$ para criptografia, e.g., com AES: \\[1em]
+    $y = \text{AES}_{k_{AB}}(x) \qquad \xrightarrow{\hspace*{2em} y \hspace*{2em}} \qquad x = \text{AES}_{k_{AB}}^{-1}(y)$
+\end{center}
+\end{frame}
+
+\begin{frame}{Troca de Chaves Diffie-Hellman: Exemplo}
+    \centering
+    \vspace*{-0.5em} % Adjust top margin if needed
+    \tiny{Parâmetros: $p=29, \alpha=2$}
+    \small % Use smaller font for the table content
+
+    % The \resizebox command will scale the table to \linewidth.
+    % \usepackage{graphicx} is required for \resizebox.
+    \resizebox{\linewidth}{!}{%
+    \begin{tabular}{p{0.42\textwidth} c p{0.42\textwidth}}
+        \multicolumn{1}{c}{\textbf{Alice}} & & \multicolumn{1}{c}{\textbf{Bob}} \\
+        \\
+        Escolhe key privada aleatória \newline $k_{prA} = a = 5$ & & Escolhe key privada aleatória \newline $k_{prB} = b = 12$ \\
+        \\[1ex]
+        Calcula key pública correspondente \newline $k_{pubA} = A = 2^5 = 3 \text{ mod } 29$ & $\xrightarrow{\hspace*{2em}3\hspace*{2em}}$ & \\
+        \\[1ex]
+        & $\xleftarrow{\hspace*{2em}7\hspace*{2em}}$ & Calcula key pública correspondente \newline $k_{pubB} = B = 2^{12} = 7 \text{ mod } 29$ \\
+        \\[1ex]
+        Calcula segredo comum \newline $k_{AB} = B^a = 7^5 = 16 \text{ mod } 29$ & & Calcula segredo comum \newline $k_{AB} = A^b = 3^{12} = 16 \text{ mod } 29$ \\
+    \end{tabular}%
+    } % End of \resizebox
+
+    \begin{minipage}{0.9\linewidth} % To center this block and allow indentation
+    \vspace{0.2em}
+    \begin{center}
+    \textbf{Prova de correção} \par    
+    Alice calcula: $B^a = (\alpha^b)^a \text{ mod } p$ \par
+    Bob calcula: $A^b = (\alpha^a)^b \text{ mod } p$ \par
+    Ou seja, Alice e Bob calculam a mesma key $k_{AB}$!
+    \end{center}
+    \end{minipage}
+
+\end{frame}
+
+\section{O Problema do Logaritmo Discreto}
+\begin{frame}{O Problema do Logaritmo Discreto}
+    \small Problema do Logaritmo Discreto (\textit{Discrete Logarithm Problem} - DLP) em $\mathbb{Z}_p^*$.
+    \normalsize
+    \begin{itemize}
+        \item Dado o grupo cíclico finito $\mathbb{Z}_p^*$ de ordem $p-1$, um elemento primitivo $\alpha \in \mathbb{Z}_p^*$ e outro elemento $\beta \in \mathbb{Z}_p^*$.
+        \item O DLP é o problema de determinar o inteiro $x$ tal que $1 \le x \le p-1$ e $\alpha^x \equiv \beta \text{ mod } p$.
+        \item Esta computação é chamada de \textbf{problema do logaritmo discreto}.
+    \end{itemize}
+
+    \begin{center}
+    $x = \log_{\alpha} \beta \text{ mod } p$
+    \end{center}
+
+    \begin{itemize}
+        \item Exemplo: Calcule $x$ para $5^x \equiv 41 \text{ mod } 47$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{O Problema do Logaritmo Discreto Generalizado}
+    \begin{itemize}
+        \item Dado um grupo cíclico finito $G$ com a operação de grupo $\circ$ e cardinalidade $n$.
+        \vspace{0.5em}
+        \item Consideramos um elemento primitivo $\alpha \in G$ e outro elemento $\beta \in G$.
+        \vspace{0.5em}
+        \item O problema do logaritmo discreto consiste em encontrar o inteiro $x$, onde $1 \le x \le n$, tal que:
+    \end{itemize}
+    \[
+        \beta = \underbrace{\alpha \circ \alpha \circ \ldots \circ \alpha}_{x \text{ vezes}} = \alpha^x
+    \]
+\end{frame}
+
+\begin{frame}{O Problema do Logaritmo Discreto Generalizado}
+    \small % Use a slightly smaller font for better fit
+    Os seguintes problemas de logaritmo discreto foram propostos para uso em criptografia:
+
+    \begin{enumerate}
+        \item O grupo multiplicativo do corpo primo $\mathbb{Z}_p$ ou um subgrupo dele. Por exemplo, o DHKE clássico utiliza este grupo (slides anteriores), mas também a criptografia Elgamal ou o Digital Signature Algorithm (DSA).
+        \vspace{0.5em}
+        \item O grupo cíclico formado por uma curva elíptica.
+        \vspace{0.5em}
+        \item O grupo multiplicativo de um corpo de Galois $GF(2^m)$ ou um subgrupo dele. Esquemas como o DHKE podem ser realizados com eles.
+        \vspace{0.5em}
+        \item Curvas hiperelípticas ou variedades algébricas, que podem ser vistas como generalizações de curvas elípticas.
+    \end{enumerate}
+
+    \vspace{1em}
+    \textbf{Observação:} Os grupos 1. e 2. são os mais frequentemente utilizados na prática.
+\end{frame}
+
+\section{Segurança da Troca de Chaves Diffie-Hellman}
+
+\begin{frame}{Ataques contra o Problema do Logaritmo Discreto}
+    \small % Para melhor ajuste do conteúdo no slide
+    \begin{itemize}
+        \item A segurança de muitas primitivas assimétricas baseia-se na dificuldade de calcular o DLP em grupos cíclicos, i.e., calcular $x$ para dados $\alpha$ e $\beta$ tais que:
+        \[
+            \beta = \underbrace{\alpha \circ \alpha \circ \ldots \circ \alpha}_{x \text{ vezes}} = \alpha^x
+        \]
+        \item Existem os seguintes algoritmos para calcular logaritmos discretos:
+        \begin{itemize}
+            \item Algoritmos genéricos: Funcionam em qualquer grupo cíclico
+            \begin{itemize}
+                \item Busca por Força Bruta
+                \item Método Baby-Step-Giant-Step de Shanks
+                \item Método Rho de Pollard
+                \item Método de Pohlig-Hellman
+            \end{itemize}
+            \item Algoritmos não genéricos: Funcionam apenas em grupos específicos, em particular em $\mathbb{Z}_p$
+            \begin{itemize}
+                \item Método do Cálculo de Índices
+            \end{itemize}
+        \end{itemize}
+        \item \textbf{Observação:} Curvas elípticas só podem ser atacadas com algoritmos genéricos, que são mais fracos que os algoritmos não genéricos. Portanto, curvas elípticas são seguras com comprimentos de key menores do que o DLP em corpos primos $\mathbb{Z}_p$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Ataques contra o Problema do Logaritmo Discreto}
+    \small % Para melhor ajuste do conteúdo no slide
+
+    Resumo dos recordes para o cálculo de logaritmos discretos em $\mathbb{Z}_p^*$:
+
+    \vspace{0.5em}
+    \begin{center}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{Dígitos decimais} & \textbf{Comprimento em bits} & \textbf{Data} \\
+        \hline
+        58  & 193 & 1991 \\
+        68  & 216 & 1996 \\
+        85  & 282 & 1998 \\
+        100 & 332 & 1999 \\
+        120 & 399 & 2001 \\
+        135 & 448 & 2006 \\
+        160 & 532 & 2007 \\
+        232 & 768 & 2016 \\ % Dado atualizado
+        240 & 795 & 2019 \\ % Dado atualizado
+        \hline
+    \end{tabular}
+    \end{center}
+    \vspace{1em}
+
+    A fim de prevenir ataques que calculam o DLP, recomenda-se usar primos com um comprimento de pelo menos 2048 bits para esquemas como o Diffie-Hellman em $\mathbb{Z}_p^*$.
+
+\end{frame}
+
+\begin{frame}[plain] % Use [plain] to remove Beamer's header/footer for more space
+    \frametitle{Ataques contra o Problema do Logaritmo Discreto} % Optional: Keep title if needed
+    \begin{figure}
+        \centering
+        \includegraphics[width=\textwidth, height=0.8\textheight, keepaspectratio]{img/dlp_evolution_quadratic_trend_graph.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Segurança da Troca de Chaves Diffie-Hellman Clássica}
+    \small % Para melhor ajuste do conteúdo no slide
+    \begin{itemize}
+        \item Quais informações Oscar possui?
+        \begin{itemize}
+            \item $\alpha, p$
+            \item $k_{pubA} = A = \alpha^a \text{ mod } p$
+            \item $k_{pubB} = B = \alpha^b \text{ mod } p$
+        \end{itemize}
+        \item Quais informações Oscar quer obter?
+        \begin{itemize}
+            \item $k_{AB} = \alpha^{ba} = \alpha^{ab} \text{ mod } p$
+            \item Isto é conhecido como Problema de Diffie-Hellman (DHP).
+        \end{itemize}
+        \item A única forma conhecida de resolver o DHP é resolver o DLP, i.e.,
+        \begin{enumerate}
+            \item Calcular $a = \log_{\alpha} A \text{ mod } p$.
+            \item Calcular $k_{AB} = B^a = \alpha^{ba} \text{ mod } p$.
+        \end{enumerate}
+        Conjectura-se que o DHP e o DLP são equivalentes, ou seja, resolver o DHP implica resolver o DLP.
+        \item Para prevenir ataques, ou seja, para prevenir que o DLP possa ser resolvido, escolha $p > 2^{1024}$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Lições Aprendidas}
+    \begin{itemize}
+        \item O protocolo Diffie-Hellman é um método amplamente utilizado para troca de chaves. Ele é baseado em grupos cíclicos.
+        \item O problema do logaritmo discreto é uma das mais importantes funções de mão única na criptografia assimétrica moderna. Muitos algoritmos de chave pública são baseados nele.
+        \item Para o protocolo Diffie-Hellman em $\mathbb{Z}_p^*$, \textit{o primo p deve ter pelo menos 1024 bits} de comprimento. Isto proporciona uma segurança aproximadamente equivalente a uma cifra simétrica de 80 bits.
+        \item Para uma melhor segurança a longo prazo, um primo de comprimento 2048 bits deve ser escolhido.
+    \end{itemize}
+\end{frame}
+
+\section{Exercícios}
+
+\begin{frame}{Exercício 1: Cálculo de Chaves DHKE}
+    Calcule as duas chaves públicas e a chave conjunta $k_{AB}$ para o esquema DHKE com os parâmetros $p=467, \alpha=2$, e os seguintes pares de chaves privadas $(a,b)$:
+
+    \begin{itemize}
+        \item $a=3, b=5$
+        \item $a=400, b=134$
+        \item $a=228, b=57$
+    \end{itemize}
+        
+    \vspace{1em}
+
+    Em todos os casos, realize o cálculo da chave conjunta tanto do ponto de vista de Alice quanto de Bob. Isso servirá como uma verificação dos seus resultados.
+\end{frame}
+
+\begin{frame}{Exercício 2: Chaves Privadas no DHKE}
+    \small
+    No protocolo DHKE, as chaves privadas são escolhidas do conjunto
+    \[ \{2, \ldots, p-2\} \]
+    \vspace{1em}
+    Por que os valores 1 e $p-1$ são excluídos? Descreva a fraqueza desses dois valores.
+\end{frame}
+
+\begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
+    \small
+    A exclusão dos valores 1 e $p-1$ para chaves privadas no protocolo Diffie-Hellman (DHKE) é crucial para a segurança. Vejamos as fraquezas associadas a cada um:
+
+    \vspace{1em}
+    \textbf{Caso 1: Chave Privada $a=1$}
+    \begin{itemize}
+        \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=1$, sua chave pública se torna:
+        \[ A = \alpha^a \pmod p = \alpha^1 \pmod p = \alpha \pmod p \]
+        \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
+        \[ K_{AB} = B^a \pmod p = B^1 \pmod p = B \pmod p \]
+        \item \textbf{Fraqueza:} A chave conjunta é simplesmente a chave pública de Bob ($B$). Se um invasor (Oscar) interceptar $B$ (que é transmitido publicamente), ele conhecerá diretamente a chave secreta $K_{AB}$. Alice não adiciona nenhuma entropia ou segurança à chave.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
+    
+    \textbf{Caso 2: Chave Privada $a=p-1$}
+    \begin{itemize}
+        \item \textbf{Contexto (Pequeno Teorema de Fermat):} Se $p$ é um número primo, então para qualquer inteiro $\alpha$ não divisível por $p$, temos $\alpha^{p-1} \equiv 1 \pmod p$.
+        \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=p-1$, sua chave pública se torna:
+        \[ A = \alpha^a \pmod p = \alpha^{p-1} \pmod p \equiv 1 \pmod p \]
+        \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
+        \[ K_{AB} = B^a \pmod p = B^{p-1} \pmod p \]
+        Considerando que $B = \alpha^b \pmod p$ e $B \not\equiv 0 \pmod p$, então $B^{p-1} \equiv 1 \pmod p$.
+        \[ K_{AB} \equiv 1 \pmod p \]
+        \item \textbf{Fraqueza:} A chave conjunta resultante é sempre 1. Uma chave secreta de valor 1 é trivial, previsível e não oferece segurança alguma.
+    \end{itemize}
+
+\end{frame}
+
+\end{document}

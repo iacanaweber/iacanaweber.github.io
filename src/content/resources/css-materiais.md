@@ -2,11 +2,19 @@
 course: "css"
 column: "materiais"
 items:
+  - title: "Apresentação"
+    type: "slides"
+    pdfPath: "/assets/pdfs/css/apresentacao.pdf"
+    order: 1
+    class: 1
   - title: "Dependabilidade: Conceitos Básicos"
     type: "slides"
     pdfPath: "/assets/pdfs/css/dependability/01-dependabilidade-conceitos.pdf"
     order: 10
-    class: 1
+  - title: "Dependabilidade: Conceitos Básicos (LaTeX)"
+    type: "slides"
+    pdfPath: "/assets/pdfs/css/dependability/01-dependabilidade-conceitos-latex.pdf"
+    order: 11
   - title: "Confiabilidade e Disponibilidade"
     type: "slides"
     pdfPath: "/assets/pdfs/css/dependability/02-confiabilidade-disponibilidade.pdf"
@@ -81,5 +89,9 @@ items:
     type: "slides"
     pdfPath: "/assets/pdfs/css/crypto/des.pdf"
     order: 900
+  - title: "RSA Lab"
+    type: "slides"
+    pdfPath: "/assets/pdfs/css/crypto/rsa-lab.pdf"
+    order: 901
 ---
 
