@@ -1,0 +1,191 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{parskip}
+\usepackage{tcolorbox}
+
+\tcbuselibrary{skins, breakable}
+
+\newcommand{\R}{\mathrm{R}}
+\newcommand{\A}{\mathrm{A}}
+\newcommand{\MTTF}{\mathrm{MTTF}}
+\newcommand{\MTBF}{\mathrm{MTBF}}
+\newcommand{\MTTR}{\mathrm{MTTR}}
+
+\setlist[enumerate,1]{leftmargin=*, label=\alph*), itemsep=1pt, topsep=2pt}
+\setlist[itemize,1]{leftmargin=*, itemsep=1pt, topsep=2pt}
+
+\newtcolorbox{solucao}{
+  title=Solução,
+  fonttitle=\bfseries\small,
+  colback=gray!5,
+  colframe=gray!50,
+  boxrule=0.4pt,
+  top=4pt, bottom=4pt, left=6pt, right=6pt,
+  breakable
+}
+
+\begin{document}
+
+\begin{center}
+  {\large\bfseries Exercícios com Soluções — Confiabilidade e Disponibilidade}\\[2pt]
+  {\small Confiabilidade e Segurança de Software \textbar{} PUCRS}
+\end{center}
+
+\vspace{4pt}
+\hrule
+\vspace{6pt}
+
+\textbf{Exercício 1: MTBF, MTTR e \(\A\)}
+
+Um sistema operou por 30 dias. Houve 6 falhas registradas.\\
+Tempos de reparo (h): 1,0 \ 0,5 \ 2,0 \ 1,5 \ 1,0 \ 0,5.
+\begin{enumerate}
+  \item Estime \(\MTBF\) em horas.
+  \item Estime \(\MTTR\) em horas.
+  \item Calcule \(\A\).
+\end{enumerate}
+
+\begin{solucao}
+\begin{itemize}
+  \item Total de horas: \(30 \times 24 = 720\,h\)
+  \item \(\MTBF \approx 720/6 = 120\,h\)
+  \item \(\MTTR = (1{,}0 + 0{,}5 + 2{,}0 + 1{,}5 + 1{,}0 + 0{,}5)/6 = 6{,}5/6 \approx 1{,}083\,h\)
+  \item \(\A \approx \dfrac{120}{120 + 1{,}083} \approx 0{,}9911 = 99{,}11\%\)
+\end{itemize}
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 2: Disponibilidade e SLA}
+
+Uma plataforma tem \(\MTBF=200\,h\) e \(\MTTR=4\,h\).
+\begin{enumerate}
+  \item Calcule \(\A\).
+  \item Estime o downtime por ano.
+\end{enumerate}
+
+\begin{solucao}
+\begin{itemize}
+  \item \(\A = \dfrac{200}{200+4} = \dfrac{200}{204} \approx 0{,}98039 = 98{,}04\%\)
+  \item \(\text{downtime/ano} \approx (1 - 0{,}98039) \times 8760 \approx 171{,}8\,h/ano\ (\approx 7{,}2\,\text{dias})\)
+\end{itemize}
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 3: \(\R(t)\) no modelo exponencial}
+
+Assuma falhas exponenciais e \(\MTBF=500\,h\).
+\begin{enumerate}
+  \item Qual a probabilidade de operar sem falhar por 100\,h?
+  \item E por 500\,h?
+\end{enumerate}
+
+\begin{solucao}
+Usando \(\R(t) = e^{-t/\MTBF}\):
+\begin{itemize}
+  \item \(\R(100) = e^{-100/500} = e^{-0{,}2} \approx 0{,}8187\ (81{,}87\%)\)
+  \item \(\R(500) = e^{-500/500} = e^{-1} \approx 0{,}3679\ (36{,}79\%)\)
+\end{itemize}
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 4: Melhorar \(\MTBF\) ou \(\MTTR\)?}
+
+Baseline: \(\MTBF=100\,h\), \(\MTTR=5\,h\).
+\begin{itemize}
+  \item Opção A: \(\MTBF \to 200\,h\) (mantendo \(\MTTR=5\,h\)).
+  \item Opção B: \(\MTTR \to 1\,h\) (mantendo \(\MTBF=100\,h\)).
+\end{itemize}
+Qual opção melhora mais a disponibilidade?
+
+\begin{solucao}
+\begin{itemize}
+  \item \(\A_{\text{base}} = 100/105 \approx 0{,}95238\)
+  \item Opção A: \(\A_A = 200/205 \approx 0{,}97561\) (ganho de \(+2{,}32\) p.p.)
+  \item Opção B: \(\A_B = 100/101 \approx 0{,}99010\) (ganho de \(+3{,}77\) p.p.)
+\end{itemize}
+Neste cenário, \textbf{reduzir MTTR} (Opção B) melhora mais a disponibilidade.
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 5: Confiabilidade vs.\ disponibilidade}
+
+Considere dois sistemas reparáveis:
+\begin{itemize}
+  \item Sistema A: \(\MTBF=400\,h\), \(\MTTR=8\,h\)
+  \item Sistema B: \(\MTBF=250\,h\), \(\MTTR=2\,h\)
+\end{itemize}
+\begin{enumerate}
+  \item Calcule a disponibilidade aproximada de cada sistema.
+  \item Estime o downtime anual de cada um.
+  \item Qual sistema é \textbf{mais confiável}?
+  \item Qual sistema é \textbf{mais disponível}?
+  \item Por que essas respostas não são necessariamente iguais?
+\end{enumerate}
+
+\begin{solucao}
+\begin{itemize}
+  \item \(\A_A = 400/408 \approx 0{,}98039\); downtime/ano \(\approx 171{,}8\,h\)
+  \item \(\A_B = 250/252 \approx 0{,}99206\); downtime/ano \(\approx 69{,}5\,h\)
+  \item \textbf{Mais confiável}: Sistema A (\(\MTBF\) maior — falha menos frequentemente).
+  \item \textbf{Mais disponível}: Sistema B (\(\MTTR\) menor compensa o \(\MTBF\) menor).
+  \item Confiabilidade mede frequência de falhas; disponibilidade mede fração do tempo operacional. Um sistema pode falhar mais e ainda assim ter menor downtime total.
+\end{itemize}
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 6: Confiabilidade em uma missão}
+
+Um serviço deve operar por \(72\,h\) continuamente. Assuma modelo exponencial.
+\begin{itemize}
+  \item Sistema atual: \(\MTBF=600\,h\) \quad Proposta de melhoria: \(\MTBF=900\,h\)
+\end{itemize}
+\begin{enumerate}
+  \item Calcule \(\R(72)\) do sistema atual.
+  \item Calcule \(\R(72)\) após a melhoria.
+  \item Qual o ganho absoluto em pontos percentuais?
+  \item A melhoria parece pequena ou relevante para uma missão crítica?
+\end{enumerate}
+
+\begin{solucao}
+\begin{itemize}
+  \item \(\R(72) = e^{-72/600} = e^{-0{,}12} \approx 0{,}8869\ (88{,}69\%)\)
+  \item \(\R(72) = e^{-72/900} = e^{-0{,}08} \approx 0{,}9231\ (92{,}31\%)\)
+  \item Ganho: \(92{,}31\% - 88{,}69\% = 3{,}62\) pontos percentuais.
+  \item Mesmo um ganho pequeno em p.p.\ pode ser relevante em missões críticas, pois representa redução real na chance de falha durante a operação.
+\end{itemize}
+\end{solucao}
+
+\vspace{4pt}
+
+\textbf{Exercício 7: Meta de SLA e requisito de \(\MTTR\)}
+
+Uma plataforma possui \(\MTBF=300\,h\) e deseja cumprir \(\A \ge 99{,}5\%\).
+\begin{enumerate}
+  \item Qual deve ser o \(\MTTR\) máximo para atender a meta?
+  \item Com esse \(\MTTR\), qual o downtime anual aproximado?
+  \item Se na prática \(\MTTR=3\,h\), o SLA será atendido?
+\end{enumerate}
+\textit{Dica:} \(\displaystyle\A \approx \frac{\MTBF}{\MTBF+\MTTR}\)
+
+\begin{solucao}
+\begin{itemize}
+  \item Resolver \(\dfrac{300}{300+\MTTR} \ge 0{,}995\): \quad
+    \(300 \ge 298{,}5 + 0{,}995\,\MTTR \Rightarrow \MTTR \le 1{,}51\,h\ (\approx 1\,h\,30\,min)\)
+  \item Downtime anual: \((1 - 0{,}995) \times 8760 = 43{,}8\,h/ano\)
+  \item Com \(\MTTR=3\,h\): \(\A = 300/303 \approx 99{,}01\%\) — \textbf{não atende} ao SLA de 99,5\%.
+\end{itemize}
+\end{solucao}
+
+\end{document}
