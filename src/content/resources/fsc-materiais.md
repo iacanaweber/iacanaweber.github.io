@@ -12,5 +12,9 @@ items:
     pdfPath: "/assets/pdfs/fsc/02-sistemas-numeracao-fsc.pdf"
     order: 120
     class: 3
+  - title: "Exercícios: Sistemas de Numeração"
+    type: "slides"
+    pdfPath: "/assets/pdfs/fsc/exercicios-sistemas-numeracao.pdf"
+    order: 121
 ---
 

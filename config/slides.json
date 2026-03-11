@@ -41,6 +41,16 @@
       "order": 120
     },
     {
+      "id": "fsc-sistemas-numeracao-exercicios",
+      "title": "Exercícios: Sistemas de Numeração",
+      "course": "fsc",
+      "sourceType": "latex",
+      "texDir": "aulas/fsc/01-SistemasNumeracao/exercicios",
+      "outputPdfPath": "/assets/pdfs/fsc/exercicios-sistemas-numeracao.pdf",
+      "classes": [],
+      "order": 121
+    },
+    {
       "id": "css-apresentacao",
       "title": "Apresentação",
       "course": "css",
