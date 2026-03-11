@@ -471,6 +471,65 @@ Use:
 \end{frame}
 \fi
 
+\begin{frame}{Desafio: incidentes reais de uma plataforma de pagamentos}
+\small
+Uma fintech publicou o seguinte relatório de incidentes do último trimestre (90 dias).
+O SLA contratado com os clientes é de \(\A \ge 99.9\%\), com multa de R\$\,50.000 por cada
+0.1 p.p. abaixo da meta.
+
+\vspace{0.4em}
+\footnotesize
+\centering
+\begin{tabular}{c l r}
+\toprule
+\textbf{\#} & \textbf{Causa} & \textbf{Duração (h)}\\
+\midrule
+1 & Deploy com bug em produção & 3.5 \\
+2 & Falha de disco no banco principal & 0.8 \\
+3 & Ataque DDoS saturou o gateway & 4.2 \\
+4 & Expiração de certificado TLS & 1.5 \\
+5 & Falha de rede no datacenter & 2.0 \\
+6 & Bug de concorrência sob carga de pico & 6.0 \\
+7 & Falha no failover automático & 1.0 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.5em}
+\raggedright
+\normalsize
+\begin{enumerate}
+  \item Calcule \(\MTBF\), \(\MTTR\) e \(\A\) do trimestre.
+  \item O SLA foi cumprido? Se não, qual o valor da multa?
+  \item Qual incidente você priorizaria para evitar no futuro? Justifique.
+\end{enumerate}
+\end{frame}
+
+\ifshowsolutions
+\begin{frame}{Solução do Desafio}
+\small
+\textbf{Dados:} 90 dias $= 2160\,h$, 7 incidentes, downtime total $= 3.5+0.8+4.2+1.5+2.0+6.0+1.0 = 19.0\,h$.
+
+\vspace{0.3em}
+\begin{itemize}
+  \item $\MTBF = \dfrac{2160}{7} \approx 308.6\,h$
+
+  \vspace{0.3em}
+  \item $\MTTR = \dfrac{19.0}{7} \approx 2.71\,h$
+
+  \vspace{0.3em}
+  \item $\A = \dfrac{308.6}{308.6 + 2.71} \approx 0.99129 = 99.13\%$
+
+  \vspace{0.3em}
+  \item \textbf{SLA não cumprido}: meta era 99.9\%, obteve 99.13\%.\\
+  Diferença: $99.9 - 99.13 = 0.77$ p.p. $\Rightarrow$ $\lceil 0.77 / 0.1 \rceil = 8$ faixas.\\
+  Multa: $8 \times \text{R\$}\,50.000 = \textbf{R\$\,400.000}$.
+
+  \vspace{0.3em}
+  \item \textbf{Priorização}: o incidente \#6 (bug de concorrência, 6h) foi o mais longo.
+  Eliminá-lo sozinho reduziria o downtime para 13h e elevaria \(\A\) para $\approx 99.40\%$ --- ainda insuficiente, mas o maior ganho individual.
+\end{itemize}
+\end{frame}
+\fi
 
 
 
