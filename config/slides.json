@@ -6,7 +6,7 @@
       "course": "fsd",
       "sourceType": "pptx",
       "pptxPath": "aulas/fsd/00-Apresentacao/Apresentacao.pptx",
-      "outputPdfPath": "/assets/pdfs/fsd/apresentacao-fsd.pdf",
+      "outputPdfPath": "/aulas/fsd/00-Apresentacao/apresentacao-fsd.pdf",
       "classes": [1],
       "order": 100
     },
@@ -16,7 +16,7 @@
       "course": "fsd",
       "sourceType": "pptx",
       "pptxPath": "aulas/fsd/01-PortasLogicas/Portas Logicas.pptx",
-      "outputPdfPath": "/assets/pdfs/fsd/portas-logicas-fsd.pdf",
+      "outputPdfPath": "/aulas/fsd/01-PortasLogicas/portas-logicas-fsd.pdf",
       "classes": [2],
       "order": 110
     },
@@ -26,7 +26,7 @@
       "course": "fsc",
       "sourceType": "pptx",
       "pptxPath": "aulas/fsc/00-Apresentacao/00- Apresentacao.pptx",
-      "outputPdfPath": "/assets/pdfs/fsc/00-apresentacao-fsc.pdf",
+      "outputPdfPath": "/aulas/fsc/00-Apresentacao/00-apresentacao-fsc.pdf",
       "classes": [1],
       "order": 100
     },
@@ -36,7 +36,7 @@
       "course": "fsc",
       "sourceType": "pptx",
       "pptxPath": "aulas/fsc/01-SistemasNumeracao/02-SistemasNumeracao.pptx",
-      "outputPdfPath": "/assets/pdfs/fsc/02-sistemas-numeracao-fsc.pdf",
+      "outputPdfPath": "/aulas/fsc/01-SistemasNumeracao/02-sistemas-numeracao-fsc.pdf",
       "classes": [3],
       "order": 120
     },
@@ -46,7 +46,7 @@
       "course": "fsc",
       "sourceType": "latex",
       "texDir": "aulas/fsc/01-SistemasNumeracao/exercicios",
-      "outputPdfPath": "/assets/pdfs/fsc/exercicios-sistemas-numeracao.pdf",
+      "outputPdfPath": "/aulas/fsc/01-SistemasNumeracao/exercicios/exercicios-sistemas-numeracao.pdf",
       "classes": [],
       "order": 121
     },
@@ -55,8 +55,8 @@
       "title": "Apresentação",
       "course": "css",
       "sourceType": "pptx",
-      "pptxPath": "aulas/css/00_apresentacao/Apresentacao.pptx",
-      "outputPdfPath": "/assets/pdfs/css/apresentacao.pdf",
+      "pptxPath": "aulas/css/apresentacao/Apresentacao.pptx",
+      "outputPdfPath": "/aulas/css/apresentacao/apresentacao.pdf",
       "classes": [1],
       "order": 1
     },
@@ -66,7 +66,7 @@
       "course": "css",
       "sourceType": "pptx",
       "pptxPath": "aulas/css/dependability/01_conceitos_dependabilidade/Conceitos de Dependabilidade.pptx",
-      "outputPdfPath": "/assets/pdfs/css/dependability/01-dependabilidade-conceitos.pdf",
+      "outputPdfPath": "/aulas/css/dependability/01_conceitos_dependabilidade/01-dependabilidade-conceitos.pdf",
       "classes": [1],
       "order": 10
     },
@@ -76,7 +76,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/dependability/01_dependabilidade_conceitos",
-      "outputPdfPath": "/assets/pdfs/css/dependability/01-dependabilidade-conceitos-latex.pdf",
+      "outputPdfPath": "/aulas/css/dependability/01_dependabilidade_conceitos/01-dependabilidade-conceitos-latex.pdf",
       "classes": [],
       "order": 11
     },
@@ -86,7 +86,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/dependability/02_confiabilidade_disponibilidade_metricas",
-      "outputPdfPath": "/assets/pdfs/css/dependability/02-confiabilidade-disponibilidade.pdf",
+      "outputPdfPath": "/aulas/css/dependability/02_confiabilidade_disponibilidade_metricas/02-confiabilidade-disponibilidade.pdf",
       "classes": [2],
       "order": 20
     },
@@ -96,7 +96,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/dependability/03_safety_security_resiliencia",
-      "outputPdfPath": "/assets/pdfs/css/dependability/03-safety-security-resiliencia.pdf",
+      "outputPdfPath": "/aulas/css/dependability/03_safety_security_resiliencia/03-safety-security-resiliencia.pdf",
       "classes": [3],
       "order": 30
     },
@@ -106,7 +106,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Introdução_a_Criptografia",
-      "outputPdfPath": "/assets/pdfs/css/crypto/introducao-a-criptografia.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Introdução_a_Criptografia/introducao-a-criptografia.pdf",
       "classes": ["9-10"],
       "order": 90
     },
@@ -116,7 +116,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Cifras_de_Fluxo",
-      "outputPdfPath": "/assets/pdfs/css/crypto/cifras-de-fluxo.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Cifras_de_Fluxo/cifras-de-fluxo.pdf",
       "classes": ["11-12"],
       "order": 110
     },
@@ -126,7 +126,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/AES",
-      "outputPdfPath": "/assets/pdfs/css/crypto/aes.pdf",
+      "outputPdfPath": "/aulas/css/crypto/AES/aes.pdf",
       "classes": ["13-14"],
       "order": 130
     },
@@ -136,7 +136,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Mais_sobre_Cifras_de_Bloco",
-      "outputPdfPath": "/assets/pdfs/css/crypto/mais-sobre-cifras-de-bloco.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Mais_sobre_Cifras_de_Bloco/mais-sobre-cifras-de-bloco.pdf",
       "classes": ["15-16"],
       "order": 150
     },
@@ -146,7 +146,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Rivest_Shamir_Adleman",
-      "outputPdfPath": "/assets/pdfs/css/crypto/rsa.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Rivest_Shamir_Adleman/rsa.pdf",
       "classes": ["19-20"],
       "order": 190
     },
@@ -156,7 +156,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Discrete_Logarithm",
-      "outputPdfPath": "/assets/pdfs/css/crypto/logaritmo-discreto.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Discrete_Logarithm/logaritmo-discreto.pdf",
       "classes": ["21-22", 24],
       "order": 210
     },
@@ -166,7 +166,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Assinatura_Digital",
-      "outputPdfPath": "/assets/pdfs/css/crypto/assinatura-digital.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Assinatura_Digital/assinatura-digital.pdf",
       "classes": [25, "29-30"],
       "order": 250
     },
@@ -176,7 +176,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Funções_Hash",
-      "outputPdfPath": "/assets/pdfs/css/crypto/funcoes-hash.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Funções_Hash/funcoes-hash.pdf",
       "classes": ["26-28", 31],
       "order": 260
     },
@@ -186,7 +186,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/Introdução_à_Criptografia_de_Chave_Pública",
-      "outputPdfPath": "/assets/pdfs/css/crypto/introducao-criptografia-chave-publica.pdf",
+      "outputPdfPath": "/aulas/css/crypto/Introdução_à_Criptografia_de_Chave_Pública/introducao-criptografia-chave-publica.pdf",
       "classes": [33],
       "order": 330
     },
@@ -196,7 +196,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/DES",
-      "outputPdfPath": "/assets/pdfs/css/crypto/des.pdf",
+      "outputPdfPath": "/aulas/css/crypto/DES/des.pdf",
       "classes": [],
       "order": 900
     },
@@ -206,7 +206,7 @@
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/crypto/RSA_Lab",
-      "outputPdfPath": "/assets/pdfs/css/crypto/rsa-lab.pdf",
+      "outputPdfPath": "/aulas/css/crypto/RSA_Lab/rsa-lab.pdf",
       "classes": [],
       "order": 901
     }
