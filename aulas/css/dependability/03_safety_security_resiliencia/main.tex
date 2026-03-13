@@ -83,11 +83,12 @@
 % ============================================================
 \section{Motivação e mapa conceitual}
 
-\begin{frame}{Por que isso importa em Engenharia de Computação?}
+\begin{frame}{Motivação}
 \begin{itemize}
   \item Sistemas modernos são \textbf{ciberfísicos} e \textbf{conectados}: falhas + ataques podem gerar \textbf{danos físicos}.
   \item Dependability (confiabilidade) não é ``só bug'': envolve \textbf{hardware, software, rede, humano, processo}.
   \item \textbf{Convergência}: safety (acidental) + security (malicioso) + resiliência (sobrevivência e recuperação).
+  \item A indústria já formalizou isso: a \textbf{PSA} (\textit{Platform Security Architecture}) da Arm define um framework de análise de ameaças, requisitos de segurança e implementação de referência para dispositivos conectados --- mostrando que \textbf{security by design} é exigência de mercado, não opcional.
 \end{itemize}
 \vspace{0.4em}
 \small
@@ -115,7 +116,8 @@
 \end{frame}
 
 \begin{frame}{Safety vs Security: definição e diferença operacional}
-\begin{columns}[T,onlytextwidth]
+\vspace{-1.5em}
+  \begin{columns}[T,onlytextwidth]
 \column{0.48\textwidth}
 \begin{tcolorbox}[title=Safety (acidental),colback=white]
 \begin{itemize}
@@ -137,11 +139,14 @@
 
 \vspace{0.3em}
 \small
-\textbf{Interseção crítica:} ataques podem gerar \textbf{hazards} (ex.: sabotagem de controle).
+\textbf{Interseção crítica:} ataques podem gerar \textbf{hazards} --- por exemplo, um atacante que compromete a rede CAN de um veículo pode injetar mensagens falsas de frenagem, transformando uma vulnerabilidade de \textit{security} em risco direto à vida (\textit{safety}).
 %% [AULA] Discuta “assets” em sistemas ciberfísicos: não só dados; inclui controle, tempo, continuidade, integridade de comando.
+\vspace{0.3em}
+\scriptsize
+\textit{Veja na prática:} \href{https://www.youtube.com/watch?v=MK0SrxBC1xs}{Hacking Jeep}
 \end{frame}
 
-\begin{frame}{Ameaças: falhas vs ataques (vocabulário mínimo rigoroso)}
+\begin{frame}{Ameaças: falhas vs ataques (vocabulário)}
 \begin{columns}[T,onlytextwidth]
 \column{0.5\textwidth}
 \textbf{Mundo de falhas (dependability clássica)}
@@ -214,7 +219,7 @@ Métricas precisam ser \textbf{amarradas a um objetivo} e a um \textbf{modelo de
 %% [AULA] Discuta armadilhas: “contar CVEs” vs risco real; “coverage de teste” vs evidência de propriedade.
 \end{frame}
 
-\begin{frame}{Trade-offs típicos (e por que eles aparecem)}
+\begin{frame}{Trade-offs típicos}
 \begin{itemize}
   \item \textbf{Autenticação} pode aumentar \textbf{latência} (impacto em controle em tempo real).
   \item \textbf{Criptografia} aumenta custo/energia; pode afetar disponibilidade em HW fraco.
@@ -438,72 +443,23 @@ Como gerar evidência para esse requisito:
 %% [AULA] Gancho forte para a próxima aula: V&V, níveis de teste e planejamento para gerar evidência.
 \end{frame}
 
-\iffalse
-% ============================================================
-\section{Integração Safety--Security (co-engineering)}
-
 \begin{frame}{Quando security vira safety (e vice-versa)}
-\begin{itemize}
-  \item Ataque $\Rightarrow$ violação de integridade/tempo $\Rightarrow$ estado perigoso (\textbf{hazard}).
-  \item Mitigações de safety podem criar riscos de security (ex.: portas de manutenção, bypass).
-  \item Mitigações de security podem piorar safety (ex.: DoS por autenticação mal projetada).
-\end{itemize}
-
-\begin{block}{Mensagem}
-Projetar separadamente é arriscado: o correto é \textbf{co-analisar} interações e trade-offs.
-\end{block}
-%% [AULA] Faça um exemplo: “bloquear comando não autenticado” pode impedir comando de emergência se credenciais falham.
-\end{frame}
-
-\begin{frame}{STPA-Sec / co-análise: um caminho moderno}
-\begin{itemize}
-  \item Extensões de STPA aplicam o raciocínio de \textbf{controle/feedback} também para \textbf{ameaças cibernéticas}.
-  \item Benefício: evidencia como vulnerabilidades impactam restrições de safety.
-\end{itemize}
-
-\begin{block}{Uso prático}
-Definir \textbf{constraints} (safety) e \textbf{constraints} (security) no mesmo modelo, derivando requisitos integrados.
-\end{block}
-
 \small
-\textit{Sugestões (fontes abertas): trabalhos e materiais do ecossistema MIT/Leveson sobre STPA e security.}
-%% TODO: inserir link exemplo MIT (paper/working paper): https://web.mit.edu/smadnick/www/wp/2018-03.pdf
-\end{frame}
-
-\begin{frame}{Fluxo de incidente (com safety + security): versão mais completa}
-\centering
-\begin{tikzpicture}[node distance=1.3cm, >=Stealth, every node/.style={draw, rounded corners, align=center}]
-\node (tb) {Trust boundary\\(entrada/integração)};
-\node[right=of tb] (vuln) {Vulnerabilidade\\(design/impl/config)};
-\node[right=of vuln] (expl) {Exploração\\(ataque)};
-\node[right=of expl] (err) {Erro de estado\\(estado interno)};
-\node[right=of err] (fail) {Falha de serviço\\(desvio)};
-\node[right=of fail] (haz) {Hazard\\(estado perigoso)};
-\node[right=of haz] (loss) {Loss/Acidente\\(dano)};
-
-\draw[->, thick] (tb) -- (vuln);
-\draw[->, thick] (vuln) -- (expl);
-\draw[->, thick] (expl) -- (err);
-\draw[->, thick] (err) -- (fail);
-\draw[->, thick] (fail) -- (haz);
-\draw[->, thick] (haz) -- (loss);
-\end{tikzpicture}
-
-\vspace{0.4em}
-\small
-\textbf{Pergunta de engenharia:} em quais setas você coloca controles? (prevent/detect/respond/recover)
-%% [AULA] Excelente para discutir camadas de mitigação e onde testar/validar cada uma.
-\end{frame}
-
-\begin{frame}{Assurance case: como justificar “está seguro o suficiente”?}
+\textbf{Security $\Rightarrow$ Safety:}
 \begin{itemize}
-  \item Ideia: \textbf{argumento estruturado} + \textbf{evidências} + \textbf{premissas/escopo}.
-  \item Em safety: safety case é comum; em security: security case é mais difícil (adversário muda).
-  \item Em sistemas conectados: ideal é \textbf{assurance contínua} (monitorar + atualizar evidência).
+  \item Em 2015, pesquisadores assumiram controle remoto de um Jeep Cherokee via vulnerabilidade no sistema de infotainment --- acelerando, freando e desligando o motor em rodovia (recall de 1,4 milhão de veículos).
+  \item Em 2021, o ataque ransomware à Colonial Pipeline interrompeu o fornecimento de combustível no leste dos EUA, afetando hospitais e serviços de emergência.
 \end{itemize}
 
-%% [AULA] Comente GSN (Goal Structuring Notation) só conceitualmente; detalhe pode ficar para outra aula.
-%% TODO: inserir figura de GSN simples (pode ser desenhada via TikZ para evitar copyright).
+\vspace{0.3em}
+\textbf{Safety $\Rightarrow$ Security:}
+\begin{itemize}
+  \item Portas de manutenção e modos de bypass criados para safety (ex.: acesso de emergência sem autenticação) tornam-se vetores de ataque se não forem protegidos.
+  \item Um gateway automotivo que exige autenticação forte pode \textbf{bloquear comandos de frenagem de emergência} se as credenciais falharem --- a mitigação de security cria um hazard de safety.
+\end{itemize}
+
+\vspace{0.3em}
+\textbf{Mensagem:} projetar separadamente é arriscado --- o correto é \textbf{co-analisar} interações e trade-offs.
 \end{frame}
 
 % ============================================================
@@ -524,7 +480,7 @@ Capacidade de \textbf{antecipar}, \textbf{resistir}, \textbf{recuperar} e \textb
 %% TODO: link: https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-160v2r1.pdf
 \end{frame}
 
-\begin{frame}{Padrões arquiteturais de resiliência (mapa prático)}
+\begin{frame}{Padrões arquiteturais de resiliência}
 \begin{columns}[T,onlytextwidth]
 \column{0.5\textwidth}
 \textbf{Antecipar/Resistir}
@@ -550,19 +506,6 @@ Capacidade de \textbf{antecipar}, \textbf{resistir}, \textbf{recuperar} e \textb
 %% [AULA] Discuta “diversidade” como defesa contra falhas correlacionadas e ataques replicáveis.
 \end{frame}
 
-\begin{frame}{Métricas de resiliência (operacionais e úteis)}
-\begin{itemize}
-  \item \textbf{MTTD} (Mean Time To Detect) e \textbf{MTTR} (Mean Time To Recover/Repair).
-  \item \textbf{RTO/RPO} (tempo/quantidade de perda aceitável) — mais comum em serviços.
-  \item \textbf{Taxa de sucesso de rollback}, \textbf{cobertura de telemetria}, \textbf{tempo em modo degradado}.
-\end{itemize}
-
-\begin{block}{Ponto crucial}
-Sem instrumentação (logs/telemetria), não há resiliência: você não detecta nem recupera.
-\end{block}
-%% [AULA] Traga exemplos: watchdogs, health checks, invariantes do sistema, detecção de anomalia de tráfego.
-\end{frame}
-
 \begin{frame}{Resiliência como “engenharia ao longo do ciclo de vida”}
 \begin{itemize}
   \item Resiliência exige processos: governança, gestão de riscos, resposta a incidentes, melhorias contínuas.
@@ -575,65 +518,111 @@ Sem instrumentação (logs/telemetria), não há resiliência: você não detect
 \end{frame}
 
 % ============================================================
-\section{Modelagem aplicada (caso embarcado + OTA) com profundidade}
+\section{Modelagem aplicada: PSA (Platform Security Architecture)}
 
-\begin{frame}{Caso base: controlador embarcado (contexto e fronteiras)}
+\begin{frame}{PSA: o que é e por que importa}
 \begin{itemize}
-  \item MCU + firmware; sensores/atuadores; barramento CAN/Ethernet; gateway; backend OTA.
-  \item \textbf{Hazards}:
-    \begin{itemize}
-      \item comando fora de faixa (atuador crítico)
-      \item operação fora do envelope (ex.: tempo/temperatura)
-    \end{itemize}
-  \item \textbf{Threats}:
-    \begin{itemize}
-      \item injeção de mensagens no barramento
-      \item comprometer pipeline de atualização (supply chain / servidor)
-    \end{itemize}
+  \item \textbf{PSA} (\textit{Platform Security Architecture}) é um framework criado pela Arm (2017) para guiar a construção de dispositivos IoT seguros.
+  \item Não é só especificação de hardware: cobre \textbf{análise de ameaças}, \textbf{arquitetura}, \textbf{implementação} e \textbf{certificação}.
+  \item Agnóstico de implementação --- pode ser aplicado a qualquer chip, software ou dispositivo.
 \end{itemize}
 
-%% [AULA] Faça os alunos desenharem um DFD mínimo e marcarem trust boundaries.
-\end{frame}
-
-\begin{frame}{Do requisito ao mecanismo: exemplo de cadeia de confiança (OTA)}
-\begin{block}{Requisito (security + safety)}
-Atualização deve ser \textbf{autenticada} e \textbf{atômica}, com \textbf{rollback seguro} e sem permitir downgrades.
+\vspace{0.3em}
+\begin{block}{As 4 etapas do PSA}
+\textbf{Analyze} (modelar ameaças e requisitos) $\rightarrow$
+\textbf{Architect} (projetar a segurança) $\rightarrow$
+\textbf{Implement} (construir com referência aberta) $\rightarrow$
+\textbf{Certify} (validar contra os 10 security goals).
 \end{block}
-
-\begin{itemize}
-  \item Assinatura digital da imagem + verificação no bootloader
-  \item Esquema A/B (slot ativo + slot candidato)
-  \item Anti-rollback (monotonic counter / versão mínima)
-  \item Health check pós-boot; se falhar $\rightarrow$ rollback automático
-\end{itemize}
-
-%% [AULA] Discuta ataques: replay de firmware antigo, comprometimento de chave, falha de energia durante update.
-%% TODO: inserir diagrama de estados do boot A/B (pode ser TikZ).
 \end{frame}
 
-\begin{frame}{Exercício de engenharia (em grupo): hazard log + threat model}
+\begin{frame}{PSA: os 10 Security Goals}
+\small
+\begin{columns}[T,onlytextwidth]
+\column{0.48\textwidth}
 \begin{enumerate}
-  \item Liste \textbf{3 hazards} e classifique severidade (qual o dano?).
-  \item Liste \textbf{3 threats} e descreva pré-condições do atacante.
-  \item Para cada hazard, proponha \textbf{1 safety constraint}.
-  \item Para cada threat, proponha \textbf{1 controle} (prevent/detect/respond/recover).
+  \item \textbf{Unique Device Identity} --- cada dispositivo com identidade única e atestável.
+  \item \textbf{Security Lifecycle} --- estados de segurança rastreáveis (fabricação, operação, fim de vida).
+  \item \textbf{Attestation} --- evidência verificável das propriedades do dispositivo.
+  \item \textbf{Secure Boot} --- apenas código autorizado executa no boot.
+  \item \textbf{Secure Update} --- atualizações autênticas e íntegras via OTA (\textit{Over-The-Air}).
 \end{enumerate}
 
-%% [AULA] Peça explicitamente para justificar trade-offs (custo, latência, energia, manutenção, certificação).
+\column{0.48\textwidth}
+\begin{enumerate}\setcounter{enumi}{5}
+  \item \textbf{Anti-Rollback} --- impedir reinstalação de versões antigas vulneráveis.
+  \item \textbf{Isolation} --- serviços confiáveis isolados entre si e do código não confiável.
+  \item \textbf{Interaction \& Communication} --- comunicação autenticada e cifrada.
+  \item \textbf{Secure Storage} --- proteção de chaves, credenciais e dados sensíveis em repouso.
+  \item \textbf{Crypto Services} --- primitivas criptográficas fornecidas pelo RoT (\textit{Root of Trust}).
+\end{enumerate}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Exercício avançado: FTA + Attack Tree para o mesmo evento}
-\begin{block}{Evento topo (comum)}
-\textbf{Comando indevido no atuador crítico} (causando hazard).
-\end{block}
-
+\begin{frame}{PSA: RoT e ambientes de processamento}
 \begin{itemize}
-  \item Construa uma \textbf{FTA} (falhas acidentais) chegando a causas básicas.
-  \item Construa uma \textbf{Attack Tree} (ação intencional) chegando a caminhos de ataque.
-  \item Compare: \textbf{quais mitigações servem para ambos?} quais são específicas?
+  \item \textbf{RoT} (\textit{Root of Trust}): componente de hardware/software que ancora as funções de segurança --- identidade, criptografia, attestation e secure boot.
+  \item O \textbf{PRoT} (\textit{Platform Root of Trust}) é responsável por:
+  \begin{itemize}
+    \item configurar a segurança no nível do sistema,
+    \item ancorar o secure boot (cadeia de confiança),
+    \item estabelecer o \textbf{SPE} (\textit{Secure Processing Environment}).
+  \end{itemize}
+  \item Modelo mínimo: dois ambientes isolados:
+  \begin{itemize}
+    \item \textbf{SPE}: hospeda partições seguras (crypto, attestation, secure storage).
+    \item \textbf{NSPE} (\textit{Non-Secure Processing Environment}): aplicação ``normal''.
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PSA na prática: Analyze + Architect}
+\small
+\textbf{Analyze} --- usar threat model + STRIDE para identificar ameaças ao dispositivo:
+\begin{itemize}
+  \item Quais são os \textbf{assets}? (chaves, firmware, dados de sensores, identidade)
+  \item Quais são as \textbf{trust boundaries}? (SPE/NSPE, rede, interface de debug, OTA)
+  \item Quais ameaças STRIDE se aplicam a cada fronteira?
 \end{itemize}
 
-%% [AULA] Excelente para mostrar convergência e também lacunas (ex.: autenticação não resolve sensor travado; redundância não resolve spoofing).
+\vspace{0.3em}
+\textbf{Architect} --- mapear ameaças aos 10 security goals:
+\begin{itemize}
+  \item Firmware malicioso via OTA? $\rightarrow$ \textbf{Secure Update} + \textbf{Anti-Rollback} + \textbf{Secure Boot}.
+  \item Extração de chaves? $\rightarrow$ \textbf{Secure Storage} + \textbf{Isolation} + \textbf{Crypto Services}.
+  \item Spoofing de dispositivo? $\rightarrow$ \textbf{Unique Identity} + \textbf{Attestation}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{PSA na prática: Implement + Certify}
+\textbf{Implement} --- referência aberta:
+\begin{itemize}
+  \item \textbf{TF-M} (\textit{Trusted Firmware-M}): implementação open-source do PSA para Cortex-M.
+  \item Fornece serviços prontos: crypto, attestation, secure storage, isolamento via partições.
+  \item Portável para diferentes chips e plataformas.
+\end{itemize}
+
+\vspace{0.4em}
+\textbf{Certify} --- níveis de certificação PSA Certified:
+\begin{itemize}
+  \item \textbf{Nível 1}: questionário de boas práticas (baseline).
+  \item \textbf{Nível 2}: avaliação laboratorial do RoT contra ataques de software.
+  \item \textbf{Nível 3}: resistência a ataques de hardware (side-channel, fault injection).
+\end{itemize}
+\end{frame}
+
+\iffalse
+\begin{frame}{Exercício: threat model com PSA para um sensor IoT industrial}
+\small
+\textbf{Cenário:} sensor de temperatura industrial conectado via rede sem fio a um gateway, com atualização OTA e envio de dados para a nuvem.
+
+\vspace{0.3em}
+\begin{enumerate}
+  \item \textbf{Desenhe} as trust boundaries (sensor, gateway, nuvem, interface de debug).
+  \item \textbf{Identifique 3 ameaças} usando STRIDE e descreva o impacto (safety e/ou security).
+  \item Para cada ameaça, \textbf{mapeie para os security goals do PSA} que a mitigam.
+  \item \textbf{Discuta trade-offs}: quais goals são críticos vs.\ opcionais para esse cenário? Qual o custo (energia, latência, complexidade) de cada mitigação?
+\end{enumerate}
 \end{frame}
 
 % ============================================================

@@ -1,4 +1,4 @@
-\documentclass[12pt, a4paper]{article}
+\documentclass[11pt, a4paper]{article}
 
 % ── Codificação e idioma ──
 \usepackage[utf8]{inputenc}
@@ -6,10 +6,13 @@
 \usepackage[brazil]{babel}
 
 % ── Layout ──
-\usepackage[margin=2.2cm]{geometry}
-\usepackage{parskip}
+\usepackage[margin=1.8cm, top=2cm, bottom=1.8cm]{geometry}
 \usepackage{enumitem}
 \usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\parindent}{0pt}
 
 % ── Matemática ──
 \usepackage{amsmath, amssymb}
@@ -31,8 +34,9 @@
 \renewcommand{\headrulewidth}{0.4pt}
 
 % ── Configurações de listas ──
-\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=6pt}
-\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=3pt}
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=4pt, topsep=4pt, parsep=1pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=1pt, topsep=2pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
 
 % ── Caixas de destaque ──
 \newtcolorbox{dica}{
@@ -42,18 +46,8 @@
   fonttitle=\small,
   sharp corners,
   boxrule=0.5pt,
-  left=4pt, right=4pt, top=2pt, bottom=2pt
-}
-
-\newtcolorbox{desafio}{
-  colback=red!5!white,
-  colframe=red!60!black,
-  title={\textbf{Desafio}},
-  fonttitle=\small,
-  sharp corners,
-  boxrule=0.5pt,
   left=4pt, right=4pt, top=2pt, bottom=2pt,
-  breakable
+  before skip=4pt, after skip=4pt
 }
 
 \newtcolorbox{contexto}{
@@ -61,63 +55,47 @@
   colframe=green!50!black,
   sharp corners,
   boxrule=0.5pt,
-  left=4pt, right=4pt, top=4pt, bottom=4pt
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{curiosidade}{
+  colback=yellow!5!white,
+  colframe=yellow!60!black,
+  title={\textbf{Curiosidade}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
 }
 
 % ══════════════════════════════════════════
 \begin{document}
 
 \begin{center}
-  {\LARGE \textbf{Lista de Exerc\'{i}cios}}\\[6pt]
-  {\Large Sistemas de Numera\c{c}\~{a}o}\\[10pt]
-  {\large 98800-04 -- Fundamentos de Sistemas Computacionais}\\[4pt]
+  {\LARGE \textbf{Lista de Exerc\'{i}cios}}\\[4pt]
+  {\Large Sistemas de Numera\c{c}\~{a}o}\\[6pt]
+  {\large 98800-04 -- Fundamentos de Sistemas Computacionais}\\[3pt]
   {\normalsize Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
 \end{center}
 
-\vspace{4pt}
+\vspace{2pt}
 \hrule
-\vspace{12pt}
-
-% ══════════════════════════════════════════
-\section*{Parte I -- Aquecimento: Conceitos Fundamentais}
-% ══════════════════════════════════════════
+\vspace{8pt}
 
 \begin{enumerate}
 
-\item Explique, com suas palavras, a diferen\c{c}a entre \emph{n\'{u}mero} e \emph{numeral}. D\^{e} um exemplo de um mesmo n\'{u}mero representado por tr\^{e}s numerais diferentes.
-
-\item Qual a diferen\c{c}a fundamental entre um sistema de numera\c{c}\~{a}o \textbf{posicional} e um \textbf{n\~{a}o-posicional}? Cite um exemplo de cada.
-
-\item No sistema romano (n\~{a}o-posicional), o s\'{i}mbolo \texttt{X} sempre vale~10, independentemente de onde aparece. J\'{a} no sistema decimal, o d\'{i}gito \texttt{3} pode valer~3, 30, 300, etc. Explique por que essa propriedade torna os sistemas posicionais mais eficientes para c\'{a}lculos aritm\'{e}ticos.
-
-\item Quantos s\'{i}mbolos diferentes s\~{a}o usados em cada uma das bases a seguir? Liste-os.
-\begin{enumerate}
-  \item Base~2 (bin\'{a}rio)
-  \item Base~8 (octal)
-  \item Base~10 (decimal)
-  \item Base~16 (hexadecimal)
-\end{enumerate}
-
-\item Complete a frase: ``Com $N$~bits, \'{e} poss\'{i}vel representar no m\'{a}ximo \rule{2cm}{0.4pt}~coisas distintas.'' Justifique.
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte II -- Representa\c{c}\~{a}o Polinomial e Convers\~{o}es B\'{a}sicas}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
+\item Complete a frase: ``Com $N$~bits, \'{e} poss\'{i}vel representar no m\'{a}ximo \rule{2cm}{0.4pt}~coisas distintas.''
 \item Escreva a \textbf{forma polinomial} de cada n\'{u}mero abaixo e calcule seu valor em decimal:
-\begin{multicols}{2}
+\begin{multicols}{3}
 \begin{enumerate}
-  \item $(10110)_2$
-  \item $(1101\,0011)_2$
-  \item $(537)_8$
-  \item $(1A3)_{16}$
-  \item $(7F)_{16}$
-  \item $(FF)_{16}$
+  \item $10110_2$
+  \item $1101\,0011_2$
+  \item $537_8$
+  \item $1A3_{16}$
+  \item $7F_{16}$
+  \item $FF_{16}$
 \end{enumerate}
 \end{multicols}
 
@@ -144,7 +122,6 @@
   \item $48879_{10}$
 \end{enumerate}
 \end{multicols}
-
 \item Converta os seguintes n\'{u}meros \textbf{bin\'{a}rios para hexadecimal}, agrupando em \emph{nibbles}:
 \begin{multicols}{2}
 \begin{enumerate}
@@ -167,99 +144,46 @@
 \end{enumerate}
 \end{multicols}
 
-\begin{dica}
-Percebeu algo curioso nos n\'{u}meros hexadecimais acima? Programadores adoram criar ``palavras'' usando d\'{i}gitos hexadecimais (A--F). Esses n\'{u}meros s\~{a}o chamados de \emph{hexspeak}. Alguns exemplos famosos: \texttt{0xDEADBEEF}, \texttt{0xCAFEBABE} (assinatura de arquivos Java \texttt{.class}), \texttt{0xFEEDFACE} (cabe\c{c}alho de bin\'{a}rios Mach-O no macOS).
-\end{dica}
-
-\item Realize a seguinte cadeia de convers\~{o}es e verifique que o valor final \'{e} igual ao inicial:
-\[
-  173_{10} \;\longrightarrow\; (\text{bin\'{a}rio}) \;\longrightarrow\; (\text{hexadecimal}) \;\longrightarrow\; (\text{decimal})
-\]
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte III -- Nibbles, Bytes e Pot\^{e}ncias de 2}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Preencha a tabela abaixo (as primeiras linhas est\~{a}o como exemplo):
-
-\begin{center}
-\begin{tabular}{c c c}
-\toprule
-\textbf{Decimal} & \textbf{Hexadecimal} & \textbf{Bin\'{a}rio (4 bits)} \\
-\midrule
-0  & 0 & 0000 \\
-1  & 1 & 0001 \\
-2  & 2 & 0010 \\
-3  &   &      \\
-4  &   &      \\
-5  &   &      \\
-6  &   &      \\
-7  &   &      \\
-8  &   &      \\
-9  &   &      \\
-10 &   &      \\
-11 &   &      \\
-12 &   &      \\
-13 &   &      \\
-14 &   &      \\
-15 &   &      \\
-\bottomrule
-\end{tabular}
-\end{center}
+\begin{curiosidade}
+Percebeu algo curioso nos n\'{u}meros hexadecimais acima? Programadores adoram criar ``palavras'' usando d\'{i}gitos hexadecimais (A--F). Esses n\'{u}meros s\~{a}o chamados de \emph{hexspeak}. Alguns exemplos famosos: \texttt{0xDEADBEEF}, \texttt{0xCAFEBABE} (primeiros bytes de todo arquivo Java \texttt{.class} -- usados pelo sistema para identificar o tipo do arquivo), \texttt{0xFEEDFACE} (idem para bin\'{a}rios Mach-O no macOS).
+\end{curiosidade}
 
 \item Responda:
+\begin{multicols}{2}
 \begin{enumerate}
   \item Quantos valores distintos um \emph{nibble} (4~bits) pode representar?
   \item Quantos valores distintos um \emph{byte} (8~bits) pode representar?
   \item Quantos d\'{i}gitos hexadecimais s\~{a}o necess\'{a}rios para representar um \emph{byte}?
   \item E para representar uma \emph{word} de 32~bits?
 \end{enumerate}
+\end{multicols}
 
 \item Sem fazer c\'{a}lculos, determine rapidamente o valor decimal de:
+\begin{multicols}{4}
 \begin{enumerate}
   \item $2^{10}$
   \item $2^{16}$
   \item $2^{20}$
   \item $2^{32}$
 \end{enumerate}
-
+\end{multicols}
+\vspace{-4pt}
 \begin{dica}
 Memorizar as pot\^{e}ncias de~2 \'{e} essencial em computa\c{c}\~{a}o. Lembre: $2^{10} = 1024 \approx 10^3$ (kilo), $2^{20} \approx 10^6$ (mega), $2^{30} \approx 10^9$ (giga).
 \end{dica}
-
-\item Um HD \'{e} anunciado como tendo 1~TB (terabyte, $10^{12}$~bytes). Qual o tamanho real em TiB (tebibytes, $2^{40}$~bytes)? Por que existe essa discrep\^{a}ncia entre fabricantes de HD e sistemas operacionais?
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte IV -- Bits Representam Qualquer Coisa}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Qual \'{e} o n\'{u}mero m\'{i}nimo de bits necess\'{a}rios para representar \textbf{exclusivamente} os 26~caracteres do alfabeto portugu\^{e}s (sem acentos)?  Quantos caracteres adicionais poderiam ser representados sem bits extras?
+\item Qual \'{e} o n\'{u}mero m\'{i}nimo de bits necess\'{a}rios para representar os 12~meses do ano? Quantos valores adicionais poderiam ser representados sem bits extras?
 
 \item A tabela ASCII usa 7~bits (arredondados para 1~byte na pr\'{a}tica). Quantos caracteres distintos 7~bits podem representar? Por que isso foi suficiente para o ingl\^{e}s, mas n\~{a}o para o portugu\^{e}s?
 
-\item O padr\~{a}o Unicode utiliza diferentes codifica\c{c}\~{o}es: UTF-8, UTF-16 e UTF-32.
-\begin{enumerate}
-  \item Quantos caracteres distintos o UTF-32 pode representar \textit{teoricamente}?
-  \item Pesquise: quantos \emph{code points} est\~{a}o efetivamente atribu\'{i}dos na vers\~{a}o mais recente do Unicode? O que explica a diferen\c{c}a?
-\end{enumerate}
-
 \item C\'{o}digos de cor HTML usam 24~bits (3~bytes), na forma \texttt{\#RRGGBB}, onde cada componente (R, G, B) usa 1~byte.
+\begin{multicols}{2}
 \begin{enumerate}
   \item Quantas cores distintas essa codifica\c{c}\~{a}o permite?
   \item O branco puro \'{e} \texttt{\#FFFFFF}. Qual \'{e} esse valor em decimal?
   \item O vermelho puro \'{e} \texttt{\#FF0000}. Qual o valor decimal de cada componente (R, G, B)?
   \item Invente uma cor, escreva seu c\'{o}digo hexadecimal e calcule o valor decimal equivalente.
 \end{enumerate}
+\end{multicols}
 
 \item Um endere\c{c}o IPv4 usa 32~bits. Um endere\c{c}o IPv6 usa 128~bits.
 \begin{enumerate}
@@ -267,37 +191,32 @@ Memorizar as pot\^{e}ncias de~2 \'{e} essencial em computa\c{c}\~{a}o. Lembre: $
   \item Quantos endere\c{c}os IPv6 existem? Expresse como pot\^{e}ncia de~2.
   \item A popula\c{c}\~{a}o mundial \'{e} de aproximadamente $8 \times 10^9$ pessoas. Quantos endere\c{c}os IPv6 cada pessoa poderia ter, em m\'{e}dia? (Apresente o resultado como pot\^{e}ncia de~2 ou de~10.)
 \end{enumerate}
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte V -- Aritm\'{e}tica Bin\'{a}ria (Unsigned)}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
 \item Realize as seguintes \textbf{adi\c{c}\~{o}es em bin\'{a}rio} (unsigned, 8~bits). Indique se houve overflow.
 \begin{multicols}{2}
 \begin{enumerate}
-  \item $0101\,0011 + 0010\,1100$
-  \item $1100\,0011 + 0011\,1101$
-  \item $1111\,0000 + 0001\,0001$
-  \item $1011\,1011 + 0111\,0110$
+  \item $0101\,0011_2 + 0010\,1100_2$
+  \item $1100\,0011_2 + 0011\,1101_2$
+  \item $1111\,0000_2 + 0001\,0001_2$
+  \item $1011\,1011_2 + 0111\,0110_2$
 \end{enumerate}
 \end{multicols}
 
-\item Realize as seguintes \textbf{subtra\c{c}\~{o}es em bin\'{a}rio} (unsigned, 8~bits):
+\item Realize as seguintes \textbf{subtra\c{c}\~{o}es em bin\'{a}rio} (8~bits):
 \begin{multicols}{2}
 \begin{enumerate}
-  \item $1001\,0110 - 0011\,0101$
-  \item $1111\,1111 - 0000\,0001$
-  \item $1000\,0000 - 0000\,0001$
-  \item $0101\,0101 - 0010\,1010$
+  \item $1001\,0110_2 - 0011\,0101_2$
+  \item $1111\,1111_2 - 0000\,0001_2$
+  \item $1000\,0000_2 - 0000\,0001_2$
+  \item $0101\,0101_2 - 0010\,1010_2$
 \end{enumerate}
 \end{multicols}
+\vspace{-4pt}
+\begin{dica}
+$A - B = A + (-B)$
+\end{dica}
 
 \item Qual \'{e} o maior n\'{u}mero inteiro sem sinal (\emph{unsigned}) que pode ser representado com:
+\begin{multicols}{3}
 \begin{enumerate}
   \item 4~bits?
   \item 8~bits?
@@ -305,78 +224,9 @@ Memorizar as pot\^{e}ncias de~2 \'{e} essencial em computa\c{c}\~{a}o. Lembre: $
   \item 32~bits?
   \item $n$~bits?
 \end{enumerate}
+\end{multicols}
 
 \item Um contador bin\'{a}rio de 4~bits come\c{c}a em $0000$ e incrementa de~1 em~1. Escreva a sequ\^{e}ncia completa de valores at\'{e} voltar a $0000$ (ap\'{o}s overflow). Quantos incrementos foram necess\'{a}rios?
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte VI -- N\'{u}meros com Sinal: Sinal-Magnitude}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Usando \textbf{sinal-magnitude com 8~bits}, represente:
-\begin{multicols}{3}
-\begin{enumerate}
-  \item $+45$
-  \item $-45$
-  \item $+127$
-  \item $-127$
-  \item $+0$
-  \item $-0$
-\end{enumerate}
-\end{multicols}
-
-\item Na representa\c{c}\~{a}o sinal-magnitude com $n$~bits:
-\begin{enumerate}
-  \item Qual \'{e} o intervalo de valores represent\'{a}veis?
-  \item Quantas representa\c{c}\~{o}es distintas existem para o zero?
-  \item Por que essa duplicidade do zero \'{e} problem\'{a}tica para circuitos de compara\c{c}\~{a}o?
-\end{enumerate}
-
-\item Cite pelo menos duas raz\~{o}es pelas quais sinal-magnitude \'{e} raramente usado em computadores de prop\'{o}sito geral.
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte VII -- Complemento de Um}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Em \textbf{complemento de um com 8~bits}, represente:
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $+33$
-  \item $-33$
-  \item $+100$
-  \item $-100$
-\end{enumerate}
-\end{multicols}
-
-\item Converta os seguintes valores em \textbf{complemento de um (8~bits) para decimal}:
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $0101\,1010$
-  \item $1010\,0101$
-  \item $0111\,1111$
-  \item $1000\,0000$
-\end{enumerate}
-\end{multicols}
-
-\item Compare sinal-magnitude e complemento de um: ambos t\^{e}m o problema dos dois zeros. Mostre, para 4~bits, quais s\~{a}o as duas representa\c{c}\~{o}es do zero em cada sistema.
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte VIII -- Complemento de Dois}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
 
 \item Usando \textbf{complemento de dois com 8~bits}, represente os seguintes valores. Mostre o processo (complementar + somar~1):
 \begin{multicols}{3}
@@ -399,23 +249,19 @@ Memorizar as pot\^{e}ncias de~2 \'{e} essencial em computa\c{c}\~{a}o. Lembre: $
   \item $1101\,1011\,0001\,1100_2$ \quad (16~bits)
 \end{enumerate}
 \end{multicols}
-
+\vspace{-4pt}
 \begin{dica}
-Para converter de complemento de dois para decimal, use a f\'{o}rmula: o bit mais significativo tem peso $-2^{N-1}$ e os demais t\^{e}m pesos $+2^{N-2}, \ldots, +2^1, +2^0$.
+Lembre-se que para o formato polinomial de um n\'{u}mero em complemento de dois o bit mais significativo tem peso negativo: $-2^{n-1} + 2^{n-2} + \ldots + 2^0$
 \end{dica}
 
-\item Usando \textbf{7~bits}, escreva as representa\c{c}\~{o}es de $23$ e $-23$ em:
-\begin{enumerate}
-  \item Sinal-magnitude
-  \item Complemento de dois
-\end{enumerate}
-
+\newpage
 \item Em complemento de dois com 12~bits:
+\begin{multicols}{2}
 \begin{enumerate}
   \item Qual \'{e} o maior n\'{u}mero positivo represent\'{a}vel? (em bin\'{a}rio e decimal)
   \item Qual \'{e} o n\'{u}mero negativo de maior magnitude? (em bin\'{a}rio e decimal)
 \end{enumerate}
-
+\end{multicols}
 \item Generalize: em complemento de dois com $n$~bits:
 \begin{enumerate}
   \item Qual \'{e} o maior positivo? Expresse como pot\^{e}ncia de~2.
@@ -424,28 +270,21 @@ Para converter de complemento de dois para decimal, use a f\'{o}rmula: o bit mai
 \end{enumerate}
 
 \item Expresse o valor $-22$ como inteiro em complemento de dois usando:
+\begin{multicols}{3}
 \begin{enumerate}
   \item 8~bits
   \item 16~bits
   \item 32~bits
 \end{enumerate}
+\end{multicols}
+\vspace{-2pt}
 Voc\^{e} percebe um padr\~{a}o? Esse fen\^{o}meno \'{e} chamado \textbf{extens\~{a}o de sinal} (\emph{sign extension}). Descreva-o em uma frase.
 
 \item Explique por que, em complemento de dois com $n$~bits, o valor $-2^{n-1}$ \textbf{n\~{a}o} tem um inverso (positivo) represent\'{a}vel.
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte IX -- Overflow em Complemento de Dois}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Descreva as condi\c{c}\~{o}es que indicam que ocorreu \textbf{overflow} ao somar dois n\'{u}meros em complemento de dois. (Dica: analise os sinais dos operandos e do resultado.)
+\item Descreva as condi\c{c}\~{o}es que indicam que ocorreu \textbf{overflow} ao somar dois n\'{u}meros em complemento de dois.
 
 \item Os n\'{u}meros a seguir est\~{a}o em complemento de dois com \textbf{4~bits}. Realize as opera\c{c}\~{o}es, converta operandos e resultados para decimal e indique se houve overflow:
-\begin{multicols}{2}
+\begin{multicols}{4}
 \begin{enumerate}
   \item $0011 + 1100$
   \item $0111 + 1111$
@@ -458,85 +297,51 @@ Voc\^{e} percebe um padr\~{a}o? Esse fen\^{o}meno \'{e} chamado \textbf{extens\~
 \end{enumerate}
 \end{multicols}
 
-\item Considere a soma em 4~bits (signed):
-\[
-  1100_2 + 0110_2
-\]
+\item Considere a soma em 4~bits (signed): $1100_2 + 0110_2$
 \begin{enumerate}
   \item Interprete como \textbf{unsigned} e verifique se h\'{a} overflow.
   \item Interprete como \textbf{signed (complemento de dois)} e verifique se h\'{a} overflow.
   \item Explique por que a mesma opera\c{c}\~{a}o pode gerar overflow em uma interpreta\c{c}\~{a}o e n\~{a}o na outra.
 \end{enumerate}
 
-\item Um programador armazena a idade de uma pessoa em uma vari\'{a}vel \texttt{int8\_t} (inteiro com sinal de 8~bits em complemento de dois). Qual \'{e} a maior idade que pode ser armazenada? O que aconteceria se ele tentasse armazenar a idade de Jeanne Calment, que viveu 122~anos?
+\item Um programador armazena a idade de uma pessoa em um inteiro com sinal de 8~bits (complemento de dois). Qual \'{e} a maior idade que pode ser armazenada? O que aconteceria se ele tentasse armazenar a idade de Jeanne Calment, que viveu 122~anos?
 
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X -- Problemas Aplicados e Criativos}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item \textbf{O Enigma do Odômetro Binário}
-
-\begin{contexto}
-Imagine um od\^{o}metro de carro que, em vez de d\'{i}gitos decimais, usa 16~bits bin\'{a}rios (unsigned).
-\end{contexto}
+\item \textbf{O Enigma do Od\^{o}metro Bin\'{a}rio:} Imagine um od\^{o}metro de carro que, em vez de d\'{i}gitos decimais, usa 16~bits bin\'{a}rios (unsigned).
 \begin{enumerate}
   \item Qual a quilometragem m\'{a}xima que esse od\^{o}metro pode registrar?
   \item Se o carro roda 50~km por dia, ap\'{o}s quantos dias o od\^{o}metro ``zera'' (overflow)?
   \item Se o od\^{o}metro usasse 32~bits, quantos anos levariam para zerar, nas mesmas condi\c{c}\~{o}es?
 \end{enumerate}
 
-\item \textbf{Mensagem Secreta}
+\item \textbf{Mensagem Secreta:} Uma mensagem foi codificada convertendo cada letra para sua posi\c{c}\~{a}o no alfabeto (A=1, B=2, \ldots, Z=26) e depois para bin\'{a}rio com 5~bits. Decodifique: \texttt{01000 01001 01110 00001 10010 01001 01111}
 
-\begin{contexto}
-Uma mensagem foi codificada convertendo cada letra para sua posi\c{c}\~{a}o no alfabeto (A=1, B=2, \ldots, Z=26) e depois para bin\'{a}rio com 5~bits.
-\end{contexto}
-
-Decodifique: \texttt{01000 01001 01110 00001 10010 01001 01111}
-
-\item \textbf{O Bug do Pac-Man}
-
-\begin{contexto}
-No jogo original \emph{Pac-Man} (1980), o contador de n\'{i}vel era armazenado em um \'{u}nico byte (8~bits, unsigned). Quando o jogador chegava ao n\'{i}vel~256, ocorria um famoso \emph{bug}.
-\end{contexto}
+\item \textbf{O Bug do Pac-Man:} No jogo original \emph{Pac-Man} (1980), o contador de n\'{i}vel era armazenado em um \'{u}nico byte (8~bits, unsigned). Quando o jogador chegava ao n\'{i}vel~256, ocorria um famoso \emph{bug}.
 \begin{enumerate}
   \item Explique, do ponto de vista de sistemas de numera\c{c}\~{a}o, o que aconteceu no n\'{i}vel~256.
   \item Qual seria o maior n\'{i}vel poss\'{i}vel se o contador usasse 16~bits?
-  \item E se usasse um \texttt{int8\_t} (8~bits com sinal em complemento de dois)?
+  \item E se usasse um inteiro com sinal de 8~bits (complemento de dois)?
 \end{enumerate}
 
-\item \textbf{Nuclear Gandhi}
-
-\begin{contexto}
-Na s\'{e}rie de jogos \emph{Civilization}, existe uma lenda urbana de que o l\'{i}der Gandhi, normalmente pac\'{i}fico, se tornava extremamente agressivo. A ``agressividade'' de Gandhi come\c{c}ava em~1 (de~0 a~255, armazenada em 1~byte unsigned). Ao adotar a democracia, a agressividade era reduzida em~2.
-\end{contexto}
+\newpage
+\item \textbf{Nuclear Gandhi:} Na s\'{e}rie de jogos \emph{Civilization}, existe uma lenda urbana de que o l\'{i}der Gandhi, normalmente pac\'{i}fico, se tornava extremamente agressivo. A ``agressividade'' de Gandhi come\c{c}ava em~1 (de~0 a~255, armazenada em 1~byte unsigned). Ao adotar a democracia, a agressividade era reduzida em~2.
 \begin{enumerate}
   \item Calcule $1 - 2$ em aritm\'{e}tica de 8~bits unsigned. Qual valor resultaria?
   \item Explique o comportamento inesperado usando o conceito de overflow/underflow.
-  \item Se a vari\'{a}vel fosse do tipo \texttt{int8\_t} (signed), qual seria o resultado de $1-2$? O bug aconteceria?
+  \item Se a vari\'{a}vel fosse um inteiro com sinal de 8~bits, qual seria o resultado de $1-2$? O bug aconteceria?
 \end{enumerate}
-
-\item \textbf{O Bug do Ano 2038}
-
-\begin{contexto}
-Muitos sistemas Unix armazenam timestamps como o n\'{u}mero de segundos desde 1\textordmasculine{} de janeiro de 1970 (``\emph{Unix epoch}''), usando um inteiro com sinal de 32~bits (complemento de dois).
-\end{contexto}
+\item \textbf{O Bug do Ano 2038:} Muitos sistemas Unix armazenam timestamps como o n\'{u}mero de segundos desde 1\textordmasculine{} de janeiro de 1970 (``\emph{Unix epoch}''), usando um inteiro com sinal de 32~bits (complemento de dois).
 \begin{enumerate}
-  \item Qual \'{e} o maior valor positivo que um \texttt{int32\_t} pode armazenar?
+  \item Qual \'{e} o maior valor positivo que um inteiro com sinal de 32~bits pode armazenar?
   \item Quantos segundos h\'{a} em um ano (considere 365,25 dias)?
   \item Em que ano aproximado o contador ir\'{a} ``estourar'' (overflow)?
   \item Qual \'{e} a solu\c{c}\~{a}o adotada pelos sistemas modernos?
 \end{enumerate}
 
-\item \textbf{Endere\c{c}os de Mem\'{o}ria}
-
-\begin{contexto}
-Um processador usa endere\c{c}os de 32~bits para acessar a mem\'{o}ria RAM.
-\end{contexto}
+\item \textbf{Endere\c{c}os de Mem\'{o}ria:} Um processador usa endere\c{c}os de 32~bits para acessar a mem\'{o}ria RAM.
+\begin{dica}
+A mem\'{o}ria \'{e} endere\c{c}ada a byte: cada endere\c{c}o aponta para exatamente 1~byte.
+\end{dica}
+\vspace{-2pt}
 \begin{enumerate}
   \item Quantos bytes de mem\'{o}ria podem ser endere\c{c}ados?
   \item Converta essa quantidade para GiB ($2^{30}$~bytes).
@@ -544,141 +349,20 @@ Um processador usa endere\c{c}os de 32~bits para acessar a mem\'{o}ria RAM.
   \item Processadores de 64~bits resolvem esse problema. Quantos bytes poderiam, em teoria, ser endere\c{c}ados? \'{E} um valor pr\'{a}tico?
 \end{enumerate}
 
-\item \textbf{Placas de Ve\'{i}culos}
-
-\begin{contexto}
-As placas de ve\'{i}culos no Brasil (padr\~{a}o Mercosul) t\^{e}m o formato \texttt{LLLNLNN}, onde L~=~letra (26~possibilidades) e N~=~d\'{i}gito (10~possibilidades).
-\end{contexto}
+\item \textbf{Placas de Ve\'{i}culos:} As placas de ve\'{i}culos no Brasil (padr\~{a}o Mercosul) t\^{e}m o formato \texttt{LLLNLNN}, onde L~=~letra (26~possibilidades) e N~=~d\'{i}gito (10~possibilidades).
 \begin{enumerate}
   \item Quantas placas distintas esse formato permite?
   \item Quantos bits seriam necess\'{a}rios para codificar cada placa como um n\'{u}mero bin\'{a}rio \'{u}nico?
 \end{enumerate}
 
-\item \textbf{Pixel Art}
-
-\begin{contexto}
-Uma imagem em escala de cinza usa 8~bits por pixel (0~=~preto, 255~=~branco).
-\end{contexto}
+\item \textbf{Pixel Art:} Uma imagem em escala de cinza usa 8~bits por pixel (0~=~preto, 255~=~branco).
 \begin{enumerate}
   \item Quantos tons de cinza distintos essa codifica\c{c}\~{a}o permite?
   \item Considere uma imagem de $1920 \times 1080$ pixels. Quantos bytes s\~{a}o necess\'{a}rios para armazen\'{a}-la (sem compress\~{a}o)?
   \item Se cada pixel usasse 24~bits (cor RGB), quantos bytes seriam necess\'{a}rios?
   \item Converta as respostas anteriores para MiB ($2^{20}$~bytes).
 \end{enumerate}
-
-\item \textbf{Criptografia e Bases}
-
-\begin{contexto}
-A codifica\c{c}\~{a}o \emph{Base64} \'{e} amplamente usada na internet para transmitir dados bin\'{a}rios como texto. Ela usa 64~s\'{i}mbolos para representar dados.
-\end{contexto}
-\begin{enumerate}
-  \item Quantos bits cada ``d\'{i}gito'' de Base64 representa?
-  \item Se voc\^{e} tem 3~bytes (24~bits) de dados, quantos caracteres Base64 s\~{a}o necess\'{a}rios?
-  \item Por que Base64 \'{e} menos eficiente que bin\'{a}rio puro? Calcule o overhead percentual.
-\end{enumerate}
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X-B -- Sistema Octal}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Converta os seguintes n\'{u}meros \textbf{decimais para octal}, usando divis\~{o}es sucessivas:
-\begin{multicols}{3}
-\begin{enumerate}
-  \item $100_{10}$
-  \item $255_{10}$
-  \item $511_{10}$
-  \item $1000_{10}$
-  \item $4096_{10}$
-  \item $8191_{10}$
-\end{enumerate}
-\end{multicols}
-
-\item Converta os seguintes n\'{u}meros \textbf{octais para decimal}:
-\begin{multicols}{3}
-\begin{enumerate}
-  \item $(77)_8$
-  \item $(377)_8$
-  \item $(1750)_8$
-  \item $(644)_8$
-  \item $(755)_8$
-  \item $(2000)_8$
-\end{enumerate}
-\end{multicols}
-
-\item A convers\~{a}o entre \textbf{bin\'{a}rio e octal} \'{e} direta, agrupando os bits de 3~em~3 (da direita para a esquerda). Converta:
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $1101\,0110_2 \longrightarrow \text{octal}$
-  \item $1\,0000\,0000_2 \longrightarrow \text{octal}$
-  \item $(375)_8 \longrightarrow \text{bin\'{a}rio}$
-  \item $(17)_8 \longrightarrow \text{bin\'{a}rio}$
-\end{enumerate}
-\end{multicols}
-
-\begin{dica}
-Em sistemas Unix/Linux, as permiss\~{o}es de arquivo s\~{a}o expressas em octal. Por exemplo, \texttt{chmod 755} significa: dono = 7 (rwx), grupo = 5 (r-x), outros = 5 (r-x). Cada d\'{i}gito octal corresponde a 3~bits: leitura (r=4), escrita (w=2), execu\c{c}\~{a}o (x=1).
-\end{dica}
-
-\item \textbf{Permiss\~{o}es Unix}
-
-\begin{contexto}
-No Linux, cada arquivo tem permiss\~{o}es para tr\^{e}s categorias: dono, grupo e outros. Cada categoria tem 3~bits: leitura (r=4), escrita (w=2) e execu\c{c}\~{a}o (x=1). A soma desses valores forma um d\'{i}gito octal.
-\end{contexto}
-\begin{enumerate}
-  \item Qual \'{e} a representa\c{c}\~{a}o bin\'{a}ria (9~bits) e octal das permiss\~{o}es \texttt{rwxr-xr--}?
-  \item Um arquivo tem permiss\~{a}o octal \texttt{640}. Quais s\~{a}o as permiss\~{o}es de cada categoria?
-  \item Por que o sistema octal \'{e} particularmente conveniente para permiss\~{o}es Unix? (Pense na rela\c{c}\~{a}o entre 3~bits e 1~d\'{i}gito octal.)
-\end{enumerate}
-
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X-C -- Aritm\'{e}tica em Outras Bases}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item Realize as seguintes \textbf{adi\c{c}\~{o}es em hexadecimal} (mostre os \emph{carries}):
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $\texttt{0x3A} + \texttt{0x1F}$
-  \item $\texttt{0xFF} + \texttt{0x01}$
-  \item $\texttt{0xAB} + \texttt{0xCD}$
-  \item $\texttt{0x1234} + \texttt{0xABCD}$
-\end{enumerate}
-\end{multicols}
-
-\item Realize as seguintes \textbf{subtra\c{c}\~{o}es em hexadecimal}:
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $\texttt{0xFF} - \texttt{0x0A}$
-  \item $\texttt{0x100} - \texttt{0x01}$
-  \item $\texttt{0xC0} - \texttt{0x3F}$
-  \item $\texttt{0xDEAD} - \texttt{0xBEEF}$
-\end{enumerate}
-\end{multicols}
-
-\item Realize as seguintes \textbf{adi\c{c}\~{o}es em octal}:
-\begin{multicols}{2}
-\begin{enumerate}
-  \item $(35)_8 + (47)_8$
-  \item $(177)_8 + (1)_8$
-  \item $(777)_8 + (1)_8$
-  \item $(644)_8 + (133)_8$
-\end{enumerate}
-\end{multicols}
-
-\item \textbf{Multiplica\c{c}\~{a}o e divis\~{a}o por pot\^{e}ncias de~2}
-
-\begin{contexto}
-Em bin\'{a}rio, multiplicar por~2 equivale a deslocar todos os bits uma posi\c{c}\~{a}o \`{a} esquerda (\emph{shift left}), e dividir por~2 equivale a deslocar uma posi\c{c}\~{a}o \`{a} direita (\emph{shift right}).
-\end{contexto}
+\item \textbf{Multiplica\c{c}\~{a}o e divis\~{a}o por pot\^{e}ncias de~2:} Em bin\'{a}rio, multiplicar por~2 equivale a deslocar todos os bits uma posi\c{c}\~{a}o \`{a} esquerda (\emph{shift left}), e dividir por~2 equivale a deslocar uma posi\c{c}\~{a}o \`{a} direita (\emph{shift right}).
 \begin{enumerate}
   \item Dado $0010\,1100_2$ (44 em decimal), calcule o resultado de desloc\'{a}-lo 1~bit \`{a} esquerda. Verifique convertendo para decimal.
   \item Dado $0110\,0000_2$ (96 em decimal), calcule o resultado de desloc\'{a}-lo 2~bits \`{a} direita. Verifique.
@@ -686,289 +370,122 @@ Em bin\'{a}rio, multiplicar por~2 equivale a deslocar todos os bits uma posi\c{c
   \item Um programador precisa multiplicar um n\'{u}mero por~10. Usando apenas shifts e adi\c{c}\~{o}es, como ele pode fazer isso? (Dica: $10 = 8 + 2$.)
 \end{enumerate}
 
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X-D -- N\'{u}meros Fracion\'{a}rios em Bin\'{a}rio}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\begin{contexto}
-Assim como no sistema decimal temos casas ap\'{o}s a v\'{i}rgula ($10^{-1}, 10^{-2}, \ldots$), em bin\'{a}rio as posi\c{c}\~{o}es ap\'{o}s o ponto bin\'{a}rio valem $2^{-1} = 0{,}5$, $2^{-2} = 0{,}25$, $2^{-3} = 0{,}125$, etc.
-\end{contexto}
-
+\newpage
 \item Converta os seguintes n\'{u}meros bin\'{a}rios fracion\'{a}rios para decimal:
-\begin{multicols}{2}
+\begin{contexto}
+Assim como no sistema decimal temos casas ap\'{o}s a v\'{i}rgula ($10^{-1}, 10^{-2}, \ldots$), em bin\'{a}rio as posi\c{c}\~{o}es ap\'{o}s o ponto bin\'{a}rio valem $2^{-1} = 0.5$, $2^{-2} = 0.25$, $2^{-3} = 0.125$, etc.
+\end{contexto}
+\vspace{-2pt}
+\begin{multicols}{3}
 \begin{enumerate}
-  \item $0{,}1_2$
-  \item $0{,}11_2$
-  \item $0{,}101_2$
-  \item $1{,}1_2$
-  \item $10{,}01_2$
-  \item $11{,}111_2$
+  \item $0.1_2$
+  \item $0.11_2$
+  \item $0.101_2$
+  \item $1.1_2$
+  \item $10.01_2$
+  \item $11.111_2$
 \end{enumerate}
 \end{multicols}
 
 \item Converta os seguintes n\'{u}meros decimais fracion\'{a}rios para bin\'{a}rio (use at\'{e} 6~casas bin\'{a}rias):
 \begin{multicols}{3}
 \begin{enumerate}
-  \item $0{,}5_{10}$
-  \item $0{,}75_{10}$
-  \item $0{,}625_{10}$
-  \item $0{,}1_{10}$
-  \item $0{,}3_{10}$
-  \item $0{,}7_{10}$
+  \item $0.5_{10}$
+  \item $0.75_{10}$
+  \item $0.625_{10}$
+  \item $0.1_{10}$
+  \item $0.3_{10}$
+  \item $0.7_{10}$
 \end{enumerate}
 \end{multicols}
 
-\begin{dica}
-M\'{e}todo para converter a parte fracion\'{a}ria: multiplique por~2 repetidamente. A parte inteira de cada resultado \'{e} o pr\'{o}ximo bit. Exemplo: $0{,}75 \times 2 = 1{,}5$ (bit = 1), $0{,}5 \times 2 = 1{,}0$ (bit = 1). Logo $0{,}75_{10} = 0{,}11_2$.
-\end{dica}
-
-\item Voc\^{e} notou que $0{,}1_{10}$ n\~{a}o tem uma representa\c{c}\~{a}o bin\'{a}ria exata (finita)?
+\item Voc\^{e} notou que $0.1_{10}$ n\~{a}o tem uma representa\c{c}\~{a}o bin\'{a}ria exata (finita)?
 \begin{enumerate}
-  \item Explique por que isso acontece.
   \item Execute o seguinte teste mental (ou em um computador): em Python, $0.1 + 0.2 == 0.3$? O resultado te surpreende?
   \item Que implica\c{c}\~{o}es pr\'{a}ticas isso tem para softwares financeiros?
 \end{enumerate}
 
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X-E -- Opera\c{c}\~{o}es L\'{o}gicas Bit a Bit}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\begin{contexto}
-Al\'{e}m de opera\c{c}\~{o}es aritm\'{e}ticas, computadores realizam opera\c{c}\~{o}es \textbf{l\'{o}gicas} bit a bit: AND (\&), OR ($|$), XOR ($\oplus$) e NOT ($\sim$). Cada opera\c{c}\~{a}o \'{e} aplicada individualmente a cada par de bits correspondentes.
-\end{contexto}
-
 \item Calcule os resultados das seguintes opera\c{c}\~{o}es bit a bit (8~bits):
+\begin{contexto}
+Al\'{e}m de opera\c{c}\~{o}es aritm\'{e}ticas, computadores realizam opera\c{c}\~{o}es \textbf{l\'{o}gicas} bit a bit: AND (\&), OR ($|$), XOR (\texttt{\^{}}) e NOT ($\sim$). Cada opera\c{c}\~{a}o \'{e} aplicada individualmente a cada par de bits correspondentes.
+\end{contexto}
+\vspace{-2pt}
+\begin{multicols}{2}
 \begin{enumerate}
   \item $1010\,0110$ AND $1100\,0011$
   \item $1010\,0110$ OR $1100\,0011$
   \item $1010\,0110$ XOR $1100\,0011$
   \item NOT $1010\,0110$
 \end{enumerate}
+\end{multicols}
 
-\item \textbf{M\'{a}scaras de bits (\emph{bitmasks})}
-
-\begin{contexto}
-M\'{a}scaras de bits s\~{a}o usadas para extrair, definir ou limpar bits espec\'{i}ficos de um n\'{u}mero.
-\end{contexto}
+\item \textbf{M\'{a}scaras de bits (\emph{bitmasks}):} M\'{a}scaras de bits s\~{a}o usadas para extrair, definir ou limpar bits espec\'{i}ficos de um n\'{u}mero.
 \begin{enumerate}
   \item Dado o byte $\texttt{0xB7}$, aplique a m\'{a}scara $\texttt{0x0F}$ com AND. O que essa opera\c{c}\~{a}o extrai?
   \item Dado o byte $\texttt{0xB7}$, aplique a m\'{a}scara $\texttt{0xF0}$ com AND e desloque 4~bits \`{a} direita. O que voc\^{e} obt\'{e}m?
   \item Explique como usar OR para ``ligar'' o bit~3 (contando de~0, da direita) de um byte, sem alterar os demais bits.
   \item Explique como usar AND para ``desligar'' o bit~5 de um byte, sem alterar os demais.
-  \item Uma propriedade do XOR: $A \oplus B \oplus B = A$. Explique por que essa propriedade \'{e} \'{u}til em criptografia simples e em algoritmos de troca de vari\'{a}veis sem usar uma vari\'{a}vel tempor\'{a}ria.
+  \item Uma propriedade do XOR: $A$ \texttt{\^{}} $B$ \texttt{\^{}} $B$ $= A$. Explique por que essa propriedade \'{e} \'{u}til em criptografia simples e em algoritmos de troca de vari\'{a}veis sem usar uma vari\'{a}vel tempor\'{a}ria.
 \end{enumerate}
-
 \item \textbf{Swap sem vari\'{a}vel tempor\'{a}ria}
 
 Dados $A = 0101\,1010$ e $B = 1100\,0011$, execute a sequ\^{e}ncia:
-\begin{enumerate}
-  \item $A \leftarrow A \oplus B$
-  \item $B \leftarrow A \oplus B$
-  \item $A \leftarrow A \oplus B$
-\end{enumerate}
+\begin{itemize}[label=$\bullet$]
+  \item \texttt{A = A \^{} B}
+  \item \texttt{B = A \^{} B}
+  \item \texttt{A = A \^{} B}
+\end{itemize}
+\vspace{-2pt}
 Mostre o valor de $A$ e $B$ ap\'{o}s cada passo. O que aconteceu?
 
-\end{enumerate}
-
-
-% ══════════════════════════════════════════
-\section*{Parte X-F -- Problemas Extras do Mundo Real}
-% ══════════════════════════════════════════
-
-\begin{enumerate}[resume]
-
-\item \textbf{O Gangnam Style e o YouTube}
-
-\begin{contexto}
-Em 2014, o clipe de ``Gangnam Style'' do PSY ultrapassou 2.147.483.647 visualiza\c{c}\~{o}es no YouTube. O contador do YouTube parou de funcionar.
-\end{contexto}
+\item \textbf{O Gangnam Style e o YouTube:} Em 2014, o clipe de ``Gangnam Style'' do PSY ultrapassou 2.147.483.647 visualiza\c{c}\~{o}es no YouTube. O contador do YouTube parou de funcionar.
 \begin{enumerate}
   \item Reconhece esse n\'{u}mero? Qual \'{e} sua rela\c{c}\~{a}o com pot\^{e}ncias de~2?
-  \item O YouTube usava \texttt{int32\_t} para contar visualiza\c{c}\~{o}es. Qual foi o problema?
-  \item Ap\'{o}s o incidente, o YouTube migrou para \texttt{int64\_t}. Qual \'{e} o novo limite? \'{E} suficiente?
+  \item O YouTube usava um inteiro com sinal de 32~bits para contar visualiza\c{c}\~{o}es. Qual foi o problema?
+  \item Ap\'{o}s o incidente, o YouTube migrou para um inteiro com sinal de 64~bits. Qual \'{e} o novo limite? \'{E} suficiente?
 \end{enumerate}
 
-\item \textbf{Endere\c{c}os MAC}
-
-\begin{contexto}
-Cada placa de rede possui um endere\c{c}o MAC \'{u}nico de 48~bits, geralmente escrito como 6~pares hexadecimais: \texttt{AA:BB:CC:DD:EE:FF}.
-\end{contexto}
-\begin{enumerate}
-  \item Quantos endere\c{c}os MAC distintos existem? Expresse como pot\^{e}ncia de~2 e em nota\c{c}\~{a}o decimal aproximada.
-  \item Converta o endere\c{c}o MAC \texttt{00:1A:2B:3C:4D:5E} para bin\'{a}rio.
-  \item Quantos d\'{i}gitos hexadecimais s\~{a}o necess\'{a}rios para representar um endere\c{c}o MAC? Por qu\^{e}?
-\end{enumerate}
-
-\item \textbf{C\'{o}digos de Barras e QR Codes}
-
-\begin{contexto}
-Um c\'{o}digo de barras EAN-13 (usado em produtos) codifica 13~d\'{i}gitos decimais.
-\end{contexto}
+\newpage
+\item \textbf{C\'{o}digos de Barras e QR Codes:} Um c\'{o}digo de barras EAN-13 (usado em produtos) codifica 13~d\'{i}gitos decimais.
 \begin{enumerate}
   \item Quantas combina\c{c}\~{o}es distintas de 13~d\'{i}gitos decimais existem?
   \item Quantos bits seriam necess\'{a}rios para representar esse mesmo n\'{u}mero de combina\c{c}\~{o}es em bin\'{a}rio puro?
   \item Compare com a codifica\c{c}\~{a}o BCD: quantos bits seriam necess\'{a}rios em BCD para 13~d\'{i}gitos?
 \end{enumerate}
 
-\item \textbf{GPS e Precis\~{a}o}
-
-\begin{contexto}
-Coordenadas GPS s\~{a}o freq\"{u}entemente armazenadas como n\'{u}meros inteiros com sinal de 32~bits, representando micrograus (milion\'{e}simos de grau). Por exemplo, a latitude $-29{,}951\,066\,\!^\circ$ seria armazenada como $-29\,951\,066$.
-\end{contexto}
+\item \textbf{Capacidade de Armazenamento ao Longo da Hist\'{o}ria:} O primeiro disco r\'{i}gido da IBM (1956, modelo 305 RAMAC) armazenava 5~MB. Hoje, discos de 20~TB s\~{a}o comuns.
 \begin{enumerate}
-  \item A latitude varia de $-90\,000\,000$ a $+90\,000\,000$ micrograus. Esse intervalo cabe em um \texttt{int32\_t}? Justifique.
-  \item E a longitude ($-180\,000\,000$ a $+180\,000\,000$ micrograus)? Cabe?
-  \item Qual \'{e} a precis\~{a}o em metros de 1~micrograu? (Circunfer\^{e}ncia da Terra $\approx 40\,000$~km.)
-\end{enumerate}
-
-\item \textbf{Cifra XOR}
-
-\begin{contexto}
-Uma das cifras mais simples em criptografia \'{e} o XOR com uma chave.
-\end{contexto}
-
-Uma mensagem de 1~byte \texttt{M = 0x48} \'{e} cifrada com a chave \texttt{K = 0x5A} usando XOR.
-\begin{enumerate}
-  \item Calcule o texto cifrado $C = M \oplus K$. Mostre o c\'{a}lculo em bin\'{a}rio.
-  \item Mostre que aplicar XOR novamente com a mesma chave recupera a mensagem: $M = C \oplus K$.
-  \item O byte \texttt{0x48} corresponde ao caractere `H' na tabela ASCII. Qual caractere \'{e} o texto cifrado?
-  \item Por que a cifra XOR sozinha n\~{a}o \'{e} segura para criptografia real?
-\end{enumerate}
-
-\item \textbf{Capacidade de Armazenamento ao Longo da Hist\'{o}ria}
-
-\begin{contexto}
-O primeiro disco r\'{i}gido da IBM (1956, modelo 305 RAMAC) armazenava 5~MB. Hoje, discos de 20~TB s\~{a}o comuns.
-\end{contexto}
-\begin{enumerate}
-  \item Converta 5~MB e 20~TB para bits.
-  \item Quantos bits s\~{a}o necess\'{a}rios para endere\c{c}ar cada byte do disco de 5~MB?
-  \item E para o disco de 20~TB?
+  \item Quantos bits s\~{a}o necess\'{a}rios para representar 5~MB e 20~TB?
   \item Quantas vezes a capacidade de armazenamento aumentou de 1956 at\'{e} hoje? Expresse como pot\^{e}ncia de~2 aproximada.
 \end{enumerate}
 
 \end{enumerate}
 
+\vspace{8pt}
+\hrule
+\vspace{8pt}
 
 % ══════════════════════════════════════════
-\section*{Parte XI -- Desafios (Opcional)}
+\section*{Desafios}
 % ══════════════════════════════════════════
 
 \begin{enumerate}[resume]
 
-\begin{desafio}
-
-\item Demonstre algebricamente que, em complemento de dois com $n$~bits, o inverso aditivo de um n\'{u}mero $x$ pode ser obtido complementando todos os bits e somando~1. Ou seja, prove que:
-\[
-  -x = \overline{x} + 1
-\]
-onde $\overline{x}$ denota o complemento bit a bit de~$x$.
-
-\textit{Dica: comece observando que $x + \overline{x} = 2^n - 1$ (todos os bits em~1).}
-
-\item \textbf{Sistema de base~$-2$ (``negabin\'{a}rio'')}
-
-Sim, \'{e} poss\'{i}vel usar bases negativas! Na base~$-2$, os pesos das posi\c{c}\~{o}es s\~{a}o $(-2)^0 = 1$, $(-2)^1 = -2$, $(-2)^2 = 4$, $(-2)^3 = -8$, etc.
-
-\begin{enumerate}
-  \item Calcule o valor decimal de $11010_{-2}$.
-  \item Represente $-6$ na base~$-2$.
-  \item Qual \'{e} a vantagem te\'{o}rica desse sistema em rela\c{c}\~{a}o ao complemento de dois?
-\end{enumerate}
-
-\item \textbf{BCD (\emph{Binary-Coded Decimal})}
-
-Na codifica\c{c}\~{a}o BCD, cada d\'{i}gito decimal \'{e} representado individualmente por 4~bits.
-
-\begin{enumerate}
-  \item Represente $9742_{10}$ em BCD.
-  \item O BCD \'{e} mais ou menos eficiente que bin\'{a}rio puro em termos de espa\c{c}o? Justifique comparando quantos bits s\~{a}o necess\'{a}rios para representar o n\'{u}mero $255$ em ambos os formatos.
-  \item Pesquise: em que tipo de aplica\c{c}\~{a}o o BCD ainda \'{e} utilizado e por qu\^{e}?
-\end{enumerate}
-
 \item \textbf{O Curioso Caso do $-0$ no Espa\c{c}o}
 
 Em 1996, o foguete Ariane~5 da Ag\^{e}ncia Espacial Europeia explodiu 37~segundos ap\'{o}s o lan\c{c}amento. A causa raiz foi a convers\~{a}o de um n\'{u}mero de ponto flutuante de 64~bits para um inteiro com sinal de 16~bits, gerando overflow.
-
 \begin{enumerate}
   \item Qual \'{e} o intervalo de valores de um inteiro com sinal de 16~bits (complemento de dois)?
   \item Se a velocidade horizontal do foguete era armazenada como um valor que excedia $32\,767$, o que aconteceu na convers\~{a}o?
   \item Que li\c{c}\~{a}o sobre sistemas de numera\c{c}\~{a}o e overflow esse acidente ensina?
 \end{enumerate}
 
-\item \textbf{Soma de Verifica\c{c}\~{a}o (\emph{Checksum})}
-
-Uma t\'{e}cnica simples de verifica\c{c}\~{a}o de integridade de dados consiste em somar todos os bytes de uma mensagem (em complemento de um) e usar o resultado como \emph{checksum}.
-
-Considere a mensagem formada pelos bytes: \texttt{0x4F}, \texttt{0x6C}, \texttt{0x61}.
-\begin{enumerate}
-  \item Some os tr\^{e}s bytes em bin\'{a}rio (8~bits). Se houver \emph{carry}, some-o de volta ao resultado.
-  \item Complemente (inverta) todos os bits. Este \'{e} o checksum.
-  \item Ao receber a mensagem junto com o checksum, como o receptor pode verificar a integridade?
-\end{enumerate}
-
-\item \textbf{O Sistema Tern\'{a}rio Balanceado}
-
-O computador sovi\'{e}tico Setun (1958) usava o sistema \textbf{tern\'{a}rio balanceado}, com d\'{i}gitos $\{-1, 0, +1\}$ (representados como $T$, $0$, $1$). As posi\c{c}\~{o}es valem pot\^{e}ncias de~3.
-
-\begin{enumerate}
-  \item Calcule o valor decimal de $1T01$ (onde $T = -1$).\\
-  \textit{Dica: $1 \cdot 3^3 + (-1) \cdot 3^2 + 0 \cdot 3^1 + 1 \cdot 3^0$}
-  \item Represente $-13$ em tern\'{a}rio balanceado.
-  \item Qual vantagem esse sistema tem sobre complemento de dois para representar n\'{u}meros negativos?
-\end{enumerate}
-
-\item \textbf{N\'{u}meros de Ponto Flutuante -- Introdu\c{c}\~{a}o}
-
-O padr\~{a}o IEEE~754 (precis\~{a}o simples, 32~bits) divide os bits em tr\^{e}s campos:
-\begin{itemize}
-  \item 1~bit de sinal ($s$)
-  \item 8~bits de expoente ($e$), com \emph{bias} de 127
-  \item 23~bits de mantissa ($m$), com um ``1'' impl\'{i}cito
-\end{itemize}
-O valor \'{e}: $(-1)^s \times 1{,}m \times 2^{(e - 127)}$
-
-\begin{enumerate}
-  \item O n\'{u}mero $\texttt{0 10000010 10100000000000000000000}$ est\'{a} em IEEE~754. Qual \'{e} seu valor decimal?
-  \item Represente $-6{,}5$ em IEEE~754 (32~bits).
-  \item Por que n\'{u}meros de ponto flutuante podem representar valores muito maiores que inteiros de 32~bits, mas com menos precis\~{a}o?
-\end{enumerate}
-
-\item \textbf{C\'{o}digo de Gray}
-
-O C\'{o}digo de Gray \'{e} um sistema bin\'{a}rio onde dois valores consecutivos diferem em apenas 1~bit. Ele \'{e} usado em encoders rotat\'{o}rios e na corre\c{c}\~{a}o de erros.
-
-A convers\~{a}o de bin\'{a}rio para Gray \'{e}: $G_i = B_i \oplus B_{i+1}$ (XOR entre bits adjacentes, onde $B_{n}=0$ para o bit mais significativo).
-
-\begin{enumerate}
-  \item Construa a tabela do C\'{o}digo de Gray para 4~bits (0 a 15).
-  \item Verifique que valores consecutivos diferem em exatamente 1~bit.
-  \item Converta o bin\'{a}rio $1011$ para C\'{o}digo de Gray.
-  \item Por que o C\'{o}digo de Gray \'{e} prefer\'{i}vel ao bin\'{a}rio natural em encoders rotat\'{o}rios? (Pense no que acontece quando m\'{u}ltiplos bits mudam simultaneamente.)
-\end{enumerate}
-
-\item \textbf{Paradoxo do Anivers\'{a}rio em Hashes}
-
-\begin{contexto}
-Fun\c{c}\~{o}es hash mapeiam dados de tamanho arbitr\'{a}rio para um valor de tamanho fixo. O ``paradoxo do anivers\'{a}rio'' implica que colis\~{o}es (dois inputs com o mesmo hash) s\~{a}o prov\'{a}veis ap\'{o}s aproximadamente $\sqrt{2^n}$ tentativas, onde $n$~\'{e} o n\'{u}mero de bits do hash.
-\end{contexto}
+\item \textbf{Paradoxo do Anivers\'{a}rio em Hashes:} Fun\c{c}\~{o}es hash mapeiam dados de tamanho arbitr\'{a}rio para um valor de tamanho fixo. O ``paradoxo do anivers\'{a}rio'' implica que colis\~{o}es s\~{a}o prov\'{a}veis ap\'{o}s aproximadamente $\sqrt{2^n}$ tentativas, onde $n$~\'{e} o n\'{u}mero de bits do hash.
 \begin{enumerate}
   \item Para um hash de 32~bits, ap\'{o}s quantas tentativas uma colis\~{a}o se torna prov\'{a}vel? Expresse como pot\^{e}ncia de~2.
   \item Para um hash de 256~bits (SHA-256), calcule o mesmo valor.
   \item A rede Bitcoin processa $\sim 10^{20}$ hashes por ano. Quantos anos seriam necess\'{a}rios para encontrar uma colis\~{a}o em SHA-256?
 \end{enumerate}
-
-\end{desafio}
 
 \end{enumerate}
 

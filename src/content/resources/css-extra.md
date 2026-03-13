@@ -22,4 +22,9 @@ items:
     url: "https://www.youtube.com/watch?v=H2tuKiiznsY"
     class: 1
     order: 1003
+  - title: "Hacking Jeep"
+    type: "video"
+    url: "https://www.youtube.com/watch?v=MK0SrxBC1xs"
+    class: 3
+    order: 1004
 ---
