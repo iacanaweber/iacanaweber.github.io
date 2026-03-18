@@ -111,6 +111,16 @@
       "order": 30
     },
     {
+      "id": "css-teste-software",
+      "title": "Teste de Software",
+      "course": "css",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/css/dependability/04_teste_software/Teste de Software.pptx",
+      "outputPdfPath": "/aulas/css/dependability/04_teste_software/04-teste-software.pdf",
+      "classes": [4],
+      "order": 40
+    },
+    {
       "id": "css-introducao-criptografia",
       "title": "Introdução à Criptografia",
       "course": "css",
