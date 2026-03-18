@@ -41,6 +41,16 @@
       "order": 120
     },
     {
+      "id": "fsc-portas-logicas",
+      "title": "Portas Lógicas e Lógica de Dois Níveis",
+      "course": "fsc",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/fsc/02-PortasLogicas/04-portas-logicas-fsc.pptx",
+      "outputPdfPath": "/aulas/fsc/02-PortasLogicas/04-portas-logicas-fsc.pdf",
+      "classes": [5],
+      "order": 140
+    },
+    {
       "id": "fsc-sistemas-numeracao-exercicios",
       "title": "Exercícios: Sistemas de Numeração",
       "course": "fsc",

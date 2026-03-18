@@ -16,5 +16,10 @@ items:
     type: "slides"
     pdfPath: "/aulas/fsc/01-SistemasNumeracao/exercicios/exercicios-sistemas-numeracao.pdf"
     order: 121
+  - title: "Portas Lógicas e Lógica de Dois Níveis"
+    type: "slides"
+    pdfPath: "/aulas/fsc/02-PortasLogicas/04-portas-logicas-fsc.pdf"
+    order: 140
+    class: 5
 ---
 
