@@ -112,12 +112,12 @@
     },
     {
       "id": "css-teste-software",
-      "title": "Teste de Software",
+      "title": "Teste de Software e Teste de Caixa Preta",
       "course": "css",
       "sourceType": "pptx",
       "pptxPath": "aulas/css/dependability/04_teste_software/Teste de Software.pptx",
       "outputPdfPath": "/aulas/css/dependability/04_teste_software/04-teste-software.pdf",
-      "classes": [4],
+      "classes": ["4-5"],
       "order": 40
     },
     {
