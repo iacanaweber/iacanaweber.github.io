@@ -12,19 +12,10 @@ items:
     pdfPath: "/aulas/fsc/01-SistemasNumeracao/02-sistemas-numeracao-fsc.pdf"
     order: 120
     class: 3
-  - title: "Exercícios: Sistemas de Numeração"
-    type: "slides"
-    pdfPath: "/aulas/fsc/01-SistemasNumeracao/exercicios/exercicios-sistemas-numeracao.pdf"
-    order: 121
   - title: "Portas Lógicas e Lógica de Dois Níveis"
     type: "slides"
     pdfPath: "/aulas/fsc/02-PortasLogicas/04-portas-logicas-fsc.pdf"
     order: 140
     class: 5
-  - title: "Exercícios: Portas Lógicas"
-    type: "slides"
-    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf"
-    order: 141
-    class: 6
 ---
 
