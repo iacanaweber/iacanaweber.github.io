@@ -1,5 +1,10 @@
 ---
 course: "fsc"
 column: "exercicios"
-items: []
+items:
+  - title: "Exercícios: Portas Lógicas"
+    type: "exercises"
+    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf"
+    order: 140
+    class: 6
 ---

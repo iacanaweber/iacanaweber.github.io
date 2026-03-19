@@ -21,5 +21,10 @@ items:
     pdfPath: "/aulas/fsc/02-PortasLogicas/04-portas-logicas-fsc.pdf"
     order: 140
     class: 5
+  - title: "Exercícios: Portas Lógicas"
+    type: "slides"
+    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf"
+    order: 141
+    class: 6
 ---
 

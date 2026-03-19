@@ -61,6 +61,16 @@
       "order": 121
     },
     {
+      "id": "fsc-portas-logicas-exercicios",
+      "title": "Exercícios: Portas Lógicas",
+      "course": "fsc",
+      "sourceType": "latex",
+      "texDir": "aulas/fsc/02-PortasLogicas/exercicios",
+      "outputPdfPath": "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf",
+      "classes": [6],
+      "order": 141
+    },
+    {
       "id": "css-apresentacao",
       "title": "Apresentação",
       "course": "css",
