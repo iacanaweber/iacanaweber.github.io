@@ -26,11 +26,16 @@ items:
     pdfPath: "/aulas/css/dependability/03_safety_security_resiliencia/03-safety-security-resiliencia.pdf"
     order: 30
     class: 3
-  - title: "Teste de Software e Teste de Caixa Preta"
+  - title: "Teste de Software"
     type: "slides"
     pdfPath: "/aulas/css/dependability/04_teste_software/04-teste-software.pdf"
     order: 40
-    class: "4-5"
+    class: 5
+  - title: "Teste de Caixa Preta"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/05_teste_caixa_preta/05-teste-caixa-preta.pdf"
+    order: 50
+    class: 6
   - title: "Introdução à Criptografia"
     type: "slides"
     pdfPath: "/aulas/css/crypto/Introdução_a_Criptografia/introducao-a-criptografia.pdf"
