@@ -1,0 +1,553 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{karnaugh-map}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Fundamentos de Sistemas Digitais}
+\newcommand{\codigodadisciplina}{4646B-04}
+\newcommand{\nomedaavaliacao}{Exercícios - Mapa de Karnaugh}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.1in}
+
+\section{Questão 1}
+
+Minimize as seguintes funções utilizando Mapa de Karnaugh:
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C) = AB + \overline{B}C + \overline{A}\overline{B} + B\overline{C}$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C,D) = ABD + A\overline{B}C + B\overline{C}D + BC\overline{D}$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C,D) = \sum m(1, 5, 15, 10, 9)$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C,D) = \sum m(2, 4, 5, 6, 7, 11, 15)$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+\end{enumerate}
+\end{multicols}
+
+\vfill
+
+\section{Questão 2}
+
+Utilize Mapa de Karnaugh para simplificar as seguintes expressões:
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C) = \overline{A}\,\overline{B}\,\overline{C} + \overline{A}\,\overline{B}C + A\overline{B}C$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C) = AC(\overline{B} + C)$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C) = \overline{A}(BC + B\overline{C}) + A(BC + B\overline{C})$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C) = \overline{A}\,\overline{B}\,\overline{C} + A\overline{B}\,\overline{C} + \overline{A}B\overline{C} + AB\overline{C}$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+\end{enumerate}
+\end{multicols}
+
+\vfill
+
+\newpage
+
+\section{Questão 3}
+
+Expanda cada expressão para o formato padrão SOP e então utilize Mapa de Karnaugh para simplificá-las:
+
+\begin{tcolorbox}[colback=gray!10, colframe=gray!50, title=\textbf{Lembrete: Soma de Produtos (SOP)}, fonttitle=\small]
+\small
+Uma expressão está na forma \textbf{SOP (Sum of Products)} quando é composta por uma soma (OR) de termos produto (AND). Por exemplo: $AB + \overline{A}C + BC$.
+
+A forma \textbf{SOP padrão} (ou \textbf{canônica}) exige que \textbf{todas as variáveis} da função apareçam em \textbf{cada termo produto}, seja na forma direta ou complementada. Cada termo produto nesse formato é chamado de \textbf{mintermo}.
+
+\textbf{Exemplo:} Para $F(A,B,C)$, a expressão $AB + C$ \textbf{não} está no formato padrão, pois o termo $AB$ não contém $C$ e o termo $C$ não contém $A$ nem $B$. A forma padrão equivalente seria: $ABC + AB\overline{C} + \overline{A}\overline{B}C + \overline{A}BC + ABC$.
+\end{tcolorbox}
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C) = AB + A\overline{B}C + ABC$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C) = A + BC$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C,D) = A\overline{B}\,\overline{C}D + AC\overline{D} + B\overline{C}D + \overline{A}BC\overline{D}$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\footnotesize $F(A,B,C,D) = A\overline{B} + A\overline{B}\,\overline{C}D + CD + B\overline{C}D + ABCD$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+\end{enumerate}
+\end{multicols}
+
+\section{Questão 4}
+
+Utilize Mapa de Karnaugh para simplificar as seguintes expressões:
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \begin{minipage}[t]{\linewidth}
+    $F(A,B,C,D) = A + B\overline{C} + CD$
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C,D) = \overline{A}\,\overline{B}\,\overline{C}\,\overline{D} + \overline{A}\,\overline{B}\,\overline{C}D + ABCD + ABC\overline{D}$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\footnotesize $F(A,B,C,D) = \overline{A}B(\overline{C}\,\overline{D} + \overline{C}D) + AB(\overline{C}\,\overline{D} + \overline{C}D) + A\overline{B}\,\overline{C}D$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C,D) = (\overline{A}\,\overline{B} + A\overline{B})(CD + C\overline{D})$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    {\small $F(A,B,C,D) = \overline{A}\,\overline{B} + A\overline{B} + \overline{C}\,\overline{D} + C\overline{D}$}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+\end{enumerate}
+\end{multicols}
+
+\section{Questão 5}
+
+Reduza a função especificada pelas tabelas verdade abaixo utilizando Mapa de Karnaugh:
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \begin{minipage}[t]{\linewidth}
+    \begin{center}
+      \begin{tabular}{ccc|c}
+        \toprule
+        $A$ & $B$ & $C$ & $F$ \\
+        \midrule
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 1 \\
+        0 & 1 & 0 & 0 \\
+        0 & 1 & 1 & 1 \\
+        1 & 0 & 0 & 1 \\
+        1 & 0 & 1 & 1 \\
+        1 & 1 & 0 & 0 \\
+        1 & 1 & 1 & 1 \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    \begin{center}
+      \begin{tabular}{cccc|c}
+        \toprule
+        $A$ & $B$ & $C$ & $D$ & $F$ \\
+        \midrule
+        0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 & 1 \\
+        0 & 0 & 1 & 0 & 1 \\
+        0 & 0 & 1 & 1 & 0 \\
+        0 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 1 & 0 \\
+        0 & 1 & 1 & 0 & 1 \\
+        0 & 1 & 1 & 1 & 1 \\
+        1 & 0 & 0 & 0 & 1 \\
+        1 & 0 & 0 & 1 & 0 \\
+        1 & 0 & 1 & 0 & 1 \\
+        1 & 0 & 1 & 1 & 0 \\
+        1 & 1 & 0 & 0 & 1 \\
+        1 & 1 & 0 & 1 & 1 \\
+        1 & 1 & 1 & 0 & 0 \\
+        1 & 1 & 1 & 1 & 1 \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    \begin{center}
+      \begin{tabular}{ccc|c}
+        \toprule
+        $A$ & $B$ & $C$ & $F$ \\
+        \midrule
+        0 & 0 & 0 & 1 \\
+        0 & 0 & 1 & 0 \\
+        0 & 1 & 0 & X \\
+        0 & 1 & 1 & 1 \\
+        1 & 0 & 0 & X \\
+        1 & 0 & 1 & 0 \\
+        1 & 1 & 0 & 1 \\
+        1 & 1 & 1 & X \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $A \backslash BC$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        0 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        1 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+  \item \begin{minipage}[t]{\linewidth}
+    \begin{center}
+      \begin{tabular}{cccc|c}
+        \toprule
+        $A$ & $B$ & $C$ & $D$ & $F$ \\
+        \midrule
+        0 & 0 & 0 & 0 & 0 \\
+        0 & 0 & 0 & 1 & 1 \\
+        0 & 0 & 1 & 0 & X \\
+        0 & 0 & 1 & 1 & 1 \\
+        0 & 1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 1 & X \\
+        0 & 1 & 1 & 0 & 1 \\
+        0 & 1 & 1 & 1 & 1 \\
+        1 & 0 & 0 & 0 & 1 \\
+        1 & 0 & 0 & 1 & 0 \\
+        1 & 0 & 1 & 0 & X \\
+        1 & 0 & 1 & 1 & 1 \\
+        1 & 1 & 0 & 0 & 0 \\
+        1 & 1 & 0 & 1 & 0 \\
+        1 & 1 & 1 & 0 & 1 \\
+        1 & 1 & 1 & 1 & X \\
+        \bottomrule
+      \end{tabular}
+    \end{center}
+
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|}
+        $AB \backslash CD$ & 00 & 01 & 11 & \multicolumn{1}{c}{10} \\
+        \hline
+        00 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        01 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        11 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \hline
+        10 & \phantom{0} & \phantom{0} & \phantom{0} & \phantom{0} \\
+        \cline{2-5}
+      \end{tabular}
+    \end{center}
+  \end{minipage}
+
+\end{enumerate}
+\end{multicols}
+
+\end{document}

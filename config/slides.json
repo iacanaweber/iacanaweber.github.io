@@ -122,13 +122,23 @@
     },
     {
       "id": "css-teste-software",
-      "title": "Teste de Software e Teste de Caixa Preta",
+      "title": "Teste de Software",
       "course": "css",
       "sourceType": "pptx",
       "pptxPath": "aulas/css/dependability/04_teste_software/Teste de Software.pptx",
       "outputPdfPath": "/aulas/css/dependability/04_teste_software/04-teste-software.pdf",
-      "classes": ["4-5"],
+      "classes": [5],
       "order": 40
+    },
+    {
+      "id": "css-teste-caixa-preta",
+      "title": "Teste de Caixa Preta",
+      "course": "css",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/css/dependability/05_teste_caixa_preta/Teste de Caixa Preta.pptx",
+      "outputPdfPath": "/aulas/css/dependability/05_teste_caixa_preta/05-teste-caixa-preta.pdf",
+      "classes": [6],
+      "order": 50
     },
     {
       "id": "css-introducao-criptografia",
@@ -239,6 +249,16 @@
       "outputPdfPath": "/aulas/css/crypto/RSA_Lab/rsa-lab.pdf",
       "classes": [],
       "order": 901
+    },
+    {
+      "id": "fsd-karnaugh-exercicios",
+      "title": "Exercícios: Mapa de Karnaugh",
+      "course": "fsd",
+      "sourceType": "latex",
+      "texDir": "aulas/fsd/07-ExercicioKarnaugh",
+      "outputPdfPath": "/aulas/fsd/07-ExercicioKarnaugh/exercicio-karnaugh.pdf",
+      "classes": [7],
+      "order": 170
     }
   ]
 }
