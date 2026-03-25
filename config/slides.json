@@ -141,6 +141,26 @@
       "order": 50
     },
     {
+      "id": "css-teste-unidade-estrutural",
+      "title": "Teste de Unidade Estrutural",
+      "course": "css",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/css/dependability/06_teste_caixa_branca/Teste de Unidade Estrutural.pptx",
+      "outputPdfPath": "/aulas/css/dependability/06_teste_caixa_branca/06-teste-unidade-estrutural.pdf",
+      "classes": [7],
+      "order": 60
+    },
+    {
+      "id": "css-teste-baseado-erros",
+      "title": "Teste Baseado em Erros",
+      "course": "css",
+      "sourceType": "pptx",
+      "pptxPath": "aulas/css/dependability/06_teste_caixa_branca/Teste Baseado em Erros.pptx",
+      "outputPdfPath": "/aulas/css/dependability/06_teste_caixa_branca/06-teste-baseado-erros.pdf",
+      "classes": [7],
+      "order": 61
+    },
+    {
       "id": "css-introducao-criptografia",
       "title": "Introdução à Criptografia",
       "course": "css",

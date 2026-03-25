@@ -36,6 +36,16 @@ items:
     pdfPath: "/aulas/css/dependability/05_teste_caixa_preta/05-teste-caixa-preta.pdf"
     order: 50
     class: 6
+  - title: "Teste de Unidade Estrutural"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/06_teste_caixa_branca/06-teste-unidade-estrutural.pdf"
+    order: 60
+    class: 7
+  - title: "Teste Baseado em Erros"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/06_teste_caixa_branca/06-teste-baseado-erros.pdf"
+    order: 61
+    class: 7
   - title: "Introdução à Criptografia"
     type: "slides"
     pdfPath: "/aulas/css/crypto/Introdução_a_Criptografia/introducao-a-criptografia.pdf"
