@@ -17,6 +17,15 @@
 \usepackage{needspace}
 \usepackage{multirow}
 \usepackage{hyperref}
+\usepackage{indentfirst}
+
+%% ----------------------------------------------------------
+%% GABARITO: altere a linha abaixo para mostrar/ocultar
+%%   \gabaritofalse  →  compila SEM gabarito (versão aluno)
+%%   \gabaritotrue   →  compila COM gabarito (versão professor)
+%% ----------------------------------------------------------
+\newif\ifgabarito
+\gabaritofalse
 
 \geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
 
@@ -57,6 +66,21 @@
   stringstyle=\color{red!60!black},
 }
 
+\tcbset{
+  gabarito/.style={
+    colback=green!5!white,
+    colframe=green!40!black,
+    fonttitle=\bfseries\small,
+    title=Gabarito,
+    boxrule=0.5pt,
+    left=6pt, right=6pt, top=4pt, bottom=4pt,
+    before skip=4pt,
+    after skip=10pt,
+    fontupper=\small,
+    parbox=false,
+  }
+}
+
 \begin{document}
 
 \noindent
@@ -85,9 +109,21 @@
 %% PARTE 1: CONCEITOS DE DEPENDABILIDADE
 %% ============================================================
 \section{Parte 1 --- Conceitos de Dependabilidade}
+\vspace{8pt}
 
-\textbf{Exercício 1.}
-Defina, com suas palavras, os conceitos de \textit{fault} (defeito), \textit{error} (erro de estado) e \textit{failure} (falha de serviço). Em seguida, dê um exemplo concreto de software em que um \textit{fault} está presente no código, mas nenhum \textit{error} se manifesta durante a execução normal.
+\textbf{Exercício 1.} Marque a alternativa que descreve corretamente a cadeia \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}:
+\begin{enumerate}[label=(\Alph*)]
+  \item Um \textit{fault} é sempre detectável imediatamente; um \textit{error} é o estado incorreto resultante; uma \textit{failure} é o defeito presente no código-fonte.
+  \item Um \textit{fault} é um defeito latente no sistema; um \textit{error} é um estado incorreto ativado pelo \textit{fault}; uma \textit{failure} ocorre quando o \textit{error} compromete o serviço entregue ao usuário.
+  \item Uma \textit{failure} precede o \textit{error}, que por sua vez ativa o \textit{fault} durante a execução.
+  \item \textit{Fault} e \textit{failure} são sinônimos; \textit{error} é o mecanismo de detecção utilizado para identificá-los em tempo de execução.
+\end{enumerate}
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+Alternativa \textbf{(B)}. O \textit{fault} é latente; é ativado e gera um \textit{error} (estado interno incorreto); o \textit{error} pode ou não propagar-se até uma \textit{failure} (serviço incorreto observável). As demais alternativas invertem a ordem ou confundem os conceitos.
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
@@ -95,74 +131,26 @@ Defina, com suas palavras, os conceitos de \textit{fault} (defeito), \textit{err
 Considere o seguinte cenário: um microsserviço de pagamentos processa uma requisição de débito, mas um bug faz com que o saldo seja decrementado duas vezes quando ocorre um timeout seguido de retry pelo cliente.
 \begin{enumerate}[label=\alph*)]
   \item Identifique o \textit{fault}, o \textit{error} e a \textit{failure} neste cenário.
-  \item A qual classe de semântica de falha (crash, omission, timing, value, Byzantine) esse comportamento pertence? Justifique.
   \item Proponha um mecanismo para evitar o problema (idempotência, deduplicação ou outro).
 \end{enumerate}
 
-\vspace{8pt}
-
-\textbf{Exercício 3.}
-Classifique cada situação abaixo na semântica de falha mais adequada (crash, omission, timing, value/response, Byzantine):
-\begin{enumerate}[label=\alph*)]
-  \item Um servidor web fecha a conexão e reinicia após uma exceção não tratada.
-  \item Um sensor de temperatura retorna sempre o valor 25\textdegree C, mesmo quando a temperatura real é 80\textdegree C.
-  \item Um serviço responde corretamente, mas após 12 segundos quando o SLA exige resposta em até 2 segundos.
-  \item Um nó de consenso envia o valor ``A'' para um peer e o valor ``B'' para outro peer na mesma rodada.
-  \item Uma mensagem de heartbeat é enviada pelo servidor, mas se perde na rede e nunca chega ao monitor.
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item \textit{Fault}: bug que não garante idempotência no débito durante retry. \textit{Error}: estado inconsistente do saldo (decrementado duas vezes). \textit{Failure}: cobrança duplicada entregue ao cliente.
+  \item Idempotência com \textit{idempotency key}: antes de debitar, verificar se o \texttt{pedido\_id} já consta na tabela de deduplicação; se sim, retornar resultado anterior sem novo débito.
 \end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
-
-\textbf{Exercício 4.}
-Explique a diferença entre \textit{fail-silent}, \textit{fail-stop} e \textit{fail-fast}. Para cada um, dê um exemplo de sistema ou componente que se beneficia desse comportamento.
-
-\vspace{8pt}
-
-\textbf{Exercício 5.}
-Um sistema de e-commerce possui a seguinte especificação: ``cada pedido deve ser processado exatamente uma vez''.
-\begin{enumerate}[label=\alph*)]
-  \item Explique por que a semântica \textit{exactly-once} é difícil de garantir em um sistema distribuído.
-  \item Compare as semânticas \textit{at-least-once} e \textit{at-most-once}, indicando vantagens e riscos de cada uma nesse contexto.
-  \item Descreva como a combinação de idempotência + chave de deduplicação pode aproximar o comportamento de \textit{exactly-once}.
-\end{enumerate}
-
-\vspace{8pt}
-
-\textbf{Exercício 6.}
-Considere um sistema IoT com os seguintes componentes: sensores, gateway local, rede (Wi-Fi), serviço na nuvem e dashboard de monitoramento.
-\begin{enumerate}[label=\alph*)]
-  \item Identifique pelo menos 3 fronteiras de contenção (\textit{fault containment regions}) nesse sistema.
-  \item Para cada fronteira, descreva: que tipo de erro ela consegue conter e o que ela \textbf{não} consegue conter.
-  \item Proponha uma estratégia de detecção para cada fronteira (check semântico, timeout, heartbeat, etc.).
-\end{enumerate}
-
-\vspace{8pt}
-
-\textbf{Exercício 7.}
-Um serviço A depende de um serviço B. Quando B fica lento, A faz retries agressivos (sem backoff), o que sobrecarrega B e causa uma cascata de falhas.
-\begin{enumerate}[label=\alph*)]
-  \item Explique o fenômeno de \textit{retry storm} e por que ele amplifica falhas.
-  \item Proponha pelo menos 3 mecanismos para mitigar esse problema.
-  \item Qual é o papel do \textit{circuit breaker} nesse cenário? Descreva seu funcionamento básico.
-\end{enumerate}
-
-\vspace{8pt}
-
-\textbf{Exercício 8.}
-Compare as quatro estratégias de recuperação abaixo. Para cada uma, dê um cenário em que ela é a mais adequada:
-\begin{enumerate}[label=\alph*)]
-  \item Restart (reinicialização do processo)
-  \item Rollback (checkpoint + retorno ao estado anterior)
-  \item Transação (atomicidade garantida por commit/abort)
-  \item Compensação (saga: desfazer efeitos parciais em sistemas distribuídos)
-\end{enumerate}
 
 %% ============================================================
 %% PARTE 2: CONFIABILIDADE E DISPONIBILIDADE
 %% ============================================================
 \section{Parte 2 --- Confiabilidade e Disponibilidade}
 
-\textbf{Exercício 9.}
+\textbf{Exercício 3.}
 Um servidor operou continuamente por 60 dias. Nesse período, ocorreram 4 falhas. Os tempos de reparo foram: 2,0h; 1,0h; 3,0h; 0,5h.
 \begin{enumerate}[label=\alph*)]
   \item Calcule o $\MTBF$ (em horas).
@@ -171,9 +159,20 @@ Um servidor operou continuamente por 60 dias. Nesse período, ocorreram 4 falhas
   \item Estime o \textit{downtime} anual desse sistema.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item $\MTTR = 6{,}5/4 = 1{,}625\,\text{h}$. Tempo operacional: $60{\times}24 - 6{,}5 = 1433{,}5\,\text{h}$. $\MTTF = 1433{,}5/4 = 358{,}375\,\text{h}$. $\MTBF = \MTTF + \MTTR = \mathbf{360\,\text{h}}$.
+  \item $\MTTR = (2{,}0+1{,}0+3{,}0+0{,}5)/4 = \mathbf{1{,}625\,\text{h}}$.
+  \item $\A = \MTTF/\MTBF = 358{,}375/360 \approx \mathbf{99{,}55\%}$.
+  \item $\text{Downtime anual} \approx (1-0{,}9955)\times 8760 \approx \mathbf{39{,}4\,\text{h/ano}}$.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 10.}
+\textbf{Exercício 4.}
 Considere dois sistemas reparáveis:
 \begin{itemize}[nosep]
   \item Sistema P: $\MTBF = 800\,\text{h}$, $\MTTR = 16\,\text{h}$
@@ -185,9 +184,19 @@ Considere dois sistemas reparáveis:
   \item Explique, em termos práticos, por que confiabilidade e disponibilidade podem apontar para sistemas diferentes.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item P: $\A = 800/(800+16) \approx \mathbf{98{,}0\%}$; \quad Q: $\A = 200/(200+1) \approx \mathbf{99{,}5\%}$.
+  \item Mais \textbf{confiável}: P ($\MTBF = 800\,\text{h}$); mais \textbf{disponível}: Q ($\A \approx 99{,}5\%$).
+  \item Um sistema pode falhar com frequência, mas ser reparado rapidamente (alta disponibilidade, baixa confiabilidade). Outro falha raramente, porém demora muito para ser restaurado (alta confiabilidade, disponibilidade moderada).
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 11.}
+\textbf{Exercício 5.}
 Assumindo o modelo exponencial de falhas com $\MTBF = 1000\,\text{h}$:
 \begin{enumerate}[label=\alph*)]
   \item Qual a taxa de falha $\lambda$?
@@ -196,9 +205,20 @@ Assumindo o modelo exponencial de falhas com $\MTBF = 1000\,\text{h}$:
   \item Se a missão exige confiabilidade de pelo menos 95\% em 100 horas, esse sistema atende?
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item $\lambda = 1/1000 = \mathbf{0{,}001\,\text{falhas/h}}$.
+  \item $\R(200) = e^{-0{,}2} \approx \mathbf{81{,}9\%}$.
+  \item $\R(1000) = e^{-1} \approx \mathbf{36{,}8\%}$.
+  \item $\R(100) = e^{-0{,}1} \approx 90{,}5\% < 95\%$ \textbf{--- não atende}.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 12.}
+\textbf{Exercício 6.}
 Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O sistema atual tem $\MTBF = 500\,\text{h}$.
 \begin{enumerate}[label=\alph*)]
   \item Qual deve ser o $\MTTR$ máximo para atender esse SLA?
@@ -206,14 +226,39 @@ Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O 
   \item Se na prática o $\MTTR = 2\,\text{h}$, o SLA é atendido? Justifique.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item $500/(500+\MTTR) \geq 0{,}999 \Rightarrow \MTTR \leq 0{,}5/0{,}999 \approx \mathbf{0{,}5\,\text{h}}$ (30 min).
+  \item Downtime anual permitido: $0{,}001 \times 8760 \approx \mathbf{8{,}76\,\text{h/ano}}$.
+  \item $\A = 500/502 \approx 99{,}60\% < 99{,}9\%$ --- \textbf{SLA não atendido}.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 13.}
-Diferencie $\MTTF$ e $\MTBF$. Em que tipo de sistema cada métrica é mais apropriada? Dê um exemplo para cada.
+\textbf{Exercício 7.} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre $\MTTF$ e $\MTBF$:
+\begin{enumerate}[label=\upshape(\hspace{0.7em})]
+  \item O $\MTTF$ é utilizado em sistemas não reparáveis, enquanto o $\MTBF$ é a métrica adequada para sistemas reparáveis.
+  \item $\MTBF = \MTTF$, pois ambos medem o tempo médio até a primeira falha do sistema.
+  \item Para um disco rígido de servidor que pode ser substituído, o $\MTBF$ é a métrica mais apropriada.
+  \item Um $\MTBF$ alto implica necessariamente alta disponibilidade, independentemente do valor do $\MTTR$.
+\end{enumerate}
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+(1)~\textbf{V} \quad (2)~\textbf{F} \quad (3)~\textbf{V} \quad (4)~\textbf{F}
+
+\smallskip
+(2)~$\MTBF = \MTTF + \MTTR$; são distintos para sistemas reparáveis.
+(4)~$\A = \MTBF/(\MTBF+\MTTR)$; um $\MTTR$ alto pode manter $\A$ baixa mesmo com $\MTBF$ elevado (cf.\ Ex.\ 10, sistema P com $\A \approx 98\%$ apesar de $\MTBF = 800\,\text{h}$).
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 14.}
+\textbf{Exercício 8.}
 Um sistema deve operar continuamente por 48 horas para uma missão crítica. Duas opções estão disponíveis:
 \begin{itemize}[nosep]
   \item Opção A: $\MTBF = 400\,\text{h}$
@@ -225,17 +270,38 @@ Um sistema deve operar continuamente por 48 horas para uma missão crítica. Dua
   \item Se o custo da opção B é 3$\times$ maior, você recomendaria a troca? Justifique considerando o contexto de missão crítica.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item $\R_A(48) = e^{-48/400} = e^{-0{,}12} \approx \mathbf{88{,}7\%}$; \quad $\R_B(48) = e^{-48/1200} = e^{-0{,}04} \approx \mathbf{96{,}1\%}$.
+  \item Ganho: $96{,}1 - 88{,}7 = \mathbf{7{,}4}$ pontos percentuais.
+  \item \textbf{Sim, recomenda-se B}: em missão crítica, 7,4 p.p. adicionais de confiabilidade podem evitar falhas cujo custo humano ou operacional supera em muito o custo 3$\times$ maior do componente.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 %% ============================================================
 %% PARTE 3: SAFETY, SECURITY E RESILIÊNCIA
 %% ============================================================
 \section{Parte 3 --- Safety, Security e Resiliência}
 
-\textbf{Exercício 15.}
-Defina \textit{safety} e \textit{security} no contexto de dependabilidade. Qual a principal diferença em termos de origem da ameaça (acidental vs. intencional)?
+\textbf{Exercício 9.} Marque a alternativa que diferencia corretamente \textit{safety} e \textit{security} no contexto de dependabilidade:
+\begin{enumerate}[label=(\Alph*)]
+  \item \textit{Safety} refere-se à proteção contra ameaças intencionais de agentes externos; \textit{security} trata de falhas acidentais que podem causar danos ao ambiente.
+  \item \textit{Safety} preocupa-se com a proteção do ambiente contra consequências catastróficas de falhas acidentais do sistema; \textit{security} protege o sistema contra ameaças e ações maliciosas intencionais.
+  \item \textit{Safety} e \textit{security} são sinônimos no contexto de dependabilidade, ambos referindo-se à ausência de consequências catastróficas.
+  \item \textit{Security} é um subconjunto de \textit{safety}, pois toda vulnerabilidade de segurança representa também um risco de safety.
+\end{enumerate}
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+Alternativa \textbf{(B)}. A diferença central é a origem da ameaça: \textit{safety} trata de falhas \emph{acidentais} (ex.: bug, falha de hardware) que podem causar danos físicos; \textit{security} trata de ameaças \emph{intencionais} (ex.: atacante, malware). As alternativas A e C invertem ou igualam os conceitos; D é incorreta porque a relação não é de subconjunto.
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 16.}
+\textbf{Exercício 10.}
 Considere um sistema de controle de tráfego ferroviário. Um atacante compromete a rede de comunicação e injeta comandos falsos de sinalização.
 \begin{enumerate}[label=\alph*)]
   \item Esse cenário é primariamente um problema de \textit{safety} ou de \textit{security}? Justifique.
@@ -243,29 +309,19 @@ Considere um sistema de controle de tráfego ferroviário. Um atacante compromet
   \item Proponha pelo menos duas mitigações que enderecem tanto o aspecto de safety quanto o de security.
 \end{enumerate}
 
-\vspace{8pt}
-
-\textbf{Exercício 17.}
-Utilizando o modelo STRIDE, identifique pelo menos uma ameaça de cada categoria para um sistema de atualização de firmware OTA (\textit{Over-The-Air}) de dispositivos IoT. Preencha a tabela:
-
-\begin{center}
-\begin{tabular}{p{3.2cm} p{5cm} p{4cm}}
-\toprule
-\textbf{Categoria STRIDE} & \textbf{Ameaça identificada} & \textbf{Propriedade violada} \\
-\midrule
-Spoofing & & \\
-Tampering & & \\
-Repudiation & & \\
-Information Disclosure & & \\
-Denial of Service & & \\
-Elevation of Privilege & & \\
-\bottomrule
-\end{tabular}
-\end{center}
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item Primariamente \textbf{security} (ameaça intencional de um atacante), com consequência direta de \textbf{safety} (risco de colisão ou descarrilamento).
+  \item A vulnerabilidade de security permite injeção de comandos falsos $\rightarrow$ o sistema de controle recebe informações incorretas $\rightarrow$ decisão errada de sinalização $\rightarrow$ acidente físico.
+  \item Autenticação mútua entre nós de sinalização (certificados digitais) + watchdog de segurança independente que valida coerência dos comandos recebidos em relação ao estado físico dos trilhos.
+\end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 18.}
+\textbf{Exercício 11.}
 Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em seguida, para um sistema de piloto automático de drone de entrega, identifique:
 \begin{enumerate}[label=\alph*)]
   \item Dois possíveis \textit{hazards}.
@@ -273,62 +329,59 @@ Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em se
   \item Uma mitigação arquitetural para cada hazard.
 \end{enumerate}
 
-\vspace{8pt}
-
-\textbf{Exercício 19.}
-Considere o seguinte trecho de uma FMEA para um sistema de monitoramento de pacientes em UTI:
-
-\begin{center}
-\small
-\begin{tabular}{p{2.2cm} p{3cm} p{3cm} p{3.5cm}}
-\toprule
-\textbf{Item} & \textbf{Modo de falha} & \textbf{Efeito} & \textbf{Mitigação} \\
-\midrule
-Sensor SpO2 & Leitura travada (\textit{stuck-at}) & ? & ? \\
-Rede Wi-Fi & Perda de pacotes & ? & ? \\
-Software de alerta & Alarme não disparado & ? & ? \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-Complete a tabela, preenchendo os efeitos e as mitigações para cada modo de falha.
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\textit{Hazard}: condição do sistema ou ambiente que pode levar a um acidente (dano físico). Diferente de \textit{failure}: um hazard pode existir sem causar acidente se as condições não se combinarem; uma failure é o serviço incorreto entregue.
+\begin{enumerate}[label=\alph*),nosep]
+  \item (i)~Perda de sinal GPS em área urbana; (ii)~Falha no sensor de altitude.
+  \item SC(i): o drone não deve voar acima da altitude máxima sem confirmação de altitude válida; SC(ii): em caso de leitura de altitude inconsistente, iniciar procedimento de pouso de emergência imediatamente.
+  \item Mit.(i): fusão de GPS + inercial (IMU) com detecção automática de falha de GPS; Mit.(ii): dois sensores de altitude independentes com votação majoritária (2-of-3 voting).
+\end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 20.}
-Desenhe uma \textit{Fault Tree} (árvore de falhas) simplificada para o evento topo: ``Paciente não recebe alerta de condição crítica''. Considere pelo menos as seguintes causas:
-\begin{itemize}[nosep]
-  \item Sensor com leitura incorreta
-  \item Rede indisponível
-  \item Software de alerta com bug
-  \item Dispositivo de notificação sem bateria
-\end{itemize}
-Indique quais combinações usam portas AND e quais usam portas OR. Justifique suas escolhas.
+\textbf{Exercício 12.} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre as propriedades CIA e AAA:
+\begin{enumerate}[label=\upshape(\hspace{0.7em})]
+  \item Confidencialidade (CIA) é violada quando dados de pacientes são acessados por pessoal não autorizado de outro setor hospitalar.
+  \item Integridade (CIA) refere-se à disponibilidade contínua do sistema de prontuário, garantindo acesso ininterrupto 24 horas por dia.
+  \item Disponibilidade (CIA) é violada quando um ataque de negação de serviço (DoS) torna o sistema de prontuário inacessível.
+  \item Autenticação (AAA) determina quais recursos e operações um usuário já identificado pode executar no sistema.
+  \item Accountability (AAA) permite rastrear quem acessou ou modificou um prontuário eletrônico e em que momento.
+\end{enumerate}
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+(1)~\textbf{V} \quad (2)~\textbf{F} \quad (3)~\textbf{V} \quad (4)~\textbf{F} \quad (5)~\textbf{V}
+
+\smallskip
+(2)~\textbf{Integridade} garante que os dados não foram alterados indevidamente; disponibilidade contínua é a propriedade \textit{Availability}.
+(4)~\textbf{Autenticação} verifica \textit{quem} é o usuário; \textit{Autorização} (não autenticação) define o que o usuário autenticado pode acessar.
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 21.}
-Explique o que são as propriedades CIA (Confidentiality, Integrity, Availability) e AAA (Authentication, Authorization, Accountability). Para cada propriedade, dê um exemplo de violação em um sistema de prontuário eletrônico hospitalar.
-
-\vspace{8pt}
-
-\textbf{Exercício 22.}
-Defina \textit{resiliência} no contexto de sistemas computacionais. Em seguida, para cada uma das quatro capacidades (antecipar, resistir, recuperar, adaptar), dê um exemplo concreto de mecanismo ou prática em um sistema web de alta disponibilidade.
-
-\vspace{8pt}
-
-\textbf{Exercício 23.}
+\textbf{Exercício 13.}
 Explique por que projetar safety e security separadamente pode ser arriscado. Dê um exemplo concreto em que uma mitigação de security cria um novo risco de safety (ou vice-versa).
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+Projetar separadamente ignora interações entre as duas propriedades: uma solução que melhora security pode criar gargalos ou pontos de falha que comprometem safety, e vice-versa.
+
+\textbf{Exemplo}: um painel de controle industrial exige autenticação multifator para todos os comandos (security). Em uma emergência real, o delay ou falha da autenticação impede o acionamento imediato do desligamento de segurança (safety), podendo agravar o acidente. Solução: projetar um \textit{safety override} autenticado por canal físico independente.
+\end{tcolorbox}
+\fi
 
 %% ============================================================
 %% PARTE 4: TESTE DE SOFTWARE --- CAIXA PRETA
 %% ============================================================
 \section{Parte 4 --- Teste de Software: Caixa Preta}
 
-\textbf{Exercício 24.}
+\textbf{Exercício 14.}
 Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as regras:
 \begin{itemize}[nosep]
-  \item Se \texttt{idade} $< 0$ ou \texttt{idade} $> 150$: retorna ``\texttt{inválido}''
   \item Se $0 \leq \texttt{idade} \leq 12$: retorna ``\texttt{criança}''
   \item Se $13 \leq \texttt{idade} \leq 17$: retorna ``\texttt{adolescente}''
   \item Se $18 \leq \texttt{idade} \leq 64$: retorna ``\texttt{adulto}''
@@ -340,9 +393,19 @@ Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as r
   \item Identifique todas as fronteiras e projete casos de teste para os valores \textit{on} e \textit{off} de cada fronteira.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item Classes válidas: [0,12], [13,17], [18,64], [65,150]. Classes inválidas: $(-\infty,-1]$, $[151,+\infty)$.
+  \item CTs representativos: $6 \to$ ``criança''; $15 \to$ ``adolescente''; $30 \to$ ``adulto''; $100 \to$ ``idoso''; $-5 \to$ ``inválido''; $200 \to$ ``inválido''.
+  \item Fronteiras e pares \textit{on}/\textit{off}: ($-1$/$0$); ($12$/$13$); ($17$/$18$); ($64$/$65$); ($150$/$151$). Total: 10 casos de teste de fronteira.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 25.}
+\textbf{Exercício 15.}
 Considere a seguinte especificação de uma função que calcula o desconto em uma loja online:
 
 \begin{lstlisting}[style=code, numbers=none]
@@ -378,14 +441,56 @@ Regras:
   \item Monte uma suíte de testes consolidada em tabela com colunas: ID, valor, tipo\_cliente, cupom, resultado esperado, técnica, classe coberta.
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item Inválidas: valor $\leq 0$; valor $> 10000$; \texttt{tipo\_cliente} $\notin \{1,2,3\}$; \texttt{cupom} $\notin \{0,1\}$.
+  \item Válidas: (normal, s/cupom)$\to$0\%; (normal, c/cupom)$\to$5\%; (premium, s/cupom)$\to$10\%; (premium, c/cupom)$\to$15\%; (VIP, s/cupom)$\to$20\%; (VIP, c/cupom)$\to$25\% (cap aplicado).
+  \item Fronteiras: valor $= 0$ (off), $0{,}01$ (on), $10000$ (on), $10000{,}01$ (off). \texttt{cupom}: $-1$ (off), $0$ (on), $1$ (on), $2$ (off).
+  \item Suíte (exemplos principais):
+\end{enumerate}
+\begin{center}
+\scriptsize
+\begin{tabular}{cccccll}
+\toprule
+\textbf{ID} & \textbf{valor} & \textbf{tipo} & \textbf{cupom} & \textbf{esperado} & \textbf{técnica} & \textbf{classe} \\
+\midrule
+T01 & 100 & 1 & 0 & 0,00 & CE válida & normal, s/cupom \\
+T02 & 100 & 1 & 1 & 5,00 & CE válida & normal, c/cupom \\
+T03 & 100 & 2 & 0 & 10,00 & CE válida & premium, s/cupom \\
+T04 & 100 & 2 & 1 & 15,00 & CE válida & premium, c/cupom \\
+T05 & 100 & 3 & 0 & 20,00 & CE válida & VIP, s/cupom \\
+T06 & 100 & 3 & 1 & 25,00 & CE válida & VIP, c/cupom (cap) \\
+T07 & 0   & 1 & 0 & $-1$ & Fronteira off & valor inválido \\
+T08 & 0,01& 1 & 0 & 0,00 & Fronteira on & valor mínimo \\
+T09 & 10000 & 1 & 0 & 0,00 & Fronteira on & valor máximo \\
+T10 & 10001 & 1 & 0 & $-1$ & Fronteira off & valor inválido \\
+T11 & 100 & 0 & 0 & $-1$ & CE inválida & tipo inválido \\
+T12 & 100 & 1 & 2 & $-1$ & CE inválida & cupom inválido \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{tcolorbox}
+\fi
+
 \vspace{8pt}
 
-\textbf{Exercício 26.}
-Para a especificação do Exercício 25, identifique pelo menos 3 defeitos plausíveis que um programador poderia introduzir na implementação. Para cada defeito, indique qual caso de teste da sua suíte o detectaria.
+\textbf{Exercício 16.}
+Para a especificação do Exercício 15, identifique pelo menos 3 defeitos plausíveis que um programador poderia introduzir na implementação. Para cada defeito, indique qual caso de teste da sua suíte o detectaria.
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=(\arabic*),nosep]
+  \item Usar $>$ em vez de $\geq$ na verificação do domínio de \texttt{valor} ($\texttt{valor} > 0$): detectado por T08 (\texttt{valor}$=0{,}01$ deve retornar 0, não $-1$).
+  \item Omitir o cap de 25\%: detectado por T06 (VIP+cupom deveria retornar 25,00 e não 26,00).
+  \item Inverter percentuais por tipo (ex.: normal recebe 10\%): detectado por T01 (deve retornar 0,00) e T03 (deve retornar 10,00).
+\end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 27.}
+\textbf{Exercício 17.}
 Uma função recebe três inteiros representando os lados de um triângulo e classifica-o como equilátero, isósceles, escaleno ou erro (não forma triângulo). Sabe-se que a implementação contém o seguinte defeito: a condição de desigualdade triangular usa $\geq$ em vez de $>$ (ou seja, $a + b \geq c$ em vez de $a + b > c$).
 \begin{enumerate}[label=\alph*)]
   \item Qual caso de teste detecta esse defeito? Forneça valores concretos.
@@ -393,12 +498,22 @@ Uma função recebe três inteiros representando os lados de um triângulo e cla
   \item Qual técnica de teste (particionamento ou valor limite) é mais eficaz para encontrar esse tipo de bug?
 \end{enumerate}
 
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item CT: $a=3, b=4, c=7$. Com $\geq$: $3+4 \geq 7$ (verdadeiro $\to$ aceita como triângulo, incorreto). Com $>$: $3+4 \not> 7$ (falso $\to$ retorna erro, correto). O CT detecta o defeito.
+  \item $a=3,b=4,c=5$: $3+4=7 > 5$ --- ambas as condições ($>$ e $\geq$) produzem o mesmo resultado (aceita), portanto o bug não é exercido.
+  \item \textbf{Valor limite} (\textit{boundary value analysis}): o defeito reside exatamente na fronteira da desigualdade triangular ($a+b = c$).
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
 %% ============================================================
 %% PARTE 5: TESTE DE SOFTWARE --- CAIXA BRANCA
 %% ============================================================
 \section{Parte 5 --- Teste de Software: Caixa Branca}
 
-\textbf{Exercício 28.}
+\textbf{Exercício 18.}
 Considere o seguinte código em C:
 
 \begin{lstlisting}[style=code]
@@ -416,14 +531,20 @@ int verificar_acesso(int nivel, int autenticado) {
 
 \begin{enumerate}[label=\alph*)]
   \item Desenhe o grafo de fluxo de controle (CFG) deste código.
-  \item Quantos caminhos independentes existem? Justifique usando a complexidade ciclomática.
-  \item Projete um conjunto mínimo de casos de teste que alcance \textbf{cobertura de ramificações} (branch coverage) de 100\%.
-  \item Os mesmos casos de teste garantem cobertura de comandos (statement coverage) de 100\%? Justifique.
 \end{enumerate}
+
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item CFG: $N_1$ (entrada: \texttt{resultado=0}); $N_2$ (if\,1 verdadeiro: \texttt{resultado=1}); $N_3$ (if\,2 verdadeiro: \texttt{resultado=2}); $N_4$ (\texttt{return}). Arestas: $N_1{\to}N_2$, $N_1{\to}N_3$ (if\,1 falso), $N_2{\to}N_3$, $N_3{\to}N_4$, $N_1{\to}N_4$ (ambos falsos).
+  \item CT1: \texttt{nivel=2, aut=0} $\to$ 0; CT2: \texttt{nivel=3, aut=1} $\to$ 1; CT3: \texttt{nivel=5, aut=1} $\to$ 2.
+\end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 29.}
+\textbf{Exercício 19.}
 Considere o seguinte código:
 
 \begin{lstlisting}[style=code]
@@ -441,36 +562,21 @@ int calcular_bonus(int vendas, int tempo_empresa) {
 
 \begin{enumerate}[label=\alph*)]
   \item Desenhe o grafo de fluxo de controle (CFG).
-  \item Calcule a complexidade ciclomática.
-  \item Projete casos de teste para alcançar 100\% de cobertura de ramificações (branch coverage).
   \item É possível alcançar 100\% de cobertura de caminhos com menos de 4 casos de teste? Justifique.
 \end{enumerate}
 
-\vspace{8pt}
-
-\textbf{Exercício 30.}
-Para o código abaixo, projete um conjunto de casos de teste que atinja 100\% de cobertura de condição/decisão (cada condição individual avaliada como verdadeira e falsa pelo menos uma vez):
-
-\begin{lstlisting}[style=code]
-int classificar(int x, int y) {
-    if (x > 0 && y > 0) {
-        return 1;  // primeiro quadrante
-    } else if (x < 0 || y < 0) {
-        return -1; // fora do primeiro quadrante
-    }
-    return 0;      // sobre um eixo
-}
-\end{lstlisting}
-
-\begin{enumerate}[label=\alph*)]
-  \item Liste todas as condições atômicas presentes no código.
-  \item Para cada condição atômica, indique em quais casos de teste ela é verdadeira e em quais é falsa.
-  \item Quantos casos de teste são necessários no mínimo? Apresente-os com os valores de \texttt{x}, \texttt{y} e o retorno esperado.
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item CFG: $N_1$ (início: \texttt{bonus=0}); $N_2$ (if externo V: \texttt{bonus=500}); $N_3$ (if interno V: \texttt{bonus=1500}); $N_4$ (\texttt{return}). Arestas: $N_1{\to}N_2$, $N_1{\to}N_4$, $N_2{\to}N_3$, $N_2{\to}N_4$, $N_3{\to}N_4$.
+  \item \textbf{Não}: existem exatamente 3 caminhos distintos, portanto são necessários pelo menos 3 CTs para path coverage também --- o mesmo número que branch coverage neste caso.
 \end{enumerate}
+\end{tcolorbox}
+\fi
 
 \vspace{8pt}
 
-\textbf{Exercício 31.}
+\textbf{Exercício 20.}
 Considere o seguinte código:
 
 \begin{lstlisting}[style=code]
@@ -494,107 +600,15 @@ int processar(int a, int b) {
   \item Existe algum caminho infactível? Se sim, qual e por quê?
 \end{enumerate}
 
-\vspace{8pt}
-
-\textbf{Exercício 32.}
-Explique a hierarquia de critérios de cobertura: cobertura de comandos (statement) $\subseteq$ cobertura de ramificações (branch) $\subseteq$ cobertura de caminhos (path). Para cada par consecutivo, dê um exemplo de código em que alcançar o critério mais fraco \textbf{não} garante o mais forte.
-
-%% ============================================================
-%% PARTE 6: INTEGRAÇÃO --- DEPENDABILIDADE + TESTE
-%% ============================================================
-\section{Parte 6 --- Integração: Dependabilidade e Teste}
-
-\textbf{Exercício 33.}
-Considere uma função que implementa um mecanismo de retry com backoff exponencial:
-
-\begin{lstlisting}[style=code]
-int retry_request(int max_retries) {
-    int tentativas = 0;
-    int sucesso = 0;
-    while (tentativas < max_retries && sucesso == 0) {
-        sucesso = enviar_requisicao();
-        if (sucesso == 0) {
-            tentativas++;
-            esperar(tentativas * 2); // backoff
-        }
-    }
-    return sucesso;
-}
-\end{lstlisting}
-
-\begin{enumerate}[label=\alph*)]
-  \item Projete casos de teste de caixa branca para cobrir todas as ramificações deste código.
-  \item Projete casos de teste de caixa preta considerando as classes de equivalência: sucesso na primeira tentativa, sucesso após retries, falha após esgotar tentativas.
-  \item Este código implementa adequadamente backoff exponencial? Se não, identifique o problema.
-  \item Do ponto de vista de dependabilidade, que mecanismos adicionais poderiam ser incorporados (jitter, circuit breaker, etc.)?
+\ifgabarito
+\begin{tcolorbox}[gabarito]
+\begin{enumerate}[label=\alph*),nosep]
+  \item P1: $a>b$, $r\neq0$; \quad P2: $a>b$, $r=0$ (infactível); \quad P3: $a\leq b$, $r\neq0$; \quad P4: $a\leq b$, $r=0$ ($a=b$).
+  \item CT1: $a=5,b=3 \to 2$ (P1); CT2: $a=3,b=3 \to {-1}$ (P4); CT3: $a=2,b=5 \to 3$ (P3). (P2 é infactível — ver c)
+  \item \textbf{P2 é infactível}: $a>b$ (estrito) implica $a\neq b$, logo $r = a-b \neq 0$ --- contradição com $r=0$.
 \end{enumerate}
+\end{tcolorbox}
+\fi
 
-\vspace{8pt}
-
-\textbf{Exercício 34.}
-Um sistema tem $\MTBF = 720\,\text{h}$ e um conjunto de testes automatizados que roda a cada deploy. Após uma melhoria no processo de testes (adição de testes de valor limite e cobertura de ramificações), o $\MTBF$ sobe para $1200\,\text{h}$, mantendo $\MTTR = 2\,\text{h}$.
-\begin{enumerate}[label=\alph*)]
-  \item Calcule a disponibilidade antes e depois da melhoria.
-  \item Calcule $\R(48)$ (modelo exponencial) antes e depois.
-  \item De que forma teste de software contribui para \textbf{prevenção de falhas} (remoção de \textit{faults})?
-  \item Qual a relação entre cobertura de testes e confiabilidade? Um sistema com 100\% de cobertura de ramificações é necessariamente confiável?
-\end{enumerate}
-
-\vspace{8pt}
-
-\textbf{Exercício 35.}
-Considere a seguinte especificação de um mecanismo de idempotência:
-
-\begin{lstlisting}[style=code]
-int processar_pedido(int pedido_id, int valor) {
-    if (pedido_id <= 0 || valor <= 0) {
-        return -1; // entrada invalida
-    }
-    if (ja_processado(pedido_id)) {
-        return buscar_resultado(pedido_id); // replay
-    }
-    int resultado = debitar(valor);
-    registrar(pedido_id, resultado);
-    return resultado;
-}
-\end{lstlisting}
-
-\begin{enumerate}[label=\alph*)]
-  \item Identifique as classes de equivalência (válidas e inválidas) para o teste de caixa preta desta função.
-  \item Projete casos de teste de caixa branca para 100\% de cobertura de ramificações.
-  \item Explique como esse mecanismo de idempotência se relaciona com a dependabilidade do sistema (especificamente com a cadeia \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}).
-  \item O que acontece se a função \texttt{registrar} falhar entre \texttt{debitar} e \texttt{registrar}? Qual estratégia de recuperação resolveria esse problema?
-\end{enumerate}
-
-\vspace{8pt}
-
-\textbf{Exercício 36.}
-Relacione as colunas, associando cada conceito de dependabilidade ao papel que o teste de software desempenha:
-
-\begin{center}
-\small
-\begin{tabular}{p{5cm} p{7cm}}
-\toprule
-\textbf{Conceito} & \textbf{Papel do Teste} \\
-\midrule
-(1) Remoção de faults & (A) Teste de stress/carga para verificar limites \\
-(2) Detecção de erros & (B) Teste funcional para encontrar e corrigir bugs antes do deploy \\
-(3) Validação de safety constraints & (C) Teste de regressão para garantir que correções não introduzem novos defeitos \\
-(4) Verificação de tolerância a falhas & (D) Teste de injeção de falhas para verificar mecanismos de recuperação \\
-(5) Manutenção da confiabilidade & (E) Teste contra requisitos de segurança funcional derivados de hazard analysis \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{8pt}
-
-\textbf{Exercício 37.}
-Um engenheiro afirma: ``Se todos os testes passam, o sistema é confiável''. Critique essa afirmação considerando:
-\begin{enumerate}[label=\alph*)]
-  \item A distinção entre verificação e validação.
-  \item As limitações de cobertura de testes (o que 100\% de branch coverage \textbf{não} garante).
-  \item A diferença entre ausência de falhas observadas e ausência de defeitos.
-  \item O papel de falhas operacionais (configuração, ambiente, carga) que testes unitários não cobrem.
-\end{enumerate}
 
 \end{document}
