@@ -9,13 +9,9 @@ items:
     class: 1
   - title: "Dependabilidade: Conceitos Básicos"
     type: "slides"
-    pdfPath: "/aulas/css/dependability/01_conceitos_dependabilidade/01-dependabilidade-conceitos.pdf"
+    pdfPath: "/aulas/css/dependability/01_dependabilidade_conceitos/01-dependabilidade-conceitos-latex.pdf"
     order: 10
     class: 1
-  - title: "Dependabilidade: Conceitos Básicos (LaTeX)"
-    type: "slides"
-    pdfPath: "/aulas/css/dependability/01_dependabilidade_conceitos/01-dependabilidade-conceitos-latex.pdf"
-    order: 11
   - title: "Confiabilidade e Disponibilidade"
     type: "slides"
     pdfPath: "/aulas/css/dependability/02_confiabilidade_disponibilidade_metricas/02-confiabilidade-disponibilidade.pdf"

@@ -101,24 +101,14 @@
       "order": 1
     },
     {
-      "id": "css-dependabilidade-conceitos-pptx",
-      "title": "Dependabilidade: Conceitos Básicos",
-      "course": "css",
-      "sourceType": "pptx",
-      "pptxPath": "aulas/css/dependability/01_conceitos_dependabilidade/Conceitos de Dependabilidade.pptx",
-      "outputPdfPath": "/aulas/css/dependability/01_conceitos_dependabilidade/01-dependabilidade-conceitos.pdf",
-      "classes": [1],
-      "order": 10
-    },
-    {
       "id": "css-dependabilidade-conceitos-latex",
-      "title": "Dependabilidade: Conceitos Básicos (LaTeX)",
+      "title": "Dependabilidade: Conceitos Básicos",
       "course": "css",
       "sourceType": "latex",
       "texDir": "aulas/css/dependability/01_dependabilidade_conceitos",
       "outputPdfPath": "/aulas/css/dependability/01_dependabilidade_conceitos/01-dependabilidade-conceitos-latex.pdf",
-      "classes": [],
-      "order": 11
+      "classes": [1],
+      "order": 10
     },
     {
       "id": "css-confiabilidade-disponibilidade",
