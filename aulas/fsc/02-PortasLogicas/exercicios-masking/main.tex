@@ -1,0 +1,419 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{needspace}
+
+%% Toggle para mostrar/ocultar respostas
+%% Troque \mostrarrespostasfalse por \mostrarrespostastrue para compilar com gabarito
+\newif\ifmostrarrespostas
+\mostrarrespostastrue
+
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Fundamentos de Sistemas Computacionais}
+\newcommand{\codigodadisciplina}{98800-04}
+\newcommand{\nomedaavaliacao}{Exercícios - Operações Bitwise e Masking}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!5},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+  morekeywords={int, unsigned, char, void, return, if, else, for, while, printf},
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\begin{tcolorbox}[colback=blue!5, colframe=blue!40, title=\textbf{Lembrete: Operadores Bitwise}, fonttitle=\small]
+\small
+Em linguagens como C e Java, os operadores bitwise atuam \textbf{bit a bit} sobre os operandos:
+
+\begin{center}
+\begin{tabular}{clcl}
+\toprule
+\textbf{Operador} & \textbf{Nome} & \textbf{Operador} & \textbf{Nome} \\
+\midrule
+\texttt{\&} & AND bitwise & \texttt{|} & OR bitwise \\
+\texttt{\^{}} & XOR bitwise & \texttt{\~{}} & NOT (complemento) \\
+\texttt{<<} & Shift left & \texttt{>>} & Shift right \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Masking} é a técnica de usar uma constante (máscara) combinada com um operador bitwise para ler, ligar, desligar ou alternar bits específicos de um valor, sem afetar os demais.
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Questão 1 --- Avaliação de expressões bitwise}
+
+Considere variáveis de \textbf{8 bits sem sinal}. Avalie cada expressão e dê o resultado em binário e hexadecimal.
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \texttt{0b11001010 \& 0b11110000}
+  \item \texttt{0b10110011 | 0b00001111}
+  \item \texttt{0b11010110 \^{} 0b11111111}
+  \item \texttt{\~{}0b00110011} (considere 8 bits)
+  \item \texttt{0b00001101 << 3}
+  \item \texttt{0b11010000 >> 4}
+\end{enumerate}
+\end{multicols}
+
+\ifmostrarrespostas
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Resposta --- Questão 1}, fonttitle=\small]
+\small
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \texttt{0b11000000} = \texttt{0xC0}
+  \item \texttt{0b10111111} = \texttt{0xBF}
+  \item \texttt{0b00101001} = \texttt{0x29}
+  \item \texttt{0b11001100} = \texttt{0xCC}
+  \item \texttt{0b01101000} = \texttt{0x68}
+  \item \texttt{0b00001101} = \texttt{0x0D}
+\end{enumerate}
+\end{multicols}
+\end{tcolorbox}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Questão 2 --- Identificando a operação}
+
+Para cada par (valor original $\rightarrow$ resultado), determine qual operador bitwise e qual máscara foram usados. Todos os valores são de 8 bits.
+
+\begin{multicols}{2}
+\begin{enumerate}[label=\alph*)]
+  \item \texttt{0b10110110} $\rightarrow$ \texttt{0b00110000}
+  \item \texttt{0b10100000} $\rightarrow$ \texttt{0b10100111}
+  \item \texttt{0b11111011} $\rightarrow$ \texttt{0b11110011}
+  \item \texttt{0b10101010} $\rightarrow$ \texttt{0b01010101}
+\end{enumerate}
+\end{multicols}
+
+\ifmostrarrespostas
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Resposta --- Questão 2}, fonttitle=\small]
+\small
+\begin{enumerate}[label=\alph*)]
+  \item AND com \texttt{0b00110000} (\texttt{0x30}): \texttt{0b10110110 \& 0x30 = 0b00110000}
+  \item OR com \texttt{0b00000111} (\texttt{0x07}): \texttt{0b10100000 | 0x07 = 0b10100111}
+  \item AND com \texttt{0b11110111} (\texttt{0xF7}), ou equivalentemente \texttt{\& \~{}(1 << 3)}: limpa o bit 3.
+  \item XOR com \texttt{0b11111111} (\texttt{0xFF}), ou equivalentemente NOT (\texttt{\~{}}): inverte todos os bits.
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Questão 3 --- Máscaras para tarefas específicas}
+
+Para cada tarefa, escreva a expressão usando operadores bitwise. Considere uma variável \texttt{unsigned char x} (8 bits).
+
+\begin{enumerate}[label=\alph*)]
+  \item Extrair (isolar) os 4 bits mais significativos de \texttt{x}.
+  \item Ligar (set) o bit 5 de \texttt{x}, sem alterar os demais.
+  \item Desligar (clear) o bit 3 de \texttt{x}, sem alterar os demais.
+  \item Alternar (toggle) os bits 0 e 1 de \texttt{x}, sem alterar os demais.
+  \item Verificar se o bit 7 de \texttt{x} está ligado (a expressão deve resultar em verdadeiro ou falso).
+\end{enumerate}
+
+{\small\textit{Convenção: bits numerados da direita para a esquerda, começando em 0 (bit 0 = LSB, bit 7 = MSB).}}
+
+\ifmostrarrespostas
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Resposta --- Questão 3}, fonttitle=\small]
+\small
+\begin{enumerate}[label=\alph*)]
+  \item \texttt{x \& 0xF0}
+  \item \texttt{x | (1 << 5)} \quad ou \quad \texttt{x | 0x20}
+  \item \texttt{x \& \~{}(1 << 3)} \quad ou \quad \texttt{x \& 0xF7}
+  \item \texttt{x \^{} 0x03}
+  \item \texttt{(x \& 0x80) != 0} \quad ou \quad \texttt{x \& (1 << 7)}
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\needspace{8\baselineskip}
+\section{Questão 4 --- Leitura de código}
+
+Analise cada trecho de código e determine o valor final de \texttt{resultado} em binário e hexadecimal.
+
+\begin{enumerate}[label=\alph*)]
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char flags = 0b10010100;
+unsigned char resultado = flags & 0x0F;
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char reg = 0b01100001;
+unsigned char resultado = reg | (1 << 7);
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char estado = 0b11111111;
+unsigned char resultado = estado & ~(1 << 4);
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char valor = 0b10101010;
+unsigned char resultado = valor ^ 0b11001100;
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char a = 0xA3;
+unsigned char b = 0x5C;
+unsigned char resultado = (a & 0xF0) | (b & 0x0F);
+\end{lstlisting}
+
+\end{enumerate}
+
+\ifmostrarrespostas
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Resposta --- Questão 4}, fonttitle=\small]
+\small
+\begin{enumerate}[label=\alph*)]
+  \item \texttt{0b00000100} = \texttt{0x04}
+  \item \texttt{0b11100001} = \texttt{0xE1}
+  \item \texttt{0b11101111} = \texttt{0xEF}
+  \item \texttt{0b01100110} = \texttt{0x66}
+  \item \texttt{0b10101100} = \texttt{0xAC}
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\needspace{10\baselineskip}
+\section{Questão 5 --- Escrita de funções}
+
+Implemente as funções abaixo usando \textbf{apenas} operadores bitwise (\texttt{\&}, \texttt{|}, \texttt{\^{}}, \texttt{\~{}}, \texttt{<<}, \texttt{>>}).
+
+\begin{enumerate}[label=\alph*)]
+\item Uma função que recebe um byte e retorna 1 se o bit na posição \texttt{pos} estiver ligado, e 0 caso contrário.
+\begin{lstlisting}[style=code]
+int bit_ligado(unsigned char byte, int pos) {
+    // sua implementacao
+}
+\end{lstlisting}
+
+\item Uma função que recebe um byte e uma posição, e retorna o byte com o bit naquela posição \textbf{ligado}.
+\begin{lstlisting}[style=code]
+unsigned char ligar_bit(unsigned char byte, int pos) {
+    // sua implementacao
+}
+\end{lstlisting}
+
+\item Uma função que recebe um byte e uma posição, e retorna o byte com o bit naquela posição \textbf{desligado}.
+\begin{lstlisting}[style=code]
+unsigned char desligar_bit(unsigned char byte, int pos) {
+    // sua implementacao
+}
+\end{lstlisting}
+
+\item Uma função que recebe um byte e troca os 4 bits mais significativos com os 4 bits menos significativos (swap nibbles).
+\begin{lstlisting}[style=code]
+unsigned char swap_nibbles(unsigned char byte) {
+    // sua implementacao
+}
+\end{lstlisting}
+
+\end{enumerate}
+
+\ifmostrarrespostas
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Resposta --- Questão 5}, fonttitle=\small]
+\small
+\begin{enumerate}[label=\alph*)]
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+int bit_ligado(unsigned char byte, int pos) {
+    return (byte >> pos) & 1;
+}
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char ligar_bit(unsigned char byte, int pos) {
+    return byte | (1 << pos);
+}
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char desligar_bit(unsigned char byte, int pos) {
+    return byte & ~(1 << pos);
+}
+\end{lstlisting}
+
+\item ~\vspace{-6pt}
+\begin{lstlisting}[style=code]
+unsigned char swap_nibbles(unsigned char byte) {
+    return (byte << 4) | (byte >> 4);
+}
+\end{lstlisting}
+\end{enumerate}
+\end{tcolorbox}
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\iffalse % Questões 6-9 desabilitadas
+\needspace{8\baselineskip}
+\section{Questão 6 --- Registrador de controle}
+
+Um microcontrolador possui um registrador de controle de 8 bits chamado \texttt{CTRL}, onde cada bit tem um significado:
+
+\begin{center}
+\small
+\begin{tabular}{cccccccc}
+\toprule
+Bit 7 & Bit 6 & Bit 5 & Bit 4 & Bit 3 & Bit 2 & Bit 1 & Bit 0 \\
+\midrule
+ENABLE & MODE1 & MODE0 & IRQ & --- & SPEED1 & SPEED0 & RESET \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+O registrador começa com o valor \texttt{CTRL = 0x00}. Escreva as expressões para executar cada operação \textbf{em sequência} (cada operação modifica o valor de \texttt{CTRL} para as próximas):
+
+\begin{enumerate}[label=\alph*)]
+  \item Habilitar o dispositivo (ligar ENABLE).
+  \item Configurar o modo de operação para 2 (MODE1=1, MODE0=0).
+  \item Configurar a velocidade para 3 (SPEED1=1, SPEED0=1).
+  \item Desabilitar interrupções (desligar IRQ).
+  \item Verificar se o dispositivo está habilitado e em modo 2 simultaneamente.
+  \item Resetar o dispositivo (ligar RESET) e desligar ENABLE numa única expressão.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\needspace{8\baselineskip}
+\section{Questão 7 --- Flags de permissão}
+
+Um sistema de arquivos simplificado usa 8 bits para representar permissões, seguindo a mesma lógica do UNIX:
+
+\begin{center}
+\small
+\begin{tabular}{cccccccc}
+\toprule
+Bit 7 & Bit 6 & Bit 5 & Bit 4 & Bit 3 & Bit 2 & Bit 1 & Bit 0 \\
+\midrule
+--- & --- & OW & OR & OX & GR & GX & UR \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Onde: O = Owner, G = Group, U = User, R = Read, W = Write, X = Execute.
+Um arquivo possui permissões \texttt{perm = 0b00110100}.
+
+\begin{enumerate}[label=\alph*)]
+  \item Quais permissões estão ativas?
+  \item Escreva uma expressão que verifica se o owner tem permissão de escrita (OW).
+  \item Adicione permissão de execução ao grupo (GX), sem alterar as demais.
+  \item Remova todas as permissões do owner (OW, OR, OX), sem alterar as demais.
+  \item Escreva uma expressão que retorne verdadeiro se \textbf{qualquer} permissão de execução (OX, GX ou UR) estiver ativa.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\needspace{6\baselineskip}
+\section{Questão 8 --- Codificação de cores RGB}
+
+Em computação gráfica, uma cor RGB pode ser representada em 24 bits (8 bits por canal), armazenada numa variável de 32 bits:
+
+\begin{center}
+\texttt{0x00RRGGBB}
+\end{center}
+
+onde \texttt{RR} são os 8 bits do vermelho (bits 23--16), \texttt{GG} do verde (bits 15--8) e \texttt{BB} do azul (bits 7--0).
+
+Dada a variável \texttt{unsigned int cor = 0x00E8A243;}, escreva expressões para:
+
+\begin{enumerate}[label=\alph*)]
+  \item Extrair o valor do canal vermelho (R).
+  \item Extrair o valor do canal verde (G).
+  \item Extrair o valor do canal azul (B).
+  \item Criar uma nova cor com R=200, G=100, B=50 usando apenas shifts e OR.
+  \item Substituir apenas o canal verde da cor original por 0xFF, sem alterar R e B.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\needspace{8\baselineskip}
+\section{Questão 9 --- Desafio: Compactação de dados}
+
+Um sensor meteorológico envia leituras empacotadas em um único \texttt{unsigned int} (32 bits) com o seguinte formato:
+
+\begin{center}
+\small
+\begin{tabular}{cccc}
+\toprule
+Bits 31--24 & Bits 23--16 & Bits 15--8 & Bits 7--0 \\
+\midrule
+Temperatura & Umidade & Pressão (MSB) & Pressão (LSB) \\
+(8 bits, $-128$ a $127$) & (8 bits, $0$ a $100$\%) & \multicolumn{2}{c}{(16 bits, em hPa)} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}[label=\alph*)]
+  \item Dada a leitura \texttt{unsigned int leitura = 0xE2381F90;}, extraia os valores de temperatura (como \texttt{signed char}), umidade e pressão.
+  \item Escreva uma função que recebe temperatura (\texttt{signed char}), umidade (\texttt{unsigned char}) e pressão (\texttt{unsigned short}) e retorna o valor compactado em 32 bits.
+\begin{lstlisting}[style=code]
+unsigned int compactar(signed char temp, unsigned char umid,
+                       unsigned short pressao) {
+    // sua implementacao
+}
+\end{lstlisting}
+  \item Dada uma leitura compactada, escreva uma expressão que verifica se a temperatura é negativa usando \textbf{apenas} operações bitwise (sem cast para signed).
+\end{enumerate}
+\fi % Fim das questões 6-9 desabilitadas
+
+\end{document}

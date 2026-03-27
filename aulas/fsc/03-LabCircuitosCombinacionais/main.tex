@@ -1,0 +1,416 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{colortbl}
+
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Fundamentos de Sistemas Computacionais}
+\newcommand{\codigodadisciplina}{98800-04}
+\newcommand{\nomedaavaliacao}{Laboratório --- Circuitos Combinacionais no LogiSim}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+%% Comando para espaço de resposta em branco
+\newcommand{\resposta}[1][1.2cm]{%
+  \par\vspace{4pt}%
+  \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{%
+    \vspace{#1}%
+  }}%
+  \par\vspace{4pt}%
+}
+
+%% Comando para linha de resposta inline
+\newcommand{\resplinha}[1][4cm]{\underline{\hspace{#1}}}
+
+%% Célula em branco para tabela-verdade
+\newcommand{\celula}{\rule{0pt}{14pt}\hspace{12pt}}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\noindent
+\textbf{Nome:} \resplinha[8cm] \hfill \textbf{Matrícula:} \resplinha[4cm]
+
+\vspace{0.15in}
+
+\begin{tcolorbox}[colback=blue!5, colframe=blue!40, title=\textbf{Objetivo do Laboratório}, fonttitle=\small]
+\small
+Neste laboratório você irá projetar e simular circuitos combinacionais utilizando o \textbf{LogiSim}.
+A partir de especificações funcionais, você deverá: montar tabelas-verdade, extrair expressões booleanas,
+simplificá-las usando Mapas de Karnaugh e implementar os circuitos no simulador.
+
+\textbf{Personalização:} vários exercícios utilizam os dígitos da sua \textbf{matrícula} para gerar
+entradas únicas. Siga as instruções com atenção.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=yellow!10, colframe=yellow!60!black, title=\textbf{Entrega}, fonttitle=\small]
+\small
+Ao final da aula, entregue:
+\begin{itemize}[nosep]
+  \item Esta folha preenchida com as tabelas-verdade, expressões e respostas.
+  \item Os arquivos \texttt{.circ} do LogiSim (nomeados conforme indicado em cada parte).
+\end{itemize}
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parte 1 --- Portas Lógicas Básicas ($\sim$15 min)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!50, fontupper=\small]
+Abra o LogiSim e crie um novo projeto. Salve como \texttt{parte1.circ}.
+\end{tcolorbox}
+
+Monte os circuitos abaixo e preencha as tabelas-verdade simulando no LogiSim.
+
+\subsection{1.1 --- Porta AND de 2 entradas}
+
+% FIGURA: fig-and2.png
+% Descrição: Screenshot do LogiSim mostrando uma porta AND de 2 entradas (A, B)
+% conectada a um LED/output. Entradas com pinos nomeados A e B, saída nomeada S.
+
+\begin{center}
+\begin{tabular}{cc|c}
+\toprule
+\textbf{A} & \textbf{B} & \textbf{S = A $\cdot$ B} \\
+\midrule
+0 & 0 & \celula \\
+0 & 1 & \celula \\
+1 & 0 & \celula \\
+1 & 1 & \celula \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{1.2 --- Porta XOR de 2 entradas}
+
+\begin{center}
+\begin{tabular}{cc|c}
+\toprule
+\textbf{A} & \textbf{B} & \textbf{S = A $\oplus$ B} \\
+\midrule
+0 & 0 & \celula \\
+0 & 1 & \celula \\
+1 & 0 & \celula \\
+1 & 1 & \celula \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{1.3 --- Circuito combinado}
+
+Monte o circuito que implementa $S = \overline{A \cdot B} + (A \oplus B)$ e preencha a tabela-verdade.
+
+\begin{center}
+\begin{tabular}{cc|c|c|c}
+\toprule
+\textbf{A} & \textbf{B} & $\overline{A \cdot B}$ & $A \oplus B$ & \textbf{S} \\
+\midrule
+0 & 0 & \celula & \celula & \celula \\
+0 & 1 & \celula & \celula & \celula \\
+1 & 0 & \celula & \celula & \celula \\
+1 & 1 & \celula & \celula & \celula \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Essa função é equivalente a alguma porta conhecida? Se sim, qual? \resplinha[6cm]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parte 2 --- Circuito personalizado com a matrícula ($\sim$40 min)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!50, fontupper=\small]
+Salve esta parte como \texttt{parte2.circ}.
+\end{tcolorbox}
+
+Nesta parte, você irá projetar um circuito combinacional de \textbf{3 entradas} (A, B, C) e \textbf{2 saídas} (S1, S2) cujas tabelas-verdade são geradas a partir da sua matrícula.
+
+\subsection{2.1 --- Gerando sua tabela-verdade}
+
+Escreva os \textbf{8 últimos dígitos} da sua matrícula nos campos abaixo (um dígito por campo).
+Se a matrícula tiver menos de 8 dígitos, preencha os campos restantes à esquerda com zeros.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+$d_1$ & $d_2$ & $d_3$ & $d_4$ & $d_5$ & $d_6$ & $d_7$ & $d_8$ \\
+\hline
+\rule{0pt}{18pt}\hspace{10pt} & \hspace{10pt} & \hspace{10pt} & \hspace{10pt} & \hspace{10pt} & \hspace{10pt} & \hspace{10pt} & \hspace{10pt} \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent Agora, converta cada dígito para a saída correspondente usando a regra:
+
+\begin{center}
+\fbox{\textbf{Dígito PAR} (0, 2, 4, 6, 8) $\rightarrow$ saída \textbf{0} \qquad\qquad \textbf{Dígito ÍMPAR} (1, 3, 5, 7, 9) $\rightarrow$ saída \textbf{1}}
+\end{center}
+
+\noindent Os dígitos $d_1$ a $d_8$ definem, respectivamente, as saídas \textbf{S1} para as linhas 0--7 da tabela-verdade (onde linha 0 = A=0, B=0, C=0 e linha 7 = A=1, B=1, C=1). Use a mesma regra com os dígitos em \textbf{ordem inversa} ($d_8$ a $d_1$) para definir \textbf{S2}.
+
+\subsection{2.2 --- Tabela-verdade}
+
+Preencha a tabela com os valores obtidos:
+
+\begin{center}
+\begin{tabular}{ccc|c|c}
+\toprule
+\textbf{A} & \textbf{B} & \textbf{C} & \textbf{S1} & \textbf{S2} \\
+\midrule
+0 & 0 & 0 & \celula & \celula \\
+0 & 0 & 1 & \celula & \celula \\
+0 & 1 & 0 & \celula & \celula \\
+0 & 1 & 1 & \celula & \celula \\
+1 & 0 & 0 & \celula & \celula \\
+1 & 0 & 1 & \celula & \celula \\
+1 & 1 & 0 & \celula & \celula \\
+1 & 1 & 1 & \celula & \celula \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{2.3 --- Expressão booleana (Soma de Produtos)}
+
+Escreva a expressão SOP (soma de mintermos) para cada saída:
+
+\noindent \textbf{S1} = \resplinha[10cm]
+
+\vspace{6pt}
+\noindent \textbf{S2} = \resplinha[10cm]
+
+\subsection{2.4 --- Simplificação por Mapa de Karnaugh}
+
+Preencha os mapas de Karnaugh e encontre a expressão simplificada.
+
+\vspace{6pt}
+\noindent\textbf{Mapa de Karnaugh --- S1:}
+\begin{center}
+\begin{tabular}{cc|c|c|c|c|}
+\cline{3-6}
+& & \multicolumn{2}{c|}{$A=0$} & \multicolumn{2}{c|}{$A=1$} \\
+\cline{3-6}
+& & $C=0$ & $C=1$ & $C=0$ & $C=1$ \\
+\hline
+\multicolumn{1}{|c}{\multirow{2}{*}{}} & $B=0$ & \celula & \celula & \celula & \celula \\
+\cline{2-6}
+\multicolumn{1}{|c}{} & $B=1$ & \celula & \celula & \celula & \celula \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent \textbf{S1 simplificada} = \resplinha[10cm]
+
+\vspace{6pt}
+\noindent\textbf{Mapa de Karnaugh --- S2:}
+\begin{center}
+\begin{tabular}{cc|c|c|c|c|}
+\cline{3-6}
+& & \multicolumn{2}{c|}{$A=0$} & \multicolumn{2}{c|}{$A=1$} \\
+\cline{3-6}
+& & $C=0$ & $C=1$ & $C=0$ & $C=1$ \\
+\hline
+\multicolumn{1}{|c}{\multirow{2}{*}{}} & $B=0$ & \celula & \celula & \celula & \celula \\
+\cline{2-6}
+\multicolumn{1}{|c}{} & $B=1$ & \celula & \celula & \celula & \celula \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent \textbf{S2 simplificada} = \resplinha[10cm]
+
+\subsection{2.5 --- Implementação no LogiSim}
+
+Implemente o circuito com as expressões \textbf{simplificadas} no LogiSim. Use:
+\begin{itemize}[nosep]
+  \item Pinos de entrada nomeados \texttt{A}, \texttt{B}, \texttt{C}.
+  \item Pinos de saída nomeados \texttt{S1}, \texttt{S2}.
+  \item Apenas portas AND, OR e NOT.
+\end{itemize}
+
+% FIGURA: fig-parte2-exemplo.png
+% Descrição: Exemplo de circuito combinacional no LogiSim com 3 entradas (A, B, C)
+% e 2 saídas (S1, S2), mostrando portas AND, OR e NOT conectadas.
+% As entradas devem estar à esquerda, as saídas à direita, com os fios organizados.
+% Serve como referência visual de como organizar o circuito.
+
+\noindent Teste \textbf{todas as 8 combinações} de entrada e verifique se as saídas conferem com sua tabela-verdade.
+
+\vspace{4pt}
+\noindent O circuito simulado confere com a tabela-verdade?  \resplinha[2cm]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parte 3 --- Detector de intervalo numérico ($\sim$30 min)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=gray!50, fontupper=\small]
+Salve esta parte como \texttt{parte3.circ}.
+\end{tcolorbox}
+
+Projete um circuito combinacional que recebe um número de \textbf{4 bits} (D, C, B, A), representando valores de 0 a 15, e possui \textbf{duas saídas}:
+
+\begin{itemize}[nosep]
+  \item \textbf{FAIXA}: vale 1 se o valor estiver dentro do intervalo personalizado (ver abaixo).
+  \item \textbf{PAR}: vale 1 se o valor for par.
+\end{itemize}
+
+\subsection{3.1 --- Personalizando o intervalo}
+
+Use os \textbf{2 últimos dígitos} da sua matrícula como $d_7$ e $d_8$:
+
+\begin{center}
+\fbox{Limite inferior $= d_7$ \qquad\qquad Limite superior $= d_7 + d_8$}
+\end{center}
+
+\noindent Se o limite superior ultrapassar 15, use 15.
+
+\vspace{4pt}
+\noindent Meu intervalo: de \resplinha[1.5cm] até \resplinha[1.5cm] (inclusive).
+
+\subsection{3.2 --- Tabela-verdade}
+
+Preencha a tabela para \textbf{FAIXA} (1 se o número está no intervalo, 0 caso contrário).
+A saída PAR não precisa de tabela (qual o padrão que determina se um número binário é par?).
+
+\begin{center}
+\begin{tabular}{cccc|c|c}
+\toprule
+\textbf{D} & \textbf{C} & \textbf{B} & \textbf{A} & \textbf{Valor} & \textbf{FAIXA} \\
+\midrule
+0 & 0 & 0 & 0 & 0  & \celula \\
+0 & 0 & 0 & 1 & 1  & \celula \\
+0 & 0 & 1 & 0 & 2  & \celula \\
+0 & 0 & 1 & 1 & 3  & \celula \\
+0 & 1 & 0 & 0 & 4  & \celula \\
+0 & 1 & 0 & 1 & 5  & \celula \\
+0 & 1 & 1 & 0 & 6  & \celula \\
+0 & 1 & 1 & 1 & 7  & \celula \\
+1 & 0 & 0 & 0 & 8  & \celula \\
+1 & 0 & 0 & 1 & 9  & \celula \\
+1 & 0 & 1 & 0 & 10 & \celula \\
+1 & 0 & 1 & 1 & 11 & \celula \\
+1 & 1 & 0 & 0 & 12 & \celula \\
+1 & 1 & 0 & 1 & 13 & \celula \\
+1 & 1 & 1 & 0 & 14 & \celula \\
+1 & 1 & 1 & 1 & 15 & \celula \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{3.3 --- Expressão para PAR}
+
+Qual bit determina se um número binário é par ou ímpar?
+
+\vspace{4pt}
+\noindent \textbf{PAR} = \resplinha[8cm]
+
+\subsection{3.4 --- Simplificação de FAIXA}
+
+Preencha o mapa de Karnaugh de 4 variáveis para FAIXA e simplifique.
+
+\vspace{6pt}
+\begin{center}
+\begin{tabular}{cc|c|c|c|c|}
+\cline{3-6}
+& & \multicolumn{4}{c|}{\textbf{DC}} \\
+\cline{3-6}
+& & 00 & 01 & 11 & 10 \\
+\hline
+\multicolumn{1}{|c}{\multirow{4}{*}{\rotatebox{90}{\textbf{BA}}}} & 00 & \celula & \celula & \celula & \celula \\
+\cline{2-6}
+\multicolumn{1}{|c}{} & 01 & \celula & \celula & \celula & \celula \\
+\cline{2-6}
+\multicolumn{1}{|c}{} & 11 & \celula & \celula & \celula & \celula \\
+\cline{2-6}
+\multicolumn{1}{|c}{} & 10 & \celula & \celula & \celula & \celula \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent \textbf{FAIXA simplificada} = \resplinha[10cm]
+
+\subsection{3.5 --- Implementação no LogiSim}
+
+Implemente o circuito no LogiSim com:
+\begin{itemize}[nosep]
+  \item Pinos de entrada: \texttt{D}, \texttt{C}, \texttt{B}, \texttt{A}.
+  \item Pinos de saída: \texttt{FAIXA}, \texttt{PAR}.
+\end{itemize}
+
+% FIGURA: fig-parte3-exemplo.png
+% Descrição: Exemplo de circuito no LogiSim com 4 entradas (D, C, B, A) à esquerda
+% e 2 saídas (FAIXA, PAR) à direita. Mostra a estrutura geral esperada:
+% a saída PAR conectada diretamente via um NOT ao bit A,
+% e a saída FAIXA passando por portas AND/OR. Os fios devem estar organizados.
+
+\noindent Teste pelo menos \textbf{4 valores}: um abaixo do intervalo, o limite inferior, o limite superior e um acima do intervalo.
+
+\vspace{4pt}
+\noindent
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Valor testado} & \textbf{DCBA} & \textbf{FAIXA esperada} & \textbf{FAIXA obtida} & \textbf{OK?} \\
+\hline
+\rule{0pt}{16pt}\hspace{20pt} & \hspace{30pt} & \hspace{20pt} & \hspace{20pt} & \hspace{14pt} \\
+\hline
+\rule{0pt}{16pt}\hspace{20pt} & \hspace{30pt} & \hspace{20pt} & \hspace{20pt} & \hspace{14pt} \\
+\hline
+\rule{0pt}{16pt}\hspace{20pt} & \hspace{30pt} & \hspace{20pt} & \hspace{20pt} & \hspace{14pt} \\
+\hline
+\rule{0pt}{16pt}\hspace{20pt} & \hspace{30pt} & \hspace{20pt} & \hspace{20pt} & \hspace{14pt} \\
+\hline
+\end{tabular}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vfill
+\begin{tcolorbox}[colback=gray!5, colframe=gray!50]
+\small
+\textbf{Checklist de entrega:}
+\begin{itemize}[nosep]
+  \item[$\square$] Esta folha preenchida (tabelas-verdade, expressões, mapas de Karnaugh, respostas).
+  \item[$\square$] Arquivo \texttt{parte1.circ} --- portas lógicas básicas.
+  \item[$\square$] Arquivo \texttt{parte2.circ} --- circuito personalizado (3 entradas, 2 saídas).
+  \item[$\square$] Arquivo \texttt{parte3.circ} --- detector de intervalo (4 entradas, 2 saídas).
+\end{itemize}
+\end{tcolorbox}
+
+\end{document}

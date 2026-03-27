@@ -26,5 +26,13 @@ items:
     pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf"
     order: 141
     class: 6
+  - title: "Exercícios: Masking em Portas Lógicas"
+    type: "slides"
+    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios-masking/main.pdf"
+    order: 142
+  - title: "Lab: Circuitos Combinacionais"
+    type: "slides"
+    pdfPath: "/aulas/fsc/03-LabCircuitosCombinacionais/main.pdf"
+    order: 160
 ---
 

@@ -71,6 +71,26 @@
       "order": 141
     },
     {
+      "id": "fsc-portas-logicas-exercicios-masking",
+      "title": "Exercícios: Masking em Portas Lógicas",
+      "course": "fsc",
+      "sourceType": "latex",
+      "texDir": "aulas/fsc/02-PortasLogicas/exercicios-masking",
+      "outputPdfPath": "/aulas/fsc/02-PortasLogicas/exercicios-masking/main.pdf",
+      "classes": [],
+      "order": 142
+    },
+    {
+      "id": "fsc-lab-circuitos-combinacionais",
+      "title": "Lab: Circuitos Combinacionais",
+      "course": "fsc",
+      "sourceType": "latex",
+      "texDir": "aulas/fsc/03-LabCircuitosCombinacionais",
+      "outputPdfPath": "/aulas/fsc/03-LabCircuitosCombinacionais/main.pdf",
+      "classes": [],
+      "order": 160
+    },
+    {
       "id": "css-apresentacao",
       "title": "Apresentação",
       "course": "css",
@@ -129,6 +149,16 @@
       "outputPdfPath": "/aulas/css/dependability/04_teste_software/04-teste-software.pdf",
       "classes": [5],
       "order": 40
+    },
+    {
+      "id": "css-exercicio-triangulos",
+      "title": "Exercício: Problema dos Triângulos",
+      "course": "css",
+      "sourceType": "latex",
+      "texDir": "aulas/css/dependability/04_teste_software/exercicio-triangulos",
+      "outputPdfPath": "/aulas/css/dependability/04_teste_software/exercicio-triangulos/main.pdf",
+      "classes": [],
+      "order": 41
     },
     {
       "id": "css-teste-caixa-preta",

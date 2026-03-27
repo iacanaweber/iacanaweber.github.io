@@ -31,6 +31,10 @@ items:
     pdfPath: "/aulas/css/dependability/04_teste_software/04-teste-software.pdf"
     order: 40
     class: 5
+  - title: "Exercício: Problema dos Triângulos"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/04_teste_software/exercicio-triangulos/main.pdf"
+    order: 41
   - title: "Teste de Caixa Preta"
     type: "slides"
     pdfPath: "/aulas/css/dependability/05_teste_caixa_preta/05-teste-caixa-preta.pdf"

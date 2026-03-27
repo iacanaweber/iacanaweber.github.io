@@ -1,0 +1,210 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{titlesec}
+
+\geometry{margin=2.5cm}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+
+\title{\textbf{Teste de Caixa Preta --- Problema dos Triângulos}\\[0.3em]
+\large Particionamento de Equivalência e Análise do Valor Limite}
+\author{Confiabilidade e Segurança de Software}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Especificação}
+
+Uma função recebe três inteiros (\texttt{a}, \texttt{b}, \texttt{c}) representando os lados de um triângulo e retorna:
+
+\begin{itemize}[nosep]
+  \item \textbf{Equilátero} --- se os três lados são iguais
+  \item \textbf{Isósceles} --- se exatamente dois lados são iguais
+  \item \textbf{Escaleno} --- se todos os lados são diferentes
+  \item \textbf{Erro} --- se não formam um triângulo válido
+\end{itemize}
+
+\noindent\textbf{Regras de validade:}
+\begin{itemize}[nosep]
+  \item Todos os lados devem ser positivos: $a > 0$, $b > 0$, $c > 0$
+  \item Desigualdade triangular: $a + b > c$,\; $a + c > b$,\; $b + c > a$
+\end{itemize}
+
+%% ============================================================
+\section{Particionamento de Equivalência}
+%% ============================================================
+
+\subsection{Classes de Equivalência --- Validade}
+
+\begin{center}
+\begin{tabular}{clc}
+\toprule
+\textbf{Classe} & \textbf{Condição} & \textbf{Tipo} \\
+\midrule
+I1 & Algum lado $\leq 0$ & Inválida \\
+I2a & $a + b \leq c$ & Inválida \\
+I2b & $a + c \leq b$ & Inválida \\
+I2c & $b + c \leq a$ & Inválida \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Classes de Equivalência --- Classificação (válidas)}
+
+\begin{center}
+\begin{tabular}{clc}
+\toprule
+\textbf{Classe} & \textbf{Condição} & \textbf{Saída} \\
+\midrule
+V1  & $a = b = c$ & Equilátero \\
+V2a & $a = b \neq c$ & Isósceles \\
+V2b & $a = c \neq b$ & Isósceles \\
+V2c & $b = c \neq a$ & Isósceles \\
+V3  & $a \neq b \neq c \neq a$ & Escaleno \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Casos de Teste --- Particionamento}
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Classe} & \textbf{Resultado esperado} \\
+\midrule
+1  & 5  & 5  & 5  & V1  & Equilátero \\
+2  & 3  & 3  & 5  & V2a & Isósceles \\
+3  & 3  & 5  & 3  & V2b & Isósceles \\
+4  & 5  & 3  & 3  & V2c & Isósceles \\
+5  & 3  & 4  & 5  & V3  & Escaleno \\
+\midrule
+6  & 0  & 5  & 5  & I1  & Erro \\
+7  & $-1$ & 5  & 5  & I1  & Erro \\
+8  & 1  & 2  & 10 & I2a & Erro \\
+9  & 1  & 10 & 2  & I2b & Erro \\
+10 & 10 & 1  & 2  & I2c & Erro \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent As classes inválidas são testadas \textbf{isoladamente} (uma entrada inválida por vez) para garantir que cada validação funciona independentemente.
+
+%% ============================================================
+\section{Análise do Valor Limite}
+%% ============================================================
+
+No problema do triângulo, a fronteira mais importante é a \textbf{desigualdade triangular}: o ponto onde $a + b = c$ (triângulo degenerado, \textbf{não} forma triângulo) versus $a + b > c$ (forma triângulo).
+
+\subsection{Fronteira: $a + b$ vs $c$ \quad (fixando $a = 3$, $b = 4$)}
+
+\begin{center}
+\begin{tabular}{cccclc}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Condição} & \textbf{Resultado} \\
+\midrule
+11 & 3 & 4 & 6 & $a + b > c$ (interior) & Escaleno \\
+12 & 3 & 4 & 7 & $a + b = c$ (fronteira) & Erro \\
+13 & 3 & 4 & 8 & $a + b < c$ (exterior) & Erro \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Fronteira: $a + c$ vs $b$ \quad (fixando $a = 3$, $c = 4$)}
+
+\begin{center}
+\begin{tabular}{cccclc}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Condição} & \textbf{Resultado} \\
+\midrule
+14 & 3 & 6 & 4 & $a + c > b$ & Escaleno \\
+15 & 3 & 7 & 4 & $a + c = b$ & Erro \\
+16 & 3 & 8 & 4 & $a + c < b$ & Erro \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Fronteira: $b + c$ vs $a$ \quad (fixando $b = 3$, $c = 4$)}
+
+\begin{center}
+\begin{tabular}{cccclc}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Condição} & \textbf{Resultado} \\
+\midrule
+17 & 6 & 3 & 4 & $b + c > a$ & Escaleno \\
+18 & 7 & 3 & 4 & $b + c = a$ & Erro \\
+19 & 8 & 3 & 4 & $b + c < a$ & Erro \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Fronteira: lado $= 0$ (validade do lado)}
+
+\begin{center}
+\begin{tabular}{ccccl}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Resultado} \\
+\midrule
+20 & 0 & 5 & 5 & Erro \\
+21 & 1 & 5 & 5 & Isósceles \\
+22 & 5 & 0 & 5 & Erro \\
+23 & 5 & 1 & 5 & Isósceles \\
+24 & 5 & 5 & 0 & Erro \\
+25 & 5 & 5 & 1 & Isósceles \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Fronteira: Isósceles $\leftrightarrow$ Equilátero}
+
+Caso sutil --- quando o triângulo isósceles ``vira'' equilátero:
+
+\begin{center}
+\begin{tabular}{ccccl}
+\toprule
+\textbf{Caso} & \textbf{a} & \textbf{b} & \textbf{c} & \textbf{Resultado} \\
+\midrule
+26 & 5 & 5 & 4 & Isósceles \\
+27 & 5 & 5 & 5 & Equilátero \\
+28 & 5 & 5 & 6 & Isósceles \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%% ============================================================
+\section{Resumo}
+%% ============================================================
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Técnica} & \textbf{Foco} & \textbf{Casos} \\
+\midrule
+Particionamento & Um representante de cada classe & 10 \\
+Valor Limite & Fronteiras da desigualdade, lado $= 0$, transição isósc./equil. & 18 \\
+\midrule
+\textbf{Total} & & \textbf{28} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Bugs típicos detectados por esses testes:}
+\begin{itemize}[nosep]
+  \item \texttt{>=} em vez de \texttt{>} na desigualdade triangular (casos 12, 15, 18)
+  \item Esquecimento de validar lado igual a zero (casos 20, 22, 24)
+  \item Não verificar todas as 3 permutações da desigualdade (casos em I2a/b/c)
+  \item Classificar equilátero como isósceles ou vice-versa (casos 26--28)
+\end{itemize}
+
+\end{document}
