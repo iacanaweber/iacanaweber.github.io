@@ -46,6 +46,15 @@ items:
     pdfPath: "/aulas/css/dependability/06_teste_caixa_branca/06-teste-baseado-erros.pdf"
     order: 61
     class: 7
+  - title: "Trabalho Prático: Teste Funcional"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/07_trabalho_teste_funcional/main.pdf"
+    order: 70
+    class: 8
+  - title: "Exercícios: Dependabilidade e Teste de Software"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/08_exercicios_dependabilidade_teste/main.pdf"
+    order: 80
   - title: "Introdução à Criptografia"
     type: "slides"
     pdfPath: "/aulas/css/crypto/Introdução_a_Criptografia/introducao-a-criptografia.pdf"

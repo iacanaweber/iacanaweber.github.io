@@ -271,6 +271,26 @@
       "order": 901
     },
     {
+      "id": "css-trabalho-teste-funcional",
+      "title": "Trabalho Prático: Teste Funcional",
+      "course": "css",
+      "sourceType": "latex",
+      "texDir": "aulas/css/dependability/07_trabalho_teste_funcional",
+      "outputPdfPath": "/aulas/css/dependability/07_trabalho_teste_funcional/main.pdf",
+      "classes": [8],
+      "order": 70
+    },
+    {
+      "id": "css-exercicios-dependabilidade-teste",
+      "title": "Exercícios: Dependabilidade e Teste de Software",
+      "course": "css",
+      "sourceType": "latex",
+      "texDir": "aulas/css/dependability/08_exercicios_dependabilidade_teste",
+      "outputPdfPath": "/aulas/css/dependability/08_exercicios_dependabilidade_teste/main.pdf",
+      "classes": [],
+      "order": 80
+    },
+    {
       "id": "fsd-karnaugh-exercicios",
       "title": "Exercícios: Mapa de Karnaugh",
       "course": "fsd",

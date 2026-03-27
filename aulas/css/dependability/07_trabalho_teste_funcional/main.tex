@@ -1,0 +1,421 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{multirow}
+\usepackage{hyperref}
+
+%% Toggle para mostrar/ocultar respostas
+%% Troque \mostrarrespostasfalse por \mostrarrespostastrue para compilar com gabarito
+\newif\ifmostrarrespostas
+\mostrarrespostasfalse
+
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Segurança de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{Trabalho Prático --- Teste Funcional}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!5},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+  morekeywords={int, unsigned, char, void, return, if, else, for, while, printf},
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\noindent\textbf{\textcolor{red}{Entrega: 12/04 (23:59) - no Moodle}}
+
+\vspace{0.15in}
+
+\begin{tcolorbox}[colback=blue!5, colframe=blue!40, title=\textbf{Contexto: Calculadora de Dano de RPG}, fonttitle=\small]
+\small
+Em jogos de RPG, o cálculo de dano em combate envolve diversas variáveis: o poder de ataque do personagem, a defesa do alvo, o tipo de ataque utilizado e a possibilidade de um golpe crítico. Neste trabalho, você testará uma função que implementa essa mecânica de combate, aplicando técnicas de \textbf{teste funcional} (caixa preta) para projetar casos de teste e detectar defeitos em versões incorretas da implementação.
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Especificação da Função}
+
+A função \texttt{calcular\_dano} recebe quatro parâmetros inteiros e retorna um inteiro representando o dano causado:
+
+\begin{lstlisting}[style=code]
+int calcular_dano(int poder_ataque, int defesa, int tipo_ataque, int eh_critico);
+\end{lstlisting}
+
+\subsection{Parâmetros}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Parâmetro} & \textbf{Tipo} & \textbf{Domínio} & \textbf{Descrição} \\
+\midrule
+\texttt{poder\_ataque} & \texttt{int} & $[1, 150]$ & Poder de ataque do personagem \\
+\texttt{defesa}        & \texttt{int} & $[0, 150]$ & Defesa do alvo \\
+\texttt{tipo\_ataque}  & \texttt{int} & $\{1, 2, 3\}$ & 1 = físico, 2 = mágico, 3 = verdadeiro \\
+\texttt{eh\_critico}   & \texttt{int} & $\{0, 1\}$ & 0 = normal, 1 = golpe crítico \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Regras de Cálculo}
+
+\begin{enumerate}[nosep]
+  \item \textbf{Validação:} Se qualquer parâmetro estiver fora do domínio, retornar \texttt{-1}.
+  \item \textbf{Dano base} conforme o tipo de ataque:
+  \begin{itemize}[nosep]
+    \item \textbf{Físico} (tipo 1): $\text{dano} = \text{poder\_ataque} - \text{defesa}$
+    \item \textbf{Mágico} (tipo 2): $\text{dano} = \text{poder\_ataque} - \lfloor\text{defesa} / 2\rfloor$ \quad (divisão inteira)
+    \item \textbf{Verdadeiro} (tipo 3): $\text{dano} = \text{poder\_ataque}$ \quad (ignora a defesa)
+  \end{itemize}
+  \item \textbf{Dano mínimo:} Se $\text{dano} < 1$, então $\text{dano} = 1$.
+  \item \textbf{Golpe crítico:} Se \texttt{eh\_critico} $= 1$, então $\text{dano} = \text{dano} \times 2$.
+  \item \textbf{Retorno:} O valor final de dano.
+\end{enumerate}
+
+\textit{Nota: As regras são aplicadas na ordem acima --- primeiro calcula-se o dano base, depois aplica-se o mínimo, e por fim o multiplicador crítico.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tarefas}
+
+\begin{enumerate}
+  \item \textbf{Particionamento de Equivalência:}
+  \begin{enumerate}[label=\alph*)]
+    \item Identifique todas as \textbf{classes de equivalência inválidas} (entradas fora do domínio).
+    \item Identifique todas as \textbf{classes de equivalência válidas} (combinações de tipo de ataque e golpe crítico, incluindo subclasses onde o dano mínimo é ativado).
+    \item Projete pelo menos um caso de teste por classe.
+  \end{enumerate}
+
+  \item \textbf{Análise do Valor Limite:}
+  \begin{enumerate}[label=\alph*)]
+    \item Identifique as \textbf{fronteiras} de cada parâmetro.
+    \item Identifique a fronteira do \textbf{dano mínimo}.
+    \item Projete casos de teste para os valores \textit{on} e \textit{off} de cada fronteira.
+  \end{enumerate}
+
+  \item \textbf{Suíte de testes:} Consolide os casos de teste em uma tabela com as colunas: \textit{ID, poder\_ataque, defesa, tipo\_ataque, eh\_critico, resultado esperado, técnica, classe coberta}.
+
+  \item \textbf{Execução contra versões incorretas:}
+  \begin{enumerate}[label=\alph*)]
+    \item Você receberá \textbf{10 versões compiladas} da função como arquivos objeto (\texttt{versao01.o} a \texttt{versao10.o}), cada uma contendo exatamente \textbf{um defeito}. O protótipo da função está no arquivo \texttt{calcular\_dano.h}.
+    \item Implemente seus casos de teste usando o framework \textbf{Unity}, disponível em:
+
+    \url{https://github.com/iacanaweber/Unity}
+
+    O projeto está na pasta \texttt{examples/calcular\_dano/}.
+
+    A estrutura já está pronta --- basta adicionar seus testes no arquivo \texttt{test/TestCalcularDano.c}.
+    \item Para trocar a versão sob teste, altere a variável \texttt{VERSAO} no \texttt{makefile} (ou passe via linha de comando):
+    \begin{lstlisting}[style=code]
+# Testar a versao correta:
+make VERSAO=correto.o
+
+# Testar a versao 03:
+make VERSAO=versao03.o
+    \end{lstlisting}
+    \item Para cada versão, identifique quais testes \textbf{falharam} e descreva o \textbf{defeito provável}.
+  \end{enumerate}
+\end{enumerate}
+
+\subsection{Estrutura do Projeto Unity}
+
+O projeto segue a mesma estrutura dos exemplos vistos em aula:
+
+\begin{lstlisting}[style=code,basicstyle=\ttfamily\footnotesize]
+calcular_dano/
+  src/
+    calcular_dano.h       # Prototipo da funcao
+    correto.o             # Versao correta (referencia)
+    versao01.o ... versao10.o  # Versoes com defeitos
+  test/
+    TestCalcularDano.c    # Seus casos de teste aqui
+    test_runners/
+      TestCalcularDano_Runner.c  # Registrar cada teste
+      all_tests.c                # Ponto de entrada
+  makefile
+\end{lstlisting}
+
+\begin{tcolorbox}[colback=blue!5, colframe=blue!40, title=\textbf{Como adicionar testes}, fonttitle=\small]
+\small
+Em \texttt{test/TestCalcularDano.c}, adicione um teste por caso:
+\begin{lstlisting}[style=code]
+TEST(CalcularDano, DanoFisicoNormal)
+{
+  TEST_ASSERT_EQUAL(70, calcular_dano(100, 30, 1, 0));
+}
+\end{lstlisting}
+Em \texttt{test/test\_runners/TestCalcularDano\_Runner.c}, registre cada teste:
+\begin{lstlisting}[style=code]
+TEST_GROUP_RUNNER(CalcularDano)
+{
+  RUN_TEST_CASE(CalcularDano, DanoFisicoNormal);
+  /* ... demais testes ... */
+}
+\end{lstlisting}
+Compile e execute com \texttt{make} ou \texttt{make VERSAO=versaoNN.o}.
+\end{tcolorbox}
+
+\subsection{Entregáveis}
+
+\begin{itemize}[nosep]
+  \item Tabela de classes de equivalência (válidas e inválidas)
+  \item Tabela de fronteiras e valores limite
+  \item Suíte de testes completa (tabela)
+  \item Código-fonte dos testes Unity (\texttt{TestCalcularDano.c} e \texttt{TestCalcularDano\_Runner.c})
+  \item Relatório de execução: para cada versão, quais testes falharam e qual o defeito identificado
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifmostrarrespostas
+
+\newpage
+\begin{center}
+\Large\textbf{--- GABARITO ---}
+\end{center}
+\vspace{0.2in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Particionamento de Equivalência}, fonttitle=\small]
+
+\textbf{Classes Inválidas:}
+
+\begin{center}
+\begin{tabular}{clc}
+\toprule
+\textbf{Classe} & \textbf{Condição} & \textbf{Saída} \\
+\midrule
+I1 & \texttt{poder\_ataque} $< 1$ & $-1$ \\
+I2 & \texttt{poder\_ataque} $> 150$ & $-1$ \\
+I3 & \texttt{defesa} $< 0$ & $-1$ \\
+I4 & \texttt{defesa} $> 150$ & $-1$ \\
+I5 & \texttt{tipo\_ataque} $\notin \{1,2,3\}$ & $-1$ \\
+I6 & \texttt{eh\_critico} $\notin \{0,1\}$ & $-1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.15in}
+\textbf{Classes Válidas:}
+
+\begin{center}
+\begin{tabular}{cllc}
+\toprule
+\textbf{Classe} & \textbf{Tipo de Ataque} & \textbf{Crítico} & \textbf{Fórmula} \\
+\midrule
+V1 & Físico (1) & Normal (0) & $\text{pa} - \text{def}$ \\
+V2 & Físico (1) & Crítico (1) & $(\text{pa} - \text{def}) \times 2$ \\
+V3 & Mágico (2) & Normal (0) & $\text{pa} - \lfloor\text{def}/2\rfloor$ \\
+V4 & Mágico (2) & Crítico (1) & $(\text{pa} - \lfloor\text{def}/2\rfloor) \times 2$ \\
+V5 & Verdadeiro (3) & Normal (0) & $\text{pa}$ \\
+V6 & Verdadeiro (3) & Crítico (1) & $\text{pa} \times 2$ \\
+\midrule
+V7 & Físico, dano mín. & Normal (0) & $1$ \quad (quando $\text{pa} \leq \text{def}$) \\
+V8 & Físico, dano mín. & Crítico (1) & $2$ \quad (quando $\text{pa} \leq \text{def}$) \\
+V9 & Mágico, dano mín. & Normal (0) & $1$ \quad (quando $\text{pa} \leq \lfloor\text{def}/2\rfloor$) \\
+V10 & Mágico, dano mín. & Crítico (1) & $2$ \quad (quando $\text{pa} \leq \lfloor\text{def}/2\rfloor$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Análise do Valor Limite}, fonttitle=\small]
+
+\textbf{Fronteiras dos parâmetros:}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Parâmetro} & \textbf{Fronteira} & \textbf{On (válido)} & \textbf{Off (inválido)} \\
+\midrule
+\texttt{poder\_ataque} & Limite inferior & 1 & 0 \\
+\texttt{poder\_ataque} & Limite superior & 150 & 151 \\
+\texttt{defesa} & Limite inferior & 0 & $-1$ \\
+\texttt{defesa} & Limite superior & 150 & 151 \\
+\texttt{tipo\_ataque} & Limite inferior & 1 & 0 \\
+\texttt{tipo\_ataque} & Limite superior & 3 & 4 \\
+\texttt{eh\_critico} & Limite inferior & 0 & $-1$ \\
+\texttt{eh\_critico} & Limite superior & 1 & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.15in}
+\textbf{Fronteira do dano mínimo (físico):}
+
+\begin{center}
+\begin{tabular}{ccccll}
+\toprule
+\textbf{PA} & \textbf{Def} & \textbf{Tipo} & \textbf{Crit} & \textbf{Condição} & \textbf{Resultado} \\
+\midrule
+50 & 49 & 1 & 0 & $\text{pa} - \text{def} = 1$ (sem mínimo) & 1 \\
+50 & 50 & 1 & 0 & $\text{pa} - \text{def} = 0$ (mínimo ativado) & 1 \\
+50 & 51 & 1 & 0 & $\text{pa} - \text{def} = -1$ (mínimo ativado) & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Nota:} Embora os três retornem 1, o caso PA=DEF é fundamental para detectar mutantes que não implementam o dano mínimo (retornariam 0) ou que aplicam o crítico na ordem errada.
+
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Suíte de Testes Completa}, fonttitle=\small]
+\small
+
+\begin{center}
+\begin{tabular}{ccccccll}
+\toprule
+\textbf{TC} & \textbf{PA} & \textbf{Def} & \textbf{Tipo} & \textbf{Crit} & \textbf{Esperado} & \textbf{Técnica} & \textbf{Classe} \\
+\midrule
+1  & 1   & 0   & 1 & 0 & 1    & BVA  & V1, PA=1 \\
+2  & 150 & 0   & 1 & 0 & 150  & BVA  & V1, PA=150 \\
+3  & 0   & 50  & 1 & 0 & $-1$ & BVA  & I1 \\
+4  & 151 & 50  & 1 & 0 & $-1$ & BVA  & I2 \\
+5  & 50  & 0   & 1 & 0 & 50   & BVA  & V1, def=0 \\
+6  & 50  & 150 & 1 & 0 & 1    & BVA  & V7, def=150 \\
+7  & 50  & $-1$& 1 & 0 & $-1$ & BVA  & I3 \\
+8  & 50  & 151 & 1 & 0 & $-1$ & BVA  & I4 \\
+9  & 50  & 50  & 0 & 0 & $-1$ & BVA  & I5 \\
+10 & 50  & 50  & 4 & 0 & $-1$ & BVA  & I5 \\
+11 & 50  & 50  & 1 & $-1$& $-1$& BVA  & I6 \\
+12 & 50  & 50  & 1 & 2 & $-1$ & BVA  & I6 \\
+\midrule
+13 & 100 & 30  & 1 & 0 & 70   & PE   & V1 \\
+14 & 100 & 30  & 1 & 1 & 140  & PE   & V2 \\
+15 & 100 & 30  & 2 & 0 & 85   & PE   & V3 \\
+16 & 100 & 30  & 2 & 1 & 170  & PE   & V4 \\
+17 & 100 & 30  & 3 & 0 & 100  & PE   & V5 \\
+18 & 100 & 30  & 3 & 1 & 200  & PE   & V6 \\
+\midrule
+19 & 50  & 50  & 1 & 0 & 1    & BVA  & V7 \\
+20 & 50  & 50  & 1 & 1 & 2    & BVA  & V8 \\
+21 & 10  & 100 & 1 & 0 & 1    & PE   & V7 \\
+22 & 10  & 100 & 1 & 1 & 2    & PE   & V8 \\
+23 & 100 & 99  & 2 & 0 & 51   & BVA  & V3 \\
+24 & 50  & 100 & 2 & 0 & 1    & PE   & V9 \\
+25 & 50  & 0   & 3 & 0 & 50   & PE   & V5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\small PE = Particionamento de Equivalência; BVA = Análise do Valor Limite.
+
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Descrição dos Defeitos}, fonttitle=\small]
+\small
+
+\begin{center}
+\begin{tabular}{cp{12cm}}
+\toprule
+\textbf{Versão} & \textbf{Defeito} \\
+\midrule
+01 & Validação de \texttt{poder\_ataque}: usa \texttt{< 2} em vez de \texttt{< 1}. Rejeita \texttt{poder\_ataque = 1} como inválido. \\
+02 & Validação de \texttt{defesa}: usa \texttt{> 149} em vez de \texttt{> 150}. Rejeita \texttt{defesa = 150} como inválido. \\
+03 & Fórmula do dano mágico: usa \texttt{defesa} em vez de \texttt{defesa / 2}. O dano mágico é calculado como se fosse físico. \\
+04 & Dano verdadeiro: subtrai a defesa (\texttt{pa - defesa}) em vez de usar apenas \texttt{pa}. O tipo verdadeiro não ignora a defesa. \\
+05 & Dano mínimo: não aplica a regra \texttt{if (dano < 1) dano = 1}. Pode retornar 0 ou valores negativos. \\
+06 & Multiplicador crítico: usa $\times 3$ em vez de $\times 2$. \\
+07 & Tipo de ataque 3: a condição usa \texttt{== 4} em vez de \texttt{== 3}. O tipo verdadeiro não é reconhecido e retorna $-1$. \\
+08 & Validação de \texttt{defesa}: usa \texttt{< 1} em vez de \texttt{< 0}. Rejeita \texttt{defesa = 0} como inválido. \\
+09 & Ordem das operações: aplica o multiplicador crítico \textbf{antes} do dano mínimo. Quando o dano base $\leq 0$ e há golpe crítico, o resultado é $1$ em vez de $2$. \\
+10 & Validação de \texttt{eh\_critico}: não verifica se está em $\{0, 1\}$. Aceita valores como $2$ ou $-1$ sem retornar erro. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Matriz de Detecção (Kill Matrix)}, fonttitle=\small]
+\small
+Cada célula indica se o teste \textbf{detecta} ($\times$) o defeito da versão.
+
+\begin{center}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{c|cccccccccc}
+\toprule
+\textbf{TC} & \textbf{V01} & \textbf{V02} & \textbf{V03} & \textbf{V04} & \textbf{V05} & \textbf{V06} & \textbf{V07} & \textbf{V08} & \textbf{V09} & \textbf{V10} \\
+\midrule
+1  & $\times$ & & & & & & & $\times$ & & \\
+2  & & & & & & & & $\times$ & & \\
+5  & & & & & & & & $\times$ & & \\
+6  & & $\times$ & & & $\times$ & & & & & \\
+12 & & & & & & & & & & $\times$ \\
+14 & & & & & & $\times$ & & & & \\
+15 & & & $\times$ & & & & & & & \\
+17 & & & & $\times$ & & & $\times$ & & & \\
+18 & & & & $\times$ & & $\times$ & $\times$ & & & \\
+19 & & & & & $\times$ & & & & & \\
+20 & & & & & $\times$ & $\times$ & & & $\times$ & \\
+21 & & & & & $\times$ & & & & & \\
+22 & & & & & $\times$ & $\times$ & & & $\times$ & \\
+23 & & & $\times$ & & & & & & & \\
+25 & & & & & & & $\times$ & $\times$ & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textit{Nota:} Apenas os testes que detectam pelo menos um defeito são listados. Os demais (TC3, TC4, TC7--TC11, TC13, TC16, TC24) produzem resultados corretos em todas as versões.
+
+\end{tcolorbox}
+
+\fi % fim do gabarito
+
+\end{document}

@@ -1,0 +1,600 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{multirow}
+\usepackage{hyperref}
+
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Segurança de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{Lista de Exercícios --- Dependabilidade e Teste de Software}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\newcommand{\R}{\mathrm{R}}
+\newcommand{\A}{\mathrm{A}}
+\newcommand{\MTTF}{\mathrm{MTTF}}
+\newcommand{\MTBF}{\mathrm{MTBF}}
+\newcommand{\MTTR}{\mathrm{MTTR}}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!5},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+  morekeywords={int, unsigned, char, void, return, if, else, for, while, printf, float, double},
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+%% ============================================================
+%% PARTE 1: CONCEITOS DE DEPENDABILIDADE
+%% ============================================================
+\section{Parte 1 --- Conceitos de Dependabilidade}
+
+\textbf{Exercício 1.}
+Defina, com suas palavras, os conceitos de \textit{fault} (defeito), \textit{error} (erro de estado) e \textit{failure} (falha de serviço). Em seguida, dê um exemplo concreto de software em que um \textit{fault} está presente no código, mas nenhum \textit{error} se manifesta durante a execução normal.
+
+\vspace{8pt}
+
+\textbf{Exercício 2.}
+Considere o seguinte cenário: um microsserviço de pagamentos processa uma requisição de débito, mas um bug faz com que o saldo seja decrementado duas vezes quando ocorre um timeout seguido de retry pelo cliente.
+\begin{enumerate}[label=\alph*)]
+  \item Identifique o \textit{fault}, o \textit{error} e a \textit{failure} neste cenário.
+  \item A qual classe de semântica de falha (crash, omission, timing, value, Byzantine) esse comportamento pertence? Justifique.
+  \item Proponha um mecanismo para evitar o problema (idempotência, deduplicação ou outro).
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 3.}
+Classifique cada situação abaixo na semântica de falha mais adequada (crash, omission, timing, value/response, Byzantine):
+\begin{enumerate}[label=\alph*)]
+  \item Um servidor web fecha a conexão e reinicia após uma exceção não tratada.
+  \item Um sensor de temperatura retorna sempre o valor 25\textdegree C, mesmo quando a temperatura real é 80\textdegree C.
+  \item Um serviço responde corretamente, mas após 12 segundos quando o SLA exige resposta em até 2 segundos.
+  \item Um nó de consenso envia o valor ``A'' para um peer e o valor ``B'' para outro peer na mesma rodada.
+  \item Uma mensagem de heartbeat é enviada pelo servidor, mas se perde na rede e nunca chega ao monitor.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 4.}
+Explique a diferença entre \textit{fail-silent}, \textit{fail-stop} e \textit{fail-fast}. Para cada um, dê um exemplo de sistema ou componente que se beneficia desse comportamento.
+
+\vspace{8pt}
+
+\textbf{Exercício 5.}
+Um sistema de e-commerce possui a seguinte especificação: ``cada pedido deve ser processado exatamente uma vez''.
+\begin{enumerate}[label=\alph*)]
+  \item Explique por que a semântica \textit{exactly-once} é difícil de garantir em um sistema distribuído.
+  \item Compare as semânticas \textit{at-least-once} e \textit{at-most-once}, indicando vantagens e riscos de cada uma nesse contexto.
+  \item Descreva como a combinação de idempotência + chave de deduplicação pode aproximar o comportamento de \textit{exactly-once}.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 6.}
+Considere um sistema IoT com os seguintes componentes: sensores, gateway local, rede (Wi-Fi), serviço na nuvem e dashboard de monitoramento.
+\begin{enumerate}[label=\alph*)]
+  \item Identifique pelo menos 3 fronteiras de contenção (\textit{fault containment regions}) nesse sistema.
+  \item Para cada fronteira, descreva: que tipo de erro ela consegue conter e o que ela \textbf{não} consegue conter.
+  \item Proponha uma estratégia de detecção para cada fronteira (check semântico, timeout, heartbeat, etc.).
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 7.}
+Um serviço A depende de um serviço B. Quando B fica lento, A faz retries agressivos (sem backoff), o que sobrecarrega B e causa uma cascata de falhas.
+\begin{enumerate}[label=\alph*)]
+  \item Explique o fenômeno de \textit{retry storm} e por que ele amplifica falhas.
+  \item Proponha pelo menos 3 mecanismos para mitigar esse problema.
+  \item Qual é o papel do \textit{circuit breaker} nesse cenário? Descreva seu funcionamento básico.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 8.}
+Compare as quatro estratégias de recuperação abaixo. Para cada uma, dê um cenário em que ela é a mais adequada:
+\begin{enumerate}[label=\alph*)]
+  \item Restart (reinicialização do processo)
+  \item Rollback (checkpoint + retorno ao estado anterior)
+  \item Transação (atomicidade garantida por commit/abort)
+  \item Compensação (saga: desfazer efeitos parciais em sistemas distribuídos)
+\end{enumerate}
+
+%% ============================================================
+%% PARTE 2: CONFIABILIDADE E DISPONIBILIDADE
+%% ============================================================
+\section{Parte 2 --- Confiabilidade e Disponibilidade}
+
+\textbf{Exercício 9.}
+Um servidor operou continuamente por 60 dias. Nesse período, ocorreram 4 falhas. Os tempos de reparo foram: 2,0h; 1,0h; 3,0h; 0,5h.
+\begin{enumerate}[label=\alph*)]
+  \item Calcule o $\MTBF$ (em horas).
+  \item Calcule o $\MTTR$.
+  \item Calcule a disponibilidade $\A$.
+  \item Estime o \textit{downtime} anual desse sistema.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 10.}
+Considere dois sistemas reparáveis:
+\begin{itemize}[nosep]
+  \item Sistema P: $\MTBF = 800\,\text{h}$, $\MTTR = 16\,\text{h}$
+  \item Sistema Q: $\MTBF = 200\,\text{h}$, $\MTTR = 1\,\text{h}$
+\end{itemize}
+\begin{enumerate}[label=\alph*)]
+  \item Calcule a disponibilidade de cada sistema.
+  \item Qual sistema é mais \textbf{confiável}? E qual é mais \textbf{disponível}?
+  \item Explique, em termos práticos, por que confiabilidade e disponibilidade podem apontar para sistemas diferentes.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 11.}
+Assumindo o modelo exponencial de falhas com $\MTBF = 1000\,\text{h}$:
+\begin{enumerate}[label=\alph*)]
+  \item Qual a taxa de falha $\lambda$?
+  \item Calcule $\R(200)$, ou seja, a probabilidade de operar sem falha por 200 horas.
+  \item Calcule $\R(1000)$.
+  \item Se a missão exige confiabilidade de pelo menos 95\% em 100 horas, esse sistema atende?
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 12.}
+Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O sistema atual tem $\MTBF = 500\,\text{h}$.
+\begin{enumerate}[label=\alph*)]
+  \item Qual deve ser o $\MTTR$ máximo para atender esse SLA?
+  \item Com esse $\MTTR$ máximo, estime o \textit{downtime} anual permitido.
+  \item Se na prática o $\MTTR = 2\,\text{h}$, o SLA é atendido? Justifique.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 13.}
+Diferencie $\MTTF$ e $\MTBF$. Em que tipo de sistema cada métrica é mais apropriada? Dê um exemplo para cada.
+
+\vspace{8pt}
+
+\textbf{Exercício 14.}
+Um sistema deve operar continuamente por 48 horas para uma missão crítica. Duas opções estão disponíveis:
+\begin{itemize}[nosep]
+  \item Opção A: $\MTBF = 400\,\text{h}$
+  \item Opção B: $\MTBF = 1200\,\text{h}$
+\end{itemize}
+\begin{enumerate}[label=\alph*)]
+  \item Calcule $\R(48)$ para cada opção (modelo exponencial).
+  \item Qual o ganho em pontos percentuais de confiabilidade da opção B sobre a opção A?
+  \item Se o custo da opção B é 3$\times$ maior, você recomendaria a troca? Justifique considerando o contexto de missão crítica.
+\end{enumerate}
+
+%% ============================================================
+%% PARTE 3: SAFETY, SECURITY E RESILIÊNCIA
+%% ============================================================
+\section{Parte 3 --- Safety, Security e Resiliência}
+
+\textbf{Exercício 15.}
+Defina \textit{safety} e \textit{security} no contexto de dependabilidade. Qual a principal diferença em termos de origem da ameaça (acidental vs. intencional)?
+
+\vspace{8pt}
+
+\textbf{Exercício 16.}
+Considere um sistema de controle de tráfego ferroviário. Um atacante compromete a rede de comunicação e injeta comandos falsos de sinalização.
+\begin{enumerate}[label=\alph*)]
+  \item Esse cenário é primariamente um problema de \textit{safety} ou de \textit{security}? Justifique.
+  \item Explique como uma vulnerabilidade de \textit{security} pode se tornar um risco de \textit{safety}.
+  \item Proponha pelo menos duas mitigações que enderecem tanto o aspecto de safety quanto o de security.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 17.}
+Utilizando o modelo STRIDE, identifique pelo menos uma ameaça de cada categoria para um sistema de atualização de firmware OTA (\textit{Over-The-Air}) de dispositivos IoT. Preencha a tabela:
+
+\begin{center}
+\begin{tabular}{p{3.2cm} p{5cm} p{4cm}}
+\toprule
+\textbf{Categoria STRIDE} & \textbf{Ameaça identificada} & \textbf{Propriedade violada} \\
+\midrule
+Spoofing & & \\
+Tampering & & \\
+Repudiation & & \\
+Information Disclosure & & \\
+Denial of Service & & \\
+Elevation of Privilege & & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{8pt}
+
+\textbf{Exercício 18.}
+Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em seguida, para um sistema de piloto automático de drone de entrega, identifique:
+\begin{enumerate}[label=\alph*)]
+  \item Dois possíveis \textit{hazards}.
+  \item Para cada hazard, uma \textit{safety constraint} (restrição de segurança funcional).
+  \item Uma mitigação arquitetural para cada hazard.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 19.}
+Considere o seguinte trecho de uma FMEA para um sistema de monitoramento de pacientes em UTI:
+
+\begin{center}
+\small
+\begin{tabular}{p{2.2cm} p{3cm} p{3cm} p{3.5cm}}
+\toprule
+\textbf{Item} & \textbf{Modo de falha} & \textbf{Efeito} & \textbf{Mitigação} \\
+\midrule
+Sensor SpO2 & Leitura travada (\textit{stuck-at}) & ? & ? \\
+Rede Wi-Fi & Perda de pacotes & ? & ? \\
+Software de alerta & Alarme não disparado & ? & ? \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Complete a tabela, preenchendo os efeitos e as mitigações para cada modo de falha.
+
+\vspace{8pt}
+
+\textbf{Exercício 20.}
+Desenhe uma \textit{Fault Tree} (árvore de falhas) simplificada para o evento topo: ``Paciente não recebe alerta de condição crítica''. Considere pelo menos as seguintes causas:
+\begin{itemize}[nosep]
+  \item Sensor com leitura incorreta
+  \item Rede indisponível
+  \item Software de alerta com bug
+  \item Dispositivo de notificação sem bateria
+\end{itemize}
+Indique quais combinações usam portas AND e quais usam portas OR. Justifique suas escolhas.
+
+\vspace{8pt}
+
+\textbf{Exercício 21.}
+Explique o que são as propriedades CIA (Confidentiality, Integrity, Availability) e AAA (Authentication, Authorization, Accountability). Para cada propriedade, dê um exemplo de violação em um sistema de prontuário eletrônico hospitalar.
+
+\vspace{8pt}
+
+\textbf{Exercício 22.}
+Defina \textit{resiliência} no contexto de sistemas computacionais. Em seguida, para cada uma das quatro capacidades (antecipar, resistir, recuperar, adaptar), dê um exemplo concreto de mecanismo ou prática em um sistema web de alta disponibilidade.
+
+\vspace{8pt}
+
+\textbf{Exercício 23.}
+Explique por que projetar safety e security separadamente pode ser arriscado. Dê um exemplo concreto em que uma mitigação de security cria um novo risco de safety (ou vice-versa).
+
+%% ============================================================
+%% PARTE 4: TESTE DE SOFTWARE --- CAIXA PRETA
+%% ============================================================
+\section{Parte 4 --- Teste de Software: Caixa Preta}
+
+\textbf{Exercício 24.}
+Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as regras:
+\begin{itemize}[nosep]
+  \item Se \texttt{idade} $< 0$ ou \texttt{idade} $> 150$: retorna ``\texttt{inválido}''
+  \item Se $0 \leq \texttt{idade} \leq 12$: retorna ``\texttt{criança}''
+  \item Se $13 \leq \texttt{idade} \leq 17$: retorna ``\texttt{adolescente}''
+  \item Se $18 \leq \texttt{idade} \leq 64$: retorna ``\texttt{adulto}''
+  \item Se $65 \leq \texttt{idade} \leq 150$: retorna ``\texttt{idoso}''
+\end{itemize}
+\begin{enumerate}[label=\alph*)]
+  \item Identifique todas as classes de equivalência (válidas e inválidas).
+  \item Projete um caso de teste representativo para cada classe.
+  \item Identifique todas as fronteiras e projete casos de teste para os valores \textit{on} e \textit{off} de cada fronteira.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 25.}
+Considere a seguinte especificação de uma função que calcula o desconto em uma loja online:
+
+\begin{lstlisting}[style=code, numbers=none]
+float calcular_desconto(float valor, int tipo_cliente, int cupom);
+\end{lstlisting}
+
+\begin{center}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Parâmetro} & \textbf{Tipo} & \textbf{Domínio} & \textbf{Descrição} \\
+\midrule
+\texttt{valor} & \texttt{float} & $(0, 10000]$ & Valor da compra em reais \\
+\texttt{tipo\_cliente} & \texttt{int} & $\{1, 2, 3\}$ & 1=normal, 2=premium, 3=VIP \\
+\texttt{cupom} & \texttt{int} & $\{0, 1\}$ & 0=sem cupom, 1=com cupom \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Regras:
+\begin{itemize}[nosep]
+  \item Se qualquer parâmetro estiver fora do domínio, retornar $-1$.
+  \item Desconto base: normal = 0\%, premium = 10\%, VIP = 20\%.
+  \item Se \texttt{cupom} $= 1$, adicionar 5\% ao desconto.
+  \item Desconto máximo: 25\%. Se o desconto calculado ultrapassar 25\%, limitar a 25\%.
+  \item Retorno: valor do desconto em reais (valor $\times$ percentual).
+\end{itemize}
+
+\begin{enumerate}[label=\alph*)]
+  \item Identifique todas as classes de equivalência inválidas.
+  \item Identifique todas as classes de equivalência válidas (considere as combinações de tipo de cliente e cupom).
+  \item Identifique as fronteiras relevantes e projete casos de teste para valores \textit{on} e \textit{off}.
+  \item Monte uma suíte de testes consolidada em tabela com colunas: ID, valor, tipo\_cliente, cupom, resultado esperado, técnica, classe coberta.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 26.}
+Para a especificação do Exercício 25, identifique pelo menos 3 defeitos plausíveis que um programador poderia introduzir na implementação. Para cada defeito, indique qual caso de teste da sua suíte o detectaria.
+
+\vspace{8pt}
+
+\textbf{Exercício 27.}
+Uma função recebe três inteiros representando os lados de um triângulo e classifica-o como equilátero, isósceles, escaleno ou erro (não forma triângulo). Sabe-se que a implementação contém o seguinte defeito: a condição de desigualdade triangular usa $\geq$ em vez de $>$ (ou seja, $a + b \geq c$ em vez de $a + b > c$).
+\begin{enumerate}[label=\alph*)]
+  \item Qual caso de teste detecta esse defeito? Forneça valores concretos.
+  \item Explique por que um caso de teste com valores ``genéricos'' (ex.: $a=3, b=4, c=5$) \textbf{não} detectaria esse defeito.
+  \item Qual técnica de teste (particionamento ou valor limite) é mais eficaz para encontrar esse tipo de bug?
+\end{enumerate}
+
+%% ============================================================
+%% PARTE 5: TESTE DE SOFTWARE --- CAIXA BRANCA
+%% ============================================================
+\section{Parte 5 --- Teste de Software: Caixa Branca}
+
+\textbf{Exercício 28.}
+Considere o seguinte código em C:
+
+\begin{lstlisting}[style=code]
+int verificar_acesso(int nivel, int autenticado) {
+    int resultado = 0;
+    if (nivel >= 3 && autenticado == 1) {
+        resultado = 1;
+    }
+    if (nivel >= 5) {
+        resultado = 2;
+    }
+    return resultado;
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Desenhe o grafo de fluxo de controle (CFG) deste código.
+  \item Quantos caminhos independentes existem? Justifique usando a complexidade ciclomática.
+  \item Projete um conjunto mínimo de casos de teste que alcance \textbf{cobertura de ramificações} (branch coverage) de 100\%.
+  \item Os mesmos casos de teste garantem cobertura de comandos (statement coverage) de 100\%? Justifique.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 29.}
+Considere o seguinte código:
+
+\begin{lstlisting}[style=code]
+int calcular_bonus(int vendas, int tempo_empresa) {
+    int bonus = 0;
+    if (vendas > 100 || tempo_empresa > 5) {
+        bonus = 500;
+        if (vendas > 200 && tempo_empresa > 10) {
+            bonus = 1500;
+        }
+    }
+    return bonus;
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Desenhe o grafo de fluxo de controle (CFG).
+  \item Calcule a complexidade ciclomática.
+  \item Projete casos de teste para alcançar 100\% de cobertura de ramificações (branch coverage).
+  \item É possível alcançar 100\% de cobertura de caminhos com menos de 4 casos de teste? Justifique.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 30.}
+Para o código abaixo, projete um conjunto de casos de teste que atinja 100\% de cobertura de condição/decisão (cada condição individual avaliada como verdadeira e falsa pelo menos uma vez):
+
+\begin{lstlisting}[style=code]
+int classificar(int x, int y) {
+    if (x > 0 && y > 0) {
+        return 1;  // primeiro quadrante
+    } else if (x < 0 || y < 0) {
+        return -1; // fora do primeiro quadrante
+    }
+    return 0;      // sobre um eixo
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Liste todas as condições atômicas presentes no código.
+  \item Para cada condição atômica, indique em quais casos de teste ela é verdadeira e em quais é falsa.
+  \item Quantos casos de teste são necessários no mínimo? Apresente-os com os valores de \texttt{x}, \texttt{y} e o retorno esperado.
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 31.}
+Considere o seguinte código:
+
+\begin{lstlisting}[style=code]
+int processar(int a, int b) {
+    int r = a;
+    if (a > b) {
+        r = a - b;
+    } else {
+        r = b - a;
+    }
+    if (r == 0) {
+        r = -1;
+    }
+    return r;
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Identifique todos os caminhos possíveis no código.
+  \item Projete casos de teste para cobertura de caminhos (path coverage) de 100\%.
+  \item Existe algum caminho infactível? Se sim, qual e por quê?
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 32.}
+Explique a hierarquia de critérios de cobertura: cobertura de comandos (statement) $\subseteq$ cobertura de ramificações (branch) $\subseteq$ cobertura de caminhos (path). Para cada par consecutivo, dê um exemplo de código em que alcançar o critério mais fraco \textbf{não} garante o mais forte.
+
+%% ============================================================
+%% PARTE 6: INTEGRAÇÃO --- DEPENDABILIDADE + TESTE
+%% ============================================================
+\section{Parte 6 --- Integração: Dependabilidade e Teste}
+
+\textbf{Exercício 33.}
+Considere uma função que implementa um mecanismo de retry com backoff exponencial:
+
+\begin{lstlisting}[style=code]
+int retry_request(int max_retries) {
+    int tentativas = 0;
+    int sucesso = 0;
+    while (tentativas < max_retries && sucesso == 0) {
+        sucesso = enviar_requisicao();
+        if (sucesso == 0) {
+            tentativas++;
+            esperar(tentativas * 2); // backoff
+        }
+    }
+    return sucesso;
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Projete casos de teste de caixa branca para cobrir todas as ramificações deste código.
+  \item Projete casos de teste de caixa preta considerando as classes de equivalência: sucesso na primeira tentativa, sucesso após retries, falha após esgotar tentativas.
+  \item Este código implementa adequadamente backoff exponencial? Se não, identifique o problema.
+  \item Do ponto de vista de dependabilidade, que mecanismos adicionais poderiam ser incorporados (jitter, circuit breaker, etc.)?
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 34.}
+Um sistema tem $\MTBF = 720\,\text{h}$ e um conjunto de testes automatizados que roda a cada deploy. Após uma melhoria no processo de testes (adição de testes de valor limite e cobertura de ramificações), o $\MTBF$ sobe para $1200\,\text{h}$, mantendo $\MTTR = 2\,\text{h}$.
+\begin{enumerate}[label=\alph*)]
+  \item Calcule a disponibilidade antes e depois da melhoria.
+  \item Calcule $\R(48)$ (modelo exponencial) antes e depois.
+  \item De que forma teste de software contribui para \textbf{prevenção de falhas} (remoção de \textit{faults})?
+  \item Qual a relação entre cobertura de testes e confiabilidade? Um sistema com 100\% de cobertura de ramificações é necessariamente confiável?
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 35.}
+Considere a seguinte especificação de um mecanismo de idempotência:
+
+\begin{lstlisting}[style=code]
+int processar_pedido(int pedido_id, int valor) {
+    if (pedido_id <= 0 || valor <= 0) {
+        return -1; // entrada invalida
+    }
+    if (ja_processado(pedido_id)) {
+        return buscar_resultado(pedido_id); // replay
+    }
+    int resultado = debitar(valor);
+    registrar(pedido_id, resultado);
+    return resultado;
+}
+\end{lstlisting}
+
+\begin{enumerate}[label=\alph*)]
+  \item Identifique as classes de equivalência (válidas e inválidas) para o teste de caixa preta desta função.
+  \item Projete casos de teste de caixa branca para 100\% de cobertura de ramificações.
+  \item Explique como esse mecanismo de idempotência se relaciona com a dependabilidade do sistema (especificamente com a cadeia \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}).
+  \item O que acontece se a função \texttt{registrar} falhar entre \texttt{debitar} e \texttt{registrar}? Qual estratégia de recuperação resolveria esse problema?
+\end{enumerate}
+
+\vspace{8pt}
+
+\textbf{Exercício 36.}
+Relacione as colunas, associando cada conceito de dependabilidade ao papel que o teste de software desempenha:
+
+\begin{center}
+\small
+\begin{tabular}{p{5cm} p{7cm}}
+\toprule
+\textbf{Conceito} & \textbf{Papel do Teste} \\
+\midrule
+(1) Remoção de faults & (A) Teste de stress/carga para verificar limites \\
+(2) Detecção de erros & (B) Teste funcional para encontrar e corrigir bugs antes do deploy \\
+(3) Validação de safety constraints & (C) Teste de regressão para garantir que correções não introduzem novos defeitos \\
+(4) Verificação de tolerância a falhas & (D) Teste de injeção de falhas para verificar mecanismos de recuperação \\
+(5) Manutenção da confiabilidade & (E) Teste contra requisitos de segurança funcional derivados de hazard analysis \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{8pt}
+
+\textbf{Exercício 37.}
+Um engenheiro afirma: ``Se todos os testes passam, o sistema é confiável''. Critique essa afirmação considerando:
+\begin{enumerate}[label=\alph*)]
+  \item A distinção entre verificação e validação.
+  \item As limitações de cobertura de testes (o que 100\% de branch coverage \textbf{não} garante).
+  \item A diferença entre ausência de falhas observadas e ausência de defeitos.
+  \item O papel de falhas operacionais (configuração, ambiente, carga) que testes unitários não cobrem.
+\end{enumerate}
+
+\end{document}
