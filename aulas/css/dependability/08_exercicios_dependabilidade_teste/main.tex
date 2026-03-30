@@ -43,10 +43,18 @@
 \newcommand{\MTBF}{\mathrm{MTBF}}
 \newcommand{\MTTR}{\mathrm{MTTR}}
 
-\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\nopagebreak]
 \titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
 \titlespacing*{\section}{0pt}{14pt}{6pt}
 \titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+%% Evita questão cortada entre páginas:
+%%   \questao[N]{num} — garante N baselines livres antes de iniciar a questão
+\newcommand{\questao}[2][8]{%
+  \needspace{#1\baselineskip}%
+  \noindent\textbf{Exercício #2.}%
+}
+\setlist{beginpenalty=300}
 
 \lstdefinestyle{code}{
   basicstyle=\ttfamily\small,
@@ -111,7 +119,7 @@
 \section{Parte 1 --- Conceitos de Dependabilidade}
 \vspace{8pt}
 
-\textbf{Exercício 1.} Marque a alternativa que descreve corretamente a cadeia \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}:
+\questao[10]{1} Marque a alternativa que descreve corretamente a cadeia \textit{fault} $\rightarrow$ \textit{error} $\rightarrow$ \textit{failure}:
 \begin{enumerate}[label=(\Alph*)]
   \item Um \textit{fault} é sempre detectável imediatamente; um \textit{error} é o estado incorreto resultante; uma \textit{failure} é o defeito presente no código-fonte.
   \item Um \textit{fault} é um defeito latente no sistema; um \textit{error} é um estado incorreto ativado pelo \textit{fault}; uma \textit{failure} ocorre quando o \textit{error} compromete o serviço entregue ao usuário.
@@ -127,7 +135,7 @@ Alternativa \textbf{(B)}. O \textit{fault} é latente; é ativado e gera um \tex
 
 \vspace{8pt}
 
-\textbf{Exercício 2.}
+\questao[8]{2}
 Considere o seguinte cenário: um microsserviço de pagamentos processa uma requisição de débito, mas um bug faz com que o saldo seja decrementado duas vezes quando ocorre um timeout seguido de retry pelo cliente.
 \begin{enumerate}[label=\alph*)]
   \item Identifique o \textit{fault}, o \textit{error} e a \textit{failure} neste cenário.
@@ -148,9 +156,10 @@ Considere o seguinte cenário: um microsserviço de pagamentos processa uma requ
 %% ============================================================
 %% PARTE 2: CONFIABILIDADE E DISPONIBILIDADE
 %% ============================================================
+\needspace{12\baselineskip}
 \section{Parte 2 --- Confiabilidade e Disponibilidade}
 
-\textbf{Exercício 3.}
+\questao[9]{3}
 Um servidor operou continuamente por 60 dias. Nesse período, ocorreram 4 falhas. Os tempos de reparo foram: 2,0h; 1,0h; 3,0h; 0,5h.
 \begin{enumerate}[label=\alph*)]
   \item Calcule o $\MTBF$ (em horas).
@@ -172,7 +181,7 @@ Um servidor operou continuamente por 60 dias. Nesse período, ocorreram 4 falhas
 
 \vspace{8pt}
 
-\textbf{Exercício 4.}
+\questao[10]{4}
 Considere dois sistemas reparáveis:
 \begin{itemize}[nosep]
   \item Sistema P: $\MTBF = 800\,\text{h}$, $\MTTR = 16\,\text{h}$
@@ -196,7 +205,7 @@ Considere dois sistemas reparáveis:
 
 \vspace{8pt}
 
-\textbf{Exercício 5.}
+\questao[8]{5}
 Assumindo o modelo exponencial de falhas com $\MTBF = 1000\,\text{h}$:
 \begin{enumerate}[label=\alph*)]
   \item Qual a taxa de falha $\lambda$?
@@ -218,7 +227,7 @@ Assumindo o modelo exponencial de falhas com $\MTBF = 1000\,\text{h}$:
 
 \vspace{8pt}
 
-\textbf{Exercício 6.}
+\questao[8]{6}
 Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O sistema atual tem $\MTBF = 500\,\text{h}$.
 \begin{enumerate}[label=\alph*)]
   \item Qual deve ser o $\MTTR$ máximo para atender esse SLA?
@@ -238,7 +247,7 @@ Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O 
 
 \vspace{8pt}
 
-\textbf{Exercício 7.} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre $\MTTF$ e $\MTBF$:
+\questao[10]{7} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre $\MTTF$ e $\MTBF$:
 \begin{enumerate}[label=\upshape(\hspace{0.7em})]
   \item O $\MTTF$ é utilizado em sistemas não reparáveis, enquanto o $\MTBF$ é a métrica adequada para sistemas reparáveis.
   \item $\MTBF = \MTTF$, pois ambos medem o tempo médio até a primeira falha do sistema.
@@ -258,7 +267,7 @@ Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O 
 
 \vspace{8pt}
 
-\textbf{Exercício 8.}
+\questao[11]{8}
 Um sistema deve operar continuamente por 48 horas para uma missão crítica. Duas opções estão disponíveis:
 \begin{itemize}[nosep]
   \item Opção A: $\MTBF = 400\,\text{h}$
@@ -283,9 +292,10 @@ Um sistema deve operar continuamente por 48 horas para uma missão crítica. Dua
 %% ============================================================
 %% PARTE 3: SAFETY, SECURITY E RESILIÊNCIA
 %% ============================================================
+\needspace{12\baselineskip}
 \section{Parte 3 --- Safety, Security e Resiliência}
 
-\textbf{Exercício 9.} Marque a alternativa que diferencia corretamente \textit{safety} e \textit{security} no contexto de dependabilidade:
+\questao[12]{9} Marque a alternativa que diferencia corretamente \textit{safety} e \textit{security} no contexto de dependabilidade:
 \begin{enumerate}[label=(\Alph*)]
   \item \textit{Safety} refere-se à proteção contra ameaças intencionais de agentes externos; \textit{security} trata de falhas acidentais que podem causar danos ao ambiente.
   \item \textit{Safety} preocupa-se com a proteção do ambiente contra consequências catastróficas de falhas acidentais do sistema; \textit{security} protege o sistema contra ameaças e ações maliciosas intencionais.
@@ -301,7 +311,7 @@ Alternativa \textbf{(B)}. A diferença central é a origem da ameaça: \textit{s
 
 \vspace{8pt}
 
-\textbf{Exercício 10.}
+\questao[8]{10}
 Considere um sistema de controle de tráfego ferroviário. Um atacante compromete a rede de comunicação e injeta comandos falsos de sinalização.
 \begin{enumerate}[label=\alph*)]
   \item Esse cenário é primariamente um problema de \textit{safety} ou de \textit{security}? Justifique.
@@ -321,7 +331,7 @@ Considere um sistema de controle de tráfego ferroviário. Um atacante compromet
 
 \vspace{8pt}
 
-\textbf{Exercício 11.}
+\questao[9]{11}
 Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em seguida, para um sistema de piloto automático de drone de entrega, identifique:
 \begin{enumerate}[label=\alph*)]
   \item Dois possíveis \textit{hazards}.
@@ -342,7 +352,7 @@ Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em se
 
 \vspace{8pt}
 
-\textbf{Exercício 12.} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre as propriedades CIA e AAA:
+\questao[11]{12} Indique \textbf{V} (verdadeiro) ou \textbf{F} (falso) para cada afirmação sobre as propriedades CIA e AAA:
 \begin{enumerate}[label=\upshape(\hspace{0.7em})]
   \item Confidencialidade (CIA) é violada quando dados de pacientes são acessados por pessoal não autorizado de outro setor hospitalar.
   \item Integridade (CIA) refere-se à disponibilidade contínua do sistema de prontuário, garantindo acesso ininterrupto 24 horas por dia.
@@ -363,7 +373,7 @@ Explique o conceito de \textit{hazard} e diferencie-o de \textit{failure}. Em se
 
 \vspace{8pt}
 
-\textbf{Exercício 13.}
+\questao[5]{13}
 Explique por que projetar safety e security separadamente pode ser arriscado. Dê um exemplo concreto em que uma mitigação de security cria um novo risco de safety (ou vice-versa).
 
 \ifgabarito
@@ -377,9 +387,10 @@ Projetar separadamente ignora interações entre as duas propriedades: uma solu�
 %% ============================================================
 %% PARTE 4: TESTE DE SOFTWARE --- CAIXA PRETA
 %% ============================================================
+\needspace{12\baselineskip}
 \section{Parte 4 --- Teste de Software: Caixa Preta}
 
-\textbf{Exercício 14.}
+\questao[12]{14}
 Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as regras:
 \begin{itemize}[nosep]
   \item Se $0 \leq \texttt{idade} \leq 12$: retorna ``\texttt{criança}''
@@ -405,7 +416,7 @@ Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as r
 
 \vspace{8pt}
 
-\textbf{Exercício 15.}
+\questao[25]{15}
 Considere a seguinte especificação de uma função que calcula o desconto em uma loja online:
 
 \begin{lstlisting}[style=code, numbers=none]
@@ -475,7 +486,7 @@ T12 & 100 & 1 & 2 & $-1$ & CE inválida & cupom inválido \\
 
 \vspace{8pt}
 
-\textbf{Exercício 16.}
+\questao[5]{16}
 Para a especificação do Exercício 15, identifique pelo menos 3 defeitos plausíveis que um programador poderia introduzir na implementação. Para cada defeito, indique qual caso de teste da sua suíte o detectaria.
 
 \ifgabarito
@@ -490,7 +501,7 @@ Para a especificação do Exercício 15, identifique pelo menos 3 defeitos plaus
 
 \vspace{8pt}
 
-\textbf{Exercício 17.}
+\questao[9]{17}
 Uma função recebe três inteiros representando os lados de um triângulo e classifica-o como equilátero, isósceles, escaleno ou erro (não forma triângulo). Sabe-se que a implementação contém o seguinte defeito: a condição de desigualdade triangular usa $\geq$ em vez de $>$ (ou seja, $a + b \geq c$ em vez de $a + b > c$).
 \begin{enumerate}[label=\alph*)]
   \item Qual caso de teste detecta esse defeito? Forneça valores concretos.
@@ -511,9 +522,10 @@ Uma função recebe três inteiros representando os lados de um triângulo e cla
 %% ============================================================
 %% PARTE 5: TESTE DE SOFTWARE --- CAIXA BRANCA
 %% ============================================================
+\needspace{12\baselineskip}
 \section{Parte 5 --- Teste de Software: Caixa Branca}
 
-\textbf{Exercício 18.}
+\questao[17]{18}
 Considere o seguinte código em C:
 
 \begin{lstlisting}[style=code]
@@ -544,7 +556,7 @@ int verificar_acesso(int nivel, int autenticado) {
 
 \vspace{8pt}
 
-\textbf{Exercício 19.}
+\questao[18]{19}
 Considere o seguinte código:
 
 \begin{lstlisting}[style=code]
@@ -576,7 +588,7 @@ int calcular_bonus(int vendas, int tempo_empresa) {
 
 \vspace{8pt}
 
-\textbf{Exercício 20.}
+\questao[23]{20}
 Considere o seguinte código:
 
 \begin{lstlisting}[style=code]
