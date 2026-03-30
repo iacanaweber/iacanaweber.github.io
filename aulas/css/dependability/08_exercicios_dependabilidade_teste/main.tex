@@ -621,6 +621,10 @@ int processar(int a, int b) {
 
 \ifgabarito
 \begin{tcolorbox}[gabarito]
+CFG gerado com \texttt{gcc -fdump-tree-cfg-graph}:
+\begin{center}
+  \includegraphics[height=11cm,keepaspectratio]{cfg/ex20_processar_cfg.pdf}
+\end{center}
 \begin{enumerate}[label=\alph*),nosep]
   \item P1: $a>b$, $r\neq0$; \quad P2: $a>b$, $r=0$ (infactível); \quad P3: $a\leq b$, $r\neq0$; \quad P4: $a\leq b$, $r=0$ ($a=b$).
   \item CT1: $a=5,b=3$ retorna 2 (P1); CT2: $a=3,b=3$ retorna $-1$ (P4); CT3: $a=2,b=5$ retorna 3 (P3). (P2 é infactível — ver c)
