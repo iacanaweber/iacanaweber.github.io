@@ -86,6 +86,7 @@
     after skip=10pt,
     fontupper=\small,
     parbox=false,
+    breakable,
   }
 }
 
@@ -260,7 +261,7 @@ Uma empresa deseja garantir um SLA de $\A \geq 99{,}9\%$ para sua plataforma. O 
 (1)~\textbf{V} \quad (2)~\textbf{F} \quad (3)~\textbf{V} \quad (4)~\textbf{F}
 
 \smallskip
-(2)~$\MTBF = \MTTF + \MTTR$; são distintos para sistemas reparáveis.
+(2)~São distintos para sistemas reparáveis.
 (4)~$\A = \MTBF/(\MTBF+\MTTR)$; um $\MTTR$ alto pode manter $\A$ baixa mesmo com $\MTBF$ elevado (cf.\ Ex.\ 10, sistema P com $\A \approx 98\%$ apesar de $\MTBF = 800\,\text{h}$).
 \end{tcolorbox}
 \fi
@@ -323,7 +324,7 @@ Considere um sistema de controle de tráfego ferroviário. Um atacante compromet
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
   \item Primariamente \textbf{security} (ameaça intencional de um atacante), com consequência direta de \textbf{safety} (risco de colisão ou descarrilamento).
-  \item A vulnerabilidade de security permite injeção de comandos falsos $\rightarrow$ o sistema de controle recebe informações incorretas $\rightarrow$ decisão errada de sinalização $\rightarrow$ acidente físico.
+  \item A vulnerabilidade de security permite injeção de comandos falsos; o sistema de controle recebe informações incorretas, o que leva a uma decisão errada de sinalização e, em seguida, ao acidente físico.
   \item Autenticação mútua entre nós de sinalização (certificados digitais) + watchdog de segurança independente que valida coerência dos comandos recebidos em relação ao estado físico dos trilhos.
 \end{enumerate}
 \end{tcolorbox}
@@ -408,7 +409,7 @@ Uma função recebe um inteiro \texttt{idade} e retorna uma string conforme as r
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
   \item Classes válidas: [0,12], [13,17], [18,64], [65,150]. Classes inválidas: $(-\infty,-1]$, $[151,+\infty)$.
-  \item CTs representativos: $6 \to$ ``criança''; $15 \to$ ``adolescente''; $30 \to$ ``adulto''; $100 \to$ ``idoso''; $-5 \to$ ``inválido''; $200 \to$ ``inválido''.
+  \item CTs representativos: 6 retorna ``criança''; 15 retorna ``adolescente''; 30 retorna ``adulto''; 100 retorna ``idoso''; $-5$ retorna ``inválido''; 200 retorna ``inválido''.
   \item Fronteiras e pares \textit{on}/\textit{off}: ($-1$/$0$); ($12$/$13$); ($17$/$18$); ($64$/$65$); ($150$/$151$). Total: 10 casos de teste de fronteira.
 \end{enumerate}
 \end{tcolorbox}
@@ -456,7 +457,7 @@ Regras:
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
   \item Inválidas: valor $\leq 0$; valor $> 10000$; \texttt{tipo\_cliente} $\notin \{1,2,3\}$; \texttt{cupom} $\notin \{0,1\}$.
-  \item Válidas: (normal, s/cupom)$\to$0\%; (normal, c/cupom)$\to$5\%; (premium, s/cupom)$\to$10\%; (premium, c/cupom)$\to$15\%; (VIP, s/cupom)$\to$20\%; (VIP, c/cupom)$\to$25\% (cap aplicado).
+  \item Válidas: (normal, s/cupom): 0\%; (normal, c/cupom): 5\%; (premium, s/cupom): 10\%; (premium, c/cupom): 15\%; (VIP, s/cupom): 20\%; (VIP, c/cupom): 25\% (cap aplicado).
   \item Fronteiras: valor $= 0$ (off), $0{,}01$ (on), $10000$ (on), $10000{,}01$ (off). \texttt{cupom}: $-1$ (off), $0$ (on), $1$ (on), $2$ (off).
   \item Suíte (exemplos principais):
 \end{enumerate}
@@ -512,7 +513,7 @@ Uma função recebe três inteiros representando os lados de um triângulo e cla
 \ifgabarito
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
-  \item CT: $a=3, b=4, c=7$. Com $\geq$: $3+4 \geq 7$ (verdadeiro $\to$ aceita como triângulo, incorreto). Com $>$: $3+4 \not> 7$ (falso $\to$ retorna erro, correto). O CT detecta o defeito.
+  \item CT: $a=3, b=4, c=7$. Com $\geq$: $3+4 \geq 7$ (verdadeiro --- aceita como triângulo, incorreto). Com $>$: $3+4 \not> 7$ (falso --- retorna erro, correto). O CT detecta o defeito.
   \item $a=3,b=4,c=5$: $3+4=7 > 5$ --- ambas as condições ($>$ e $\geq$) produzem o mesmo resultado (aceita), portanto o bug não é exercido.
   \item \textbf{Valor limite} (\textit{boundary value analysis}): o defeito reside exatamente na fronteira da desigualdade triangular ($a+b = c$).
 \end{enumerate}
@@ -548,8 +549,9 @@ int verificar_acesso(int nivel, int autenticado) {
 \ifgabarito
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
-  \item CFG: $N_1$ (entrada: \texttt{resultado=0}); $N_2$ (if\,1 verdadeiro: \texttt{resultado=1}); $N_3$ (if\,2 verdadeiro: \texttt{resultado=2}); $N_4$ (\texttt{return}). Arestas: $N_1{\to}N_2$, $N_1{\to}N_3$ (if\,1 falso), $N_2{\to}N_3$, $N_3{\to}N_4$, $N_1{\to}N_4$ (ambos falsos).
-  \item CT1: \texttt{nivel=2, aut=0} $\to$ 0; CT2: \texttt{nivel=3, aut=1} $\to$ 1; CT3: \texttt{nivel=5, aut=1} $\to$ 2.
+  \item CFG: $N_1$ (\texttt{res=0}); $N_2$ (if\,1\,V: \texttt{res=1}); $N_3$ (if\,2\,V: \texttt{res=2}); $N_4$ (\texttt{return}).\\
+  Arestas: $(N_1, N_2)$; $(N_1, N_3)$ (if\,1\,F); $(N_2, N_3)$; $(N_3, N_4)$; $(N_1, N_4)$ (ambos F).
+  \item CT1: \texttt{nivel=2, aut=0} retorna 0; CT2: \texttt{nivel=3, aut=1} retorna 1; CT3: \texttt{nivel=5, aut=1} retorna 2.
 \end{enumerate}
 \end{tcolorbox}
 \fi
@@ -580,7 +582,8 @@ int calcular_bonus(int vendas, int tempo_empresa) {
 \ifgabarito
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
-  \item CFG: $N_1$ (início: \texttt{bonus=0}); $N_2$ (if externo V: \texttt{bonus=500}); $N_3$ (if interno V: \texttt{bonus=1500}); $N_4$ (\texttt{return}). Arestas: $N_1{\to}N_2$, $N_1{\to}N_4$, $N_2{\to}N_3$, $N_2{\to}N_4$, $N_3{\to}N_4$.
+  \item CFG: $N_1$ (\texttt{bonus=0}); $N_2$ (if ext.\,V: \texttt{bonus=500}); $N_3$ (if int.\,V: \texttt{bonus=1500}); $N_4$ (\texttt{return}).\\
+  Arestas: $(N_1, N_2)$; $(N_1, N_4)$; $(N_2, N_3)$; $(N_2, N_4)$; $(N_3, N_4)$.
   \item \textbf{Não}: existem exatamente 3 caminhos distintos, portanto são necessários pelo menos 3 CTs para path coverage também --- o mesmo número que branch coverage neste caso.
 \end{enumerate}
 \end{tcolorbox}
@@ -616,7 +619,7 @@ int processar(int a, int b) {
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
   \item P1: $a>b$, $r\neq0$; \quad P2: $a>b$, $r=0$ (infactível); \quad P3: $a\leq b$, $r\neq0$; \quad P4: $a\leq b$, $r=0$ ($a=b$).
-  \item CT1: $a=5,b=3 \to 2$ (P1); CT2: $a=3,b=3 \to {-1}$ (P4); CT3: $a=2,b=5 \to 3$ (P3). (P2 é infactível — ver c)
+  \item CT1: $a=5,b=3$ retorna 2 (P1); CT2: $a=3,b=3$ retorna $-1$ (P4); CT3: $a=2,b=5$ retorna 3 (P3). (P2 é infactível — ver c)
   \item \textbf{P2 é infactível}: $a>b$ (estrito) implica $a\neq b$, logo $r = a-b \neq 0$ --- contradição com $r=0$.
 \end{enumerate}
 \end{tcolorbox}
