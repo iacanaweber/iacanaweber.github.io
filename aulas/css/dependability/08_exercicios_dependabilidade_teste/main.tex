@@ -549,8 +549,10 @@ int verificar_acesso(int nivel, int autenticado) {
 \ifgabarito
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
-  \item CFG: $N_1$ (\texttt{res=0}); $N_2$ (if\,1\,V: \texttt{res=1}); $N_3$ (if\,2\,V: \texttt{res=2}); $N_4$ (\texttt{return}).\\
-  Arestas: $(N_1, N_2)$; $(N_1, N_3)$ (if\,1\,F); $(N_2, N_3)$; $(N_3, N_4)$; $(N_1, N_4)$ (ambos F).
+  \item CFG gerado com \texttt{gcc -fdump-tree-cfg-graph}:
+  \begin{center}
+    \includegraphics[height=11cm,keepaspectratio]{cfg/ex18_verificar_acesso_cfg.pdf}
+  \end{center}
   \item CT1: \texttt{nivel=2, aut=0} retorna 0; CT2: \texttt{nivel=3, aut=1} retorna 1; CT3: \texttt{nivel=5, aut=1} retorna 2.
 \end{enumerate}
 \end{tcolorbox}
@@ -582,8 +584,10 @@ int calcular_bonus(int vendas, int tempo_empresa) {
 \ifgabarito
 \begin{tcolorbox}[gabarito]
 \begin{enumerate}[label=\alph*),nosep]
-  \item CFG: $N_1$ (\texttt{bonus=0}); $N_2$ (if ext.\,V: \texttt{bonus=500}); $N_3$ (if int.\,V: \texttt{bonus=1500}); $N_4$ (\texttt{return}).\\
-  Arestas: $(N_1, N_2)$; $(N_1, N_4)$; $(N_2, N_3)$; $(N_2, N_4)$; $(N_3, N_4)$.
+  \item CFG gerado com \texttt{gcc -fdump-tree-cfg-graph}:
+  \begin{center}
+    \includegraphics[height=11cm,keepaspectratio]{cfg/ex19_calcular_bonus_cfg.pdf}
+  \end{center}
   \item \textbf{Não}: existem exatamente 3 caminhos distintos, portanto são necessários pelo menos 3 CTs para path coverage também --- o mesmo número que branch coverage neste caso.
 \end{enumerate}
 \end{tcolorbox}
