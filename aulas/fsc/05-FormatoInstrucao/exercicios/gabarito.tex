@@ -1,0 +1,222 @@
+\documentclass[11pt, a4paper]{article}
+
+% ── Codificação e idioma ──
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Layout ──
+\usepackage[margin=1.5cm, top=1.5cm, bottom=1.4cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\parindent}{0pt}
+
+% ── Matemática ──
+\usepackage{amsmath, amssymb}
+
+% ── Tabelas e gráficos ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage[breakable]{tcolorbox}
+
+% ── Cabeçalho e rodapé ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Fundamentos de Sistemas Computacionais}
+\rhead{\small Formatos de Instru\c{c}\~{a}o RISC-V (\textbf{Gabarito})}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Configurações de listas ──
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=3pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=1pt, topsep=1pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+
+% ══════════════════════════════════════════
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Gabarito da Lista de Exerc\'{i}cios}}\\[2pt]
+  {\large Formatos de Instru\c{c}\~{a}o RISC-V: Montagem e Desmontagem}\\[3pt]
+  {\normalsize 98800-04 -- Fundamentos de Sistemas Computacionais\ \ $\cdot$\ \ Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
+\end{center}
+
+\vspace{1pt}
+\hrule
+\vspace{5pt}
+
+\begin{enumerate}
+
+% ── 1 ──
+\item \begin{center}
+\small
+\begin{tabular}{clccl}
+\toprule
+& \textbf{Palavra} & \textbf{opcode} & \textbf{Formato} & \textbf{Instru\c{c}\~{a}o}\\
+\midrule
+a) & \texttt{0x00C58533} & \texttt{0110011} & R & \texttt{add} \ (\texttt{add a0, a1, a2})\\
+b) & \texttt{0xFFF28293} & \texttt{0010011} & I & \texttt{addi} \ (\texttt{addi t0, t0, -1})\\
+c) & \texttt{0x00A12423} & \texttt{0100011} & S & \texttt{sw} \ (\texttt{sw a0, 8(sp)})\\
+d) & \texttt{0xFE031CE3} & \texttt{1100011} & B & \texttt{bne} \ (\texttt{bne t1, zero, -8})\\
+e) & \texttt{0x000115B7} & \texttt{0110111} & U & \texttt{lui} \ (\texttt{lui a1, 0x11})\\
+f) & \texttt{0x00C000EF} & \texttt{1101111} & J & \texttt{jal} \ (\texttt{jal ra, +12})\\
+g) & \texttt{0x00028067} & \texttt{1100111} & I & \texttt{jalr} \ (\texttt{jalr zero, t0, 0})\\
+h) & \texttt{0x0006A803} & \texttt{0000011} & I (load) & \texttt{lw} \ (\texttt{lw a6, 0(a3)})\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ── 2 ──
+\item \begin{center}
+\small
+\begin{tabular}{clll}
+\toprule
+& \textbf{Instru\c{c}\~{a}o} & \textbf{Campos (bin\'{a}rio)} & \textbf{Hex}\\
+\midrule
+a) & \texttt{add x5, x6, x7}  & \texttt{0000000|00111|00110|000|00101|0110011} & \texttt{0x007302B3}\\
+b) & \texttt{addi t2, t2, -4} & \texttt{111111111100|00111|000|00111|0010011} & \texttt{0xFFC38393}\\
+c) & \texttt{lw a0, 8(sp)}    & \texttt{000000001000|00010|010|01010|0000011} & \texttt{0x00812503}\\
+d) & \texttt{sw s1, 12(s0)}   & \texttt{0000000|01001|01000|010|01100|0100011} & \texttt{0x00942623}\\
+e) & \texttt{xor a1, a1, a1}  & \texttt{0000000|01011|01011|100|01011|0110011} & \texttt{0x00B5C5B3}\\
+f) & \texttt{srai t0, t1, 2}  & \texttt{0100000|00010|00110|101|00101|0010011} & \texttt{0x40235293}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Item (e): \texttt{x} \textsc{xor} \texttt{x} $= 0$ para qualquer valor, logo a instru\c{c}\~{a}o \textbf{zera} \texttt{a1}.
+
+% ── 3 ──
+\item \begin{enumerate}
+  \item \texttt{0x40B50533} $=$ \texttt{sub a0, a0, a1} \ (\texttt{funct7} $=$ \texttt{0100000})
+  \item \texttt{0x00F37313} $=$ \texttt{andi t1, t1, 15} \ (isola o \emph{nibble} menos significativo)
+  \item \texttt{0xFFC62A83} $=$ \texttt{lw s5, -4(a2)} \ (imediato negativo)
+  \item \texttt{0xFE112E23} $=$ \texttt{sw ra, -4(sp)}. \'{E} um pr\'{o}logo de fun\c{c}\~{a}o: salva o endere\c{c}o de retorno (\texttt{ra}) na pilha antes de chamar outra fun\c{c}\~{a}o.
+  \item \texttt{0x00050593} $=$ \texttt{addi a1, a0, 0} $=$ pseudoinstru\c{c}\~{a}o \texttt{mv a1, a0}.
+\end{enumerate}
+
+% ── 4 ──
+\item \begin{enumerate}
+  \item \texttt{0x05200513} $=$ \texttt{addi a0, zero, 82} $\rightarrow$ \texttt{'R'}
+  \item \texttt{0x05600593} $=$ \texttt{addi a1, zero, 86} $\rightarrow$ \texttt{'V'}
+  \item \texttt{0x03300613} $=$ \texttt{addi a2, zero, 51} $\rightarrow$ \texttt{'3'}
+  \item \texttt{0x03200693} $=$ \texttt{addi a3, zero, 50} $\rightarrow$ \texttt{'2'}
+\end{enumerate}
+Palavra formada: \textbf{\texttt{RV32}}.
+
+% ── 5 ──
+\item \begin{enumerate}
+  \item Deslocamento $= \texttt{0x110} - \texttt{0x104} = +12$ bytes. Em 13 bits: \texttt{0\,0\,000000\,0110\,0}.\\
+  \texttt{imm[12]}$=$\texttt{0}, \texttt{imm[10:5]}$=$\texttt{000000}, \texttt{imm[4:1]}$=$\texttt{0110}, \texttt{imm[11]}$=$\texttt{0}.\\
+  Campos: \texttt{0000000|00000|00101|000|01100|1100011} $\Rightarrow$ \texttt{0x00028663}.
+  \item Deslocamento $= \texttt{0x100} - \texttt{0x10C} = -12$ bytes $=$ \texttt{1\,11111111\,1\,1111111010\,0} (21 bits, compl.\ de 2).\\
+  \texttt{imm[20]}$=$\texttt{1}, \texttt{imm[10:1]}$=$\texttt{1111111010}, \texttt{imm[11]}$=$\texttt{1}, \texttt{imm[19:12]}$=$\texttt{11111111}.\\
+  Campos: \texttt{1|1111111010|1|11111111|00000|1101111} $\Rightarrow$ \texttt{0xFF5FF06F}.
+  \item \texttt{beq} (tipo B): $\pm 2^{10} = \pm 1024$ instru\c{c}\~{o}es ($\pm 4$\,KiB). \texttt{jal} (tipo J): $\pm 2^{18} \approx \pm 262\,000$ instru\c{c}\~{o}es ($\pm 1$\,MiB).
+  \item N\~{a}o alcan\c{c}a ($3000 > 1024$). Inverte-se a condi\c{c}\~{a}o e usa-se um salto incondicional, que alcan\c{c}a $\pm 2^{18}$ instru\c{c}\~{o}es:\\
+  \texttt{bne t0, zero, Continua} \ ; \ \texttt{jal zero, Achei} \ ; \ \texttt{Continua: ...}
+\end{enumerate}
+
+% ── 6 ──
+\item \begin{enumerate}
+  \item Desmontagem:
+\begin{center}
+\small
+\begin{tabular}{lll}
+\texttt{0x00} & \texttt{0x00053023} & \textbf{inv\'{a}lida} (ver abaixo)\\
+\texttt{0x04} & \texttt{0x00450513} & \texttt{addi a0, a0, 4}\\
+\texttt{0x08} & \texttt{0xFFF58593} & \texttt{addi a1, a1, -1}\\
+\texttt{0x0C} & \texttt{0xFE059AE3} & \texttt{bne a1, zero, -12} \ (volta para \texttt{0x00})\\
+\texttt{0x10} & \texttt{0x00008067} & \texttt{jalr zero, ra, 0} \ ($=$ \texttt{ret})\\
+\end{tabular}
+\end{center}
+A palavra em \texttt{0x00} tem opcode \texttt{0100011} (store), mas \texttt{funct3} $=$ \texttt{011} \textbf{n\~{a}o existe} para o opcode de \emph{store} (\texttt{sb}$=$\texttt{000}, \texttt{sh}$=$\texttt{001}, \texttt{sw}$=$\texttt{010}).
+  \item O \textbf{bit 12} (bit menos significativo do \texttt{funct3}) foi invertido: \texttt{010} $\rightarrow$ \texttt{011}. A palavra original era \texttt{0x00052023} $=$ \texttt{sw zero, 0(a0)}.
+  \item Rotina corrigida:
+\begin{center}
+\begin{tabular}{ll}
+\texttt{Loop:} & \texttt{sw \ \ zero, 0(a0)}\\
+ & \texttt{addi a0, a0, 4}\\
+ & \texttt{addi a1, a1, -1}\\
+ & \texttt{bne \ a1, zero, Loop}\\
+ & \texttt{jalr zero, ra, 0 \ \ \# ret}\\
+\end{tabular}
+\end{center}
+\end{enumerate}
+
+% ── 7 ──
+\item \begin{enumerate}
+  \item \texttt{0x00008067} $=$ \texttt{jalr zero, ra, 0} $=$ pseudoinstru\c{c}\~{a}o \texttt{ret}.
+  \item Toda fun\c{c}\~{a}o retorna ao chamador saltando para o endere\c{c}o salvo em \texttt{ra} (\texttt{PC} $=$ \texttt{ra} $+$ \texttt{0}); como \texttt{rd} $=$ \texttt{zero}, o endere\c{c}o de retorno do pr\'{o}prio salto \'{e} descartado.
+  \item $+32$ bytes: \texttt{imm[20]}$=$\texttt{0}, \texttt{imm[10:1]}$=$\texttt{0000010000}, \texttt{imm[11]}$=$\texttt{0}, \texttt{imm[19:12]}$=$\texttt{00000000}, \texttt{rd}$=$\texttt{00001} $\Rightarrow$ \texttt{0x020000EF}.
+  \item B e J somam o deslocamento ao \textbf{PC}, que aponta sempre para endere\c{c}os pares; o bit 0 seria sempre 0, ent\~{a}o n\~{a}o \'{e} armazenado e ganha-se 1 bit de alcance. O \texttt{jalr} soma o imediato a \texttt{rs1}, um valor \textbf{arbitr\'{a}rio} em bytes, e reaproveita o formato I exatamente como os loads (\texttt{rs1} $+$ \texttt{imm}); por isso o imediato \'{e} em bytes, sem multiplica\c{c}\~{a}o.
+\end{enumerate}
+
+% ── 8 ──
+\item \begin{enumerate}
+  \item Os 12 bits baixos (\texttt{0x678}) t\^{e}m bit 11 $=$ 0, sem pegadinha:\\
+  \texttt{lui t0, 0x12345} \ (\texttt{0x123452B7}); \quad \texttt{addi t0, t0, 0x678} \ (\texttt{0x67828293}).
+  \item Abordagem direta: \texttt{lui t1, 0xDEADB} $+$ \texttt{addi t1, t1, 0xEEF}. Mas \texttt{0xEEF} tem bit 11 $=$ 1: o \texttt{addi} estende o sinal e soma $-273$, resultando \texttt{0xDEADB000} $- 273 =$ \texttt{0xDEADAEEF} $\neq$ \texttt{0xDEADBEEF}.\\
+  Correta: \texttt{lui t1, 0xDEADC} \ (\texttt{0xDEADC337}); \quad \texttt{addi t1, t1, -273} \ (\texttt{0xEEF30313});\\
+  \texttt{0xDEADC000} $- 273 =$ \texttt{0xDEADBEEF}.
+  \item Se o bit 11 dos 12 bits baixos for 1, o \texttt{addi} subtrai \texttt{0x1000} do resultado; compensa-se somando $+1$ ao imediato de 20 bits do \texttt{lui}. (A pseudoinstru\c{c}\~{a}o \texttt{li} faz isso automaticamente.)
+\end{enumerate}
+
+% ── 9 ──
+\item \begin{center}
+\small
+\begin{tabular}{clll}
+\toprule
+\# & \textbf{Veredito} & \textbf{O que o hex realmente faz} & \textbf{Corre\c{c}\~{a}o}\\
+\midrule
+1 & \textbf{Errado} & \texttt{0x40990433} $=$ \texttt{sub s0, s2, s1} & \texttt{0x41248433}\\
+2 & \textbf{Errado} & \texttt{0x28512023} $=$ \texttt{sw t0, 640(sp)} & \texttt{0x00512A23}\\
+3 & \textbf{Errado} & \texttt{0x00B50163} $=$ \texttt{beq a0, a1, +2} & \texttt{0x00B50463}\\
+4 & \textbf{Correto} & \texttt{0x00655383} $=$ \texttt{lhu t2, 6(a0)} & ---\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item[1.] \texttt{rs1} e \texttt{rs2} foram trocados: o c\'{o}digo calcula \texttt{s2}$-$\texttt{s1} em vez de \texttt{s1}$-$\texttt{s2}. Subtra\c{c}\~{a}o n\~{a}o \'{e} comutativa.
+  \item[2.] O imediato do formato S n\~{a}o foi \textbf{dividido}: \texttt{20} $=$ \texttt{10100} foi colocado inteiro em \texttt{imm[11:5]}, e o offset virou $20 \times 32 = 640$. Correto: \texttt{imm[11:5]}$=$\texttt{0000000}, \texttt{imm[4:0]}$=$\texttt{10100}.
+  \item[3.] O deslocamento foi contado em \textbf{instru\c{c}\~{o}es} (2) em vez de \textbf{bytes} (8); \texttt{+2} aponta para o meio da instru\c{c}\~{a}o seguinte.
+  \item[4.] Nada a corrigir.
+\end{enumerate}
+
+% ── 10 ──
+\item Itens (a) e (b), desmontagem com r\'{o}tulos:
+\begin{enumerate}
+  \item[]
+\begin{center}
+\small
+\begin{tabular}{llll}
+\texttt{0x200} & & \texttt{addi t0, zero, 0} & \texttt{\# acumulador = 0}\\
+\texttt{0x204} & \texttt{Loop:} & \texttt{beq \ a1, zero, Fim} & \texttt{\# +16 $\rightarrow$ 0x214}\\
+\texttt{0x208} & & \texttt{add \ t0, t0, a0} & \texttt{\# acumula a0}\\
+\texttt{0x20C} & & \texttt{addi a1, a1, -1} & \texttt{\# decrementa contador}\\
+\texttt{0x210} & & \texttt{jal \ zero, Loop} & \texttt{\# -12 $\rightarrow$ 0x204}\\
+\texttt{0x214} & \texttt{Fim:} & \texttt{addi a0, t0, 0} & \texttt{\# a0 = resultado (mv)}\\
+\end{tabular}
+\end{center}
+  \item[c)] Soma \texttt{a0} repetidamente, \texttt{a1} vezes: calcula a \textbf{multiplica\c{c}\~{a}o} $\texttt{a0} \times \texttt{a1}$ por somas sucessivas.
+  \item[d)] $6 \times 7 = \textbf{42}$.
+  \item[e)] O \texttt{beq} \'{e} avaliado a cada itera\c{c}\~{a}o ($\texttt{a1} = 7, 6, \ldots, 1$, falso) e uma \'{u}ltima vez com $\texttt{a1} = 0$ (verdadeiro): $7 + 1 = \textbf{8}$ vezes.
+\end{enumerate}
+
+% ── 11 ──
+\item \begin{enumerate}
+  \item Com \texttt{rs1}/\texttt{rs2}/\texttt{rd} sempre nos mesmos bits, o processador pode ler o banco de registradores \emph{em paralelo} com a decodifica\c{c}\~{a}o, antes mesmo de saber qual instru\c{c}\~{a}o \'{e}. Isso exige menos multiplexadores e simplifica o hardware.
+  \item O \emph{store} precisa de dois registradores-fonte e um imediato, mas n\~{a}o tem \texttt{rd}. Dividir o imediato permite manter \texttt{rs1} e \texttt{rs2} exatamente nas posi\c{c}\~{o}es dos formatos R/I: os 5 bits baixos do imediato ocupam o lugar onde estaria o \texttt{rd}. Sacrifica-se a contiguidade do imediato (menos cr\'{i}tico) para preservar a posi\c{c}\~{a}o dos registradores (mais cr\'{i}tico).
+  \item Instru\c{c}\~{o}es nunca come\c{c}am em endere\c{c}o \'{i}mpar, ent\~{a}o o bit 0 do deslocamento seria sempre 0 e armazen\'{a}-lo desperdi\c{c}aria 1 bit: m\'{u}ltiplos de 2 \textbf{dobram o alcance} e mant\^{e}m o suporte \`{a} extens\~{a}o comprimida de 16 bits. M\'{u}ltiplos de 4 dobrariam o alcance de novo, mas quebrariam esse suporte.
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

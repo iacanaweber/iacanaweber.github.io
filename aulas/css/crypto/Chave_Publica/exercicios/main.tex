@@ -1,0 +1,187 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.5cm, footskip=1.1cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\raggedbottom
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\RSA, Diffie--Hellman e Logaritmo Discreto\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: RSA, DH e Log.\ Discreto}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Cada exerc\'{i}cio \'{e} um bloco indivis\'{i}vel (tcolorbox `blanker', sem moldura):
+%% se n\~{a}o couber no restante da p\'{a}gina, o bloco inteiro vai para a pr\'{o}xima.
+\newtcolorbox[auto counter]{exercicio}[1][]{%
+    blanker,
+    before skip=18pt plus 4pt minus 2pt,
+    after skip=2pt,
+    before upper={%
+        \noindent
+        {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+        \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio \thetcbcounter}%
+        \par\nobreak\vspace{-0.4em}
+        \noindent{\color{black!35}\rule{\linewidth}{0.4pt}}%
+        \par\nobreak\vspace{0.35em}\noindent
+    },
+    #1
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.1in}
+
+\begin{exercicio}
+Aplique o algoritmo de Euclides para calcular o m\'{a}ximo divisor comum dos pares abaixo. Apresente todas as itera\c{c}\~{o}es da divis\~{a}o.
+\begin{enumerate}[label=(\alph*)]
+    \item $\gcd(285,\,165)$.
+    \item $\gcd(1547,\,560)$.
+    \item $\gcd(12345,\,4321)$.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Calcule os inversos multiplicativos abaixo usando o Algoritmo de Euclides Estendido. Verifique cada resposta multiplicando-a pelo elemento original e reduzindo m\'{o}dulo $m$.
+\begin{enumerate}[label=(\alph*)]
+    \item $11^{-1} \bmod 30$.
+    \item $17^{-1} \bmod 60$.
+    \item $23^{-1} \bmod 1001$.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Determine o valor da fun\c{c}\~{a}o totiente de Euler para os inteiros a seguir, justificando a partir da fatora\c{c}\~{a}o em primos:
+\begin{enumerate}[label=(\alph*)]
+    \item $\varphi(15)$, $\varphi(21)$ e $\varphi(100)$.
+    \item $\varphi(360)$.
+    \item Em geral, se $n = p \cdot q$ com $p$ e $q$ primos distintos, deduza uma express\~{a}o fechada para $\varphi(n)$ a partir da multiplicatividade.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Use o Teorema de Euler para reduzir os expoentes e obter as redu\c{c}\~{o}es a seguir. Em cada item, identifique primeiro $\varphi(n)$ e a redu\c{c}\~{a}o do expoente.
+\begin{enumerate}[label=(\alph*)]
+    \item $7^{222} \bmod 15$.
+    \item $11^{1234} \bmod 21$.
+    \item Explique, com suas pr\'{o}prias palavras, por que o argumento utilizado nos itens anteriores depende da hip\'{o}tese $\gcd(a, n) = 1$. D\^{e} um exemplo num\'{e}rico em que essa hip\'{o}tese falha e a redu\c{c}\~{a}o ingenu do expoente d\'{a} um resultado incorreto.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o grupo multiplicativo $\mathbb{Z}_{11}^{*}$.
+\begin{enumerate}[label=(\alph*)]
+    \item Liste a ordem $\operatorname{ord}(a)$ de cada elemento $a \in \{1, 2, \ldots, 10\}$.
+    \item Identifique todas as ra\'{i}zes primitivas m\'{o}dulo $11$, isto \'{e}, os elementos com ordem igual a $|\mathbb{Z}_{11}^{*}|$.
+    \item Compare a quantidade de ra\'{i}zes primitivas encontradas com o valor $\varphi(\varphi(11))$ e comente o resultado.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Para gerar um par de chaves RSA, Alice escolheu os primos $p = 23$ e $q = 31$.
+\begin{enumerate}[label=(\alph*)]
+    \item Dentre os candidatos a expoente p\'{u}blico $e \in \{7, 11, 21\}$, determine quais s\~{a}o v\'{a}lidos. Justifique com base em $\varphi(n)$.
+    \item Escolha o expoente v\'{a}lido e calcule a chave privada $d$ correspondente usando o Algoritmo de Euclides Estendido.
+    \item Escreva explicitamente $K_{\text{pub}}$ e $K_{\text{pr}}$.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o RSA com par\^{a}metros $p = 7$, $q = 17$ e expoente p\'{u}blico $e = 5$.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule $n$, $\varphi(n)$ e a chave privada $d$.
+    \item Cifre a mensagem $x = 19$.
+    \item Decifre o resultado obtido em (b) e verifique que se recupera o texto em claro original.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Alice e Bob v\~{a}o estabelecer uma chave compartilhada usando Diffie--Hellman com $p = 41$ e $\alpha = 6$.
+\begin{enumerate}[label=(\alph*)]
+    \item Mostre que $\alpha = 6$ \'{e} uma raiz primitiva m\'{o}dulo $41$, verificando que $\alpha^{(p-1)/r} \not\equiv 1 \pmod{p}$ para todos os divisores primos $r$ de $p-1$.
+    \item Alice escolhe $a = 5$ e Bob escolhe $b = 12$. Calcule $A$, $B$ e a chave compartilhada $K_{AB}$ pelos dois caminhos ($A^{b}$ e $B^{a}$), confirmando a coincid\^{e}ncia.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Em um esquema Diffie--Hellman sobre $\mathbb{Z}_{p}^{*}$, dois valores de chave privada \emph{nunca} devem ser escolhidos: $a = 1$ e $a = p-1$.
+\begin{enumerate}[label=(\alph*)]
+    \item Mostre, de forma geral, por que cada uma dessas escolhas permite que um adversa\'{r}io passivo recupere imediatamente a chave privada apenas observando a chave p\'{u}blica.
+    \item Ilustre os dois casos para $p = 23$, $\alpha = 5$. Quantos elementos comp\~{o}em o subgrupo gerado por $\alpha^{a}$ quando $a = p-1$?
+    \item Suponha agora que o adversa\'{r}io ativo consiga substituir $\alpha$ por um elemento $\alpha'$ de ordem $2$. Explique como isso reduz drasticamente o espa\c{c}o de poss\'{i}veis chaves compartilhadas e relacione com a discuss\~{a}o de subgrupos pequenos.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o RSA com $p = 11$, $q = 17$, $e = 7$ e o criptograma $y = 35$.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule a chave privada $d$ e decifre $y$ diretamente computando $y^{d} \bmod n$.
+    \item Repita a decifra\c{c}\~{a}o usando o Teorema Chin\^{e}s do Resto. Apresente $d_p$, $d_q$, $x_p$, $x_q$ e a recombina\c{c}\~{a}o final.
+    \item Considere agora $n$ com $2048$ bits. Estime o ganho de desempenho aproximado da decifra\c{c}\~{a}o via CRT em rela\c{c}\~{a}o \`{a} decifra\c{c}\~{a}o direta, supondo que o custo do square-and-multiply seja proporcional ao cubo do tamanho dos operandos.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Suponha que mensagens RSA s\~{a}o usadas para transportar comandos curtos em um sistema embarcado. Cada mensagem $x$ \'{e} um \'{u}nico s\'{i}mbolo do conjunto $\mathcal{M}$ de $128$ caracteres ASCII imprim\'{i}veis, e \emph{n\~{a}o} h\'{a} \emph{padding} aleat\'{o}rio. A chave p\'{u}blica \'{e} $K_{\text{pub}} = (n, e)$, com $n$ de $2048$ bits.
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, passo a passo, como um adversa\'{r}io passivo que conhece $K_{\text{pub}}$ pode recuperar $x$ a partir de $y$ \emph{sem fatorar $n$}.
+    \item Estime o custo computacional do ataque proposto.
+    \item Que contramedida do RSA padronizado em RFC~8017 (PKCS\#1) inviabiliza esse ataque e por qu\^{e}?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o protocolo Diffie--Hellman com par\^{a}metros $p = 467$ e $\alpha = 2$. Suponha que Oscar consiga atuar como \emph{man-in-the-middle} (MITM) entre Alice e Bob, interceptando e retransmitindo todas as mensagens.
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, em forma de diagrama de sequ\^{e}ncia, todas as mensagens trocadas e quais valores Oscar conhece ao final do protocolo.
+    \item Suponha que Alice escolha $a = 3$, Oscar escolha $a_O = 7$ (para o ramo de Alice) e $b_O = 9$ (para o ramo de Bob), e Bob escolha $b = 5$. Calcule numericamente as duas chaves compartilhadas \emph{distintas} que Oscar estabelece, uma com Alice e outra com Bob.
+    \item Por que o DH ``puro'' \'{e} vulner\'{a}vel a esse ataque, mesmo que o DLP seja computacionalmente intrat\'{a}vel? Que servi\c{c}o de seguran\c{c}a est\'{a} \emph{ausente} no protocolo? Cite ao menos uma contramedida pr\'{a}tica usada em protocolos reais (por exemplo, no TLS) para mitig\'{a}-lo.
+\end{enumerate}
+\end{exercicio}
+
+\end{document}

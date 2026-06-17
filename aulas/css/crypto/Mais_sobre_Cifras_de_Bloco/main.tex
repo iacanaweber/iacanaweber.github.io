@@ -126,17 +126,32 @@
         \item Modo Output Feedback (OFB)
         \item Modo Cipher Feedback (CFB)
         \item Modo Counter (CTR)
-        \item Modo Galois Counter (GCM)
     \end{itemize}
 
-    \item Todos os 6 modos têm um objetivo:
+    \item Todos esses modos fornecem \textbf{confidencialidade}
     \begin{itemize}
-        \item Além da confidencialidade, eles fornecem autenticidade e integridade:
-        \begin{itemize}
-            \item A mensagem realmente veio do remetente original? (autenticidade)
-            \item O texto cifrado foi alterado durante a transmissão? (integridade)
-        \end{itemize}
+        \item \textit{Autenticidade} e \textit{integridade} (a mensagem realmente veio do remetente original? o texto cifrado foi alterado durante a transmissão?) serão tratadas mais adiante, ao estudarmos MACs
     \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Padding (preenchimento de blocos)}
+
+\begin{itemize}
+    \item Cifras de bloco operam em blocos de tamanho fixo (ex.: 128 bits no AES)
+    \item Quando o último bloco da mensagem não é múltiplo do tamanho do bloco, é necessário preencher (\textit{padding}) os bits restantes
+    \begin{itemize}
+        \item Relevante principalmente para os modos \textbf{ECB} e \textbf{CBC}
+        \item Modos baseados em fluxo (\textbf{OFB}, \textbf{CFB}, \textbf{CTR}) não exigem \textit{padding}, pois operam bit a bit
+    \end{itemize}
+    \item Esquema mais comum: \textbf{PKCS\#7}
+    \begin{itemize}
+        \item Se faltam $N$ bytes para completar o bloco, adicionam-se $N$ bytes de valor $N$
+        \item Se a mensagem já é múltipla do bloco, adiciona-se um bloco extra inteiramente de \textit{padding}
+        \item Ex. (bloco de 8 bytes), mensagem de 5 bytes \texttt{AB CD EF 12 34} $\to$ \texttt{AB CD EF 12 34 03 03 03}
+    \end{itemize}
+    \item O receptor remove o \textit{padding} após a decriptação, conferindo se o último byte indica corretamente quantos bytes descartar
 \end{itemize}
 
 \end{frame}
@@ -242,7 +257,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB}
+\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB (1/2)}
 
 \begin{itemize}
     \item Textos claros idênticos são mapeados para textos cifrados idênticos
@@ -260,7 +275,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB}
+\begin{frame}{Exemplo de criptografia de \textit{bitmaps} no modo ECB (2/2)}
 
 \begin{itemize}
     \item Textos claros idênticos são mapeados para textos cifrados idênticos
@@ -372,7 +387,7 @@
 \vspace{-0.5em}
 \begin{itemize}
     \small
-    \item Utiliza uma cifra de bloco como base para construir uma \textit{cifra de fluxo assíncrona} (semelhante ao modo OFB)
+    \item Utiliza uma cifra de bloco como base para construir uma \textit{cifra de fluxo autossincronizante} (\textit{self-synchronizing})
     \item O \textit{key stream} $S_i$ é gerado em blocos e também depende do texto cifrado
     \item Uso de IV faz a encriptação no modo CFB não determinística
 \end{itemize}
@@ -404,7 +419,7 @@
 \end{itemize}
 \vspace{-0.5em}
 \begin{center}
-    \includegraphics[width=0.4\linewidth]{ctr.png}
+    \includegraphics[width=0.4\linewidth]{img/ctr.png}
 \end{center}
 \vspace{-0.5em}
 \begin{itemize}
@@ -423,6 +438,8 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% GCM oculto: será apresentado quando MAC for tratado
+\iffalse
 \subsection{Galois Counter Mode (GCM)}
 \begin{frame}{Modo Galois Counter (GCM)}
 
@@ -474,30 +491,38 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Modo Galois Counter (GCM)}
+\begin{frame}{Modo Galois Counter (GCM): Diagrama}
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.6\linewidth]{galoismode.png}
+    \includegraphics[width=0.78\linewidth]{img/galoismode.png}
 \end{figure}
-\vspace{-1.5em}
-\small\textbf{Encriptação:}
+
+\end{frame}
+
+\begin{frame}{Modo Galois Counter (GCM): Operações}
+
+\textbf{Encriptação}
 \begin{itemize}
-\tiny
+    \small
     \item Derivar um valor de contador $CTR_0$ a partir do IV e calcular $CTR_1 = CTR_0 + 1$
     \item Calcular o texto cifrado: $y_i = e_k(CTR_i) \oplus x_i,\quad i \geq 1$
 \end{itemize}
 
-\small\textbf{Autenticação:}
+\vspace{0.8em}
+
+\textbf{Autenticação} (todas as multiplicações em $GF(2^{128})$)
 \begin{itemize}
-    \tiny
-    \item Gerar a subchave de autenticação $H = e_k(0)$
-    \item Calcular $g_0 = AAD \times H \quad$ (multiplicação no campo de Galois)
-    \item Calcular $g_i = (g_{i-1} \oplus y_i) \times H,\quad 1 \leq i \leq n \quad$ (multiplicação no campo de Galois)
-    \item Tag final de autenticação: $T = (g_n \times H) \oplus e_k(CTR_0)$
+    \small
+    \item Gerar a subchave de autenticação: $H = e_k(0)$
+    \item Calcular $g_0 = AAD \times H$
+    \item Calcular $g_i = (g_{i-1} \oplus y_i) \times H,\quad 1 \leq i \leq n$
+    \item \textit{Tag} final: $T = (g_n \times H) \oplus e_k(CTR_0)$
 \end{itemize}
 
 \end{frame}
+\fi
+% fim GCM oculto
 
 \section{Busca Exaustiva de Chave}
 
@@ -596,7 +621,7 @@
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{double_encryption.png}
+    \includegraphics[width=0.5\linewidth]{img/double_encryption.png}
 \end{figure}
 
 \begin{itemize}
@@ -621,7 +646,7 @@
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{meet_in_the_middle.png}
+    \includegraphics[width=0.5\linewidth]{img/meet_in_the_middle.png}
 \end{figure}
 
 \vspace{-0.5em}
@@ -650,7 +675,7 @@
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{meet_in_the_middle.png}
+    \includegraphics[width=0.5\linewidth]{img/meet_in_the_middle.png}
 \end{figure}
 
 \vspace{-0.5em}
@@ -687,7 +712,7 @@
 
 \subsection{Tripla Encriptação}
 
-\begin{frame}{Triple Encryption}
+\begin{frame}{Tripla Encriptação}
   \begin{itemize}
     \item A \textbf{encriptação de um bloco três vezes}:
     \begin{center}
@@ -713,7 +738,7 @@
 
 \subsection{\textit{Key Whitening}}
 
-\begin{frame}{Key Whitening}
+\begin{frame}{\textit{Key Whitening}}
   \begin{itemize}
     \item Torna \textit{block ciphers} mais resistentes a ataques de força bruta
 
@@ -721,7 +746,7 @@
 
     \begin{figure}
         \centering
-        \includegraphics[width=0.5\linewidth]{key_whitening.png}
+        \includegraphics[width=0.5\linewidth]{img/key_whitening.png}
     \end{figure}
 
     \item Não fortalece \textit{block ciphers} contra a maioria dos ataques analíticos, como criptoanálise linear e diferencial
@@ -745,7 +770,7 @@
 
     \item Há modos que realizam encriptação juntamente com autenticação, isto é, um \textit{checksum} criptográfico protege contra manipulação da mensagem
 
-    \item O modo ECB simples possui vulnerabilidades de segurança, independentemente do qual \textit{block cipher} for utilizada
+    \item O modo ECB simples possui vulnerabilidades de segurança, independentemente de qual \textit{block cipher} seja utilizada
 
     \item O modo \textit{counter} permite paralelização da encriptação e, portanto, é adequado para implementações de alta velocidade
 
@@ -756,49 +781,6 @@
     \item O \textit{key whitening} aumenta o comprimento da \textit{key} do DES sem sobrecarga computacional significativa
   \end{itemize}
 \end{frame}
-
-\section{Exercícios}
-
-\begin{frame}{Exercício: Modos de Operação com um Cifrador Simples}
-  Considere um \textit{toy block cipher} $e()$ para encriptação de blocos de 5 bits. A função de encriptação é uma permutação de bits, que depende da \textit{key}. Assuma que, para uma dada \textit{key}, a encriptação (permutação) é a seguinte:
-  \[
-    e(b_1 b_2 b_3 b_4 b_5) = (b_2 b_5 b_4 b_1 b_3)
-  \]
-
-  \vspace{0.8em}
-  Encripte a mensagem $x = \texttt{01101 11011 11010 00110}$ utilizando os cinco diferentes modos de operação: ECB, CBC, CFB, OFB e CTR. Forneça os correspondentes \textit{ciphertexts} $y$.
-
-  \vspace{0.8em}
-  Use $IV = \texttt{11001}$ como vetor de inicialização.
-\end{frame}
-
-\begin{frame}{Exercício: Recuperação de Vetor de Inicialização (IV) em AES-CBC}
-  Em uma empresa, todos os arquivos enviados pela rede interna são automaticamente encriptados utilizando AES-128 no modo CBC. Uma \textit{key} fixa é utilizada, e o vetor de inicialização (IV) é alterado uma vez por dia. A encriptação na rede é feita por arquivo, de modo que o IV é utilizado no início de cada arquivo.
-
-  \vspace{0.5em}
-  Ao invadir o sistema, você conseguiu encontrar a \textit{key} fixa do AES-128, mas não conhece o IV atual. Hoje, você conseguiu interceptar dois arquivos diferentes: um com conteúdo desconhecido, e outro conhecido por ser um arquivo temporário gerado automaticamente, contendo apenas o valor $0{\times}\texttt{FF}$.
-
-  \vspace{0.5em}
-  Descreva brevemente como é possível obter o vetor de inicialização desconhecido (IV) e como você pode decifrar o conteúdo do arquivo desconhecido.
-\end{frame}
-
-
-\begin{frame}{Exercício: Reutilização de IV no Modo OFB}
-  O modo OFB (Output Feedback) utiliza o vetor de inicialização (IV) como ponto de partida para gerar a \textit{keystream} usada na encriptação. Se o IV não for diferente a cada execução da operação de encriptação, a segurança do esquema é comprometida.
-
-  \vspace{2.5em}
-  \textbf{Dica}: considere o uso de trechos conhecidos do \textit{plaintext}, como \href{https://en.wikipedia.org/wiki/List_of_file_signatures}{\textit{file signatures} (magic numbers)}.
-\end{frame}
-
-\begin{frame}{Exercício: Tamanho do IV em AES-CTR}
-  Estamos utilizando o AES no modo \textit{counter} (CTR) para encriptar um disco rígido com capacidade de \textbf{1 TB}.
-
-  \vspace{1em}
-  Qual é o comprimento máximo possível do vetor de inicialização (IV), considerando que cada bloco de 16 bytes deve ser encriptado com um valor único de contador?
-\end{frame}
-
-
-
 
 %\section{Aumentando a Segurança Usando Cifras de Bloco}
 

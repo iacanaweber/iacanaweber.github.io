@@ -1,0 +1,31 @@
+# Solucao --- Trabalho Pratico Logaritmo Discreto (CSS 98G08-04)
+#
+# Preencha K_ab em decimal para cada cenario resolvido.
+# Deixe em branco (ou comente com #) os cenarios nao alcancados.
+#
+# Nome do aluno: ___________________________________________________
+#
+
+[C0]   K_ab =     # copie o valor revelado em desafios.txt para confirmar sua implementacao
+[C1]   K_ab =
+[C2]   K_ab =
+[C3]   K_ab =
+[C4]   K_ab =
+[C5]   K_ab =
+[C6]   K_ab =
+[C7]   K_ab =
+[C8]   K_ab =
+[C9]   K_ab =
+[C10]  K_ab =
+[C11]  K_ab =
+[C12]  K_ab =
+[C13]  K_ab =
+[C14]  K_ab =
+[C15]  K_ab =
+[C16]  K_ab =
+[C17]  K_ab =
+[C18]  K_ab =
+[C19]  K_ab =
+[C20]  K_ab =
+[C21]  K_ab =
+[C22]  K_ab =

@@ -1,0 +1,680 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage{mdframed}
+
+\geometry{margin=2.5cm}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Cifras de Bloco\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+\newcommand{\exercicio}[1]{%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+\newmdenv[
+    linecolor=red!65!black,
+    linewidth=0.8pt,
+    roundcorner=2pt,
+    backgroundcolor=red!3,
+    skipabove=0.8em,
+    skipbelow=1.0em,
+    innertopmargin=0.7em,
+    innerbottommargin=0.7em,
+    innerleftmargin=0.8em,
+    innerrightmargin=0.8em
+]{respostabox}
+\newenvironment{resposta}{%
+    \begin{respostabox}
+    \color{red!70!black}\sloppy
+}{%
+    \end{respostabox}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\textbf{Observação:} esta versão contém os enunciados originais e uma proposta de solução. Em itens discursivos, respostas equivalentes podem ser igualmente corretas.
+
+\textbf{Tabela de inversos multiplicativos em $\mathrm{GF}(2^8)$ usados no AES, com}
+\[
+P(x) = x^8 + x^4 + x^3 + x + 1.
+\]
+
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.95}
+\scriptsize
+\[
+\resizebox{\textwidth}{!}{$
+\begin{array}{c|cccccccccccccccc}
+X \backslash Y & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} & \mathrm{F} \\
+\hline
+0 & 00 & 01 & 8D & F6 & CB & 52 & 7B & D1 & E8 & 4F & 29 & C0 & B0 & E1 & E5 & C7 \\
+1 & 74 & B4 & AA & 4B & 99 & 2B & 60 & 5F & 58 & 3F & FD & CC & FF & 40 & EE & B2 \\
+2 & 3A & 6E & 5A & F1 & 55 & 4D & A8 & C9 & C1 & 0A & 98 & 15 & 30 & 44 & A2 & C2 \\
+3 & 2C & 45 & 92 & 6C & F3 & 39 & 66 & 42 & F2 & 35 & 20 & 6F & 77 & BB & 59 & 19 \\
+4 & 1D & FE & 37 & 67 & 2D & 31 & F5 & 69 & A7 & 64 & AB & 13 & 54 & 25 & E9 & 09 \\
+5 & ED & 5C & 05 & CA & 4C & 24 & 87 & BF & 18 & 3E & 22 & F0 & 51 & EC & 61 & 17 \\
+6 & 16 & 5E & AF & D3 & 49 & A6 & 36 & 43 & F4 & 47 & 91 & DF & 33 & 93 & 21 & 3B \\
+7 & 79 & B7 & 97 & 85 & 10 & B5 & BA & 3C & B6 & 70 & D0 & 06 & A1 & FA & 81 & 82 \\
+8 & 83 & 7E & 7F & 80 & 96 & 73 & BE & 56 & 9B & 9E & 95 & D9 & F7 & 02 & B9 & A4 \\
+9 & DE & 6A & 32 & 6D & D8 & 8A & 84 & 72 & 2A & 14 & 9F & 88 & F9 & DC & 89 & 9A \\
+\mathrm{A} & FB & 7C & 2E & C3 & 8F & B8 & 65 & 48 & 26 & C8 & 12 & 4A & CE & E7 & D2 & 62 \\
+\mathrm{B} & 0C & E0 & 1F & EF & 11 & 75 & 78 & 71 & A5 & 8E & 76 & 3D & BD & BC & 86 & 57 \\
+\mathrm{C} & 0B & 28 & 2F & A3 & DA & D4 & E4 & 0F & A9 & 27 & 53 & 04 & 1B & FC & AC & E6 \\
+\mathrm{D} & 7A & 07 & AE & 63 & C5 & DB & E2 & EA & 94 & 8B & C4 & D5 & 9D & F8 & 90 & 6B \\
+\mathrm{E} & B1 & 0D & D6 & EB & C6 & 0E & CF & AD & 08 & 4E & D7 & E3 & 5D & 50 & 1E & B3 \\
+\mathrm{F} & 5B & 23 & 38 & 34 & 68 & 46 & 03 & 8C & DD & 9C & 7D & A0 & CD & 1A & 41 & 1C
+\end{array}
+$}
+\]
+\endgroup
+
+\textbf{Tabela da S-box do AES: valores de substitui\c{c}\~{a}o em nota\c{c}\~{a}o hexadecimal para o byte de entrada $(xy)$.}
+
+\begingroup
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{0.95}
+\scriptsize
+\[
+\resizebox{\textwidth}{!}{$
+\begin{array}{c|cccccccccccccccc}
+x \backslash y & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & \mathrm{A} & \mathrm{B} & \mathrm{C} & \mathrm{D} & \mathrm{E} & \mathrm{F} \\
+\hline
+0 & 63 & 7C & 77 & 7B & F2 & 6B & 6F & C5 & 30 & 01 & 67 & 2B & FE & D7 & AB & 76 \\
+1 & CA & 82 & C9 & 7D & FA & 59 & 47 & F0 & AD & D4 & A2 & AF & 9C & A4 & 72 & C0 \\
+2 & B7 & FD & 93 & 26 & 36 & 3F & F7 & CC & 34 & A5 & E5 & F1 & 71 & D8 & 31 & 15 \\
+3 & 04 & C7 & 23 & C3 & 18 & 96 & 05 & 9A & 07 & 12 & 80 & E2 & EB & 27 & B2 & 75 \\
+4 & 09 & 83 & 2C & 1A & 1B & 6E & 5A & A0 & 52 & 3B & D6 & B3 & 29 & E3 & 2F & 84 \\
+5 & 53 & D1 & 00 & ED & 20 & FC & B1 & 5B & 6A & CB & BE & 39 & 4A & 4C & 58 & CF \\
+6 & D0 & EF & AA & FB & 43 & 4D & 33 & 85 & 45 & F9 & 02 & 7F & 50 & 3C & 9F & A8 \\
+7 & 51 & A3 & 40 & 8F & 92 & 9D & 38 & F5 & BC & B6 & DA & 21 & 10 & FF & F3 & D2 \\
+8 & CD & 0C & 13 & EC & 5F & 97 & 44 & 17 & C4 & A7 & 7E & 3D & 64 & 5D & 19 & 73 \\
+9 & 60 & 81 & 4F & DC & 22 & 2A & 90 & 88 & 46 & EE & B8 & 14 & DE & 5E & 0B & DB \\
+\mathrm{A} & E0 & 32 & 3A & 0A & 49 & 06 & 24 & 5C & C2 & D3 & AC & 62 & 91 & 95 & E4 & 79 \\
+\mathrm{B} & E7 & C8 & 37 & 6D & 8D & D5 & 4E & A9 & 6C & 56 & F4 & EA & 65 & 7A & AE & 08 \\
+\mathrm{C} & BA & 78 & 25 & 2E & 1C & A6 & B4 & C6 & E8 & DD & 74 & 1F & 4B & BD & 8B & 8A \\
+\mathrm{D} & 70 & 3E & B5 & 66 & 48 & 03 & F6 & 0E & 61 & 35 & 57 & B9 & 86 & C1 & 1D & 9E \\
+\mathrm{E} & E1 & F8 & 98 & 11 & 69 & D9 & 8E & 94 & 9B & 1E & 87 & E9 & CE & 55 & 28 & DF \\
+\mathrm{F} & 8C & A1 & 89 & 0D & BF & E6 & 42 & 68 & 41 & 99 & 2D & 0F & B0 & 54 & BB & 16
+\end{array}
+$}
+\]
+\endgroup
+
+\newpage
+
+\exercicio{1}
+Calcule $A(x) + B(x) \bmod P(x)$ em $\mathrm{GF}(2^4)$ usando $P(x) = x^4 + x + 1$. O que aconteceria se alterássemos o polinômio de redução?
+
+\begin{enumerate}[label=\arabic*.]
+    \item $A(x) = x^2 + 1$, \quad $B(x) = x^3 + x^2 + 1$.
+    \item $A(x) = x^2 + 1$, \quad $B(x) = x + 1$.
+\end{enumerate}
+
+\begin{resposta}
+
+A soma em $\mathrm{GF}(2^n)$ é simplesmente o XOR coeficiente a coeficiente. Como $\deg A, \deg B < 4$, o resultado já tem grau $< 4$ e \emph{nenhuma} redução por $P(x)$ é aplicada.
+
+\begin{enumerate}[label=\arabic*.]
+    \item $A(x) + B(x) = (x^2+1) \oplus (x^3+x^2+1) = x^3$. Em binário: $\texttt{1000}$, ou seja $\texttt{0x8}$.
+    \item $A(x) + B(x) = (x^2+1) \oplus (x+1) = x^2 + x$. Em binário: $\texttt{0110}$, ou seja $\texttt{0x6}$.
+\end{enumerate}
+
+\textbf{Influência de $P(x)$:} a soma nunca aumenta o grau, então a redução por $P(x)$ nunca é acionada e o resultado independe da escolha do polinômio irredutível.
+
+\end{resposta}
+
+\exercicio{2}
+Calcule $A(x) \cdot B(x) \bmod P(x)$ em $\mathrm{GF}(2^4)$ usando $P(x) = x^4 + x + 1$. Qual a influência da escolha do polinômio de redução?
+
+\begin{enumerate}[label=\arabic*.]
+    \item $A(x) = x^2 + 1$, \quad $B(x) = x^3 + x^2 + 1$.
+    \item $A(x) = x^2 + 1$, \quad $B(x) = x + 1$.
+\end{enumerate}
+
+\begin{resposta}
+
+\begin{enumerate}[label=\arabic*.]
+    \item $(x^2+1)(x^3+x^2+1) = x^5 + x^4 + x^3 + 1$ (em $\mathrm{GF}(2)$, $2x^2 = 0$).
+
+    Reduzindo módulo $P(x) = x^4 + x + 1$, temos $x^4 \equiv x + 1$ e $x^5 = x \cdot x^4 \equiv x^2 + x$. Logo
+    \[
+    x^5 + x^4 + x^3 + 1 \equiv (x^2+x) + (x+1) + x^3 + 1 = x^3 + x^2.
+    \]
+    Em binário: $\texttt{1100}$, ou seja $\texttt{0xC}$.
+
+    \item $(x^2+1)(x+1) = x^3 + x^2 + x + 1$. Como $\deg = 3 < 4$, não há redução. Em binário: $\texttt{1111}$, ou seja $\texttt{0xF}$.
+\end{enumerate}
+
+\textbf{Influência de $P(x)$:} ao contrário da soma, a multiplicação produz polinômios de grau até $2(n-1)$ e \emph{precisa} ser reduzida módulo $P(x)$. Polinômios irredutíveis distintos geram corpos isomorfos, mas com tabelas de multiplicação numericamente diferentes.
+
+\end{resposta}
+
+\exercicio{3}
+Calcule em $\mathrm{GF}(2^8)$:
+\[
+\frac{x^4 + x + 1}{x^7 + x^6 + x^3 + x^2}
+\]
+com $P(x) = x^8 + x^4 + x^3 + x + 1$.
+
+\begin{resposta}
+
+Em hexadecimal: numerador $\texttt{0x13}$, denominador $\texttt{0xCC}$.
+
+Divisão = multiplicação pelo inverso. Pela tabela de inversos, linha $\mathrm{C}$, coluna $\mathrm{C}$:
+\[
+(\texttt{0xCC})^{-1} = \texttt{0x1B}.
+\]
+
+Resta computar $\texttt{0x13} \cdot \texttt{0x1B}$ em $\mathrm{GF}(2^8)$.
+
+\[
+(x^4 + x + 1)(x^4 + x^3 + x + 1) = x^8 + x^7 + x^4 + x^3 + x^2 + 1.
+\]
+
+Aplicando $x^8 \equiv x^4 + x^3 + x + 1$:
+\[
+(x^4 + x^3 + x + 1) + x^7 + x^4 + x^3 + x^2 + 1 = x^7 + x^2 + x.
+\]
+
+Em binário: $\texttt{1000\,0110}$, ou seja $\boxed{\texttt{0x86}}$.
+
+\end{resposta}
+
+\exercicio{4}
+Considere a primeira parte da operação ByteSub: a inversão em $\mathrm{GF}(2^8)$.
+
+\begin{enumerate}[label=\arabic*.]
+    \item Determine os inversos dos bytes \texttt{29}, \texttt{F3} e \texttt{01}.
+    \item Verifique multiplicando em $\mathrm{GF}(2^8)$.
+\end{enumerate}
+
+\begin{resposta}
+
+Da tabela de inversos:
+\[
+(\texttt{0x29})^{-1} = \texttt{0x0A}, \qquad
+(\texttt{0xF3})^{-1} = \texttt{0x34}, \qquad
+(\texttt{0x01})^{-1} = \texttt{0x01}.
+\]
+
+\textbf{Verificação de} $\texttt{0x29} \cdot \texttt{0x0A}$:
+\[
+\texttt{0x29} = x^5 + x^3 + 1, \quad \texttt{0x0A} = x^3 + x.
+\]
+\[
+(x^5+x^3+1)(x^3+x) = x^8 + x^4 + x^3 + x.
+\]
+Aplicando $x^8 \equiv x^4 + x^3 + x + 1$:
+\[
+(x^4+x^3+x+1) + x^4 + x^3 + x = 1. \quad \checkmark
+\]
+
+\textbf{Verificação de} $\texttt{0xF3} \cdot \texttt{0x34}$: substituindo $\texttt{0xF3} = x^7+x^6+x^5+x^4+x+1$ e $\texttt{0x34} = x^5+x^4+x^2$, expandindo e reduzindo módulo $P(x)$, obtém-se $1$.
+
+\textbf{Verificação de} $\texttt{0x01} \cdot \texttt{0x01} = 1$ é trivial.
+
+\end{resposta}
+
+\exercicio{5}
+Calcule a S-box (operação ByteSub) para os bytes \texttt{29}, \texttt{F3} e \texttt{01}.
+
+\begin{enumerate}[label=\arabic*.]
+    \item Use a tabela de inversos para obter $B'$ e em seguida aplique o mapeamento afim.
+    \item Confirme com a tabela da S-box.
+    \item Qual o valor de $S(0)$?
+\end{enumerate}
+
+\begin{resposta}
+
+A operação ByteSub é $S(B) = A \cdot B^{-1} + c$, onde a transformação afim é dada pela matriz $A$ (8$\times$8 sobre $\mathrm{GF}(2)$) e o vetor constante $c = \texttt{0x63}$.
+
+Equivalentemente, escrevendo cada bit:
+\[
+b'_i = b_i \oplus b_{(i+4)\bmod 8} \oplus b_{(i+5)\bmod 8} \oplus b_{(i+6)\bmod 8} \oplus b_{(i+7)\bmod 8} \oplus c_i,
+\]
+onde $b$ é o inverso (já calculado no Ex.\ 4) e $c_i$ é o $i$-ésimo bit de $\texttt{0x63} = \texttt{0110\,0011}$.
+
+\textbf{Para \texttt{0x29}:} $B' = \texttt{0x0A}$. Aplicando a transformação afim, obtém-se $\texttt{0xA5}$.
+
+\textbf{Para \texttt{0xF3}:} $B' = \texttt{0x34}$. Aplicando a transformação afim, obtém-se $\texttt{0x0D}$.
+
+\textbf{Para \texttt{0x01}:} $B' = \texttt{0x01}$. Aplicando a transformação afim, obtém-se $\texttt{0x7C}$.
+
+Conferência pela tabela da S-box (linha $X$, coluna $Y$ do byte $\texttt{0x}XY$):
+\[
+S(\texttt{0x29}) = \texttt{0xA5}, \quad S(\texttt{0xF3}) = \texttt{0x0D}, \quad S(\texttt{0x01}) = \texttt{0x7C}. \quad \checkmark
+\]
+
+\textbf{Valor de $S(0)$:} por convenção define-se $0^{-1} := 0$ (o $0$ não tem inverso). Aplicando a parte afim a $\texttt{0x00}$, sobra apenas o vetor constante:
+\[
+S(0) = c = \texttt{0x63}.
+\]
+
+\end{resposta}
+
+\exercicio{6}
+Qual a saída da primeira rodada do AES-128 se a entrada da camada SubBytes é toda $1$ (128 bits) e a subchave $k_1$ também é toda $1$?
+
+\begin{resposta}
+
+A entrada de SubBytes é uma matriz $4{\times}4$ com todos os bytes iguais a $\texttt{0xFF}$.
+
+\textbf{SubBytes:} $S(\texttt{0xFF}) = \texttt{0x16}$ (linha $\mathrm{F}$, coluna $\mathrm{F}$). Logo, todos os $16$ bytes do estado passam a $\texttt{0x16}$.
+
+\textbf{ShiftRows:} desloca linhas, mas como todos os bytes são iguais, o estado não muda.
+
+\textbf{MixColumns:} cada coluna é multiplicada pela matriz MDS
+$\begin{psmallmatrix}02 & 03 & 01 & 01\\01 & 02 & 03 & 01\\01 & 01 & 02 & 03\\03 & 01 & 01 & 02\end{psmallmatrix}$.
+
+A soma de cada linha é $02 \oplus 03 \oplus 01 \oplus 01 = 01$. Como cada coluna do estado tem os quatro bytes iguais a $v$, o resultado de cada byte da coluna é $01 \cdot v = v$. Logo, o estado continua sendo $\texttt{0x16}$ em todas as posições.
+
+\textbf{AddRoundKey} com $k_1$ todo $\texttt{0xFF}$:
+\[
+\texttt{0x16} \oplus \texttt{0xFF} = \texttt{0xE9}.
+\]
+
+\textbf{Estado final:}
+\[
+\begin{bmatrix}
+\texttt{E9} & \texttt{E9} & \texttt{E9} & \texttt{E9}\\
+\texttt{E9} & \texttt{E9} & \texttt{E9} & \texttt{E9}\\
+\texttt{E9} & \texttt{E9} & \texttt{E9} & \texttt{E9}\\
+\texttt{E9} & \texttt{E9} & \texttt{E9} & \texttt{E9}
+\end{bmatrix}.
+\]
+
+\end{resposta}
+
+\exercicio{7}
+Verifique a difusão do AES após uma única rodada com $X = (\texttt{0x01000000}, 0, 0, 0)$ e as subchaves $W[0]$\ldots$W[7]$ dadas. Compare com a saída quando $X = 0$.
+
+\begin{resposta}
+
+Organizando $X$ como matriz de estado (\emph{column-major}) e as chaves $K_0 = W[0..3]$ e $K_1 = W[4..7]$:
+\[
+X = \begin{bmatrix}\texttt{01}&\texttt{00}&\texttt{00}&\texttt{00}\\\texttt{00}&\texttt{00}&\texttt{00}&\texttt{00}\\\texttt{00}&\texttt{00}&\texttt{00}&\texttt{00}\\\texttt{00}&\texttt{00}&\texttt{00}&\texttt{00}\end{bmatrix},\;
+K_0 = \begin{bmatrix}\texttt{2B}&\texttt{28}&\texttt{AB}&\texttt{09}\\\texttt{7E}&\texttt{AE}&\texttt{F7}&\texttt{CF}\\\texttt{15}&\texttt{D2}&\texttt{15}&\texttt{4F}\\\texttt{16}&\texttt{A6}&\texttt{88}&\texttt{3C}\end{bmatrix},\;
+K_1 = \begin{bmatrix}\texttt{A0}&\texttt{88}&\texttt{23}&\texttt{2A}\\\texttt{FA}&\texttt{54}&\texttt{A3}&\texttt{6C}\\\texttt{FE}&\texttt{2C}&\texttt{39}&\texttt{76}\\\texttt{17}&\texttt{B1}&\texttt{39}&\texttt{05}\end{bmatrix}.
+\]
+
+\textbf{Caso (1): entrada com 1 bit ativo.}
+
+Após $\mathrm{ARK}(K_0)$:
+$\left[\begin{smallmatrix}\texttt{2A}&\texttt{28}&\texttt{AB}&\texttt{09}\\\texttt{7E}&\texttt{AE}&\texttt{F7}&\texttt{CF}\\\texttt{15}&\texttt{D2}&\texttt{15}&\texttt{4F}\\\texttt{16}&\texttt{A6}&\texttt{88}&\texttt{3C}\end{smallmatrix}\right]$.
+
+Após SubBytes (lookup S-box):
+$\left[\begin{smallmatrix}\texttt{E5}&\texttt{34}&\texttt{62}&\texttt{01}\\\texttt{F3}&\texttt{E4}&\texttt{68}&\texttt{8A}\\\texttt{59}&\texttt{B5}&\texttt{59}&\texttt{84}\\\texttt{47}&\texttt{24}&\texttt{C4}&\texttt{EB}\end{smallmatrix}\right]$.
+
+Após ShiftRows (linha $i$ desloca $i$ posições à esquerda):
+$\left[\begin{smallmatrix}\texttt{E5}&\texttt{34}&\texttt{62}&\texttt{01}\\\texttt{E4}&\texttt{68}&\texttt{8A}&\texttt{F3}\\\texttt{59}&\texttt{84}&\texttt{59}&\texttt{B5}\\\texttt{EB}&\texttt{47}&\texttt{24}&\texttt{C4}\end{smallmatrix}\right]$.
+
+Após MixColumns (multiplicação coluna-a-coluna por MDS):
+$\left[\begin{smallmatrix}\texttt{54}&\texttt{13}&\texttt{3C}&\texttt{7D}\\\texttt{36}&\texttt{34}&\texttt{A2}&\texttt{FC}\\\texttt{95}&\texttt{86}&\texttt{36}&\texttt{D4}\\\texttt{44}&\texttt{3E}&\texttt{3D}&\texttt{D6}\end{smallmatrix}\right]$.
+
+Após $\mathrm{ARK}(K_1)$ (saída da rodada 1 para $X$ com 1 bit):
+\[
+Y_1 \;=\; \begin{bmatrix}\texttt{F4}&\texttt{9B}&\texttt{1F}&\texttt{57}\\\texttt{CC}&\texttt{60}&\texttt{01}&\texttt{90}\\\texttt{6B}&\texttt{AA}&\texttt{0F}&\texttt{A2}\\\texttt{53}&\texttt{8F}&\texttt{04}&\texttt{D3}\end{bmatrix}.
+\]
+
+\textbf{Caso (2): entrada $X = 0$.}
+
+Repetindo as mesmas etapas com estado inicial nulo (somente $K_0$ entra em SubBytes), as colunas $1, 2, 3$ de saída são idênticas ao caso (1) (pois MixColumns é coluna-a-coluna e só a coluna $0$ depende do bit alterado). A coluna $0$ muda. Resultado:
+\[
+Y_0 \;=\; \begin{bmatrix}\texttt{DC}&\texttt{9B}&\texttt{1F}&\texttt{57}\\\texttt{D8}&\texttt{60}&\texttt{01}&\texttt{90}\\\texttt{7F}&\texttt{AA}&\texttt{0F}&\texttt{A2}\\\texttt{6F}&\texttt{8F}&\texttt{04}&\texttt{D3}\end{bmatrix}.
+\]
+
+\textbf{Diferença} $Y_1 \oplus Y_0$:
+\[
+\begin{bmatrix}\texttt{28}&0&0&0\\\texttt{14}&0&0&0\\\texttt{14}&0&0&0\\\texttt{3C}&0&0&0\end{bmatrix}
+\quad\Longrightarrow\quad
+\text{bits diferentes} = 2 + 2 + 2 + 4 = \boxed{10 \text{ bits}}.
+\]
+
+\textbf{Comentário (efeito avalanche):} a diferença de 1 bit na entrada produz, após apenas \emph{uma} rodada, alterações em $4$ bytes (uma coluna inteira) em $\sim 10$ bits dos $128$ totais. Após cada rodada subsequente, MixColumns + ShiftRows espalham essas diferenças para todas as posições; o resultado típico depois de poucas rodadas é $\approx 50\%$ dos bits alterados.
+
+\end{resposta}
+
+\exercicio{8}
+Estamos na 9ª rodada de uma decifragem AES-128. Calcule a rodada final e o texto em claro, dada a chave $k_0$ e o estado após a substituição inversa de bytes na rodada 9.
+
+\begin{resposta}
+
+A 9$^{\underline{\text{a}}}$ rodada da decifragem (penúltima) está pela metade: o estado dado é o resultado de \emph{InvByteSub} dessa rodada. A partir dele, ainda falta:
+\begin{enumerate}[label=(\alph*)]
+\item $\mathrm{ARK}(k_1)$ (fim da rodada 9 da decifragem);
+\item rodada final da decifragem: \emph{InvMixColumns} $\to$ \emph{InvShiftRows} $\to$ \emph{InvByteSub};
+\item $\mathrm{ARK}(k_0)$ (\emph{whitening} inicial), produzindo o texto em claro.
+\end{enumerate}
+
+\textbf{Subchave $k_1$} (obtida pelo Key Schedule do AES-128 a partir de $k_0$):
+\[
+k_1 \;=\; \begin{bmatrix}\texttt{C2}&\texttt{86}&\texttt{0E}&\texttt{2C}\\\texttt{0A}&\texttt{5F}&\texttt{C6}&\texttt{F5}\\\texttt{DE}&\texttt{B8}&\texttt{B8}&\texttt{FC}\\\texttt{A0}&\texttt{D7}&\texttt{C6}&\texttt{93}\end{bmatrix}.
+\]
+
+\textbf{(a) Após $\mathrm{ARK}(k_1)$:}
+\[
+\begin{bmatrix}\texttt{77}&\texttt{e9}&\texttt{45}&\texttt{58}\\\texttt{c4}&\texttt{cf}&\texttt{fa}&\texttt{c3}\\\texttt{b8}&\texttt{66}&\texttt{87}&\texttt{95}\\\texttt{05}&\texttt{23}&\texttt{31}&\texttt{20}\end{bmatrix}
+\oplus k_1
+\;=\;
+\begin{bmatrix}\texttt{B5}&\texttt{6F}&\texttt{4B}&\texttt{74}\\\texttt{CE}&\texttt{90}&\texttt{3C}&\texttt{36}\\\texttt{66}&\texttt{DE}&\texttt{3F}&\texttt{69}\\\texttt{A5}&\texttt{F4}&\texttt{F7}&\texttt{B3}\end{bmatrix}.
+\]
+
+\textbf{(b1) Após \emph{InvMixColumns}:}
+\[
+\begin{bmatrix}\texttt{2D}&\texttt{5F}&\texttt{5E}&\texttt{B0}\\\texttt{3D}&\texttt{A0}&\texttt{0B}&\texttt{9E}\\\texttt{95}&\texttt{5F}&\texttt{4F}&\texttt{86}\\\texttt{3D}&\texttt{75}&\texttt{A5}&\texttt{30}\end{bmatrix}.
+\]
+
+\textbf{(b2) Após \emph{InvShiftRows}} (linha $i$ desloca $i$ posições à direita):
+\[
+\begin{bmatrix}\texttt{2D}&\texttt{5F}&\texttt{5E}&\texttt{B0}\\\texttt{9E}&\texttt{3D}&\texttt{A0}&\texttt{0B}\\\texttt{4F}&\texttt{86}&\texttt{95}&\texttt{5F}\\\texttt{75}&\texttt{A5}&\texttt{30}&\texttt{3D}\end{bmatrix}.
+\]
+
+\textbf{(b3) Após \emph{InvByteSub}} (S-box inversa):
+\[
+\begin{bmatrix}\texttt{FA}&\texttt{84}&\texttt{9D}&\texttt{FC}\\\texttt{DF}&\texttt{8B}&\texttt{47}&\texttt{9E}\\\texttt{92}&\texttt{DC}&\texttt{AD}&\texttt{84}\\\texttt{3F}&\texttt{29}&\texttt{08}&\texttt{8B}\end{bmatrix}.
+\]
+
+\textbf{(c) Após $\mathrm{ARK}(k_0)$ — texto em claro:}
+\[
+\boxed{\;\begin{bmatrix}\texttt{FA}&\texttt{C0}&\texttt{15}&\texttt{DE}\\\texttt{CE}&\texttt{DE}&\texttt{DE}&\texttt{AD}\\\texttt{B0}&\texttt{BA}&\texttt{AD}&\texttt{C0}\\\texttt{0C}&\texttt{5E}&\texttt{19}&\texttt{DE}\end{bmatrix}\;}
+\]
+
+\textbf{Texto em claro} (lendo em ordem \emph{column-major}, como aparece no canal):
+\[
+\texttt{FA\,CE\,B0\,0C\;\;C0\,DE\,BA\,5E\;\;15\,DE\,AD\,19\;\;DE\,AD\,C0\,DE}.
+\]
+
+\end{resposta}
+
+\exercicio{9}
+AES-192 com $3 \cdot 10^7$ chaves/s por chip e $10^5$ chips em paralelo.
+
+\begin{enumerate}[label=\arabic*.]
+    \item Tempo médio de busca exaustiva. Compare com a idade do universo ($\approx 10^{10}$ anos).
+    \item Quantos anos teremos que esperar (Lei de Moore) até conseguir $24\,\mathrm{h}$ de busca?
+\end{enumerate}
+
+\begin{resposta}
+
+\textbf{Item 1.} Velocidade total: $10^5 \cdot 3 \cdot 10^7 = 3 \cdot 10^{12}$ chaves/s. Em média, a busca exige $2^{191}$ tentativas (metade do espaço de $2^{192}$ chaves).
+
+\[
+T \;=\; \frac{2^{191}}{3 \cdot 10^{12}} \;\approx\; \frac{3{,}14 \cdot 10^{57}}{3 \cdot 10^{12}} \;\approx\; 1{,}05 \cdot 10^{45}\,\mathrm{s}.
+\]
+
+Convertendo para anos ($1$ ano $\approx 3{,}15 \cdot 10^7$\,s):
+\[
+T \;\approx\; 3{,}3 \cdot 10^{37}\,\text{anos}.
+\]
+
+Comparando com a idade do universo ($\approx 10^{10}$ anos):
+\[
+\frac{T}{T_{\text{universo}}} \;\approx\; 3{,}3 \cdot 10^{27}.
+\]
+
+Ou seja, a busca leva da ordem de $10^{27}$ idades do universo. Inviável.
+
+\textbf{Item 2.} Lei de Moore: a velocidade dobra a cada $1{,}5$ ano. Queremos $T = 24\,\mathrm{h} = 86400\,\mathrm{s}$:
+\[
+\text{velocidade necessária} \;=\; \frac{2^{191}}{86400} \;\approx\; 3{,}66 \cdot 10^{52}\,\text{chaves/s},
+\]
+distribuída em $10^5$ chips, dá $\approx 3{,}66 \cdot 10^{47}$ chaves/s por chip.
+
+Speedup necessário sobre o atual ($3 \cdot 10^7$/s/chip):
+\[
+\text{speedup} \;=\; \frac{3{,}66 \cdot 10^{47}}{3 \cdot 10^7} \;\approx\; 1{,}22 \cdot 10^{40} \;\approx\; 2^{133}.
+\]
+
+Tempo até atingir esse speedup:
+\[
+2^{t/1{,}5} = 2^{133} \;\Longrightarrow\; t = 1{,}5 \cdot 133 \;\approx\; \boxed{200\,\text{anos}}.
+\]
+
+(Pressupondo, naturalmente, que a Lei de Moore continue válida por dois séculos — o que está longe de ser garantido.)
+
+\end{resposta}
+
+\exercicio{10}
+Cifra didática $e(b_1 b_2 b_3 b_4 b_5) = (b_2 b_5 b_4 b_1 b_3)$. Encripte $x = \texttt{01101\,11011\,11010\,00110}$ em ECB, CBC, CFB, OFB e CTR, com $IV = \texttt{11001}$.
+
+\begin{resposta}
+
+Blocos de entrada:
+$x_1 = \texttt{01101}$, $x_2 = \texttt{11011}$, $x_3 = \texttt{11010}$, $x_4 = \texttt{00110}$.
+
+A função $e$ é uma permutação dos cinco bits. Aplicando-a aos valores que aparecem nos cálculos abaixo:
+
+\begin{center}
+\small
+\begin{tabular}{|c|c||c|c||c|c|}
+\hline
+$x$ & $e(x)$ & $x$ & $e(x)$ & $x$ & $e(x)$ \\
+\hline
+\texttt{01101} & \texttt{11001} & \texttt{11001} & \texttt{11010} & \texttt{10100} & \texttt{00011} \\
+\texttt{11011} & \texttt{11110} & \texttt{11000} & \texttt{10010} & \texttt{01000} & \texttt{10000} \\
+\texttt{11010} & \texttt{10110} & \texttt{10110} & \texttt{00111} & \texttt{00111} & \texttt{01101} \\
+\texttt{00110} & \texttt{00101} & \texttt{10111} & \texttt{01111} & \texttt{11100} & \texttt{10011} \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{ECB.} $y_i = e(x_i)$:
+\[
+y \;=\; \texttt{11001\;11110\;10110\;00101}.
+\]
+
+\textbf{CBC.} $y_1 = e(x_1 \oplus IV)$ e $y_i = e(x_i \oplus y_{i-1})$:
+\begin{align*}
+y_1 &= e(\texttt{01101}\oplus\texttt{11001}) = e(\texttt{10100}) = \texttt{00011},\\
+y_2 &= e(\texttt{11011}\oplus\texttt{00011}) = e(\texttt{11000}) = \texttt{10010},\\
+y_3 &= e(\texttt{11010}\oplus\texttt{10010}) = e(\texttt{01000}) = \texttt{10000},\\
+y_4 &= e(\texttt{00110}\oplus\texttt{10000}) = e(\texttt{10110}) = \texttt{00111}.
+\end{align*}
+\[
+y \;=\; \texttt{00011\;10010\;10000\;00111}.
+\]
+
+\textbf{OFB.} $s_1 = e(IV)$, $s_i = e(s_{i-1})$, $y_i = s_i \oplus x_i$:
+\begin{align*}
+s_1 &= e(\texttt{11001}) = \texttt{11010}, & y_1 &= \texttt{11010}\oplus\texttt{01101} = \texttt{10111},\\
+s_2 &= e(\texttt{11010}) = \texttt{10110}, & y_2 &= \texttt{10110}\oplus\texttt{11011} = \texttt{01101},\\
+s_3 &= e(\texttt{10110}) = \texttt{00111}, & y_3 &= \texttt{00111}\oplus\texttt{11010} = \texttt{11101},\\
+s_4 &= e(\texttt{00111}) = \texttt{01101}, & y_4 &= \texttt{01101}\oplus\texttt{00110} = \texttt{01011}.
+\end{align*}
+\[
+y \;=\; \texttt{10111\;01101\;11101\;01011}.
+\]
+
+\textbf{CFB.} $y_1 = e(IV) \oplus x_1$ e $y_i = e(y_{i-1}) \oplus x_i$:
+\begin{align*}
+y_1 &= e(\texttt{11001})\oplus\texttt{01101} = \texttt{11010}\oplus\texttt{01101} = \texttt{10111},\\
+y_2 &= e(\texttt{10111})\oplus\texttt{11011} = \texttt{01111}\oplus\texttt{11011} = \texttt{10100},\\
+y_3 &= e(\texttt{10100})\oplus\texttt{11010} = \texttt{00011}\oplus\texttt{11010} = \texttt{11001},\\
+y_4 &= e(\texttt{11001})\oplus\texttt{00110} = \texttt{11010}\oplus\texttt{00110} = \texttt{11100}.
+\end{align*}
+\[
+y \;=\; \texttt{10111\;10100\;11001\;11100}.
+\]
+
+\textbf{CTR.} Contador iniciado em $IV$ e incrementado: $\mathrm{CTR}_i = IV+i-1$.
+\begin{align*}
+\mathrm{CTR}_1 &= \texttt{11001}, & e(\mathrm{CTR}_1) &= \texttt{11010}, & y_1 &= \texttt{11010}\oplus\texttt{01101} = \texttt{10111},\\
+\mathrm{CTR}_2 &= \texttt{11010}, & e(\mathrm{CTR}_2) &= \texttt{10110}, & y_2 &= \texttt{10110}\oplus\texttt{11011} = \texttt{01101},\\
+\mathrm{CTR}_3 &= \texttt{11011}, & e(\mathrm{CTR}_3) &= \texttt{11110}, & y_3 &= \texttt{11110}\oplus\texttt{11010} = \texttt{00100},\\
+\mathrm{CTR}_4 &= \texttt{11100}, & e(\mathrm{CTR}_4) &= \texttt{10011}, & y_4 &= \texttt{10011}\oplus\texttt{00110} = \texttt{10101}.
+\end{align*}
+\[
+y \;=\; \texttt{10111\;01101\;00100\;10101}.
+\]
+
+\end{resposta}
+
+\exercicio{11}
+Em uma rede interna, AES-128 em CBC com chave fixa e IV diário. Você descobriu a chave mas não conhece o IV. Hoje interceptou dois arquivos: um desconhecido e outro contendo apenas \texttt{0xFF} (16 bytes). Como recuperar o IV e decifrar o desconhecido?
+
+\begin{resposta}
+
+\textbf{Recuperação do IV.} Seja $y_1^{\mathrm{(FF)}}$ o primeiro bloco cifrado do arquivo conhecido (todo $\texttt{0xFF}$) e $x_1^{\mathrm{(FF)}} = \texttt{FF\,FF\,\ldots\,FF}$ (16 bytes). Pela definição do modo CBC,
+\[
+y_1^{\mathrm{(FF)}} \;=\; e_k\bigl(x_1^{\mathrm{(FF)}} \oplus IV\bigr) \quad\Longrightarrow\quad
+e_k^{-1}\!\bigl(y_1^{\mathrm{(FF)}}\bigr) \;=\; x_1^{\mathrm{(FF)}} \oplus IV.
+\]
+Como o atacante conhece $k$, $y_1^{\mathrm{(FF)}}$ e $x_1^{\mathrm{(FF)}}$:
+\[
+\boxed{\,IV \;=\; e_k^{-1}\!\bigl(y_1^{\mathrm{(FF)}}\bigr) \;\oplus\; x_1^{\mathrm{(FF)}}\,.}
+\]
+
+\textbf{Decifragem do arquivo desconhecido.} Seja $y_1^{\mathrm{(?)}}, y_2^{\mathrm{(?)}}, \ldots$ o arquivo desconhecido. Aplicando a decifragem CBC padrão com o $IV$ recuperado:
+\[
+x_1^{\mathrm{(?)}} = e_k^{-1}\!\bigl(y_1^{\mathrm{(?)}}\bigr) \oplus IV, \qquad
+x_i^{\mathrm{(?)}} = e_k^{-1}\!\bigl(y_i^{\mathrm{(?)}}\bigr) \oplus y_{i-1}^{\mathrm{(?)}} \quad (i \geq 2).
+\]
+
+\textbf{Observação prática:} esse ataque depende de termos um par $(x_1, y_1)$ conhecido, o que ocorre frequentemente em sistemas que injetam arquivos temporários previsíveis na rede. É um lembrete de que \emph{IV no CBC não pode ser apenas público — ele precisa ser \emph{único} a cada arquivo}, idealmente um \textit{nonce} aleatório, não um valor fixo por dia.
+
+\end{resposta}
+
+\exercicio{12}
+Como o modo OFB pode ser atacado se o IV não for diferente a cada execução?
+
+\begin{resposta}
+
+No OFB, a \textit{keystream} é gerada \emph{exclusivamente} a partir de $k$ e $IV$ — \textbf{não depende do texto em claro}. Ou seja, com $k$ e $IV$ fixos:
+\[
+s_1 = e_k(IV),\; s_2 = e_k(s_1),\;\ldots
+\]
+é sempre a \emph{mesma} sequência.
+
+Logo, se duas mensagens $x$ e $x'$ são cifradas com o mesmo par $(k, IV)$:
+\[
+y_i = s_i \oplus x_i, \qquad y'_i = s_i \oplus x'_i.
+\]
+Aplicando XOR:
+\[
+y_i \oplus y'_i \;=\; x_i \oplus x'_i.
+\]
+A \textit{keystream} \emph{cancela}, e o atacante obtém o XOR dos textos em claro. Esse é o ataque clássico de \emph{many-time pad}.
+
+\textbf{Exploração com plaintext conhecido (a dica do enunciado).} Muitos formatos de arquivo começam com \emph{magic numbers} fixos: PNG inicia com \texttt{89\,50\,4E\,47\,0D\,0A\,1A\,0A}, ZIP com \texttt{50\,4B\,03\,04}, PDF com \texttt{\%PDF-}, JPEG com \texttt{FF\,D8\,FF}, etc.
+
+Se o atacante \emph{suspeita} que $x$ é um PNG, ele toma o cabeçalho conhecido $x_{\text{hdr}}$ e calcula
+\[
+x'_{\text{hdr}} \;=\; (y \oplus y') \oplus x_{\text{hdr}}.
+\]
+Os bytes de $x'$ correspondentes ao cabeçalho são revelados imediatamente. A partir daí, com texto e estatística (n-gramas, dicionário, padrões), normalmente é possível recuperar boa parte de ambas as mensagens.
+
+\textbf{Pior caso:} se $x_i$ é totalmente conhecido em algum trecho, então para esse trecho o atacante recupera $s_i = y_i \oplus x_i$ — e qualquer outra mensagem cifrada com o mesmo $(k, IV)$ é decifrada \emph{naquele trecho} sem esforço.
+
+\textbf{Conclusão:} no OFB, IV deve ser \emph{único por execução} (\textit{nonce}). Reusar IV é equivalente a reusar uma chave de \textit{one-time pad} — destrói a confidencialidade.
+
+\end{resposta}
+
+\exercicio{13}
+AES no modo CTR para encriptar 1~TB. Qual o comprimento máximo do IV?
+
+\begin{resposta}
+
+AES tem bloco de $128$ bits $= 16$ bytes. O input da cifra no modo CTR é o par $(IV \,\|\, \mathrm{CTR})$, totalizando $128$ bits.
+
+\textbf{Quantidade de blocos para cobrir 1\,TB.}
+\[
+\frac{1\,\mathrm{TB}}{16\,\text{bytes}} \;=\; \frac{2^{40}\,\text{bytes}}{2^4\,\text{bytes}} \;=\; 2^{36}\,\text{blocos}.
+\]
+(Adotando o convênio binário $1\,\mathrm{TB}=2^{40}$\,bytes.)
+
+\textbf{Tamanho mínimo do contador.} Para que cada bloco tenha um valor de contador único, precisamos de pelo menos $36$ bits no contador.
+
+\textbf{Tamanho máximo do IV.}
+\[
+\boxed{\,|IV|_{\max} \;=\; 128 - 36 \;=\; 92\,\text{bits}.\,}
+\]
+
+(Se for usado $1\,\mathrm{TB}=10^{12}$\,bytes, o número de blocos é $\approx 6{,}25 \cdot 10^{10}$, ainda exigindo $36$ bits de contador, e a resposta é a mesma.)
+
+\end{resposta}
+
+\exercicio{14}
+No CFB com largura de realimentação de $1$ bit, mostre que a sincronização é restaurada após $k+1$ passos depois de uma deleção/inserção, onde $k$ é o tamanho do bloco da cifra.
+
+\begin{resposta}
+
+\textbf{Configuração.} No CFB com realimentação de 1\,bit, o registrador de deslocamento (\emph{shift register}, SR) tem $k$ bits. Em cada passo:
+\begin{enumerate}[label=(\alph*)]
+    \item o emissor calcula $z_t = \mathrm{MSB}\!\bigl(e_k(SR_t)\bigr)$ e $c_t = p_t \oplus z_t$;
+    \item desloca $c_t$ para dentro do SR (descartando o bit mais antigo).
+\end{enumerate}
+O receptor faz o mesmo: usa o SR atual para gerar $z_t$, recupera $p_t = c_t \oplus z_t$, e desloca $c_t$ no seu SR. \textbf{Para que a decifragem seja correta, o SR do receptor precisa coincidir com o do emissor no instante de cada bit.}
+
+\textbf{Efeito de uma única deleção.} Suponha que o bit $c_d$ enviado pelo emissor seja \emph{perdido} no canal. A partir desse ponto, o receptor passa a tratar o que recebe como se fossem os bits do emissor, mas com índices defasados em $1$: quando o emissor envia $c_{d+j}$, o receptor o recebe como se fosse $c_{d+j-1}$.
+
+\textbf{Conteúdo do SR após a deleção.} O SR do receptor, no momento em que ele processa o que ele \emph{acha} ser o bit $c_{d+j-1}$, contém os $k$ bits mais recentes \emph{efetivamente recebidos} antes desse:
+\[
+SR_{\text{rec}} \;=\; (\,c_{d-k+1},\, \ldots,\, c_{d-1},\, c_{d+1},\, \ldots,\, c_{d+j-1}\,).
+\]
+Isto é, dos $k$ bits do SR, $\max(k - j + 1, 0)$ deles são bits anteriores à deleção e os demais são bits posteriores.
+
+\textbf{Quando o SR fica $100\%$ pós-deleção?} Tão logo $j - 1 \geq k$, ou seja, $j \geq k + 1$. Nesse instante:
+\[
+SR_{\text{rec}} \;=\; (c_{d+1},\, c_{d+2},\, \ldots,\, c_{d+k}).
+\]
+
+\textbf{Coincidência com o SR do emissor.} O emissor, ao gerar $c_{d+k+1}$, usa o SR
+\[
+SR_{\text{emi}} \;=\; (c_{d+1},\, c_{d+2},\, \ldots,\, c_{d+k}).
+\]
+Logo, $SR_{\text{rec}} = SR_{\text{emi}}$ a partir desse passo. A partir daí, todo bit deslocado é o mesmo dos dois lados, e a sincronização se mantém.
+
+\textbf{Conclusão.} A sincronização é restaurada após exatamente $k+1$ bits de texto cifrado transmitidos depois da deleção (ou inserção, por argumento simétrico). Os $k$ primeiros bits após o erro continuam sendo decifrados incorretamente, pois o SR do receptor ainda contém pelo menos um bit defasado.
+
+\end{resposta}
+
+\end{document}

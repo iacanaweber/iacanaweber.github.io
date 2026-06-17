@@ -1,0 +1,238 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{titlesec}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{needspace}
+\usepackage{multirow}
+\usepackage{hyperref}
+
+%% Toggle para mostrar/ocultar respostas
+%% Troque \mostrarrespostasfalse por \mostrarrespostastrue para compilar com gabarito
+\newif\ifmostrarrespostas
+\mostrarrespostasfalse
+
+\geometry{left=1.5cm, top=1.5cm, right=1.5cm, bottom=1.5cm}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Segurança de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{Trabalho Prático: Logaritmo Discreto}
+\newcommand{\nomedoprofessor}{Iaçanã Ianiski Weber}
+
+\titleformat{\section}{\large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{}{0em}{}
+\titlespacing*{\section}{0pt}{10pt}{6pt}
+
+\lstdefinestyle{code}{
+  basicstyle=\ttfamily\small,
+  numbers=none,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  backgroundcolor=\color{gray!5},
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+  morekeywords={int, unsigned, char, void, return, if, else, for, while, def, import, from, mod, gcd},
+  keywordstyle=\color{blue!70!black},
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+}
+
+\begin{document}
+
+\noindent
+\begin{minipage}[l]{0.1\textwidth}
+    \noindent
+    \includegraphics[width=1.3\textwidth]{../../../common/Brasão_PUCRS.png}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.9\textwidth}
+    \begin{center}
+        {\large Pontifícia Universidade Católica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\noindent\textbf{\textcolor{red}{Entrega: 22/06 (23:59) - no Moodle}}
+
+\vspace{0.15in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=blue!5, colframe=blue!40, title=\textbf{Contexto: Diffie-Hellman e o Problema do Logaritmo Discreto}, fonttitle=\small]
+\small
+O protocolo de troca de chaves de \textbf{Diffie--Hellman} permite que duas partes estabeleçam um segredo compartilhado sobre um canal público. Alice e Bob acordam em um primo $p$ e um gerador $\alpha \in (\mathbb{Z}/p\mathbb{Z})^*$; cada um sorteia um expoente secreto ($a$ e $b$), publica $A = \alpha^a \bmod p$ e $B = \alpha^b \bmod p$, e calcula $K_{ab} = B^a \bmod p = A^b \bmod p = \alpha^{ab} \bmod p$.
+
+A segurança desse esquema repousa no \textbf{Problema do Logaritmo Discreto (DLP)}: dados $\alpha$, $p$ e $\alpha^x \bmod p$, recuperar $x$ é computacionalmente difícil quando os parâmetros são bem escolhidos. Neste trabalho você atacará o DLP em $(\mathbb{Z}/p\mathbb{Z})^*$ para uma sequência crescente de tamanhos de $p$.
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{O Problema}
+
+Para cada cenário $C_i$ é fornecida uma quádrupla
+\[
+(\alpha, \; p, \; A, \; B), \qquad A = \alpha^a \bmod p, \qquad B = \alpha^b \bmod p,
+\]
+e o seu objetivo é recuperar a chave compartilhada de Diffie--Hellman
+\[
+K_{ab} = \alpha^{a \cdot b} \bmod p.
+\]
+Você \textbf{não} precisa reportar $a$ nem $b$, apenas $K_{ab}$ em decimal. A correção compara cada $K_{ab}$ entregue, byte a byte, com o gabarito do professor.
+
+\subsection{Estrutura dos arquivos}
+
+\begin{itemize}[nosep]
+  \item \texttt{desafios.txt}: entrada do trabalho. Contém $(\alpha, p, A, B)$ para cada cenário. Texto puro, decimal, fácil de parsear com \texttt{split} em qualquer linguagem.
+  \item \texttt{solucao.txt}: modelo a preencher e entregar. Preencha $K_{ab}$ em cada cenário resolvido; deixe em branco (ou comentado com \texttt{\#}) os que você não conseguir atacar.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Cenários}
+
+São \textbf{23 cenários} de Diffie--Hellman, com $p$ variando de 16 até 1024 bits. O cenário $C_0$ (16 bits) acompanha a solução completa; use-o para validar sua implementação antes de partir para os demais.
+
+\begin{center}
+\small
+\begin{tabular}{cc@{\hspace{1.2cm}}cc@{\hspace{1.2cm}}cc}
+\toprule
+\textbf{Cenário} & \textbf{bits($p$)} & \textbf{Cenário} & \textbf{bits($p$)} & \textbf{Cenário} & \textbf{bits($p$)} \\
+\midrule
+$C_0$ (exemplo) & 16  & $C_8$    & 64  & $C_{16}$ & 128  \\
+$C_1$           & 32  & $C_9$    & 80  & $C_{17}$ & 256  \\
+$C_2$           & 32  & $C_{10}$ & 80  & $C_{18}$ & 256  \\
+$C_3$           & 40  & $C_{11}$ & 96  & $C_{19}$ & 512  \\
+$C_4$           & 40  & $C_{12}$ & 96  & $C_{20}$ & 512  \\
+$C_5$           & 48  & $C_{13}$ & 112 & $C_{21}$ & 1024 \\
+$C_6$           & 48  & $C_{14}$ & 112 & $C_{22}$ & 1024 \\
+$C_7$           & 64  & $C_{15}$ & 128 &          &      \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=green!5, colframe=green!40!black, title=\textbf{Exemplo resolvido: $C_0$ (16 bits)}, fonttitle=\small]
+\small
+O cenário $C_0$ é fornecido com $a$, $b$ e $K_{ab}$ revelados em \texttt{desafios.txt}. Use esse cenário como \emph{sanity check}: implemente seu ataque, rode contra $C_0$, e confirme que o $K_{ab}$ recuperado coincide com o publicado antes de avançar para os cenários reais. Se a implementação falha em 16 bits, não fará sentido tentar 128.
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tarefas}
+
+\begin{enumerate}
+  \item \textbf{Pesquise} os principais ataques ao DLP em $(\mathbb{Z}/p\mathbb{Z})^*$ e sintetize, em poucas linhas, as ideias centrais e a complexidade assintótica de cada um:
+  \begin{enumerate}[label=\alph*), nosep]
+    \item Força bruta ($\mathcal{O}(p)$),
+    \item Baby-step Giant-step (BSGS, $\mathcal{O}(\sqrt{q})$ tempo e memória, onde $q = \mathrm{ord}(\alpha)$),
+    \item Pollard rho ($\mathcal{O}(\sqrt{q})$ tempo, $\mathcal{O}(1)$ memória),
+    \item Pohlig--Hellman (reduz ao DLP nos subgrupos de ordem prima de $q$),
+    \item Index Calculus / Number Field Sieve (subexponencial em $p$).
+  \end{enumerate}
+
+  \item \textbf{Implemente} um ou mais ataques na linguagem que preferir. Bibliotecas de aritmética arbitrária são encorajadas: \texttt{int} nativo do Python, \texttt{gmpy2}, \texttt{BigInteger} em Java, \texttt{mpz} (GMP) em C/C++.
+
+  \item \textbf{Execute} seu ataque contra $C_0$ a $C_{22}$, registrando o tempo até obter $K_{ab}$ ou desistir. O timeout sugerido é de \textbf{1 hora por cenário}, mas a escolha é sua. Resolva todos os que conseguir; para os demais, projete o tempo estimado.
+
+  \item \textbf{Gráfico} tempo $\times$ bits($p$) em escala log no eixo $y$. Inclua:
+  \begin{itemize}[nosep]
+    \item os pontos medidos para os cenários efetivamente resolvidos,
+    \item uma linha de \textbf{projeção} para os cenários não alcançados, \textbf{justificada} pela complexidade assintótica da técnica utilizada.
+  \end{itemize}
+
+  \item \textbf{Reporte a infraestrutura computacional} usada. Este item é \emph{obrigatório}, pois sem ele o tempo medido é incomparável e a projeção perde valor:
+  \begin{itemize}[nosep]
+    \item modelo da CPU (e/ou GPU), número de núcleos e \textit{threads} efetivamente usados;
+    \item memória RAM disponível;
+    \item sistema operacional;
+    \item se o ataque for distribuído: \textbf{topologia} (quantas máquinas, como foram coordenadas, latência da rede, divisão de trabalho).
+  \end{itemize}
+
+  \item \textbf{Relatório} de no máximo \textbf{2 páginas} (não conta capa nem anexos) contendo: técnica utilizada, gráfico, tabela de tempos, descrição da infraestrutura e \textbf{discussão crítica} sobre o que os cenários revelam sobre escolha de parâmetros em Diffie--Hellman real.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tcolorbox}[colback=yellow!12, colframe=yellow!60!brown, title=\textbf{Entregáveis}, fonttitle=\small]
+\small
+\begin{itemize}[nosep]
+  \item \texttt{relatorio.pdf}: máx. 2 páginas, contendo técnica, gráfico tempo $\times$ bits($p$) com projeção, tabela de tempos, descrição da \textbf{infraestrutura computacional} (obrigatório) e discussão.
+  \item \texttt{solucao.txt}: preenchido com $K_{ab}$ por cenário resolvido, no formato fornecido.
+  \item \textbf{Código:} \emph{não} incluir no corpo do relatório. Se imprescindível, anexar como apêndice ou disponibilizar em \textbf{repositório público} (GitHub, GitLab). Não conta para o limite de 2 páginas.
+\end{itemize}
+\end{tcolorbox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ifmostrarrespostas
+
+\newpage
+\begin{center}
+\Large\textbf{GABARITO (uso interno)}
+\end{center}
+\vspace{0.2in}
+
+\begin{tcolorbox}[colback=red!5, colframe=red!40, title=\textbf{Tipo de cada cenário e $\mathrm{ord}(\alpha)$}, fonttitle=\small]
+\small
+A construção fornece, para cada tamanho de $p$ entre 32 e 1024 bits, \emph{um par} de cenários: um \textbf{NIST FFC} (subgrupo de ordem prima $q$, conforme FIPS 186-4 A.2) e um \textbf{anti-NIST} ($p-1$ \emph{smooth}, $\alpha$ de ordem máxima $p-1$). A ordem dos tipos dentro de cada par é deliberadamente embaralhada para não revelar o padrão ao aluno.
+
+\begin{center}
+\scriptsize
+\begin{tabular}{cccl}
+\toprule
+\textbf{Cenário} & \textbf{bits($p$)} & \textbf{Tipo} & \textbf{Estrutura de $\mathrm{ord}(\alpha)$} \\
+\midrule
+$C_0$    & 16   & NIST FFC seguro    & primo $q \approx 2^{15}$ \\
+$C_1$    & 32   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{7}$ \\
+$C_2$    & 32   & NIST FFC seguro    & primo $q \approx 2^{31}$ \\
+$C_3$    & 40   & NIST FFC seguro    & primo $q \approx 2^{39}$ \\
+$C_4$    & 40   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{8}$ \\
+$C_5$    & 48   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{9}$ \\
+$C_6$    & 48   & NIST FFC seguro    & primo $q \approx 2^{47}$ \\
+$C_7$    & 64   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{10}$ \\
+$C_8$    & 64   & NIST FFC seguro    & primo $q \approx 2^{63}$ \\
+$C_9$    & 80   & NIST FFC seguro    & primo $q \approx 2^{79}$ \\
+$C_{10}$ & 80   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{11}$ \\
+$C_{11}$ & 96   & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{12}$ \\
+$C_{12}$ & 96   & NIST FFC seguro    & primo $q \approx 2^{95}$ \\
+$C_{13}$ & 112  & NIST FFC seguro    & primo $q \approx 2^{111}$ \\
+$C_{14}$ & 112  & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{14}$ \\
+$C_{15}$ & 128  & NIST FFC seguro    & primo $q \approx 2^{127}$ \\
+$C_{16}$ & 128  & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{16}$ \\
+$C_{17}$ & 256  & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{20}$ \\
+$C_{18}$ & 256  & NIST FFC seguro    & primo $q \approx 2^{224}$ \\
+$C_{19}$ & 512  & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{24}$ \\
+$C_{20}$ & 512  & NIST FFC seguro    & primo $q \approx 2^{224}$ \\
+$C_{21}$ & 1024 & NIST FFC seguro    & primo $q \approx 2^{256}$ \\
+$C_{22}$ & 1024 & anti-NIST (smooth) & $p-1$ produto de primos $\lesssim 2^{30}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Observação pedagógica:} a cada tamanho de $p$ entre 32 e 1024 bits, o aluno enfrenta dois cenários: o smooth quebra com Pohlig--Hellman em segundos ou minutos; o NIST FFC só cede a Pollard rho dentro do orçamento computacional para $\mathrm{bits}(q) \lesssim 80$. Os valores numéricos de $a$, $b$, $K_{ab}$ e a fatoração de $p-1$ para todos os cenários estão em \texttt{gabarito.txt} (uso interno).
+\end{tcolorbox}
+
+\fi % fim do gabarito
+
+\end{document}

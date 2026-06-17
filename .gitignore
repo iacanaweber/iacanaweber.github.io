@@ -12,6 +12,16 @@ AGENTS.md
 CLAUDE.md
 src/content/resources/generated/
 
+# Local working files / ferramentas (não publicar)
+.codex
+temp/
+livro/
+*:Zone.Identifier
+
+# Python
+__pycache__/
+*.pyc
+
 # LaTeX build artifacts (keep sources/images/PDFs)
 *.aux
 *.log

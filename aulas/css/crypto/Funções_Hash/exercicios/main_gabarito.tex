@@ -1,0 +1,315 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{needspace}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Fun\c{c}\~{o}es Hash: Teoria, SHA-2 e SHA-3\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Fun\c{c}\~{o}es Hash, SHA-2 e SHA-3 (gabarito)}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Cabe\c{c}alho de exerc\'{i}cio (numera\c{c}\~{a}o manual; o conte\'{u}do pode quebrar p\'{a}gina)
+\newcommand{\exercicio}[1]{%
+    \Needspace{8\baselineskip}%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+
+%% Caixa de resposta (vermelha, quebr\'{a}vel entre p\'{a}ginas)
+\newmdenv[
+    linecolor=red!65!black,
+    linewidth=0.8pt,
+    roundcorner=2pt,
+    backgroundcolor=red!3,
+    skipabove=0.8em,
+    skipbelow=1.0em,
+    innertopmargin=0.7em,
+    innerbottommargin=0.7em,
+    innerleftmargin=0.8em,
+    innerrightmargin=0.8em
+]{respostabox}
+\newenvironment{resposta}{%
+    \begin{respostabox}
+    \color{red!70!black}\sloppy
+}{%
+    \end{respostabox}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 11).}
+
+\textbf{Observa\c{c}\~{a}o:} esta vers\~{a}o cont\'{e}m os enunciados e uma proposta de solu\c{c}\~{a}o. Em itens discursivos, respostas equivalentes podem ser igualmente corretas.
+
+%% ══════════════════════════════ 1 ══════════════════════════════
+\exercicio{1}
+Sistemas de autentica\c{c}\~{a}o costumam armazenar $h(\text{senha})$ em vez da senha: o valor digitado \'{e} processado por $h$ e comparado com o hash guardado. Suponha que um atacante obteve o arquivo com todos os hashes de senha. \livro{11.5}
+\begin{enumerate}[label=(\alph*)]
+    \item Para cada cen\'{a}rio abaixo, discuta se o ataque permite recuperar senhas para se passar por usu\'{a}rios leg\'{i}timos e com quais consequ\^{e}ncias: \textbf{Ataque A:} quebrar a propriedade de m\~{a}o \'{u}nica (\textit{one-wayness}) de $h$; \textbf{Ataque B:} encontrar segundas pr\'{e}-imagens de $h$; \textbf{Ataque C:} encontrar colis\~{o}es de $h$.
+    \item Por que essa t\'{e}cnica costuma ser estendida com um \textit{salt} (valor aleat\'{o}rio anexado \`{a} senha antes do hash)? Os ataques do item (a) s\~{a}o afetados pelo \textit{salt}?
+    \item Uma fun\c{c}\~{a}o hash com sa\'{i}da de \textbf{80 bits} \'{e} suficiente para essa aplica\c{c}\~{a}o? Justifique com base nas propriedades que ela realmente exige.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)}
+\textbf{Ataque A} --- \'{e} o ataque devastador: invertendo $h$, o atacante recupera diretamente a senha correspondente a cada hash da lista e consegue se passar por \emph{qualquer} usu\'{a}rio do sistema.
+
+\textbf{Ataque B} --- encontrar uma segunda pr\'{e}-imagem significa: \emph{dado um par conhecido} $(x_1, h(x_1))$, achar $x_2 \neq x_1$ com $h(x_2) = h(x_1)$. O atacante, por\'{e}m, s\'{o} possui os hashes --- ele n\~{a}o conhece nenhuma senha $x_1$ dos outros usu\'{a}rios. O ataque s\'{o} \'{e} \'{u}til se ele j\'{a} tiver uma senha v\'{a}lida que produza o hash-alvo (e, nesse caso, ele j\'{a} teria o acesso). Logo, n\~{a}o permite recuperar senhas a partir da lista.
+
+\textbf{Ataque C} --- numa colis\~{a}o, o atacante escolhe livremente \emph{ambas} as mensagens $x_1 \neq x_2$ com $h(x_1) = h(x_2)$. Nada garante que algum desses valores coincida com um hash j\'{a} armazenado na lista; portanto, colis\~{o}es n\~{a}o ajudam a personificar usu\'{a}rios existentes.
+
+\textbf{(b)} Sem \textit{salt}, dois usu\'{a}rios com a mesma senha t\^{e}m o mesmo hash: o atacante detecta senhas repetidas e, pior, pode usar tabelas pr\'{e}-computadas (ex.: \textit{rainbow tables}) v\'{a}lidas para todos os usu\'{a}rios de todos os sistemas. Com um \textit{salt} aleat\'{o}rio e individual, $h(\text{senha} \,\|\, \text{salt})$ quebra essa rela\c{c}\~{a}o determin\'{i}stica e obriga o atacante a atacar cada conta separadamente. Os tr\^{e}s ataques gen\'{e}ricos do item (a), entretanto, \emph{n\~{a}o s\~{a}o afetados} em sua ess\^{e}ncia: o \textit{salt} \'{e} armazenado em claro junto ao hash, ent\~{a}o ele n\~{a}o aumenta a resist\^{e}ncia a pr\'{e}-imagem de uma conta espec\'{i}fica --- apenas impede ataques em lote/pr\'{e}-computados.
+
+\textbf{(c)} Sim. A aplica\c{c}\~{a}o exige apenas \textbf{m\~{a}o \'{u}nica} (e resist\^{e}ncia a segunda pr\'{e}-imagem); resist\^{e}ncia a colis\~{o}es \emph{n\~{a}o} \'{e} necess\'{a}ria, pois colis\~{o}es n\~{a}o comprometem senhas armazenadas (item a). Como o ataque do anivers\'{a}rio n\~{a}o se aplica, a seguran\c{c}a efetiva \'{e} de $2^{80}$ passos (busca de pr\'{e}-imagem), e n\~{a}o $2^{40}$. \textit{Nota:} $2^{80}$ \'{e} considerado o limiar m\'{i}nimo hoje; em sistemas novos recomenda-se sa\'{i}da maior (e fun\c{c}\~{o}es lentas dedicadas a senhas, como bcrypt/Argon2, cf. Se\c{c}\~{a}o 11.6 do livro).
+\end{resposta}
+
+%% ══════════════════════════════ 2 ══════════════════════════════
+\exercicio{2}
+Considere tr\^{e}s fun\c{c}\~{o}es hash com sa\'{i}das de $64$, $128$ e $160$ bits. O n\'{u}mero esperado de entradas aleat\'{o}rias que precisam ser processadas para que ocorra uma colis\~{a}o com probabilidade $\lambda$ \'{e} aproximadamente
+\[
+    t \approx 2^{(n+1)/2}\sqrt{\ln\!\left(\tfrac{1}{1-\lambda}\right)},
+\]
+onde $n$ \'{e} o comprimento da sa\'{i}da em bits. \livro{11.3}
+\begin{enumerate}[label=(\alph*)]
+    \item Para cada um dos tr\^{e}s comprimentos, ap\'{o}s quantas entradas aleat\'{o}rias h\'{a} probabilidade $\lambda = 0{,}5$ de colis\~{a}o?
+    \item E para $\lambda = 0{,}1$?
+\end{enumerate}
+
+\begin{resposta}
+Para $\lambda = 0{,}5$: $\sqrt{\ln 2} \approx 0{,}8326$; para $\lambda = 0{,}1$: $\sqrt{\ln(1/0{,}9)} \approx 0{,}3246$. Substituindo na equa\c{c}\~{a}o (11.1) do livro:
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+$n$ & $\lambda = 0{,}5$ & $\lambda = 0{,}1$\\
+\midrule
+$64$  & $t \approx 2^{32{,}2} \approx 5{,}1 \cdot 10^{9}$  & $t \approx 2^{30{,}9} \approx 2{,}0 \cdot 10^{9}$\\
+$128$ & $t \approx 2^{64{,}2} \approx 2{,}2 \cdot 10^{19}$ & $t \approx 2^{62{,}9} \approx 8{,}5 \cdot 10^{18}$\\
+$160$ & $t \approx 2^{80{,}2} \approx 1{,}4 \cdot 10^{24}$ & $t \approx 2^{78{,}9} \approx 5{,}5 \cdot 10^{23}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Observe que reduzir a probabilidade desejada de $50\%$ para $10\%$ diminui $t$ em menos de $2$ bits de expoente: a complexidade do ataque do anivers\'{a}rio \'{e} essencialmente $t \approx 2^{n/2}$, pouco sens\'{i}vel a $\lambda$.
+
+\textit{Nota para o professor:} o manual oficial de solu\c{c}\~{o}es (2\textsuperscript{a}~ed.) lista valores menores por um fator $\sqrt{2}$ (ex.: $3{,}6 \cdot 10^{9}$ para $n=64$, $\lambda=0{,}5$), pois omite o ``$+1$'' do expoente da pr\'{o}pria equa\c{c}\~{a}o (11.1) do livro. Os valores acima seguem a equa\c{c}\~{a}o como enunciada (e como consta no exerc\'{i}cio).
+\end{resposta}
+
+%% ══════════════════════════════ 3 ══════════════════════════════
+\exercicio{3}
+Vamos computar \`{a} m\~{a}o a primeira rodada ($j = 0$) da fun\c{c}\~{a}o de compress\~{a}o do SHA-256. Ignore os valores iniciais padronizados e assuma todos os registradores zerados: $A_0 = \cdots = H_0 = \texttt{00000000}_{\text{hex}}$. Lembre que $T_1 = H + \Sigma_1(E) + Ch(E,F,G) + K_j + W_j$, \ $T_2 = \Sigma_0(A) + Maj(A,B,C)$, e que $K_0 = \texttt{428A2F98}_{\text{hex}}$. \livro{11.9}
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule os registradores $A_1, \dots, H_1$ para o bloco $x = \{0\dots00\}$ (todas as palavras $W_j$ nulas).
+    \item Repita para $x = \{0\dots01\}$, isto \'{e}, $W_0 = \texttt{00000001}_{\text{hex}}$ e as demais palavras nulas.
+    \item O que (a) e (b) sugerem sobre o papel das constantes $K_j$ quando a entrada \'{e} toda nula?
+\end{enumerate}
+
+\begin{resposta}
+Com todos os registradores zerados, todas as fun\c{c}\~{o}es internas se anulam: $\Sigma_1(0) = 0$ (rota\c{c}\~{o}es de zero), $Ch(0,0,0) = (0 \wedge 0) \oplus (\lnot 0 \wedge 0) = 0$, $\Sigma_0(0) = 0$ e $Maj(0,0,0) = 0$. Logo:
+\[
+    T_1 = H_0 + \Sigma_1(E_0) + Ch(E_0,F_0,G_0) + K_0 + W_0 = K_0 + W_0,
+    \qquad T_2 = \Sigma_0(A_0) + Maj(A_0,B_0,C_0) = 0.
+\]
+A atualiza\c{c}\~{a}o dos registradores \'{e} $A_1 = T_1 + T_2$, $E_1 = D_0 + T_1$ e os demais apenas deslocam: $B_1 = A_0$, $C_1 = B_0$, $D_1 = C_0$, $F_1 = E_0$, $G_1 = F_0$, $H_1 = G_0$.
+
+\textbf{(a)} Com $W_0 = \texttt{00000000}$: \quad $T_1 = K_0 = \texttt{428A2F98}$, ent\~{a}o
+\[
+    A_1 = E_1 = \texttt{428A2F98}_{\text{hex}}, \qquad B_1 = C_1 = D_1 = F_1 = G_1 = H_1 = \texttt{00000000}_{\text{hex}}.
+\]
+
+\textbf{(b)} Com $W_0 = \texttt{00000001}$: \quad $T_1 = K_0 + W_0 = \texttt{428A2F99}$, ent\~{a}o
+\[
+    A_1 = E_1 = \texttt{428A2F99}_{\text{hex}}, \qquad B_1 = C_1 = D_1 = F_1 = G_1 = H_1 = \texttt{00000000}_{\text{hex}}.
+\]
+
+\textbf{(c)} Sem as constantes $K_j$, uma entrada toda nula com estado todo nulo produziria $T_1 = T_2 = 0$ e o estado permaneceria nulo \emph{em todas as rodadas} --- a fun\c{c}\~{a}o de compress\~{a}o teria um ``ponto fixo'' trivial e degenerado. As constantes de rodada quebram essa simetria e garantem que mesmo entradas degeneradas (todas nulas, todas em 1, padr\~{o}es repetitivos) sejam misturadas; \'{e} o mesmo papel que as constantes $RC[i]$ da etapa $\iota$ desempenham no Keccak-$f$.
+\end{resposta}
+
+%% ══════════════════════════════ 4 ══════════════════════════════
+\exercicio{4}
+Use uma ferramenta de linha de comando para calcular o hash SHA-512 das mensagens $m_1$ = \texttt{Have you eaten, my child?} e $m_2$ = \texttt{Have you eaten my child?} Calcule o hash de cada mensagem \emph{sem} o caractere de nova linha ao final; no Linux, por exemplo: \texttt{printf 'Have you eaten, my child?' | sha512sum} \livro{11.10}
+\begin{enumerate}[label=(\alph*)]
+    \item Apresente os quatro primeiros bytes de cada hash em nota\c{c}\~{a}o hexadecimal.
+    \item As mensagens $m_1$ e $m_2$ s\~{a}o quase id\^{e}nticas (diferem em uma v\'{i}rgula). O que voc\^{e} observa nos hashes? Que nome damos a esse comportamento e por que ele \'{e} desej\'{a}vel?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Sem o caractere de nova linha ao final:
+\[
+    \text{SHA-512}(m_1) = \texttt{81 9F 6E 39}\ldots
+    \qquad\qquad
+    \text{SHA-512}(m_2) = \texttt{E7 82 FE 26}\ldots
+\]
+\textit{Nota para o professor:} se o aluno usar \texttt{echo} sem \texttt{-n}, um \texttt{\textbackslash n} \'{e} anexado \`{a} mensagem e os hashes mudam completamente --- vale aceitar a resposta se o procedimento estiver coerente, mas \'{e} uma boa oportunidade para discutir que o hash \'{e} sobre \emph{bytes exatos}, n\~{a}o sobre o ``texto''.
+
+\textbf{(b)} Os dois hashes s\~{a}o completamente diferentes, sem qualquer semelhan\c{c}a vis\'{i}vel, embora as mensagens difiram em um \'{u}nico caractere. Esse comportamento \'{e} o \textbf{efeito avalanche} (difus\~{a}o): a altera\c{c}\~{a}o de 1 bit da entrada inverte, em m\'{e}dia, metade dos bits da sa\'{i}da. Ele \'{e} desej\'{a}vel porque o hash n\~{a}o deve vazar informa\c{c}\~{a}o sobre a entrada --- em particular, mensagens parecidas n\~{a}o podem produzir hashes parecidos, sen\~{a}o um atacante poderia inferir conte\'{u}do ou procurar colis\~{o}es por aproxima\c{c}\~{a}o.
+\end{resposta}
+
+%% ══════════════════════════════ 5 ══════════════════════════════
+\exercicio{5}
+O Keccak-$f$ \'{e} uma \textbf{fun\c{c}\~{a}o de permuta\c{c}\~{a}o}: cada um dos $2^{b}$ valores poss\'{i}veis do estado \'{e} mapeado, de forma bijetiva (um-para-um), para exatamente um valor de sa\'{i}da. Isso \'{e} diferente de uma \textbf{permuta\c{c}\~{a}o de bits} (como as permuta\c{c}\~{o}es $P$ e $IP$ do DES), que apenas troca as \emph{posi\c{c}\~{o}es} dos bits. Para enxergar a diferen\c{c}a, considere um exemplo em miniatura com $d = 2$ bits de entrada e sa\'{i}da. \livro{11.13}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantas permuta\c{c}\~{o}es de bits existem com 2 bits de entrada e sa\'{i}da? Desenhe um diagrama para cada uma.
+    \item Quantos valores distintos de entrada (e de sa\'{i}da) existem? E quantas fun\c{c}\~{o}es de permuta\c{c}\~{a}o (mapeamentos bijetivos) distintas existem entre entrada e sa\'{i}da? Justifique com um argumento de contagem.
+    \item Dentre as fun\c{c}\~{o}es de permuta\c{c}\~{a}o do item (b), quais correspondem \`{a}s permuta\c{c}\~{o}es de bits do item (a)? Mostre as duas tabelas-verdade.
+    \item Generalize: para $d$ bits, quantas permuta\c{c}\~{o}es de bits e quantas fun\c{c}\~{o}es de permuta\c{c}\~{a}o existem? O que esses dois n\'{u}meros sugerem no caso do estado do Keccak-$f$ ($b = 1600$)?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Existem apenas $2! = 2$ permuta\c{c}\~{o}es de bits: a \emph{identidade} (bit 1 $\to$ bit 1, bit 2 $\to$ bit 2) e o \emph{cruzamento} (bit 1 $\to$ bit 2, bit 2 $\to$ bit 1):
+\begin{center}
+\begin{tabular}{cc@{\qquad\qquad}cc}
+$b_1 \longrightarrow b_1$ & & $b_1 \searrow b_2$ &\\[-2pt]
+$b_2 \longrightarrow b_2$ & & $b_2 \nearrow b_1$ &\\
+\multicolumn{2}{c}{identidade} & \multicolumn{2}{c}{cruzamento}
+\end{tabular}
+\end{center}
+
+\textbf{(b)} H\'{a} $2^2 = 4$ valores de entrada e $4$ de sa\'{i}da: $\{00, 01, 10, 11\}$. Contagem das bije\c{c}\~{o}es: a primeira entrada pode ser mapeada para $4$ sa\'{i}das; a segunda, para $3$ restantes; a terceira, para $2$; a \'{u}ltima fica determinada. Total: $4 \cdot 3 \cdot 2 \cdot 1 = 4! = \mathbf{24}$ fun\c{c}\~{o}es de permuta\c{c}\~{a}o.
+
+\textbf{(c)} Apenas $2$ das $24$ bije\c{c}\~{o}es s\~{a}o realiz\'{a}veis trocando posi\c{c}\~{o}es de bits:
+\begin{center}
+\begin{tabular}{c|c@{\qquad\qquad}c|c}
+\multicolumn{2}{c}{identidade} & \multicolumn{2}{c}{cruzamento}\\
+entrada & sa\'{i}da & entrada & sa\'{i}da\\
+\hline
+00 & 00 & 00 & 00\\
+01 & 01 & 01 & 10\\
+10 & 10 & 10 & 01\\
+11 & 11 & 11 & 11\\
+\end{tabular}
+\end{center}
+Note que toda permuta\c{c}\~{a}o de bits fixa $00$ e $11$ --- por isso a maioria das bije\c{c}\~{o}es \emph{n\~{a}o} pode ser obtida apenas reposicionando bits.
+
+\textbf{(d)} Para $d$ bits: $d!$ permuta\c{c}\~{o}es de bits contra $(2^d)!$ fun\c{c}\~{o}es de permuta\c{c}\~{a}o. Para o Keccak-$f$ ($b = 1600$): $1600!$ contra $(2^{1600})!$ --- o segundo n\'{u}mero \'{e} inimaginavelmente maior. Permuta\c{c}\~{o}es de bits formam uma fra\c{c}\~{a}o \'{i}nfima e estruturalmente pobre (s\~{a}o lineares e n\~{a}o criam \emph{confus\~{a}o}); j\'{a} o Keccak-$f$ \'{e} projetado para se comportar como uma permuta\c{c}\~{a}o ``gen\'{e}rica'' desse espa\c{c}o gigantesco, o que fundamenta a seguran\c{c}a da constru\c{c}\~{a}o esponja.
+\end{resposta}
+
+%% ══════════════════════════════ 6 ══════════════════════════════
+\exercicio{6}
+Suponha que o SHA-3 \'{e} usado em uma aplica\c{c}\~{a}o com sa\'{i}da de 256 bits (SHA3-256, taxa $r = 1088$ bits) e que medimos uma vaz\~{a}o de \textbf{120~MByte/s} com nossa biblioteca criptogr\'{a}fica. Por raz\~{o}es de seguran\c{c}a, decidimos trocar para o SHA3-384, cuja taxa \'{e} $r = 832$ bits. \livro{11.11}
+\begin{enumerate}[label=(\alph*)]
+    \item Explique por que a vaz\~{a}o muda, considerando como a constru\c{c}\~{a}o esponja absorve a mensagem em blocos de $r$ bits.
+    \item Calcule a vaz\~{a}o aproximada da nova configura\c{c}\~{a}o, assumindo que o custo de cada invoca\c{c}\~{a}o de Keccak-$f$ \'{e} o mesmo nos dois casos.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Na fase de absor\c{c}\~{a}o, cada invoca\c{c}\~{a}o de Keccak-$f$ processa exatamente $r$ bits da mensagem (o estado \'{e} sempre de $b = 1600$ bits; o que muda \'{e} a parcela $r$ dispon\'{i}vel para a mensagem, pois $c = b - r$ cresce com o n\'{i}vel de seguran\c{c}a). Como o custo de Keccak-$f$ independe de $r$, absorver a mesma mensagem com $r$ menor exige \emph{mais} invoca\c{c}\~{o}es --- da\'{i} a queda de vaz\~{a}o.
+
+\textbf{(b)} A vaz\~{a}o \'{e} proporcional a $r$:
+\[
+    120 \ \text{MByte/s} \times \frac{832}{1088} \approx 91{,}8 \ \text{MByte/s} \approx 92 \ \text{MByte/s}.
+\]
+
+\textit{Nota para o professor:} o manual oficial de solu\c{c}\~{o}es responde $97$~MByte/s usando $r = 1344$ e $r = 1088$ --- mas essas s\~{a}o as linhas erradas da Tabela 11.3 do livro ($1344$ \'{e} a taxa do SHAKE128; a do SHA3-256 \'{e} $1088$ e a do SHA3-384 \'{e} $832$). O c\'{a}lculo acima segue a tabela do livro (e o padr\~{a}o FIPS 202).
+\end{resposta}
+
+%% ══════════════════════════════ 7 ══════════════════════════════
+\exercicio{7}
+Queremos calcular o hash da mensagem curta de dois bytes $\texttt{0xCCCC}$ usando o SHA-3 como substituto do SHA-2 com 256 bits de sa\'{i}da (SHA3-256, $r = 1088$). Lembre que o SHA-3 anexa o sufixo $\texttt{01}$ \`{a} mensagem e, em seguida, aplica o \textit{multi-rate padding} $\texttt{10}^{*}\texttt{1}$ at\'{e} completar um m\'{u}ltiplo de $r$ bits. \livro{11.12}
+\begin{enumerate}[label=(\alph*)]
+    \item Qual \'{e} a mensagem ap\'{o}s sufixo e padding? Apresente a resposta em nota\c{c}\~{a}o bin\'{a}ria, indicando claramente cada campo (mensagem, sufixo, padding) e a quantidade de zeros.
+    \item Quantos blocos de $r$ bits ser\~{a}o absorvidos pela esponja? Quantas invoca\c{c}\~{o}es de Keccak-$f$ ocorrem na fase de absor\c{c}\~{a}o?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} A mensagem tem $16$ bits: $\texttt{0xCCCC} = \texttt{1100\,1100\,1100\,1100}$. Ap\'{o}s anexar o sufixo \texttt{01}, temos $18$ bits. O multi-rate padding $\texttt{1}\,\texttt{0}^{j}\,\texttt{1}$ deve completar $1088$ bits, logo ocupa $1088 - 18 = 1070$ bits: um \texttt{1}, depois $j = 1068$ zeros, depois o \texttt{1} final:
+\[
+    \underbrace{\texttt{1100110011001100}}_{\text{mensagem (16 bits)}}
+    \,\|\,
+    \underbrace{\texttt{01}}_{\text{sufixo}}
+    \,\|\,
+    \underbrace{\texttt{1}\,\underbrace{\texttt{0}\cdots\texttt{0}}_{1068\ \text{zeros}}\,\texttt{1}}_{\text{padding (1070 bits)}}
+    \qquad \Rightarrow \qquad 16 + 2 + 1070 = 1088 \ \text{bits}.
+\]
+
+\textbf{(b)} O resultado ocupa exatamente \textbf{um bloco} de $r = 1088$ bits; portanto, a fase de absor\c{c}\~{a}o realiza \textbf{uma \'{u}nica invoca\c{c}\~{a}o} de Keccak-$f$. (Como a sa\'{i}da desejada, $256$ bits, cabe em $y_0$, tamb\'{e}m n\~{a}o h\'{a} invoca\c{c}\~{o}es extras na fase de espremedura.)
+\end{resposta}
+
+%% ══════════════════════════════ 8 ══════════════════════════════
+\exercicio{8}
+Considere um estado $A$ do SHA-3 (Keccak-$f$ com $b = 1600$, palavras de $w = 64$ bits) em que todos os bits valem $0$, \emph{exceto} os bits cuja coordenada $z$ \'{e} igual a zero, isto \'{e}, $A[x,y,0] = 1$ para todos $x, y$. Lembre que a etapa $\theta$ computa
+\[
+    A'[x,y,z] = A[x,y,z] \oplus \bigoplus_{y'=0}^{4} A[x{-}1,\,y',\,z] \oplus \bigoplus_{y'=0}^{4} A[x{+}1,\,y',\,z{-}1],
+\]
+com \'{i}ndices $x$ m\'{o}dulo 5 e $z$ m\'{o}dulo 64. \livro{11.15}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantos bits do estado valem $1$? Onde esses bits est\~{a}o localizados na representa\c{c}\~{a}o tridimensional do estado (que nome recebe essa ``fatia'')?
+    \item Aplique a etapa $\theta$ ao estado $A$ e descreva o novo estado $A'$ (analise os bits com $z = 0$, $z = 1$ e $z \ge 2$).
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} S\~{a}o $5 \times 5 = \mathbf{25}$ bits em $1$: todos os bits do plano $z = 0$. Na representa\c{c}\~{a}o tridimensional do estado, esse plano \'{e} chamado de \textbf{fatia} (\textit{slice}) --- aqui, a primeira fatia.
+
+\textbf{(b)} Analisando $A'[x,y,z] = A[x,y,z] \oplus P(x{-}1, z) \oplus P(x{+}1, z{-}1)$, onde $P(x,z) = \bigoplus_{y'} A[x,y',z]$ \'{e} a paridade da coluna $(x,z)$. No estado dado, toda coluna da fatia $z=0$ tem cinco $1$s, logo $P(x, 0) = 1$ para todo $x$; todas as demais fatias t\^{e}m paridade $0$.
+\begin{itemize}
+    \item \textbf{Bits com $z = 0$:} \ $A' = \underbrace{1}_{A[x,y,0]} \oplus \underbrace{1}_{P(x-1,\,0)} \oplus \underbrace{0}_{P(x+1,\,63)} = 0$.
+    \item \textbf{Bits com $z = 1$:} \ $A' = \underbrace{0}_{A[x,y,1]} \oplus \underbrace{0}_{P(x-1,\,1)} \oplus \underbrace{1}_{P(x+1,\,0)} = 1$.
+    \item \textbf{Bits com $z \ge 2$:} \ todos os tr\^{e}s termos s\~{a}o $0$, logo $A' = 0$.
+\end{itemize}
+Resultado: o novo estado $A'$ tem exatamente os $25$ bits da fatia $z = 1$ em $1$ e todos os demais em $0$ --- a fatia ``acesa'' deslocou-se de $z=0$ para $z=1$. (O exemplo tamb\'{e}m ilustra como $\theta$ propaga informa\c{c}\~{a}o entre fatias vizinhas.)
+\end{resposta}
+
+\end{document}

@@ -1,0 +1,180 @@
+\documentclass[10pt, a4paper]{article}
+
+% ── Codificação e idioma ──
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Layout ──
+\usepackage[margin=1.4cm, top=1.2cm, bottom=1.1cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{1.5pt plus 1pt}
+\setlength{\parindent}{0pt}
+\setlength{\multicolsep}{2pt plus 1pt minus 1pt}
+
+% ── Matemática ──
+\usepackage{amsmath, amssymb}
+
+% ── Tabelas e gráficos ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage[breakable]{tcolorbox}
+
+% ── Cabeçalho e rodapé ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Fundamentos de Sistemas Computacionais}
+\rhead{\small Hierarquia de Mem\'{o}ria}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Configurações de listas ──
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=6pt, topsep=3pt, parsep=0pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=2pt, topsep=3pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+
+% ── Caixas de destaque ──
+\newtcolorbox{dica}{
+  colback=blue!5!white,
+  colframe=blue!50!black,
+  title={\textbf{Dica}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{curiosidade}{
+  colback=yellow!5!white,
+  colframe=yellow!60!black,
+  title={\textbf{Curiosidade}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{formulario}{
+  colback=gray!5!white,
+  colframe=gray!60!black,
+  title={\textbf{Formul\'{a}rio}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+% ══════════════════════════════════════════
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Lista de Exerc\'{i}cios}}\\[2pt]
+  {\large Hierarquia de Mem\'{o}ria}\\[3pt]
+  {\normalsize 98800-04 -- Fundamentos de Sistemas Computacionais\ \ $\cdot$\ \ Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
+\end{center}
+
+\vspace{1pt}
+\hrule
+\vspace{4pt}
+
+\begin{formulario}
+\small
+Considere a mem\'{o}ria endere\c{c}\'{a}vel a \emph{byte} e use pot\^{e}ncias de 2 (1\,KB $=2^{10}$\,bytes, 1\,MB $=2^{20}$\,bytes, \ldots).\\[2pt]
+$\text{Miss ratio} = 1 - \text{Hit ratio}$ \qquad
+$\text{AMAT} = \text{Hit time} + \text{Miss ratio} \times \text{Miss penalty}$\\[2pt]
+Em hierarquia de \emph{n} n\'{i}veis, a \emph{Miss penalty} de um n\'{i}vel \'{e} o AMAT do n\'{i}vel imediatamente inferior.
+\end{formulario}
+
+\begin{enumerate}
+
+% ── 1: Parâmetros (fácil, conceitual) ──
+\item Explique, em uma frase cada, o significado dos seguintes \textbf{par\^{a}metros} de uma mem\'{o}ria:
+\begin{multicols}{2}
+\begin{enumerate}
+  \item Tempo de acesso
+  \item Taxa de transfer\^{e}ncia
+  \item Capacidade
+  \item Volatilidade
+  \item Temporariedade
+\end{enumerate}
+\end{multicols}
+
+% ── 2: Volatilidade e tecnologia por nível (fácil-médio) ──
+\item Classifique cada mem\'{o}ria abaixo como \textbf{vol\'{a}til} ou \textbf{n\~{a}o-vol\'{a}til} e associe-a ao n\'{i}vel da hierarquia em que costuma aparecer (registradores, cache, mem\'{o}ria principal ou mem\'{o}ria secund\'{a}ria):
+\begin{multicols}{2}
+\begin{itemize}
+  \item[] SRAM
+  \item[] DRAM
+  \item[] ROM
+  \item[] Flash (SSD)
+\end{itemize}
+\end{multicols}
+Por que faz sentido que o n\'{i}vel \emph{mais distante} do processador seja, em geral, n\~{a}o-vol\'{a}til?
+
+% ── 3: Capacidade e bits de endereçamento (médio) ──
+\item Determine, para cada capacidade abaixo, (i) o n\'{u}mero total de \textbf{bytes} (como pot\^{e}ncia de 2) e (ii) o n\'{u}mero m\'{i}nimo de \textbf{bits de endere\c{c}o} necess\'{a}rios para endere\c{c}ar a mem\'{o}ria byte a byte:
+\begin{multicols}{3}
+\begin{enumerate}
+  \item 28\,KB
+  \item 2\,GB
+  \item 4\,TB
+\end{enumerate}
+\end{multicols}
+
+% ── 4: Taxa de transferência (médio) ──
+\item Uma mem\'{o}ria possui \textbf{tempo de acesso de 20\,ns} e entrega \textbf{16 bits por acesso}.
+\begin{enumerate}
+  \item Calcule a \textbf{taxa de transfer\^{e}ncia} resultante (em MB/s).
+  \item Se o barramento de dados passar a transferir \textbf{64 bits por acesso} (mantido o tempo de acesso), qual a nova taxa? O ganho \'{e} proporcional? Explique.
+\end{enumerate}
+
+% ── 5: Localidade (médio) ──
+\item Para cada trecho de c\'{o}digo abaixo, identifique se predomina \textbf{localidade temporal}, \textbf{espacial} (ou ambas) e \textbf{justifique}:
+\begin{enumerate}
+  \item \texttt{for (i=0; i<N; i++)\ \ soma += A[i];} \quad --- considere separadamente o acesso a \texttt{soma}, a \texttt{i} e a \texttt{A[i]}.
+  \item Percorrer uma matriz \texttt{M[L][C]} (armazenada por \emph{linhas}) acessando-a \textbf{coluna a coluna}.
+\end{enumerate}
+Por que, sem a propriedade de localidade, toda a ideia de hierarquia de mem\'{o}ria seria in\'{u}til?
+
+% ── 6: Terminologia hit/miss (médio) ──
+\item Defina os termos a seguir, usados na rela\c{c}\~{a}o entre dois n\'{i}veis de mem\'{o}ria: \textbf{bloco}, \textbf{hit}, \textbf{miss}, \textbf{hit ratio}, \textbf{miss ratio}, \textbf{hit time} e \textbf{miss penalty}. Em seguida, suponha que de \textbf{2000 acessos} ao n\'{i}vel superior, \textbf{120 resultaram em \emph{miss}}: calcule o \emph{hit ratio} e o \emph{miss ratio}.
+
+% ── 7: AMAT simples (médio-difícil) ──
+\item Um sistema possui uma \'{u}nica cache com \textbf{hit time $=2$\,ns}, \textbf{hit ratio $=95\%$} e \textbf{miss penalty $=80$\,ns}.
+\begin{enumerate}
+  \item Calcule o \textbf{AMAT} (tempo m\'{e}dio efetivo de acesso).
+  \item Que \textbf{hit ratio m\'{i}nimo} seria necess\'{a}rio para que o AMAT n\~{a}o ultrapassasse \textbf{5\,ns}?
+\end{enumerate}
+
+% ── 8: AMAT hierárquico L1/L2 (difícil) ──
+\item Considere a hierarquia: \textbf{L1} (hit time $=1$\,ns, hit ratio $=92\%$); em caso de falha na L1, acessa-se a \textbf{L2} (hit time $=8$\,ns, hit ratio $=80\%$); e, em caso de falha na L2, acessa-se a \textbf{DRAM} com penalidade de \textbf{100\,ns}.
+\begin{enumerate}
+  \item Calcule o \textbf{AMAT total} do sistema.
+  \item Da lat\^{e}ncia m\'{e}dia obtida, qual parcela \'{e} ``culpa'' dos acessos \`{a} DRAM? Comente o impacto de um \emph{miss ratio} de L2 alto sobre o desempenho.
+\end{enumerate}
+
+% ── 9: CPI efetivo / desempenho (difícil) ──
+\item Uma CPU de \textbf{2\,GHz} (per\'{i}odo de $0{,}5$\,ns) tem \textbf{CPI base $=1{,}0$} e realiza, em m\'{e}dia, \textbf{$1{,}5$ acessos \`{a} mem\'{o}ria por instru\c{c}\~{a}o} (incluindo a busca da instru\c{c}\~{a}o). Cada acesso tem \textbf{miss rate $=4\%$} e \textbf{miss penalty $=50$\,ns}.
+\begin{enumerate}
+  \item Converta a \emph{miss penalty} para \textbf{ciclos de clock}.
+  \item Calcule os \textbf{ciclos de \emph{stall} por instru\c{c}\~{a}o} causados pelas falhas e o \textbf{CPI efetivo}.
+  \item Quantas vezes a m\'{a}quina ficaria \emph{mais lenta} que o caso ideal (sem falhas)?
+\end{enumerate}
+
+\begin{curiosidade}
+A f\'{o}rmula do AMAT mostra por que arquitetos investem tanto em aumentar o \emph{hit ratio}: como a \emph{miss penalty} costuma ser \textbf{dezenas a centenas de vezes} maior que o \emph{hit time}, mesmo poucos pontos percentuais de falhas dominam a lat\^{e}ncia m\'{e}dia --- exatamente o que voc\^{e} observou nas quest\~{o}es 7 a 9.
+\end{curiosidade}
+
+\end{enumerate}
+
+\end{document}

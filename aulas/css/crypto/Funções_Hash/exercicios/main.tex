@@ -1,0 +1,163 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Fun\c{c}\~{o}es Hash: Teoria, SHA-2 e SHA-3\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Fun\c{c}\~{o}es Hash, SHA-2 e SHA-3}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Cada exerc\'{i}cio \'{e} um bloco indivis\'{i}vel (tcolorbox `blanker', sem moldura):
+%% se n\~{a}o couber no restante da p\'{a}gina, o bloco inteiro vai para a pr\'{o}xima.
+\newtcolorbox[auto counter]{exercicio}[1][]{%
+    blanker,
+    before skip=26pt plus 6pt minus 2pt,
+    after skip=8pt,
+    before upper={%
+        \noindent
+        {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+        \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio \thetcbcounter}%
+        \par\nobreak\vspace{-0.4em}
+        \noindent{\color{black!35}\rule{\linewidth}{0.4pt}}%
+        \par\nobreak\vspace{0.35em}\noindent
+    },
+    #1
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 11).}
+
+\begin{exercicio}
+Sistemas de autentica\c{c}\~{a}o costumam armazenar $h(\text{senha})$ em vez da senha: o valor digitado \'{e} processado por $h$ e comparado com o hash guardado. Suponha que um atacante obteve o arquivo com todos os hashes de senha. \livro{11.5}
+\begin{enumerate}[label=(\alph*)]
+    \item Para cada cen\'{a}rio abaixo, discuta se o ataque permite recuperar senhas para se passar por usu\'{a}rios leg\'{i}timos e com quais consequ\^{e}ncias: \textbf{Ataque A:} quebrar a propriedade de m\~{a}o \'{u}nica (\textit{one-wayness}) de $h$; \textbf{Ataque B:} encontrar segundas pr\'{e}-imagens de $h$; \textbf{Ataque C:} encontrar colis\~{o}es de $h$.
+    \item Por que essa t\'{e}cnica costuma ser estendida com um \textit{salt} (valor aleat\'{o}rio anexado \`{a} senha antes do hash)? Os ataques do item (a) s\~{a}o afetados pelo \textit{salt}?
+    \item Uma fun\c{c}\~{a}o hash com sa\'{i}da de \textbf{80 bits} \'{e} suficiente para essa aplica\c{c}\~{a}o? Justifique com base nas propriedades que ela realmente exige.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere tr\^{e}s fun\c{c}\~{o}es hash com sa\'{i}das de $64$, $128$ e $160$ bits. O n\'{u}mero esperado de entradas aleat\'{o}rias que precisam ser processadas para que ocorra uma colis\~{a}o com probabilidade $\lambda$ \'{e} aproximadamente
+\[
+    t \approx 2^{(n+1)/2}\sqrt{\ln\!\left(\tfrac{1}{1-\lambda}\right)},
+\]
+onde $n$ \'{e} o comprimento da sa\'{i}da em bits. \livro{11.3}
+\begin{enumerate}[label=(\alph*)]
+    \item Para cada um dos tr\^{e}s comprimentos, ap\'{o}s quantas entradas aleat\'{o}rias h\'{a} probabilidade $\lambda = 0{,}5$ de colis\~{a}o?
+    \item E para $\lambda = 0{,}1$?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Vamos computar \`{a} m\~{a}o a primeira rodada ($j = 0$) da fun\c{c}\~{a}o de compress\~{a}o do SHA-256. Ignore os valores iniciais padronizados e assuma todos os registradores zerados: $A_0 = \cdots = H_0 = \texttt{00000000}_{\text{hex}}$. Lembre que $T_1 = H + \Sigma_1(E) + Ch(E,F,G) + K_j + W_j$, \ $T_2 = \Sigma_0(A) + Maj(A,B,C)$, e que $K_0 = \texttt{428A2F98}_{\text{hex}}$. \livro{11.9}
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule os registradores $A_1, \dots, H_1$ para o bloco $x = \{0\dots00\}$ (todas as palavras $W_j$ nulas).
+    \item Repita para $x = \{0\dots01\}$, isto \'{e}, $W_0 = \texttt{00000001}_{\text{hex}}$ e as demais palavras nulas.
+    \item O que (a) e (b) sugerem sobre o papel das constantes $K_j$ quando a entrada \'{e} toda nula?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Use uma ferramenta de linha de comando para calcular o hash SHA-512 das mensagens $m_1$ = \texttt{Have you eaten, my child?} e $m_2$ = \texttt{Have you eaten my child?} Calcule o hash de cada mensagem \emph{sem} o caractere de nova linha ao final; no Linux, por exemplo: \texttt{printf 'Have you eaten, my child?' | sha512sum} \livro{11.10}
+\begin{enumerate}[label=(\alph*)]
+    \item Apresente os quatro primeiros bytes de cada hash em nota\c{c}\~{a}o hexadecimal.
+    \item As mensagens $m_1$ e $m_2$ s\~{a}o quase id\^{e}nticas (diferem em uma v\'{i}rgula). O que voc\^{e} observa nos hashes? Que nome damos a esse comportamento e por que ele \'{e} desej\'{a}vel?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+O Keccak-$f$ \'{e} uma \textbf{fun\c{c}\~{a}o de permuta\c{c}\~{a}o}: cada um dos $2^{b}$ valores poss\'{i}veis do estado \'{e} mapeado, de forma bijetiva (um-para-um), para exatamente um valor de sa\'{i}da. Isso \'{e} diferente de uma \textbf{permuta\c{c}\~{a}o de bits} (como as permuta\c{c}\~{o}es $P$ e $IP$ do DES), que apenas troca as \emph{posi\c{c}\~{o}es} dos bits. Para enxergar a diferen\c{c}a, considere um exemplo em miniatura com $d = 2$ bits de entrada e sa\'{i}da. \livro{11.13}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantas permuta\c{c}\~{o}es de bits existem com 2 bits de entrada e sa\'{i}da? Desenhe um diagrama para cada uma.
+    \item Quantos valores distintos de entrada (e de sa\'{i}da) existem? E quantas fun\c{c}\~{o}es de permuta\c{c}\~{a}o (mapeamentos bijetivos) distintas existem entre entrada e sa\'{i}da? Justifique com um argumento de contagem.
+    \item Dentre as fun\c{c}\~{o}es de permuta\c{c}\~{a}o do item (b), quais correspondem \`{a}s permuta\c{c}\~{o}es de bits do item (a)? Mostre as duas tabelas-verdade.
+    \item Generalize: para $d$ bits, quantas permuta\c{c}\~{o}es de bits e quantas fun\c{c}\~{o}es de permuta\c{c}\~{a}o existem? O que esses dois n\'{u}meros sugerem no caso do estado do Keccak-$f$ ($b = 1600$)?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Suponha que o SHA-3 \'{e} usado em uma aplica\c{c}\~{a}o com sa\'{i}da de 256 bits (SHA3-256, taxa $r = 1088$ bits) e que medimos uma vaz\~{a}o de \textbf{120~MByte/s} com nossa biblioteca criptogr\'{a}fica. Por raz\~{o}es de seguran\c{c}a, decidimos trocar para o SHA3-384, cuja taxa \'{e} $r = 832$ bits. \livro{11.11}
+\begin{enumerate}[label=(\alph*)]
+    \item Explique por que a vaz\~{a}o muda, considerando como a constru\c{c}\~{a}o esponja absorve a mensagem em blocos de $r$ bits.
+    \item Calcule a vaz\~{a}o aproximada da nova configura\c{c}\~{a}o, assumindo que o custo de cada invoca\c{c}\~{a}o de Keccak-$f$ \'{e} o mesmo nos dois casos.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Queremos calcular o hash da mensagem curta de dois bytes $\texttt{0xCCCC}$ usando o SHA-3 como substituto do SHA-2 com 256 bits de sa\'{i}da (SHA3-256, $r = 1088$). Lembre que o SHA-3 anexa o sufixo $\texttt{01}$ \`{a} mensagem e, em seguida, aplica o \textit{multi-rate padding} $\texttt{10}^{*}\texttt{1}$ at\'{e} completar um m\'{u}ltiplo de $r$ bits. \livro{11.12}
+\begin{enumerate}[label=(\alph*)]
+    \item Qual \'{e} a mensagem ap\'{o}s sufixo e padding? Apresente a resposta em nota\c{c}\~{a}o bin\'{a}ria, indicando claramente cada campo (mensagem, sufixo, padding) e a quantidade de zeros.
+    \item Quantos blocos de $r$ bits ser\~{a}o absorvidos pela esponja? Quantas invoca\c{c}\~{o}es de Keccak-$f$ ocorrem na fase de absor\c{c}\~{a}o?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere um estado $A$ do SHA-3 (Keccak-$f$ com $b = 1600$, palavras de $w = 64$ bits) em que todos os bits valem $0$, \emph{exceto} os bits cuja coordenada $z$ \'{e} igual a zero, isto \'{e}, $A[x,y,0] = 1$ para todos $x, y$. Lembre que a etapa $\theta$ computa
+\[
+    A'[x,y,z] = A[x,y,z] \oplus \bigoplus_{y'=0}^{4} A[x{-}1,\,y',\,z] \oplus \bigoplus_{y'=0}^{4} A[x{+}1,\,y',\,z{-}1],
+\]
+com \'{i}ndices $x$ m\'{o}dulo 5 e $z$ m\'{o}dulo 64. \livro{11.15}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantos bits do estado valem $1$? Onde esses bits est\~{a}o localizados na representa\c{c}\~{a}o tridimensional do estado (que nome recebe essa ``fatia'')?
+    \item Aplique a etapa $\theta$ ao estado $A$ e descreva o novo estado $A'$ (analise os bits com $z = 0$, $z = 1$ e $z \ge 2$).
+\end{enumerate}
+\end{exercicio}
+
+\end{document}

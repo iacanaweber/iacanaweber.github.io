@@ -1,0 +1,132 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+
+\geometry{margin=2.5cm}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Cifras de Fluxo, OTP, LFSR e ChaCha\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+\newcommand{\exercicio}[1]{%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.15in}
+
+\exercicio{1}
+A cifra de fluxo descrita na Definição 2.1.1 pode ser facilmente generalizada para operar em alfabetos diferentes do binário. Para cifragem manual, uma versão especialmente útil é uma cifra de fluxo que opera sobre letras.
+
+\begin{enumerate}[label=\arabic*.]
+    \item Desenvolva um esquema que opere com as letras A, B, \ldots, Z, representadas pelos números $0,1,\ldots,25$. Como é a chave (fluxo de chave)? Quais são as funções de cifragem e decifragem?
+    \item Decifre o seguinte texto cifrado:
+
+    \texttt{bsaspp kkuosr}
+
+    que foi cifrado usando a chave:
+
+    \texttt{rsidpy dkawoa}
+    \item Como o jovem foi assassinado?
+\end{enumerate}
+
+\exercicio{2}
+Suponha que armazenemos uma chave de uso único (\emph{one-time key}) em um DVD com capacidade de 1~Gbyte. Discuta as implicações \emph{reais} de um sistema de \emph{one-time pad} (OTP). Aborde questões como o ciclo de vida da chave, o armazenamento da chave durante o ciclo de vida e após o fim desse ciclo, a distribuição da chave, a geração da chave, etc.
+
+\exercicio{3}
+Suponha uma cifragem do tipo OTP com uma chave curta de 128 bits. Essa chave é então usada periodicamente para cifrar grandes volumes de dados. Descreva como funciona um ataque que quebra esse esquema.
+
+\exercicio{4}
+À primeira vista, parece que uma busca exaustiva de chave é possível contra um sistema OTP. É dada uma mensagem curta, digamos 5 caracteres ASCII representados por 40 bits, que foi cifrada usando um OTP de 40 bits. Explique \emph{exatamente} por que uma busca exaustiva não terá sucesso, mesmo que recursos computacionais suficientes estejam disponíveis. Isso parece um paradoxo, já que sabemos que o OTP é incondicionalmente seguro. Isto é, explique por que um ataque de força bruta não funciona.
+
+\textbf{Nota:} você precisa resolver o paradoxo. Isso significa que respostas como ``o OTP é incondicionalmente seguro e, portanto, um ataque de força bruta não funciona'' não são válidas.
+
+\exercicio{5}
+O OTP pode ser usado para cifrar dados de comprimento arbitrário ao cifrar símbolos binários $x_i \in \{0,1\}$. Decifre manualmente o seguinte texto cifrado. O texto cifrado é dado em notação hexadecimal:
+
+\texttt{26 34 05 18 0c 06 07 15 1c 2a 13 3c 0c 23 04 27 07 27 18}
+
+A chave é dada por:
+
+\texttt{6a 51 71 6b 49 68 64 67 65 5a 67 68 64 4a 77 65 68 48 73}
+
+Calcule o texto em claro, que está codificado em símbolos ASCII.
+
+\exercicio{6}
+O OTP oferece segurança demonstrável. Descreva duas grandes desvantagens do OTP que o tornam impraticável para a maioria das aplicações, como cifragem de e-mails ou mensagens instantâneas.
+
+\exercicio{7}
+Suponha que temos uma cifra de fluxo cujo período é bastante curto. Sabemos que esse período tem entre 150 e 200 bits de comprimento. Assumimos que não sabemos mais nada sobre os detalhes internos da cifra de fluxo. Em particular, não devemos supor que ela seja um LFSR simples. Para simplificar, assuma que texto em inglês, em formato ASCII, está sendo cifrado.
+
+Descreva em detalhe como uma cifra desse tipo pode ser atacada. Especifique exatamente o que Oscar precisa conhecer em termos de texto em claro/texto cifrado, e como ele pode decifrar todo o texto cifrado.
+
+\exercicio{8}
+É dada uma cifra de fluxo baseada em um único LFSR como gerador de fluxo de chave. O LFSR tem grau 256.
+
+\begin{enumerate}[label=\arabic*.]
+    \item Quantos pares de bits de texto em claro/texto cifrado são necessários para lançar um ataque bem-sucedido?
+    \item Descreva todos os passos do ataque em detalhe e desenvolva as fórmulas que precisam ser resolvidas.
+    \item Qual é a chave nesse sistema? Por que não faz sentido usar o conteúdo inicial do LFSR como chave ou como parte da chave?
+\end{enumerate}
+
+\exercicio{9}
+Vamos agora observar mais de perto a função de quarto de rodada (\emph{quarter-round}) do ChaCha, isto é, $QR(a,b,c,d)$. Qual é a saída de $QR$ para a seguinte entrada?
+
+\[
+a = \texttt{0x00000001}
+\]
+\[
+b = \texttt{0x00000000}
+\]
+\[
+c = \texttt{0x00000000}
+\]
+\[
+d = \texttt{0x00000000}
+\]
+
+\end{document}

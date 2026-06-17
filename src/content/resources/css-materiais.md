@@ -65,6 +65,10 @@ items:
     pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/cifras-de-fluxo.pdf"
     order: 110
     class: "11-12"
+  - title: "Exercícios: Cifras de Fluxo"
+    type: "slides"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/main.pdf"
+    order: 111
   - title: "AES"
     type: "slides"
     pdfPath: "/aulas/css/crypto/AES/aes.pdf"
@@ -75,6 +79,10 @@ items:
     pdfPath: "/aulas/css/crypto/Mais_sobre_Cifras_de_Bloco/mais-sobre-cifras-de-bloco.pdf"
     order: 150
     class: "15-16"
+  - title: "Exercícios: Cifras de Bloco"
+    type: "slides"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Bloco/exercicios/main.pdf"
+    order: 151
   - title: "Criptossistema RSA"
     type: "slides"
     pdfPath: "/aulas/css/crypto/Rivest_Shamir_Adleman/rsa.pdf"
@@ -90,6 +98,10 @@ items:
     pdfPath: "/aulas/css/crypto/Discrete_Logarithm/logaritmo-discreto.pdf"
     order: 211
     class: 24
+  - title: "Trabalho Prático: Logaritmo Discreto"
+    type: "slides"
+    pdfPath: "/aulas/css/crypto/Discrete_Logarithm_Lab/main.pdf"
+    order: 211
   - title: "Assinatura Digital"
     type: "slides"
     pdfPath: "/aulas/css/crypto/Assinatura_Digital/assinatura-digital.pdf"
@@ -115,6 +127,10 @@ items:
     pdfPath: "/aulas/css/crypto/Introdução_à_Criptografia_de_Chave_Pública/introducao-criptografia-chave-publica.pdf"
     order: 330
     class: 33
+  - title: "Exercícios: Criptografia de Chave Pública (RSA, DH, DLP)"
+    type: "slides"
+    pdfPath: "/aulas/css/crypto/Chave_Publica/exercicios/main.pdf"
+    order: 331
   - title: "DES"
     type: "slides"
     pdfPath: "/aulas/css/crypto/DES/des.pdf"

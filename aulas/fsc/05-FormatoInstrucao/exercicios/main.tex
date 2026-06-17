@@ -1,0 +1,260 @@
+\documentclass[11pt, a4paper]{article}
+
+% ── Codificação e idioma ──
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Layout ──
+\usepackage[margin=1.5cm, top=1.5cm, bottom=1.4cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\parindent}{0pt}
+
+% ── Matemática ──
+\usepackage{amsmath, amssymb}
+
+% ── Tabelas e gráficos ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage[breakable]{tcolorbox}
+
+% ── Cabeçalho e rodapé ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Fundamentos de Sistemas Computacionais}
+\rhead{\small Formatos de Instru\c{c}\~{a}o RISC-V}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Configurações de listas ──
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=3pt, topsep=2pt, parsep=0pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=0pt, topsep=1pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+
+% ── Caixas de destaque ──
+\newtcolorbox{dica}{
+  colback=blue!5!white,
+  colframe=blue!50!black,
+  title={\textbf{Dica}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{contexto}{
+  colback=green!5!white,
+  colframe=green!50!black,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{curiosidade}{
+  colback=yellow!5!white,
+  colframe=yellow!60!black,
+  title={\textbf{Curiosidade}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+% ══════════════════════════════════════════
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Lista de Exerc\'{i}cios}}\\[2pt]
+  {\large Formatos de Instru\c{c}\~{a}o RISC-V: Montagem e Desmontagem}\\[3pt]
+  {\normalsize 98800-04 -- Fundamentos de Sistemas Computacionais\ \ $\cdot$\ \ Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
+\end{center}
+
+\vspace{1pt}
+\hrule
+\vspace{5pt}
+
+\begin{enumerate}
+
+% ── 1: Triagem ──
+\item Para cada palavra de 32 bits abaixo, identifique o \texttt{opcode} em bin\'{a}rio, o \textbf{formato} (R, I, S, B, U ou J) e o \textbf{nome} da instru\c{c}\~{a}o. N\~{a}o \'{e} preciso desmontar a instru\c{c}\~{a}o inteira: basta olhar o \texttt{opcode} e, quando necess\'{a}rio, o \texttt{funct3} e o \texttt{funct7}.
+
+\begin{multicols}{4}
+\begin{enumerate}
+  \item \texttt{0x00C58533}
+  \item \texttt{0xFFF28293}
+  \item \texttt{0x00A12423}
+  \item \texttt{0xFE031CE3}
+  \item \texttt{0x000115B7}
+  \item \texttt{0x00C000EF}
+  \item \texttt{0x00028067}
+  \item \texttt{0x0006A803}
+\end{enumerate}
+\end{multicols}
+
+% ── 2: Montagem ──
+\item Monte cada instru\c{c}\~{a}o abaixo: escreva os \textbf{campos em bin\'{a}rio} (na ordem do formato correspondente) e a \textbf{palavra final em hexadecimal}:
+\begin{multicols}{2}
+\begin{enumerate}
+  \item \texttt{add x5, x6, x7}
+  \item \texttt{addi t2, t2, -4}
+  \item \texttt{lw a0, 8(sp)}
+  \item \texttt{sw s1, 12(s0)}
+  \item \texttt{xor a1, a1, a1}
+  \item \texttt{srai t0, t1, 2}
+\end{enumerate}
+\end{multicols}
+Para o item (e): o que essa instru\c{c}\~{a}o faz com \texttt{a1}?
+
+% ── 3: Desmontagem ──
+\item Desmonte cada palavra abaixo para assembly (com nomes ABI dos registradores e imediatos em decimal):
+\begin{multicols}{2}
+\begin{enumerate}
+  \item \texttt{0x40B50533}
+  \item \texttt{0x00F37313}
+  \item \texttt{0xFFC62A83}
+  \item \texttt{0xFE112E23}
+  \item \texttt{0x00050593}
+\end{enumerate}
+\end{multicols}
+O item (d) \'{e} comum em pr\'{o}logos de fun\c{c}\~{a}o: o que ele est\'{a} fazendo? E o item (e) corresponde a qual \textbf{pseudoinstru\c{c}\~{a}o}?
+
+% ── 4: Mensagem secreta ──
+\item Cada instru\c{c}\~{a}o abaixo carrega um imediato que corresponde a um c\'{o}digo \textbf{ASCII}. Desmonte as quatro instru\c{c}\~{o}es, extraia os imediatos e determine a palavra formada pelos caracteres correspondentes:
+\begin{multicols}{4}
+\begin{enumerate}
+  \item \texttt{0x05200513}
+  \item \texttt{0x05600593}
+  \item \texttt{0x03300613}
+  \item \texttt{0x03200693}
+\end{enumerate}
+\end{multicols}
+\begin{dica}
+ASCII: \texttt{'A'} = 65 \ldots\ \texttt{'Z'} = 90; \quad \texttt{'0'} = 48 \ldots\ \texttt{'9'} = 57.
+\end{dica}
+
+% ── 5: Branches ──
+\item O trecho abaixo procura o primeiro zero em um vetor de palavras. Os endere\c{c}os de cada instru\c{c}\~{a}o est\~{a}o indicados:
+
+\begin{center}
+\small
+\begin{tabular}{rll}
+\texttt{0x100} & \texttt{Loop:} & \texttt{lw \ \ t0, 0(a0)}\\
+\texttt{0x104} & & \texttt{beq \ t0, zero, Achei}\\
+\texttt{0x108} & & \texttt{addi a0, a0, 4}\\
+\texttt{0x10C} & & \texttt{jal \ zero, Loop}\\
+\texttt{0x110} & \texttt{Achei:} & \texttt{...}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Calcule o deslocamento (em bytes) do \texttt{beq} e monte a instru\c{c}\~{a}o completa: mostre os campos \texttt{imm[12|10:5]}, \texttt{rs2}, \texttt{rs1}, \texttt{funct3}, \texttt{imm[4:1|11]} e \texttt{opcode}, e o valor final em hexadecimal.
+  \item Fa\c{c}a o mesmo para o \texttt{jal zero, Loop} (deslocamento \textbf{negativo}): campos \texttt{imm[20|10:1|11|19:12]}, \texttt{rd}, \texttt{opcode} e o hexadecimal final.
+  \item Qual o alcance m\'{a}ximo de um \texttt{beq}, em instru\c{c}\~{o}es de 32 bits? E de um \texttt{jal}?
+  \item Suponha agora que o r\'{o}tulo \texttt{Achei} esteja a 3000 instru\c{c}\~{o}es de dist\^{a}ncia. O \texttt{beq} ainda alcan\c{c}a? Se n\~{a}o, reescreva o desvio condicional usando duas instru\c{c}\~{o}es, conforme visto em aula.
+\end{enumerate}
+
+% ── 6: CubeSat ──
+\item A rotina abaixo zera \texttt{a1} palavras de mem\'{o}ria a partir do endere\c{c}o em \texttt{a0}. Durante a opera\c{c}\~{a}o em um ambiente sujeito a radia\c{c}\~{a}o, \textbf{exatamente um bit} de \textbf{uma} das palavras foi invertido (\emph{bit flip}) e a rotina parou de funcionar:
+
+\begin{center}
+\small
+\begin{tabular}{rl}
+\textbf{Endere\c{c}o} & \textbf{Conte\'{u}do}\\
+\texttt{0x00} & \texttt{0x00053023}\\
+\texttt{0x04} & \texttt{0x00450513}\\
+\texttt{0x08} & \texttt{0xFFF58593}\\
+\texttt{0x0C} & \texttt{0xFE059AE3}\\
+\texttt{0x10} & \texttt{0x00008067}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Desmonte as cinco palavras. Uma delas n\~{a}o corresponde a nenhuma instru\c{c}\~{a}o RV32I v\'{a}lida. Qual, e por qu\^{e}?
+  \item Qual bit (indique a posi\c{c}\~{a}o, 0--31) foi invertido? Qual era a palavra original e que instru\c{c}\~{a}o ela codificava?
+  \item Com a corre\c{c}\~{a}o aplicada, reescreva a rotina completa em assembly com r\'{o}tulos.
+\end{enumerate}
+
+\begin{curiosidade}
+\emph{Bit flips} por radia\c{c}\~{a}o s\~{a}o um problema real em sat\'{e}lites e at\'{e} em servidores na superf\'{i}cie. Por isso, mem\'{o}rias de sistemas cr\'{i}ticos usam c\'{o}digos de corre\c{c}\~{a}o de erros (ECC), e decodificadores de instru\c{c}\~{a}o detectam \emph{opcodes} inv\'{a}lidos e disparam uma exce\c{c}\~{a}o.
+\end{curiosidade}
+
+% ── 7: ret ──
+\item A palavra \texttt{0x00008067} aparece milhares de vezes em praticamente qualquer bin\'{a}rio RISC-V compilado.
+\begin{enumerate}
+  \item Desmonte-a. Qual instru\c{c}\~{a}o \'{e}? A qual pseudoinstru\c{c}\~{a}o corresponde?
+  \item Por que ela aparece no final de quase toda fun\c{c}\~{a}o?
+  \item Monte a instru\c{c}\~{a}o \texttt{jal ra, Func}, onde \texttt{Func} est\'{a} 32 bytes \emph{adiante}. D\^{e} o hexadecimal final.
+  \item Diferentemente de B e J, o imediato do \texttt{jalr} \textbf{n\~{a}o} \'{e} multiplicado por 2. Explique por qu\^{e}.
+\end{enumerate}
+
+% ── 8: Imediatos longos ──
+\item Constantes de 32 bits s\~{a}o constru\'{i}das com o par \texttt{lui} + \texttt{addi}.
+\begin{enumerate}
+  \item Escreva a sequ\^{e}ncia \texttt{lui}/\texttt{addi} que coloca \texttt{0x12345678} em \texttt{t0}.
+  \item Repita para \texttt{0xDEADBEEF} em \texttt{t1}. Mostre por que a abordagem direta (\texttt{lui} com \texttt{0xDEADB}) produz um resultado incorreto e apresente a sequ\^{e}ncia correta.
+  \item Explique a regra geral: quando \'{e} preciso ajustar o imediato do \texttt{lui}, e por qu\^{e}?
+\end{enumerate}
+
+% ── 9: Estagiário ──
+\item As instru\c{c}\~{o}es da tabela abaixo foram montadas \`{a} m\~{a}o e algumas cont\^{e}m erros. Para cada linha, verifique se o hexadecimal realmente codifica a instru\c{c}\~{a}o pretendida. Se estiver \textbf{errado}, desmonte o que foi \emph{de fato} codificado, explique o erro cometido e d\^{e} o hexadecimal correto.
+
+\begin{center}
+\small
+\begin{tabular}{cll}
+\toprule
+\# & \textbf{Instru\c{c}\~{a}o pretendida} & \textbf{Hex montado}\\
+\midrule
+1 & \texttt{sub s0, s1, s2} & \texttt{0x40990433}\\
+2 & \texttt{sw t0, 20(sp)} & \texttt{0x28512023}\\
+3 & \texttt{beq a0, a1, +8} \ (pular para 2 instru\c{c}\~{o}es adiante) & \texttt{0x00B50163}\\
+4 & \texttt{lhu t2, 6(a0)} & \texttt{0x00655383}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ── 10: Arqueologia ──
+\item O \emph{dump} de mem\'{o}ria abaixo cont\'{e}m um programa cujo c\'{o}digo-fonte n\~{a}o est\'{a} dispon\'{i}vel:
+
+\begin{center}
+\small
+\begin{tabular}{rl}
+\textbf{Endere\c{c}o} & \textbf{Conte\'{u}do}\\
+\texttt{0x200} & \texttt{0x00000293}\\
+\texttt{0x204} & \texttt{0x00058863}\\
+\texttt{0x208} & \texttt{0x00A282B3}\\
+\texttt{0x20C} & \texttt{0xFFF58593}\\
+\texttt{0x210} & \texttt{0xFF5FF06F}\\
+\texttt{0x214} & \texttt{0x00028513}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Desmonte as seis palavras (aten\c{c}\~{a}o aos deslocamentos das instru\c{c}\~{o}es de desvio).
+  \item Reescreva o programa em assembly com r\'{o}tulos leg\'{i}veis.
+  \item O que esse programa calcula, considerando que recebe dois valores em \texttt{a0} e \texttt{a1} e devolve o resultado em \texttt{a0}?
+  \item Se o programa for chamado com \texttt{a0 = 6} e \texttt{a1 = 7}, qual o valor final de \texttt{a0}?
+  \item Quantas vezes a instru\c{c}\~{a}o no endere\c{c}o \texttt{0x204} \'{e} executada nesse caso?
+\end{enumerate}
+
+% ── 11: Conselho de projeto ──
+\item Justifique tecnicamente, em 1--2 frases cada, as seguintes decis\~{o}es de projeto do RISC-V:
+\begin{enumerate}
+  \item Por que \texttt{rs1}, \texttt{rs2} e \texttt{rd} ficam \textbf{sempre nas mesmas posi\c{c}\~{o}es} em todos os formatos que os utilizam?
+  \item Por que o formato S \textbf{divide o imediato} em dois peda\c{c}os em vez de mant\^{e}-lo cont\'{i}guo como no formato I?
+  \item Por que os deslocamentos de B e J s\~{a}o codificados em \textbf{m\'{u}ltiplos de 2 bytes}, e n\~{a}o de 1 ou de 4?
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

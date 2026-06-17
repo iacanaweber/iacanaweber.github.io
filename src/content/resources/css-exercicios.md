@@ -12,4 +12,14 @@ items:
     pdfPath: "/aulas/css/dependability/07_trabalho_teste_funcional/main.pdf"
     order: 60
     class: 6
+  - title: "Exercícios: Cifras de Fluxo, OTP, LFSR e ChaCha"
+    type: "pdf"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/main.pdf"
+    order: 110
+    class: "11-12"
+  - title: "Exercícios: Cifras de Fluxo, OTP, LFSR e ChaCha (Com Respostas)"
+    type: "pdf"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/main_gabarito.pdf"
+    order: 111
+    class: "11-12"
 ---

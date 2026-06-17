@@ -45,6 +45,23 @@
   \end{frame}
 }
 
+%% Placeholder para figuras ainda não disponíveis: se o arquivo existir em img/,
+%% inclui a imagem; senão desenha uma caixa indicando qual figura do livro buscar.
+%% Uso: \figuraplaceholder[largura]{img/arquivo.png}{Fig. X.Y do livro (pág. Z)}
+\newcommand{\figuraplaceholder}[3][0.8\textwidth]{%
+    \IfFileExists{#2}{%
+        \includegraphics[width=#1]{#2}%
+    }{%
+        \begin{tikzpicture}
+            \node[draw=gray!70, dashed, very thick, fill=gray!10,
+                  minimum width=0.85\textwidth, minimum height=2.6cm, align=center]
+                {{\large\bfseries\color{gray!60!black} PLACEHOLDER}\\[3pt]
+                 #3\\[3pt]
+                 {\footnotesize arquivo esperado: \texttt{#2}}};
+        \end{tikzpicture}%
+    }%
+}
+
 % Informações da apresentação
 \title[Funções Hash]{Funções Hash}
 \author{Prof. Iaçanã Ianiski Weber}
@@ -284,7 +301,18 @@
 
         \bigskip
         \textbf{Recomendação de Segurança:} Para se proteger deste ataque, a recomendação é que a saída de uma função de hash deve ter \textbf{no mínimo 224 bits}.
-    
+
+\end{frame}
+
+\begin{frame}{O Paradoxo do Aniversário em Números}
+    \begin{center}
+        \includegraphics[width=0.78\textwidth]{img/birthday_paradox.png}
+    \end{center}
+    \begin{itemize}
+        \footnotesize
+        \item A curva sobe muito mais rápido do que a intuição sugere: com 23 pessoas ($\approx 6\%$ dos 365 dias!) a colisão já é mais provável que não, pois o número de \textbf{pares} cresce como $\binom{n}{2}$.
+        \item Para funções de hash vale o mesmo: com $\approx \sqrt{2^n} = 2^{n/2}$ tentativas, encontrar \textit{alguma} colisão torna-se provável: é o \textit{birthday attack}.
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{O Ataque de Aniversário e a Segurança Moderna}
@@ -319,7 +347,7 @@
 \end{frame}
 
 %\section {Algorítmos}
-\begin{frame}{Funções de Hash: Lições Aprendidas (Versão Atualizada)}
+\begin{frame}{Funções de Hash: Lições Aprendidas}
 
     \begin{itemize}
         \small
@@ -350,6 +378,313 @@
         \begin{itemize}
             \item Para segurança de longo prazo e para resistir a ataques de colisão (ataques de aniversário), a recomendação atual é usar saídas de no mínimo \alert{256 bits}.
         \end{itemize}
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{SHA-2}
+
+\begin{frame}{De MD4 ao SHA-2: Uma Breve História}
+    \textbf{SHA-2 não nasceu do zero}: ele é o integrante mais bem-sucedido da \textbf{família MD4}.
+    \medskip
+    \begin{center}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        evento/.style={align=center, font=\footnotesize},
+        ano/.style={font=\scriptsize\bfseries, text=blue!60!black}
+    ]
+        \draw[->, very thick, gray!70] (0,0) -- (12.6,0);
+        \draw[thick] (0.6,0.12) -- (0.6,-0.12);
+        \node[ano, above=4pt] at (0.6, 0.1) {1990};
+        \node[evento, below=4pt] at (0.6, -0.1) {\textbf{MD4}\\(Rivest)};
+        \draw[thick] (2.6,0.12) -- (2.6,-0.12);
+        \node[ano, above=4pt] at (2.6, 0.1) {1991};
+        \node[evento, below=4pt] at (2.6, -0.1) {\textbf{MD5}\\(Rivest)};
+        \draw[thick] (4.6,0.12) -- (4.6,-0.12);
+        \node[ano, above=4pt] at (4.6, 0.1) {1993};
+        \node[evento, below=4pt] at (4.6, -0.1) {\textbf{SHA-0}\\(NIST)};
+        \draw[thick] (6.6,0.12) -- (6.6,-0.12);
+        \node[ano, above=4pt] at (6.6, 0.1) {1995};
+        \node[evento, below=4pt] at (6.6, -0.1) {\textbf{SHA-1}\\(NIST)};
+        \draw[thick] (8.6,0.12) -- (8.6,-0.12);
+        \node[ano, above=4pt] at (8.6, 0.1) {2001};
+        \node[evento, below=4pt] at (8.6, -0.1) {\textbf{SHA-2}\\(NIST)};
+        \draw[thick] (10.9,0.12) -- (10.9,-0.12);
+        \node[ano, above=4pt] at (10.9, 0.1) {2004--05};
+        \node[evento, below=4pt] at (10.9, -0.1) {\alert{Colisões!}\\MD5 e SHA-1};
+    \end{tikzpicture}}
+    \end{center}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{A ideia do MD4} (Rivest, o ``R'' do RSA): ser \textbf{rápido em software}, usando apenas operações bit a bit sobre palavras de 32 bits (AND, OR, XOR, NOT). \textit{Todos} os descendentes herdaram esse princípio.
+        \item MD5 (128 bits) e SHA-1 (160 bits) pareciam seguros\dots{} até que \alert{colisões reais} foram anunciadas em 2004--2005. Hoje, uma colisão de SHA-1 custa apenas $\approx 2^{61}$ operações (vs.\ os $2^{80}$ esperados).
+        \item A resposta do NIST (2001): \textbf{mesma receita, saídas bem maiores}, com SHA-256, SHA-384 e SHA-512 (SHA-224 veio em 2004). Nascia a família \textbf{SHA-2}.
+        \item \textbf{Moral da história:} SHA-2 é o ``sobrevivente endurecido'' da família MD4: mesmo DNA, mas com margens de segurança muito maiores.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{A Família SHA-2: Seis Algoritmos}
+    O nome diz tudo: \textbf{o número após ``SHA-'' é o tamanho da saída em bits}.
+    \begin{center}
+        \small
+        \begin{tabular}{lcccc}
+            \toprule
+            \textbf{Algoritmo} & \textbf{Saída [bits]} & \textbf{Bloco [bits]} & \textbf{Rodadas} & \textbf{Colisões?} \\
+            \midrule
+            \rowcolor{red!12}   MD5     & 128 & 512  & 64 & \alert{encontradas} \\
+            \rowcolor{red!12}   SHA-1   & 160 & 512  & 80 & \alert{encontradas} \\
+            \rowcolor{green!12} SHA-224 & 224 & 512  & 64 & não \\
+            \rowcolor{green!12} SHA-256 & 256 & 512  & 64 & não \\
+            \rowcolor{green!12} SHA-384 & 384 & 1024 & 80 & não \\
+            \rowcolor{green!12} SHA-512 & 512 & 1024 & 80 & não \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+    \begin{itemize}
+        \footnotesize
+        \item Em \textcolor{green!50!black}{verde}: a família SHA-2. Há ainda duas variantes truncadas, \textbf{SHA-512/224} e \textbf{SHA-512/256}.
+        \item \textbf{A estrutura interna dos seis algoritmos é idêntica}; por isso, nesta seção estudamos só o \textbf{SHA-256} e, de quebra, entendemos todos.
+        \item Limites de mensagem: SHA-256 aceita até $2^{64}-1$ bits; SHA-384/512, até $2^{128}-1$ bits.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{SHA-256: Visão de Alto Nível (Merkle--Damgård)}
+    \textbf{Como digerir uma mensagem de qualquer tamanho? Em fatias.}
+    \medskip
+    \begin{columns}[c]
+        \begin{column}{0.56\textwidth}
+            \begin{itemize}
+                \footnotesize
+                \item A mensagem recebe um \textbf{padding} e é dividida em \textbf{blocos de 512 bits}.
+                \medskip
+                \item Um \textbf{estado de 256 bits} ($H_i$) atravessa a \textbf{função de compressão} bloco a bloco: o resultado de um bloco vira entrada para o próximo (construção \textbf{Merkle--Damgård}).
+                \medskip
+                \item Depois do último bloco, o estado final \textbf{é} o hash $h(x)$.
+                \medskip
+                \item \textbf{Insight:} a função de compressão age como uma \textbf{cifra de bloco disfarçada}, em que a ``mensagem'' cifrada é o estado $H_{i-1}$ e a ``chave'' é o bloco $x_i$. As rodadas internas lembram uma cifra de Feistel.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \centering
+            \figuraplaceholder[\linewidth]{img/sha2_high_level.png}{Fig.~11.9 do livro: diagrama de alto nível do SHA-256 (pág.~352)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{Pré-processamento: o Padding}
+    \textbf{Objetivo:} fazer o comprimento total ser um \textbf{múltiplo de 512 bits}.
+    \medskip
+
+    \textbf{A receita} (para uma mensagem $x$ de $l$ bits):
+    \begin{enumerate}
+        \footnotesize
+        \item Anexa-se um único bit \texttt{1};
+        \item Anexam-se $k$ bits \texttt{0}, onde $k$ é o \textit{menor} valor que fecha a conta:
+            \[
+                k \equiv 448 - (l + 1) \pmod{512}
+            \]
+        \item Anexa-se o comprimento $l$ codificado em \textbf{64 bits}.
+    \end{enumerate}
+    \begin{center}
+        \figuraplaceholder[0.75\textwidth]{img/sha2_padding.png}{Fig.~11.10 do livro: padding de uma mensagem no SHA-256 (pág.~353)}
+    \end{center}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Por que 64 bits para o comprimento?} O SHA-256 aceita mensagens de até $2^{64}-1$ bits, e $448 = 512 - 64$ reserva exatamente esse espaço no fim do último bloco.    \end{itemize}
+\end{frame}
+
+\begin{frame}{Padding na Prática: a mensagem \texttt{"abc"}}
+    Mensagem \texttt{"abc"} = 3 caracteres ASCII de 8 bits $\Rightarrow l = 24$ bits:
+    \[
+        \underbrace{\texttt{01100001}}_{\texttt{a}}\quad
+        \underbrace{\texttt{01100010}}_{\texttt{b}}\quad
+        \underbrace{\texttt{01100011}}_{\texttt{c}}
+    \]
+    \textbf{Passo 1: quantos zeros?}
+    \[
+        k \equiv 448 - (l+1) = 448 - 25 = 423 \pmod{512}
+    \]
+    \textbf{Passo 2: montar o bloco} (comprimento $l = 24_{10} = 11000_2$ em 64 bits):
+    \[
+        \underbrace{\texttt{01100001}}_{\texttt{a}}\;
+        \underbrace{\texttt{01100010}}_{\texttt{b}}\;
+        \underbrace{\texttt{01100011}}_{\texttt{c}}\;
+        \texttt{1}\;
+        \underbrace{\texttt{00}\cdots\texttt{0}}_{423\text{ zeros}}\;
+        \underbrace{\texttt{0}\cdots\texttt{011000}}_{l\,=\,24\text{ em 64 bits}}
+    \]
+    \textbf{Conferindo:} $24 + 1 + 423 + 64 = 512$, ou seja, a mensagem ocupa exatamente \textbf{um} bloco.
+\end{frame}
+
+\begin{frame}{Dividindo o Bloco em Palavras}
+    Antes da compressão, cada bloco de 512 bits é visto como \textbf{16 palavras de 32 bits}:
+    \[
+        x_i = \left( x_i^{(0)}\; x_i^{(1)}\; \cdots\; x_i^{(15)} \right)
+    \]
+    \begin{center}
+        \begin{tikzpicture}[scale=0.95]
+            \draw[thick] (0,0) rectangle (12,0.8);
+            \foreach \i in {1,...,15} \draw (0.75*\i,0) -- (0.75*\i,0.8);
+            \node[font=\scriptsize] at (0.375,0.4) {$x_i^{(0)}$};
+            \node[font=\scriptsize] at (1.125,0.4) {$x_i^{(1)}$};
+            \node[font=\scriptsize] at (1.875,0.4) {$x_i^{(2)}$};
+            \node[font=\scriptsize] at (5.65,0.4) {$\cdots$};
+            \node[font=\scriptsize] at (11.625,0.4) {$x_i^{(15)}$};
+            \draw[<->] (0,1.1) -- node[above, font=\scriptsize] {bloco de 512 bits} (12,1.1);
+            \draw[<->] (0,-0.3) -- node[below, font=\scriptsize] {32 bits} (0.75,-0.3);
+        \end{tikzpicture}
+    \end{center}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Por que 32 bits?} É o tamanho clássico dos registradores de CPU: \textit{todas} as operações internas do SHA-256 (somas, XOR, rotações) atuam sobre palavras de 32 bits, herança direta do projeto ``rápido em software'' do MD4.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{A Função de Compressão: Visão Geral}
+    Para cada bloco $x_i$, a função de compressão executa \textbf{64 rodadas}.
+    \medskip
+    \begin{columns}[c]
+        \begin{column}{0.48\textwidth}
+            \textbf{Três ingredientes:}
+            \begin{itemize}
+                \footnotesize
+                \item \textbf{O estado anterior} $H_{i-1}$ (256 bits = 8 palavras);
+                \item \textbf{O message schedule} $W_0, \dots, W_{63}$: 64 palavras derivadas do próprio bloco $x_i$;
+                \item \textbf{As constantes} $K_0, \dots, K_{63}$: 64 palavras fixas do padrão.
+            \end{itemize}
+            \medskip
+            \begin{itemize}
+                \footnotesize
+                \item Em cada rodada $j$ entram \textbf{uma} palavra $W_j$ e \textbf{uma} constante $K_j$.
+                \item O símbolo $\boxplus$ nos diagramas é a \textbf{soma módulo $2^{32}$}, uma soma comum que ``dá a volta'' ao estourar 32 bits.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.50\textwidth}
+            \centering
+            \figuraplaceholder[\linewidth]{img/sha2_compression.png}{Fig.~11.11 do livro: função de compressão do SHA-2 com 256 bits (pág.~354)}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{O Message Schedule \texorpdfstring{$W_j$}{Wj}}
+    \textbf{Antes da fórmula, duas operações básicas} (exemplo com 8 bits):
+    \begin{itemize}
+        \footnotesize
+        \item $ROTR^{n}(x)$ é a \textbf{rotação} à direita: os bits dão a volta. \quad $ROTR^{3}(\texttt{10110010}) = \texttt{01010110}$
+        \item $SHR^{n}(x)$ é o \textbf{deslocamento} à direita: os bits caem fora. \quad $SHR^{3}(\texttt{10110010}) = \texttt{00010110}$
+    \end{itemize}
+    \smallskip
+    \textbf{A regra:} as 16 primeiras palavras são \textit{o próprio bloco}; as 48 seguintes misturam quatro palavras anteriores:
+    \[
+        W_j =
+        \begin{cases}
+            x_i^{(j)} & 0 \le j \le 15\\[4pt]
+            \sigma_1(W_{j-2}) + W_{j-7} + \sigma_0(W_{j-15}) + W_{j-16} & 16 \le j \le 63
+        \end{cases}
+    \]
+    \vspace{-0.8em}
+    \begin{align*}
+        \sigma_0(x) &= ROTR^{7}(x) \oplus ROTR^{18}(x) \oplus SHR^{3}(x)\\
+        \sigma_1(x) &= ROTR^{17}(x) \oplus ROTR^{19}(x) \oplus SHR^{10}(x)
+    \end{align*}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Efeito avalanche:} cada palavra nova depende de quatro anteriores; mudar \textit{um único bit} do bloco contamina todo o schedule.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Uma Rodada por Dentro (iteração \texorpdfstring{$j$}{j})}
+    O estado de 256 bits vive em \textbf{8 registradores} de 32 bits: $A, B, \dots, H$.
+    \begin{center}
+        \figuraplaceholder[0.42\textwidth]{img/sha2_round.png}{Fig.~11.12 do livro: iteração $j$ da função de compressão (pág.~355)}
+    \end{center}
+    \vspace{-0.3em}
+    Em cada uma das 64 rodadas, calculam-se \textbf{duas palavras temporárias} e o resto \textbf{desliza}:
+    \vspace{-0.3em}
+    \[
+        \small
+        T_1 = H + \Sigma_1(E) + Ch(E,F,G) + K_j + W_j
+        \qquad
+        T_2 = \Sigma_0(A) + Maj(A,B,C)
+    \]
+    \vspace{-1.4em}
+    \[
+        \small
+        H{=}G,\quad G{=}F,\quad F{=}E,\quad E{=}D+T_1,\quad D{=}C,\quad C{=}B,\quad B{=}A,\quad A{=}T_1+T_2
+    \]
+    \vspace{-1.2em}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Leitura didática:} só $A$ e $E$ recebem valores ``novos'' (somas módulo $2^{32}$); os outros seis registradores apenas andam uma posição, como uma fila. E repare que há \textbf{só somas, XOR, AND e rotações}: por isso o SHA-2 é tão rápido em software.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{As Funções Internas: \textit{Ch}, \textit{Maj} e \texorpdfstring{$\Sigma$}{Sigma}}
+    \begin{itemize}
+        \footnotesize
+        \item Na \textbf{\textit{Ch} (``choice'')}, $x$ funciona como um \textbf{seletor} bit a bit:
+        \[
+            Ch(x,y,z) = (x \wedge y) \oplus (\neg x \wedge z)
+        \]
+        Se o bit de $x$ é \texttt{1}, sai o bit de $y$; se é \texttt{0}, sai o bit de $z$.
+        \medskip
+        \item A \textbf{\textit{Maj} (``majority'')} é o \textbf{voto da maioria} bit a bit:
+        \[
+            Maj(x,y,z) = (x \wedge y) \oplus (x \wedge z) \oplus (y \wedge z)
+        \]
+        Cada bit de saída é o valor que aparecer em \textit{pelo menos dois} dos três bits de entrada.
+        \medskip
+        \item \textbf{$\Sigma_0$ e $\Sigma_1$} fazem a \textbf{difusão} por rotações sobrepostas:
+        \[
+            \Sigma_0(x) = ROTR^{2}(x) \oplus ROTR^{13}(x) \oplus ROTR^{22}(x)
+        \]
+        \[
+            \Sigma_1(x) = ROTR^{6}(x) \oplus ROTR^{11}(x) \oplus ROTR^{25}(x)
+        \]
+        Cada bit de saída mistura três bits distantes da entrada.
+    \end{itemize}
+    \medskip
+    \textbf{Exemplo rápido} (1 bit): $x{=}1, y{=}0, z{=}1$: \quad $Ch = y = 0$ \quad e \quad $Maj = 1$ (dois ``votos'' 1).
+\end{frame}
+
+\begin{frame}{De Onde Vêm as Constantes? (\textit{nothing up my sleeve})}
+    \textbf{Pergunta natural:} quem escolheu os 64 valores $K_j$ e os 8 valores iniciais $H_0$? Não poderiam esconder um \textit{backdoor}?
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{As constantes $K_j$:} os primeiros 32 bits da \textbf{parte fracionária das raízes cúbicas} dos 64 primeiros números primos ($\sqrt[3]{2}, \sqrt[3]{3}, \sqrt[3]{5}, \dots$).
+        \item \textbf{Os valores iniciais $H_0$:} idem, com as \textbf{raízes quadradas} dos 8 primeiros primos. Exemplo:
+        \[
+            \sqrt{2} = 1{,}414213562\ldots \;\Rightarrow\; \lfloor 0{,}414213562\ldots \times 2^{32} \rfloor = \texttt{0x6A09E667} = H_0^{(0)}
+        \]
+    \end{itemize}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item São os chamados números \textbf{\textit{nothing up my sleeve}} (``nada na manga''): derivados de constantes matemáticas \textbf{públicas e verificáveis}: qualquer pessoa pode refazer a conta.
+        \item Isso demonstra que \alert{não há valores especialmente construídos} que possam esconder uma fraqueza proposital no algoritmo.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Saída Final e Desempenho na Prática}
+    \textbf{O hash final:} processados todos os $n$ blocos, o digest é a concatenação das 8 palavras do estado:
+    \[
+        \text{SHA-256}(x) = H_n^{(0)} \,\|\, H_n^{(1)} \,\|\, \cdots \,\|\, H_n^{(7)} \qquad (8 \times 32 = 256 \text{ bits})
+    \]
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Em software, SHA-2 voa:} só operações bit a bit e somas de 32 bits $\Rightarrow$ $\approx$ 10 Gbit/s em CPUs de 64 bits modernas.
+        \item Vários processadores x86 (Intel e AMD) têm \textbf{instruções SHA dedicadas}, acelerando ainda mais.
+        \item \textbf{Em hardware (FPGA), nem tanto:} poucos Gbit/s, pois as operações internas são difíceis de paralelizar; o desempenho fica na mesma faixa do software.
+    \end{itemize}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item<2-> \textbf{Gancho para a próxima seção:} o \textbf{SHA-3} foi projetado com uma estrutura interna completamente diferente, e bem mais amigável a hardware.
     \end{itemize}
 \end{frame}
 

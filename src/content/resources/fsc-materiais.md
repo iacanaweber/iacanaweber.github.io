@@ -34,5 +34,21 @@ items:
     type: "slides"
     pdfPath: "/aulas/fsc/03-LabCircuitosCombinacionais/main.pdf"
     order: 160
+  - title: "Exercícios: Máquinas de Estados Finitos (FSM)"
+    type: "slides"
+    pdfPath: "/aulas/fsc/04-FSM/exercicios/main.pdf"
+    order: 181
+  - title: "Exercícios: Formato de Instrução"
+    type: "slides"
+    pdfPath: "/aulas/fsc/05-FormatoInstrucao/exercicios/main.pdf"
+    order: 201
+  - title: "Exercícios: CALL"
+    type: "slides"
+    pdfPath: "/aulas/fsc/06-CALL/exercicios/main.pdf"
+    order: 221
+  - title: "Exercícios: Hierarquia de Memória"
+    type: "slides"
+    pdfPath: "/aulas/fsc/07-HierarquiaMemoria/exercicios/main.pdf"
+    order: 241
 ---
 

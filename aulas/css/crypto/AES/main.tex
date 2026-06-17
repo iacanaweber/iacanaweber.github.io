@@ -701,4 +701,114 @@ B_7 & B_{11} & B_{15} & B_3
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aprofundamento: por que MixColumns sai da última rodada}
+
+\begin{frame}{Duas versões da decriptação}
+A decriptação do AES pode ser escrita de duas formas matematicamente equivalentes:
+
+\medskip
+\begin{itemize}
+    \item \textbf{Versão A (\textit{naïve}):} reverte literalmente cada operação da encriptação. Round: \texttt{ISR, ISB, ARK, IMC}. É a forma mostrada nos livros e diagramas didáticos.
+    \medskip
+    \item \textbf{Versão B (\textit{equivalent inverse cipher}):} reescrita algébrica da Versão A. Round: \texttt{ISB, ISR, IMC, ARK}, espelhando o round da encriptação \texttt{SB, SR, MC, ARK}.
+\end{itemize}
+
+\bigskip
+\textbf{Mesma saída para a mesma entrada.} A diferença é apenas estrutural.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Versão A: decriptação \textit{naïve}}
+\centering
+\includegraphics[page=1, height=0.85\textheight, keepaspectratio]{decryption_diagrams.pdf}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Por que a Versão B importa: hardware único}
+A Versão B permite que o \textbf{mesmo circuito} faça encriptação e decriptação:
+\begin{itemize}
+    \item Forma de round idêntica nos dois sentidos: \texttt{(op, op, op, ARK)}
+    \item Para decriptar, o circuito troca SB$\leftrightarrow$ISB, SR$\leftrightarrow$ISR, MC$\leftrightarrow$IMC
+    \item O \textit{key scheduler} usa $\text{IMC}(K_i)$ nos rounds intermediários da decriptação; o \textit{whitening} ($K_0$ e $K_n$) usa as chaves originais, sem transformação
+\end{itemize}
+
+\bigskip
+A especificação FIPS 197 (NIST, seção 5.3.5) descreve formalmente a Versão B sob o nome \textit{Equivalent Inverse Cipher}.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{O truque: como ir da Versão A para a Versão B}
+Dois fatos algébricos sobre as operações inversas:
+
+\medskip
+\begin{enumerate}
+    \item \textbf{InvShiftRows e InvSubBytes comutam.} Substituição byte a byte (ISB) e permutação de posições (ISR) podem ser aplicadas em qualquer ordem sem alterar o resultado.
+
+    \medskip
+    \item \textbf{InvMixColumns é linear sobre $\mathrm{GF}(2)$.} Portanto:
+    \[
+        \text{IMC}(x \oplus K) \;=\; \text{IMC}(x) \,\oplus\, \text{IMC}(K)
+    \]
+    Isso permite trocar a ordem de uma IMC com uma ARK, ao custo de pré-aplicar IMC na chave.
+\end{enumerate}
+
+\bigskip
+Aplicando os dois truques na sequência inteira da Versão A, os blocos se reorganizam exatamente na estrutura da Versão B.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Versão B: \textit{equivalent inverse cipher}}
+\centering
+\includegraphics[page=2, height=0.85\textheight, keepaspectratio]{decryption_diagrams.pdf}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Comparação estrutural}
+\centering
+\renewcommand{\arraystretch}{1.4}
+\footnotesize
+\begin{tabular}{l|l|l}
+\textbf{Posição} & \textbf{Encriptação} & \textbf{Decriptação (Versão B)} \\
+\hline
+\textit{Whitening}              & ARK$(K_0)$              & ARK$(K_n)$ \\
+Round intermediário $i$         & SB, SR, MC, ARK$(K_i)$  & ISB, ISR, IMC, ARK$(\text{IMC}(K_{n-i}))$ \\
+Último round                    & SB, SR, ARK$(K_n)$      & ISB, ISR, ARK$(K_0)$ \\
+\end{tabular}
+
+\bigskip
+\raggedright\small
+Cada linha do lado direito é o espelho estrutural da linha do lado esquerdo. A \textbf{poda} (ausência da operação MC ou IMC) acontece na \textbf{mesma posição relativa} nos dois lados.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Por que MC e não ShiftRows?}
+Tanto MC quanto SR são lineares e públicas; pelo critério de segurança, qualquer uma das duas poderia ser removida sem perda.
+
+\bigskip
+A diferença está na reescrita algébrica:
+
+\begin{itemize}
+    \item Removendo MC, a Versão B sai com round $(\text{ISB, ISR, IMC, ARK})$, espelhando exatamente $(\text{SB, SR, MC, ARK})$
+    \item Removendo SR, a Versão B sai com round $(\text{ISB, IMC, ISR, ARK})$, com IMC e ISR em ordem trocada em relação ao espelho da encriptação
+\end{itemize}
+
+\bigskip
+A simetria perfeita só sobrevive a uma poda específica: a de MixColumns.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Conclusão}
+\begin{itemize}
+    \item A omissão de MixColumns na última rodada do AES \textbf{não é arbitrária} nem uma economia de operações
+    \medskip
+    \item É a costura mínima que faz a decriptação ter exatamente o mesmo formato da encriptação, depois de aplicada a reescrita do \textit{equivalent inverse cipher}
+    \medskip
+    \item \textbf{Critério de segurança:} a poda é gratuita. Qualquer operação linear final seria absorvida pela chave
+    \medskip
+    \item \textbf{Critério de implementação:} apenas a omissão de MixColumns (e não, por exemplo, de ShiftRows) preserva a simetria entre os dois caminhos. Por isso MC é a escolhida, e SR fica
+\end{itemize}
+\end{frame}
+
 \end{document}

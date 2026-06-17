@@ -1,0 +1,211 @@
+\documentclass[11pt, a4paper]{article}
+
+% ── Codificação e idioma ──
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Layout ──
+\usepackage[margin=1.5cm, top=1.5cm, bottom=1.4cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{2pt plus 1pt}
+\setlength{\parindent}{0pt}
+
+% ── Matemática ──
+\usepackage{amsmath, amssymb}
+
+% ── Tabelas e gráficos ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage[breakable]{tcolorbox}
+
+% ── Cabeçalho e rodapé ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Fundamentos de Sistemas Computacionais}
+\rhead{\small CALL: Compiler, Assembler, Linker, Loader}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Configurações de listas ──
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=14pt, topsep=4pt, parsep=0pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=2pt, topsep=3pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+
+% ── Caixas de destaque ──
+\newtcolorbox{dica}{
+  colback=blue!5!white,
+  colframe=blue!50!black,
+  title={\textbf{Dica}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{curiosidade}{
+  colback=yellow!5!white,
+  colframe=yellow!60!black,
+  title={\textbf{Curiosidade}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+% ══════════════════════════════════════════
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Lista de Exerc\'{i}cios}}\\[2pt]
+  {\large CALL --- Compiler, Assembler, Linker e Loader}\\[3pt]
+  {\normalsize 98800-04 -- Fundamentos de Sistemas Computacionais\ \ $\cdot$\ \ Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
+\end{center}
+
+\vspace{1pt}
+\hrule
+\vspace{5pt}
+
+\begin{enumerate}
+
+% ── 1: Pipeline ──
+\item O caminho de um programa C at\'{e} sua execu\c{c}\~{a}o passa por quatro ferramentas. Para cada uma, indique o \textbf{arquivo de entrada}, o \textbf{arquivo de sa\'{i}da} (use como exemplo \texttt{foo.c}, \texttt{foo.s}, \texttt{foo.o} e \texttt{a.out}) e descreva, em uma frase, sua fun\c{c}\~{a}o:
+\begin{multicols}{4}
+\begin{enumerate}
+  \item Compiler
+  \item Assembler
+  \item Linker
+  \item Loader
+\end{enumerate}
+\end{multicols}
+Qual dessas etapas \'{e}, na pr\'{a}tica, realizada pelo Sistema Operacional?
+
+% ── 2: Tradutor x Interpretador ──
+\item Explique a diferen\c{c}a entre um \textbf{tradutor} e um \textbf{interpretador}. Por que traduzir um programa para linguagem de m\'{a}quina geralmente resulta em maior desempenho do que interpret\'{a}-lo?
+
+% ── 3: Diretivas ──
+\item Considere o trecho de assembly abaixo (linhas numeradas):
+
+\begin{center}
+\small
+\begin{tabular}{rl}
+1 & \texttt{\ \ \ \ \ \ \ .text}\\
+2 & \texttt{\ \ \ \ \ \ \ .globl max}\\
+3 & \texttt{max:\ \ \ add a0, a0, a1}\\
+4 & \texttt{\ \ \ \ \ \ \ .data}\\
+5 & \texttt{vetor:\ .word 3, 9, 27}\\
+6 & \texttt{msg:\ \ \ .string "FSC"}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Quais linhas cont\^{e}m \textbf{diretivas} e quais produzem \textbf{instru\c{c}\~{o}es de m\'{a}quina}?
+  \item Explique a fun\c{c}\~{a}o de cada diretiva que aparece no trecho.
+  \item Se as diretivas n\~{a}o geram instru\c{c}\~{o}es, para que elas servem no object file?
+\end{enumerate}
+
+% ── 4: Pseudoinstruções ──
+\item O compilador gerou o c\'{o}digo abaixo:
+
+\begin{center}
+\small
+\begin{tabular}{rl}
+1 & \texttt{main:\ \ li\ \ \ t0, 10}\\
+2 & \texttt{\ \ \ \ \ \ \ mv\ \ \ a0, t0}\\
+3 & \texttt{\ \ \ \ \ \ \ la\ \ \ a1, vetor}\\
+4 & \texttt{\ \ \ \ \ \ \ call soma}\\
+5 & \texttt{\ \ \ \ \ \ \ ret}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Identifique todas as \textbf{pseudoinstru\c{c}\~{o}es} do trecho. Qual ferramenta as substitui por instru\c{c}\~{o}es reais?
+  \item Reescreva as linhas 1, 2 e 5 usando apenas instru\c{c}\~{o}es reais do RV32I.
+  \item Por que a pseudoinstru\c{c}\~{a}o \texttt{la} (linha 3) pode precisar de \textbf{duas} instru\c{c}\~{o}es reais?
+\end{enumerate}
+
+% ── 5: Duas passagens ──
+\item O assembler processa o programa abaixo (endere\c{c}os \`{a} esquerda):
+
+\begin{center}
+\small
+\begin{tabular}{rll}
+\texttt{0x00} & & \texttt{addi t2, zero, 9}\\
+\texttt{0x04} & \texttt{Loop:} & \texttt{slt \ t1, zero, t2}\\
+\texttt{0x08} & & \texttt{beq \ t1, zero, Exit}\\
+\texttt{0x0C} & & \texttt{addi t2, t2, -1}\\
+\texttt{0x10} & & \texttt{j \ \ \ Loop}\\
+\texttt{0x14} & \texttt{Exit:} & \texttt{...}\\
+\end{tabular}
+\end{center}
+
+\begin{enumerate}
+  \item Por que o assembler \textbf{n\~{a}o consegue} gerar todo o c\'{o}digo de m\'{a}quina em uma \'{u}nica passagem sobre esse programa? Aponte a instru\c{c}\~{a}o que causa o problema.
+  \item Descreva o que o assembler faz em cada uma das \textbf{duas passagens}.
+  \item Monte a \textbf{tabela de s\'{i}mbolos} do trecho (label $\rightarrow$ endere\c{c}o).
+  \item Calcule o deslocamento em bytes (com sinal) do \texttt{beq} e do \texttt{j}.
+\end{enumerate}
+
+% ── 6: Object file ──
+\newpage
+\setlength{\itemsep}{48pt} % p\'{a}gina 2 tem menos quest\~{o}es: espa\c{c}amento maior
+\item Um object file (ex: formato ELF) \'{e} composto por cinco partes.
+\begin{enumerate}
+  \item Cite as cinco partes e a fun\c{c}\~{a}o de cada uma.
+  \item No programa da quest\~{a}o 4, suponha que \texttt{main} foi declarada com \texttt{.globl}, que \texttt{soma} est\'{a} definida em \textbf{outro arquivo} e que \texttt{vetor} est\'{a} no segmento \texttt{.data} deste arquivo. Indique o que vai para a \textbf{tabela de s\'{i}mbolos} e o que vai para a \textbf{tabela de realoca\c{c}\~{a}o} deste object file.
+\end{enumerate}
+
+% ── 7: Quando os bits ficam prontos? ──
+\item Para cada instru\c{c}\~{a}o abaixo, indique \textbf{ap\'{o}s qual etapa} (Compiler, Assembler, Linker ou Loader) todos os 32 bits do c\'{o}digo de m\'{a}quina est\~{a}o determinados. Justifique brevemente.
+\begin{enumerate}
+  \item \texttt{add x6, x7, x8}
+  \item \texttt{beq t0, zero, Loop} \quad (r\'{o}tulo \texttt{Loop} no mesmo arquivo)
+  \item \texttt{jal ra, printf} \quad (\texttt{printf} em uma biblioteca)
+  \item \texttt{la a0, msg} \quad (\texttt{msg} no segmento de dados est\'{a}ticos)
+\end{enumerate}
+
+% ── 8: Linker em ação ──
+\item O linker recebe dois object files: \texttt{file1.o} (text: \texttt{0x340} bytes; data: \texttt{0x40} bytes) e \texttt{file2.o} (text: \texttt{0x280} bytes; data: \texttt{0x20} bytes). No RV32, o primeiro segmento de texto come\c{c}a em \texttt{0x10000}, os segmentos de texto s\~{a}o concatenados na ordem dos arquivos e os segmentos de dados v\^{e}m logo ap\'{o}s todo o texto.
+\begin{enumerate}
+  \item Em que endere\c{c}o come\c{c}a o segmento de texto de \texttt{file2.o} no execut\'{a}vel?
+  \item Em que endere\c{c}o come\c{c}a o segmento de dados combinado?
+  \item A fun\c{c}\~{a}o \texttt{util} est\'{a} no deslocamento \texttt{0x60} dentro do texto de \texttt{file2.o}. Qual seu endere\c{c}o absoluto?
+  \item \texttt{file1.o} cont\'{e}m \texttt{jal ra, util} no deslocamento \texttt{0x120} de seu texto. Calcule o deslocamento relativo ao PC (em bytes) que o linker preenche nessa instru\c{c}\~{a}o.
+\end{enumerate}
+
+\begin{curiosidade}
+O nome original do linker era \emph{Link Editor}, pois sua fun\c{c}\~{a}o era ``editar os links'' das instru\c{c}\~{o}es \emph{jump-and-link} --- exatamente o que voc\^{e} fez no item (d).
+\end{curiosidade}
+
+% ── 9: Loader ──
+\item As tarefas do loader est\~{a}o listadas abaixo, \textbf{fora de ordem}:
+\begin{itemize}
+  \item[\textbf{I.}] Inicializa os registradores e aponta \texttt{sp} para a primeira posi\c{c}\~{a}o livre da pilha.
+  \item[\textbf{II.}] L\^{e} o cabe\c{c}alho do execut\'{a}vel para descobrir os tamanhos dos segmentos de texto e dados.
+  \item[\textbf{III.}] Salta para a rotina de inicializa\c{c}\~{a}o, que copia os argumentos para os registradores e define o PC.
+  \item[\textbf{IV.}] Cria um espa\c{c}o de endere\c{c}amento grande o suficiente para texto, dados e pilha.
+  \item[\textbf{V.}] Copia os argumentos passados ao programa para a pilha.
+  \item[\textbf{VI.}] Copia instru\c{c}\~{o}es e dados do execut\'{a}vel para o novo espa\c{c}o de endere\c{c}amento.
+\end{itemize}
+Coloque as tarefas na ordem correta de execu\c{c}\~{a}o. O que acontece quando a fun\c{c}\~{a}o \texttt{main} retorna?
+
+% ── 10: Estático x dinâmico ──
+\item Uma falha de seguran\c{c}a foi corrigida na biblioteca \texttt{libc}. Considere dois programas j\'{a} instalados: \textbf{A}, linkado \textbf{estaticamente}, e \textbf{B}, linkado \textbf{dinamicamente}.
+\begin{enumerate}
+  \item Qual dos dois recebe a corre\c{c}\~{a}o sem precisar ser recompilado? Explique.
+  \item Cite uma vantagem da abordagem est\'{a}tica e uma da din\^{a}mica.
+  \item Por que bibliotecas din\^{a}micas economizam \textbf{mem\'{o}ria} quando dois programas que as utilizam executam ao mesmo tempo?
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,479 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{pifont}
+
+\newcommand{\xmark}{\ding{55}}
+
+\geometry{margin=2.5cm, footskip=1.1cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\raggedbottom
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\RSA, Diffie--Hellman e Logaritmo Discreto\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Gabarito: RSA, DH e Log.\ Discreto}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Cada exerc\'{i}cio \'{e} um bloco indivis\'{i}vel (tcolorbox `blanker', sem moldura):
+%% se n\~{a}o couber no restante da p\'{a}gina, o bloco inteiro vai para a pr\'{o}xima.
+%% Use \begin{exercicio}[breakable] apenas se um exerc\'{i}cio exceder uma p\'{a}gina.
+\newtcolorbox[auto counter]{exercicio}[1][]{%
+    blanker,
+    before skip=18pt plus 4pt minus 2pt,
+    after skip=2pt,
+    before upper={%
+        \noindent
+        {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+        \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio \thetcbcounter}%
+        \par\nobreak\vspace{-0.4em}
+        \noindent{\color{black!35}\rule{\linewidth}{0.4pt}}%
+        \par\nobreak\vspace{0.35em}\noindent
+    },
+    #1
+}
+
+%% Caixa de resposta, aninhada dentro do exerc\'{i}cio
+\newtcolorbox{resposta}{%
+    enhanced,
+    colback=red!3,
+    colframe=red!65!black,
+    boxrule=0.6pt,
+    arc=1.5pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    before skip=10pt,
+    after skip=2pt,
+    title={Resposta},
+    fonttitle=\small\bfseries,
+    coltitle=white,
+    colbacktitle=red!65!black,
+    bottomtitle=2pt, toptitle=2pt,
+    fontupper=\color{red!70!black}\sloppy
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \large \hfill \par
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.2in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.1in}
+
+\textbf{Observa\c{c}\~{a}o:} esta vers\~{a}o cont\'{e}m os enunciados e uma proposta de solu\c{c}\~{a}o. Em quest\~{o}es discursivas, respostas equivalentes tamb\'{e}m podem ser consideradas corretas.
+
+\begin{exercicio}
+Aplique o algoritmo de Euclides para calcular o m\'{a}ximo divisor comum dos pares abaixo. Apresente todas as itera\c{c}\~{o}es da divis\~{a}o.
+\begin{enumerate}[label=(\alph*)]
+    \item $\gcd(285,\,165)$.
+    \item $\gcd(1547,\,560)$.
+    \item $\gcd(12345,\,4321)$.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $\gcd(285, 165)$:
+\[
+285 = 1 \cdot 165 + 120;\quad 165 = 1 \cdot 120 + 45;\quad 120 = 2 \cdot 45 + 30;
+\]
+\[
+45 = 1 \cdot 30 + 15;\quad 30 = 2 \cdot 15 + 0.
+\]
+Portanto $\gcd(285,165) = \boxed{15}$.
+
+\textbf{(b)} $\gcd(1547, 560)$:
+\[
+1547 = 2 \cdot 560 + 427;\ 560 = 1 \cdot 427 + 133;\ 427 = 3 \cdot 133 + 28;
+\]
+\[
+133 = 4 \cdot 28 + 21;\ 28 = 1 \cdot 21 + 7;\ 21 = 3 \cdot 7 + 0.
+\]
+Logo $\gcd(1547,560) = \boxed{7}$.
+
+\textbf{(c)} $\gcd(12345, 4321)$:
+\[
+12345 = 2 \cdot 4321 + 3703;\quad 4321 = 1 \cdot 3703 + 618;
+\]
+\[
+3703 = 5 \cdot 618 + 613;\quad 618 = 1 \cdot 613 + 5;
+\]
+\[
+613 = 122 \cdot 5 + 3;\quad 5 = 1 \cdot 3 + 2;\quad 3 = 1 \cdot 2 + 1;\quad 2 = 2 \cdot 1 + 0.
+\]
+Portanto $\gcd(12345, 4321) = \boxed{1}$ (s\~{a}o coprimos).
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Calcule os inversos multiplicativos abaixo usando o Algoritmo de Euclides Estendido. Verifique cada resposta multiplicando-a pelo elemento original e reduzindo m\'{o}dulo $m$.
+\begin{enumerate}[label=(\alph*)]
+    \item $11^{-1} \bmod 30$.
+    \item $17^{-1} \bmod 60$.
+    \item $23^{-1} \bmod 1001$.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $30 = 2 \cdot 11 + 8;\ 11 = 1 \cdot 8 + 3;\ 8 = 2 \cdot 3 + 2;\ 3 = 1 \cdot 2 + 1;\ 2 = 2 \cdot 1$. Substituindo de volta:
+\[
+1 = 3 - 2 = 3 - (8 - 2 \cdot 3) = 3 \cdot 3 - 8 = 3(11 - 8) - 8 = 3 \cdot 11 - 4 \cdot 8
+\]
+\[
+= 3 \cdot 11 - 4(30 - 2 \cdot 11) = 11 \cdot 11 - 4 \cdot 30.
+\]
+Logo $11^{-1} \equiv 11 \pmod{30}$. \emph{Verifica\c{c}\~{a}o:} $11 \cdot 11 = 121 = 4 \cdot 30 + 1$. \checkmark
+
+\textbf{(b)} $60 = 3 \cdot 17 + 9;\ 17 = 1 \cdot 9 + 8;\ 9 = 1 \cdot 8 + 1$. Substituindo:
+\[
+1 = 9 - 8 = 9 - (17 - 9) = 2 \cdot 9 - 17 = 2(60 - 3 \cdot 17) - 17 = 2 \cdot 60 - 7 \cdot 17.
+\]
+Logo $17^{-1} \equiv -7 \equiv 53 \pmod{60}$. \emph{Verifica\c{c}\~{a}o:} $17 \cdot 53 = 901 = 15 \cdot 60 + 1$. \checkmark
+
+\textbf{(c)} $1001 = 43 \cdot 23 + 12;\ 23 = 1 \cdot 12 + 11;\ 12 = 1 \cdot 11 + 1$. Substituindo:
+\[
+1 = 12 - 11 = 12 - (23 - 12) = 2 \cdot 12 - 23 = 2(1001 - 43 \cdot 23) - 23 = 2 \cdot 1001 - 87 \cdot 23.
+\]
+Logo $23^{-1} \equiv -87 \equiv 914 \pmod{1001}$. \emph{Verifica\c{c}\~{a}o:} $23 \cdot 914 = 21022 = 21 \cdot 1001 + 1$. \checkmark
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Determine o valor da fun\c{c}\~{a}o totiente de Euler para os inteiros a seguir, justificando a partir da fatora\c{c}\~{a}o em primos:
+\begin{enumerate}[label=(\alph*)]
+    \item $\varphi(15)$, $\varphi(21)$ e $\varphi(100)$.
+    \item $\varphi(360)$.
+    \item Em geral, se $n = p \cdot q$ com $p$ e $q$ primos distintos, deduza uma express\~{a}o fechada para $\varphi(n)$ a partir da multiplicatividade.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)}
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $15 = 3 \cdot 5 \Rightarrow \varphi(15) = \varphi(3)\varphi(5) = 2 \cdot 4 = \mathbf{8}.$
+    \item $21 = 3 \cdot 7 \Rightarrow \varphi(21) = 2 \cdot 6 = \mathbf{12}.$
+    \item $100 = 2^2 \cdot 5^2 \Rightarrow \varphi(100) = (2^2 - 2)(5^2 - 5) = 2 \cdot 20 = \mathbf{40}.$
+\end{itemize}
+
+\textbf{(b)} $360 = 2^3 \cdot 3^2 \cdot 5$. Pela multiplicatividade:
+\[
+\varphi(360) = (2^3 - 2^2)(3^2 - 3)(5 - 1) = 4 \cdot 6 \cdot 4 = \mathbf{96}.
+\]
+
+\textbf{(c)} Como $\gcd(p,q) = 1$ e $\varphi(p) = p-1$, $\varphi(q) = q-1$:
+\[
+\varphi(p \cdot q) = \varphi(p) \cdot \varphi(q) = (p-1)(q-1).
+\]
+Esta \'{e} exatamente a quantidade que aparece no RSA.
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Use o Teorema de Euler para reduzir os expoentes e obter as redu\c{c}\~{o}es a seguir. Em cada item, identifique primeiro $\varphi(n)$ e a redu\c{c}\~{a}o do expoente.
+\begin{enumerate}[label=(\alph*)]
+    \item $7^{222} \bmod 15$.
+    \item $11^{1234} \bmod 21$.
+    \item Explique, com suas pr\'{o}prias palavras, por que o argumento utilizado nos itens anteriores depende da hip\'{o}tese $\gcd(a, n) = 1$. D\^{e} um exemplo num\'{e}rico em que essa hip\'{o}tese falha e a redu\c{c}\~{a}o ingenu do expoente d\'{a} um resultado incorreto.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $\varphi(15) = 8$ e $\gcd(7,15)=1$. Como $222 = 27 \cdot 8 + 6$, temos $222 \bmod 8 = 6$. Logo
+\[
+7^{222} \equiv 7^{6} \pmod{15}.
+\]
+$7^2 = 49 \equiv 4;\ 7^4 \equiv 4^2 = 16 \equiv 1;\ 7^6 = 7^4 \cdot 7^2 \equiv 1 \cdot 4 = \mathbf{4} \pmod{15}.$
+
+\textbf{(b)} $\varphi(21) = 12$ e $\gcd(11,21)=1$. Como $1234 = 102 \cdot 12 + 10$, $1234 \bmod 12 = 10$:
+\[
+11^{1234} \equiv 11^{10} \pmod{21}.
+\]
+$11^2 = 121 \equiv 16;\ 11^4 \equiv 16^2 = 256 \equiv 4;\ 11^8 \equiv 16;\ 11^{10} = 11^8 \cdot 11^2 \equiv 16 \cdot 16 = 256 \equiv \mathbf{4} \pmod{21}.$
+
+\textbf{(c)} O Teorema de Euler exige $\gcd(a,n) = 1$ para garantir $a^{\varphi(n)} \equiv 1 \pmod{n}$. Quando $a$ e $n$ compartilham fatores, a ordem multiplicativa de $a$ em $\mathbb{Z}_n$ n\~{a}o est\'{a} definida (n\~{a}o pertence ao grupo $\mathbb{Z}_n^{*}$), e a redu\c{c}\~{a}o pode falhar.
+
+\emph{Exemplo num\'{e}rico:} $a = 2$, $n = 4$. Aqui $\gcd(2,4)=2$ e $\varphi(4) = 2$.
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item Redu\c{c}\~{a}o ingenu: $2^{5} \equiv 2^{5 \bmod 2} = 2^{1} = 2 \pmod{4}$.
+    \item C\'{a}lculo direto: $2^{5} = 32 \equiv 0 \pmod{4}$.
+\end{itemize}
+Os resultados diferem, mostrando que a hip\'{o}tese de coprimalidade \'{e} essencial.
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o grupo multiplicativo $\mathbb{Z}_{11}^{*}$.
+\begin{enumerate}[label=(\alph*)]
+    \item Liste a ordem $\operatorname{ord}(a)$ de cada elemento $a \in \{1, 2, \ldots, 10\}$.
+    \item Identifique todas as ra\'{i}zes primitivas m\'{o}dulo $11$, isto \'{e}, os elementos com ordem igual a $|\mathbb{Z}_{11}^{*}|$.
+    \item Compare a quantidade de ra\'{i}zes primitivas encontradas com o valor $\varphi(\varphi(11))$ e comente o resultado.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $|\mathbb{Z}_{11}^{*}| = 10$ e as ordens dividem $10 \in \{1, 2, 5, 10\}$.
+\[
+\begin{array}{c|cccccccccc}
+a & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\ \hline
+\operatorname{ord}(a) & 1 & 10 & 5 & 5 & 5 & 10 & 10 & 10 & 5 & 2
+\end{array}
+\]
+(Por exemplo, $2^5 = 32 \equiv 10 \not\equiv 1$ e $2^{10} \equiv 1$, portanto $\operatorname{ord}(2) = 10$.)
+
+\textbf{(b)} Ra\'{i}zes primitivas (ordem $10$): $\{2,\ 6,\ 7,\ 8\}$.
+
+\textbf{(c)} $\varphi(\varphi(11)) = \varphi(10) = 4$, coincidindo com a quantidade de ra\'{i}zes primitivas. Em geral, em $\mathbb{Z}_p^{*}$ existem exatamente $\varphi(p-1)$ ra\'{i}zes primitivas.
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Para gerar um par de chaves RSA, Alice escolheu os primos $p = 23$ e $q = 31$.
+\begin{enumerate}[label=(\alph*)]
+    \item Dentre os candidatos a expoente p\'{u}blico $e \in \{7, 11, 21\}$, determine quais s\~{a}o v\'{a}lidos. Justifique com base em $\varphi(n)$.
+    \item Escolha o expoente v\'{a}lido e calcule a chave privada $d$ correspondente usando o Algoritmo de Euclides Estendido.
+    \item Escreva explicitamente $K_{\text{pub}}$ e $K_{\text{pr}}$.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $n = 23 \cdot 31 = 713$; $\varphi(n) = 22 \cdot 30 = 660 = 2^2 \cdot 3 \cdot 5 \cdot 11$. \\
+Para $e$ ser v\'{a}lido \'{e} necess\'{a}rio $\gcd(e, 660) = 1$:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $\gcd(7,660) = 1$ \checkmark
+    \item $\gcd(11,660) = 11$ \xmark (11 divide 660)
+    \item $\gcd(21,660) = 3$ \xmark (3 divide 660)
+\end{itemize}
+Apenas $e = 7$ \'{e} v\'{a}lido.
+
+\textbf{(b)} $d = 7^{-1} \bmod 660$. AEE: $660 = 94 \cdot 7 + 2;\ 7 = 3 \cdot 2 + 1$. Substituindo:
+\[
+1 = 7 - 3 \cdot 2 = 7 - 3(660 - 94 \cdot 7) = 283 \cdot 7 - 3 \cdot 660.
+\]
+$\Rightarrow d = 283$. \emph{Verifica\c{c}\~{a}o:} $7 \cdot 283 = 1981 = 3 \cdot 660 + 1$. \checkmark
+
+\textbf{(c)} $K_{\text{pub}} = (n, e) = (713,\ 7);\quad K_{\text{pr}} = (p, q, d) = (23,\ 31,\ 283).$
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o RSA com par\^{a}metros $p = 7$, $q = 17$ e expoente p\'{u}blico $e = 5$.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule $n$, $\varphi(n)$ e a chave privada $d$.
+    \item Cifre a mensagem $x = 19$.
+    \item Decifre o resultado obtido em (b) e verifique que se recupera o texto em claro original.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $n = 7 \cdot 17 = 119$; $\varphi(n) = 6 \cdot 16 = 96$. \\
+$d = 5^{-1} \bmod 96$. AEE: $96 = 19 \cdot 5 + 1$. Logo $1 = 96 - 19 \cdot 5 \Rightarrow d \equiv -19 \equiv 77 \pmod{96}$.
+
+\textbf{(b)} $y = 19^{5} \bmod 119$.
+\[
+19^{2} = 361 \equiv 4;\ 19^{4} \equiv 16;\ 19^{5} = 19^{4} \cdot 19 \equiv 16 \cdot 19 = 304 \equiv \mathbf{66} \pmod{119}.
+\]
+
+\textbf{(c)} $x = 66^{77} \bmod 119$. Usando CRT como atalho:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $66 \bmod 7 = 3;\ d_p = 77 \bmod 6 = 5;\ 3^{5} = 243 \equiv 5 \pmod{7}.$
+    \item $66 \bmod 17 = 15 \equiv -2;\ d_q = 77 \bmod 16 = 13;\ (-2)^{13} = -2^{13}.$ Como $2^{8} \equiv 1 \pmod{17}$, $2^{13} = 2^{8}\cdot 2^{4}\cdot 2 \equiv 1 \cdot (-1) \cdot 2 = -2 \pmod{17}.$ Logo $(-2)^{13} \equiv 2 \pmod{17}$.
+\end{itemize}
+Por CRT, $x \equiv 5 \pmod 7$ e $x \equiv 2 \pmod{17}$. Verifica-se que $x = 19$ satisfaz ambas as congru\^{e}ncias. \checkmark
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Alice e Bob v\~{a}o estabelecer uma chave compartilhada usando Diffie--Hellman com $p = 41$ e $\alpha = 6$.
+\begin{enumerate}[label=(\alph*)]
+    \item Mostre que $\alpha = 6$ \'{e} uma raiz primitiva m\'{o}dulo $41$, verificando que $\alpha^{(p-1)/r} \not\equiv 1 \pmod{p}$ para todos os divisores primos $r$ de $p-1$.
+    \item Alice escolhe $a = 5$ e Bob escolhe $b = 12$. Calcule $A$, $B$ e a chave compartilhada $K_{AB}$ pelos dois caminhos ($A^{b}$ e $B^{a}$), confirmando a coincid\^{e}ncia.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $p - 1 = 40 = 2^{3} \cdot 5$. Divisores primos: $\{2,\ 5\}$.
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $6^{40/2} = 6^{20}$. $6^{2} = 36 \equiv -5;\ 6^{4} \equiv 25;\ 6^{8} \equiv 25^{2} = 625 \equiv 10;\ 6^{10} = 6^{8}\cdot 6^{2} \equiv 10 \cdot 36 = 360 \equiv 32;\ 6^{20} \equiv 32^{2} = 1024 \equiv 40 \equiv -1.$ Como $-1 \ne 1$: \checkmark
+    \item $6^{40/5} = 6^{8} \equiv 10 \ne 1.$ \checkmark
+\end{itemize}
+Portanto $\operatorname{ord}(6) = 40$ e $6$ \'{e} raiz primitiva m\'{o}dulo $41$.
+
+\textbf{(b)}
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $A = 6^{5} = 6^{4} \cdot 6 \equiv 25 \cdot 6 = 150 \equiv \mathbf{27} \pmod{41}.$
+    \item $B = 6^{12} = 6^{8} \cdot 6^{4} \equiv 10 \cdot 25 = 250 \equiv \mathbf{4} \pmod{41}.$
+\end{itemize}
+Chave compartilhada:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $K_{AB} = B^{a} = 4^{5} = 1024 \equiv \mathbf{40} \pmod{41}.$
+    \item $K_{AB} = A^{b} = 27^{12}$. Como $27 \equiv -14$, $(-14)^{2} \equiv 196 \equiv 32;\ (-14)^{4} \equiv 32^{2} = 1024 \equiv -1;\ (-14)^{12} = ((-14)^{4})^{3} \equiv (-1)^{3} = -1 \equiv \mathbf{40} \pmod{41}.$ \checkmark
+\end{itemize}
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Em um esquema Diffie--Hellman sobre $\mathbb{Z}_{p}^{*}$, dois valores de chave privada \emph{nunca} devem ser escolhidos: $a = 1$ e $a = p-1$.
+\begin{enumerate}[label=(\alph*)]
+    \item Mostre, de forma geral, por que cada uma dessas escolhas permite que um adversa\'{r}io passivo recupere imediatamente a chave privada apenas observando a chave p\'{u}blica.
+    \item Ilustre os dois casos para $p = 23$, $\alpha = 5$. Quantos elementos comp\~{o}em o subgrupo gerado por $\alpha^{a}$ quando $a = p-1$?
+    \item Suponha agora que o adversa\'{r}io ativo consiga substituir $\alpha$ por um elemento $\alpha'$ de ordem $2$. Explique como isso reduz drasticamente o espa\c{c}o de poss\'{i}veis chaves compartilhadas e relacione com a discuss\~{a}o de subgrupos pequenos.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)}
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item Se $a = 1$, ent\~{a}o $A = \alpha^{1} = \alpha$. Como $\alpha$ \'{e} p\'{u}blico, basta o adversa\'{r}io ver que $A = \alpha$ para concluir $a = 1$.
+    \item Se $a = p-1$, pelo Pequeno Teorema de Fermat $A = \alpha^{p-1} \equiv 1 \pmod{p}$. Logo $A = 1$ entrega trivialmente que $a \equiv p-1 \pmod{\operatorname{ord}(\alpha)}$.
+\end{itemize}
+
+\textbf{(b)} Com $p = 23$, $\alpha = 5$:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $a = 1 \Rightarrow A = 5$. O adversa\'{r}io v\^{e} $A = \alpha$ e infere $a = 1$.
+    \item $a = 22 \Rightarrow A = 5^{22} \equiv 1 \pmod{23}$ (Fermat). O adversa\'{r}io v\^{e} $A = 1$ e infere $a = p-1$.
+\end{itemize}
+O subgrupo gerado por $\alpha^{p-1} = 1$ \'{e} $\{1\}$, contendo \textbf{1 elemento}.
+
+\textbf{(c)} Se $\alpha' \in \mathbb{Z}_p^{*}$ tem ordem $2$, o subgrupo $\langle \alpha' \rangle = \{1, \alpha'\}$ tem apenas $2$ elementos. Logo $\alpha'^{ab} \in \{1, \alpha'\}$, e a chave compartilhada $K_{AB}$ assume somente \emph{duas} configura\c{c}\~{o}es poss\'{i}veis. Um adversa\'{r}io ativo que injete um $\alpha'$ de ordem pequena (\emph{small-subgroup attack}) reduz a busca de chaves a poucas possibilidades, mesmo que o DLP geral em $\mathbb{Z}_p^{*}$ seja invi\'{a}vel. Na pr\'{a}tica, isso motiva trabalhar em subgrupos primos grandes (RFC~7919) e validar elementos recebidos.
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Considere o RSA com $p = 11$, $q = 17$, $e = 7$ e o criptograma $y = 35$.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule a chave privada $d$ e decifre $y$ diretamente computando $y^{d} \bmod n$.
+    \item Repita a decifra\c{c}\~{a}o usando o Teorema Chin\^{e}s do Resto. Apresente $d_p$, $d_q$, $x_p$, $x_q$ e a recombina\c{c}\~{a}o final.
+    \item Considere agora $n$ com $2048$ bits. Estime o ganho de desempenho aproximado da decifra\c{c}\~{a}o via CRT em rela\c{c}\~{a}o \`{a} decifra\c{c}\~{a}o direta, supondo que o custo do square-and-multiply seja proporcional ao cubo do tamanho dos operandos.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} $n = 187$, $\varphi(n) = 160$. $d = 7^{-1} \bmod 160$: $160 = 22 \cdot 7 + 6;\ 7 = 1 \cdot 6 + 1$. Logo $1 = 7 - 6 = 7 - (160 - 22 \cdot 7) = 23 \cdot 7 - 160$, $\Rightarrow d = 23$. \\
+$x = 35^{23} \bmod 187$. Pelo c\'{a}lculo via CRT em (b), $x = 52$.
+
+\textbf{(b)}
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $d_p = 23 \bmod 10 = 3;\quad d_q = 23 \bmod 16 = 7.$
+    \item $x_p = 35^{3} \bmod 11 = 2^{3} = 8.$
+    \item $x_q = 35^{7} \bmod 17 = 1^{7} = 1.$
+    \item Inversos: $q^{-1} \bmod p = 17^{-1} \bmod 11 = 6^{-1} \bmod 11 = 2$;\ $p^{-1} \bmod q = 11^{-1} \bmod 17 = 14.$
+    \item $x \equiv x_p \cdot q \cdot (q^{-1} \bmod p) + x_q \cdot p \cdot (p^{-1} \bmod q) \pmod{n}$
+    \item $\phantom{x} = 8 \cdot 17 \cdot 2 + 1 \cdot 11 \cdot 14 = 272 + 154 = 426 \equiv \mathbf{52} \pmod{187}.$
+\end{itemize}
+Confer\^{e}ncia: $52 \bmod 11 = 8$ e $52 \bmod 17 = 1$. \checkmark
+
+\textbf{(c)} Decifra\c{c}\~{a}o direta: uma exponencia\c{c}\~{a}o modular com operandos de $2048$ bits e custo $\sim k_1 \cdot 2048^{3}$. \\
+Via CRT: duas exponencia\c{c}\~{o}es com operandos de $1024$ bits, custo $\sim 2 \cdot k_1 \cdot 1024^{3} = \tfrac{2}{8} k_1 \cdot 2048^{3} = \tfrac{1}{4} k_1 \cdot 2048^{3}$. \\
+Ganho aproximado: \textbf{$\sim 4\times$}. (Implementa\c{c}\~{o}es reais reportam acelera\c{c}\~{o}es de 3$\times$--4$\times$, dependendo de \emph{Montgomery multiplication}, \emph{caching} etc.)
+\end{resposta}
+\end{exercicio}
+
+\begin{exercicio}
+Suponha que mensagens RSA s\~{a}o usadas para transportar comandos curtos em um sistema embarcado. Cada mensagem $x$ \'{e} um \'{u}nico s\'{i}mbolo do conjunto $\mathcal{M}$ de $128$ caracteres ASCII imprim\'{i}veis, e \emph{n\~{a}o} h\'{a} \emph{padding} aleat\'{o}rio. A chave p\'{u}blica \'{e} $K_{\text{pub}} = (n, e)$, com $n$ de $2048$ bits.
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, passo a passo, como um adversa\'{r}io passivo que conhece $K_{\text{pub}}$ pode recuperar $x$ a partir de $y$ \emph{sem fatorar $n$}.
+    \item Estime o custo computacional do ataque proposto.
+    \item Que contramedida do RSA padronizado em RFC~8017 (PKCS\#1) inviabiliza esse ataque e por qu\^{e}?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Como o conjunto de mensagens \'{e} pequeno ($|\mathcal{M}| = 128$) e o RSA livro-texto \'{e} determin\'{i}stico, basta pr\'{e}-computar uma tabela:
+\begin{enumerate}[label=\arabic*.,leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item Para cada $j \in \mathcal{M}$, calcula-se $\hat y_j = j^{e} \bmod n$.
+    \item Compara-se cada $\hat y_j$ com o criptograma $y$ observado.
+    \item Quando $\hat y_j = y$, conclui-se que $x = j$.
+\end{enumerate}
+N\~{a}o \'{e} preciso conhecer $d$ nem fatorar $n$.
+
+\textbf{(b)} Cada $\hat y_j$ exige uma exponencia\c{c}\~{a}o $j^{e} \bmod n$ com $n$ de $2048$ bits. Com $e$ pequeno padr\~{a}o (por exemplo $e = 65537$, $\sim 17$ bits) e custo por multiplica\c{c}\~{a}o modular de cerca de $|n|^{2}$ opera\c{c}\~{o}es de bit, o trabalho total fica em torno de
+\[
+128 \cdot |e| \cdot |n|^{2} \approx 128 \cdot 17 \cdot 2048^{2} \approx 2^{36} \text{ opera\c{c}\~{o}es},
+\]
+quest\~{a}o de segundos em hardware comum.
+
+\textbf{(c)} \emph{Padding} probabil\'{i}stico OAEP (PKCS\#1 v2). Antes da cifra\c{c}\~{a}o, $x$ \'{e} expandido para um bloco de comprimento $|n|$ usando uma seed aleat\'{o}ria de centenas de bits processada por uma fun\c{c}\~{a}o geradora de m\'{a}scara (MGF). Resultado:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item Cifrar o mesmo $x$ duas vezes produz criptogramas praticamente sempre distintos.
+    \item O espa\c{c}o de cifras poss\'{i}veis por mensagem cresce para algo da ordem de $2^{|\text{seed}|}$, tornando a enumera\c{c}\~{a}o invi\'{a}vel.
+\end{itemize}
+Logo o ataque acima exigiria for\c{c}a bruta exponencial no tamanho da seed.
+\end{resposta}
+\end{exercicio}
+
+%% Enunciado + resposta excedem uma p\'{a}gina: permite quebra entre eles,
+%% mantendo a caixa de resposta indivis\'{i}vel.
+\begin{exercicio}[breakable]
+Considere o protocolo Diffie--Hellman com par\^{a}metros $p = 467$ e $\alpha = 2$. Suponha que Oscar consiga atuar como \emph{man-in-the-middle} (MITM) entre Alice e Bob, interceptando e retransmitindo todas as mensagens.
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, em forma de diagrama de sequ\^{e}ncia, todas as mensagens trocadas e quais valores Oscar conhece ao final do protocolo.
+    \item Suponha que Alice escolha $a = 3$, Oscar escolha $a_O = 7$ (para o ramo de Alice) e $b_O = 9$ (para o ramo de Bob), e Bob escolha $b = 5$. Calcule numericamente as duas chaves compartilhadas \emph{distintas} que Oscar estabelece, uma com Alice e outra com Bob.
+    \item Por que o DH ``puro'' \'{e} vulner\'{a}vel a esse ataque, mesmo que o DLP seja computacionalmente intrat\'{a}vel? Que servi\c{c}o de seguran\c{c}a est\'{a} \emph{ausente} no protocolo? Cite ao menos uma contramedida pr\'{a}tica usada em protocolos reais (por exemplo, no TLS) para mitig\'{a}-lo.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Diagrama de sequ\^{e}ncia (Oscar intercepta e reescreve):
+\begin{center}
+\begin{tabular}{lcl}
+\textbf{Alice} & $\xrightarrow{\ A = \alpha^{a}\ }$ & \textbf{Oscar} \\
+               & $\xleftarrow{\ \alpha^{b_O}\ }$ & \\
+\textbf{Oscar} & $\xrightarrow{\ \alpha^{a_O}\ }$ & \textbf{Bob} \\
+               & $\xleftarrow{\ B = \alpha^{b}\ }$ &
+\end{tabular}
+\end{center}
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item Alice computa $K_{AO} = (\alpha^{b_O})^{a} = \alpha^{a \cdot b_O}.$ Oscar tamb\'{e}m: $K_{AO} = A^{b_O} = \alpha^{a \cdot b_O}.$
+    \item Bob computa $K_{OB} = (\alpha^{a_O})^{b} = \alpha^{a_O \cdot b}.$ Oscar tamb\'{e}m: $K_{OB} = B^{a_O} = \alpha^{a_O \cdot b}.$
+\end{itemize}
+Oscar conhece \emph{ambas} as chaves e pode decifrar/recifrar todas as mensagens entre Alice e Bob, sem que eles percebam.
+
+\textbf{(b)} Com $\alpha = 2$, $p = 467$:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item $K_{AO} = 2^{a \cdot b_O} = 2^{3 \cdot 9} = 2^{27} \bmod 467.$ \\
+    $2^{10} = 1024 \equiv 90;\ 2^{20} \equiv 90^{2} = 8100 \equiv 161;\ 2^{27} = 2^{20}\cdot 2^{7} \equiv 161 \cdot 128 = 20608 \equiv \mathbf{60}.$
+    \item $K_{OB} = 2^{a_O \cdot b} = 2^{7 \cdot 5} = 2^{35} \bmod 467.$ \\
+    $2^{35} = 2^{20}\cdot 2^{10}\cdot 2^{5} \equiv 161 \cdot 90 \cdot 32.$ \\
+    $161 \cdot 90 = 14490 \equiv 13 \pmod{467}.$ \\
+    $13 \cdot 32 = 416 \Rightarrow K_{OB} = \mathbf{416}.$
+\end{itemize}
+As duas chaves s\~{a}o efetivamente distintas ($60 \ne 416$), e Oscar conhece as duas.
+
+\textbf{(c)} O DH ``puro'' n\~{a}o fornece \textbf{autentica\c{c}\~{a}o de origem das mensagens}. Mesmo com o DLP sendo intrat\'{a}vel, Alice n\~{a}o tem como verificar que o valor $\alpha^{b_O}$ recebido vem de Bob, e vice-versa.
+
+Contramedidas pr\'{a}ticas:
+\begin{itemize}[leftmargin=1.4em,topsep=2pt,itemsep=1pt]
+    \item \emph{DH autenticado por assinatura}: as mensagens DH s\~{a}o assinadas digitalmente com chaves de longo prazo (e.g., DHE-RSA / ECDHE-ECDSA no TLS), e os certificados X.509 ligam essas chaves \`{a}s identidades.
+    \item Uso de PKI / cadeias de certifica\c{c}\~{a}o para garantir a autenticidade das chaves p\'{u}blicas de longo prazo.
+    \item Protocolos com \emph{key confirmation} ap\'{o}s o estabelecimento (handshake do TLS, SIGMA).
+\end{itemize}
+\end{resposta}
+\end{exercicio}
+
+\end{document}

@@ -1,0 +1,222 @@
+\documentclass[tikz, multi=tikzpicture, border=4mm]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usetikzlibrary{positioning, fit, arrows.meta, calc}
+
+\tikzset{
+  op/.style       = {rectangle, draw, thick, minimum width=3.8cm,
+                     minimum height=0.55cm, font=\small,
+                     inner sep=2pt, fill=white},
+  ark/.style      = {op, fill=yellow!30},
+  trim/.style     = {op, draw=red!70, dashed, fill=red!10,
+                     font=\small\itshape},
+  io/.style       = {font=\small\bfseries\itshape},
+  arr/.style      = {-{Stealth[length=5pt]}, semithick,
+                     shorten >=1pt, shorten <=1pt},
+  roundbox/.style = {draw=gray, dashed, inner xsep=8pt,
+                     inner ysep=4pt, rounded corners},
+  rlabel/.style   = {font=\footnotesize\itshape, text=gray!80},
+}
+
+\begin{document}
+
+% =====================================================================
+% DIAGRAMA A: Decriptação naïve (livros-texto / FIPS 197 informal)
+% Round da decriptação: ISR, ISB, ARK, IMC -- estrutura DIFERENTE da
+% encriptação. Não permite reaproveitar hardware diretamente.
+% =====================================================================
+\begin{tikzpicture}[node distance=0.18cm and 0cm]
+
+%---------------- ENCRIPTAÇÃO (coluna esquerda) ----------------
+\node[io] (pt_e) at (0,0) {Plaintext};
+\node[ark, below=of pt_e] (ark0_e) {AddRoundKey ($K_0$)};
+
+\node[op, below=0.5cm of ark0_e] (sb1_e) {SubBytes};
+\node[op, below=of sb1_e]        (sr1_e) {ShiftRows};
+\node[op, below=of sr1_e]        (mc1_e) {MixColumns};
+\node[ark, below=of mc1_e]       (ark1_e) {AddRoundKey ($K_1$)};
+\node[roundbox, fit=(sb1_e)(ark1_e)] (r1_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r1_e.west) {Round 1};
+
+\node[below=0.3cm of r1_e] (dots_e) {$\vdots$};
+
+\node[op, below=0.3cm of dots_e] (sb9_e) {SubBytes};
+\node[op, below=of sb9_e]        (sr9_e) {ShiftRows};
+\node[op, below=of sr9_e]        (mc9_e) {MixColumns};
+\node[ark, below=of mc9_e]       (ark9_e) {AddRoundKey ($K_9$)};
+\node[roundbox, fit=(sb9_e)(ark9_e)] (r9_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r9_e.west) {Round 9};
+
+\node[op, below=0.5cm of r9_e]   (sb10_e) {SubBytes};
+\node[op, below=of sb10_e]       (sr10_e) {ShiftRows};
+\node[trim, below=of sr10_e]     (nomc_e) {(sem MixColumns)};
+\node[ark, below=of nomc_e]      (ark10_e) {AddRoundKey ($K_{10}$)};
+\node[roundbox, fit=(sb10_e)(ark10_e)] (r10_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r10_e.west) {Round 10};
+
+\node[io, below=0.3cm of r10_e] (ct_e) {Ciphertext};
+
+\draw[arr] (pt_e)   -- (ark0_e);
+\draw[arr] (ark0_e) -- (sb1_e);
+\draw[arr] (sb1_e)  -- (sr1_e);
+\draw[arr] (sr1_e)  -- (mc1_e);
+\draw[arr] (mc1_e)  -- (ark1_e);
+\draw[arr] (ark1_e) -- (dots_e);
+\draw[arr] (dots_e) -- (sb9_e);
+\draw[arr] (sb9_e)  -- (sr9_e);
+\draw[arr] (sr9_e)  -- (mc9_e);
+\draw[arr] (mc9_e)  -- (ark9_e);
+\draw[arr] (ark9_e) -- (sb10_e);
+\draw[arr] (sb10_e) -- (sr10_e);
+\draw[arr] (sr10_e) -- (nomc_e);
+\draw[arr] (nomc_e) -- (ark10_e);
+\draw[arr] (ark10_e)-- (ct_e);
+
+%---------------- DECRIPTAÇÃO VERSÃO A (coluna direita) ----------------
+\node[io] (ct_d) at ($(pt_e) + (10cm, 0)$) {Ciphertext};
+\node[ark, below=of ct_d] (ark10_d) {AddRoundKey ($K_{10}$)};
+
+\node[op, below=0.5cm of ark10_d] (isr1_d) {InvShiftRows};
+\node[op, below=of isr1_d]        (isb1_d) {InvSubBytes};
+\node[ark, below=of isb1_d]       (arkr1_d) {AddRoundKey ($K_9$)};
+\node[op, below=of arkr1_d]       (imc1_d) {InvMixColumns};
+\node[roundbox, fit=(isr1_d)(imc1_d)] (r1_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r1_d.west) {Round 1};
+
+\node[below=0.3cm of r1_d] (dots_d) {$\vdots$};
+
+\node[op, below=0.3cm of dots_d] (isr9_d) {InvShiftRows};
+\node[op, below=of isr9_d]       (isb9_d) {InvSubBytes};
+\node[ark, below=of isb9_d]      (arkr9_d) {AddRoundKey ($K_1$)};
+\node[op, below=of arkr9_d]      (imc9_d) {InvMixColumns};
+\node[roundbox, fit=(isr9_d)(imc9_d)] (r9_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r9_d.west) {Round 9};
+
+\node[op, below=0.5cm of r9_d]   (isr10_d) {InvShiftRows};
+\node[op, below=of isr10_d]      (isb10_d) {InvSubBytes};
+\node[ark, below=of isb10_d]     (arkr10_d) {AddRoundKey ($K_0$)};
+\node[trim, below=of arkr10_d]   (noimc_d) {(sem InvMixColumns)};
+\node[roundbox, fit=(isr10_d)(noimc_d)] (r10_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r10_d.west) {Round 10};
+
+\node[io, below=0.3cm of r10_d] (pt_d) {Plaintext};
+
+\draw[arr] (ct_d)    -- (ark10_d);
+\draw[arr] (ark10_d) -- (isr1_d);
+\draw[arr] (isr1_d)  -- (isb1_d);
+\draw[arr] (isb1_d)  -- (arkr1_d);
+\draw[arr] (arkr1_d) -- (imc1_d);
+\draw[arr] (imc1_d)  -- (dots_d);
+\draw[arr] (dots_d)  -- (isr9_d);
+\draw[arr] (isr9_d)  -- (isb9_d);
+\draw[arr] (isb9_d)  -- (arkr9_d);
+\draw[arr] (arkr9_d) -- (imc9_d);
+\draw[arr] (imc9_d)  -- (isr10_d);
+\draw[arr] (isr10_d) -- (isb10_d);
+\draw[arr] (isb10_d) -- (arkr10_d);
+\draw[arr] (arkr10_d)-- (noimc_d);
+\draw[arr] (noimc_d) -- (pt_d);
+
+\end{tikzpicture}
+
+% =====================================================================
+% DIAGRAMA B: Equivalent inverse cipher
+% Round da decriptação: ISB, ISR, IMC, ARK -- estrutura IDÊNTICA à da
+% encriptação. Mesmo circuito serve para os dois sentidos. A agenda de
+% chaves dos rounds intermediários passa por IMC.
+% =====================================================================
+\begin{tikzpicture}[node distance=0.18cm and 0cm]
+
+%---------------- ENCRIPTAÇÃO (coluna esquerda) ----------------
+\node[io] (pt_e) at (0,0) {Plaintext};
+\node[ark, below=of pt_e] (ark0_e) {AddRoundKey ($K_0$)};
+
+\node[op, below=0.5cm of ark0_e] (sb1_e) {SubBytes};
+\node[op, below=of sb1_e]        (sr1_e) {ShiftRows};
+\node[op, below=of sr1_e]        (mc1_e) {MixColumns};
+\node[ark, below=of mc1_e]       (ark1_e) {AddRoundKey ($K_1$)};
+\node[roundbox, fit=(sb1_e)(ark1_e)] (r1_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r1_e.west) {Round 1};
+
+\node[below=0.3cm of r1_e] (dots_e) {$\vdots$};
+
+\node[op, below=0.3cm of dots_e] (sb9_e) {SubBytes};
+\node[op, below=of sb9_e]        (sr9_e) {ShiftRows};
+\node[op, below=of sr9_e]        (mc9_e) {MixColumns};
+\node[ark, below=of mc9_e]       (ark9_e) {AddRoundKey ($K_9$)};
+\node[roundbox, fit=(sb9_e)(ark9_e)] (r9_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r9_e.west) {Round 9};
+
+\node[op, below=0.5cm of r9_e]   (sb10_e) {SubBytes};
+\node[op, below=of sb10_e]       (sr10_e) {ShiftRows};
+\node[trim, below=of sr10_e]     (nomc_e) {(sem MixColumns)};
+\node[ark, below=of nomc_e]      (ark10_e) {AddRoundKey ($K_{10}$)};
+\node[roundbox, fit=(sb10_e)(ark10_e)] (r10_e) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r10_e.west) {Round 10};
+
+\node[io, below=0.3cm of r10_e] (ct_e) {Ciphertext};
+
+\draw[arr] (pt_e)   -- (ark0_e);
+\draw[arr] (ark0_e) -- (sb1_e);
+\draw[arr] (sb1_e)  -- (sr1_e);
+\draw[arr] (sr1_e)  -- (mc1_e);
+\draw[arr] (mc1_e)  -- (ark1_e);
+\draw[arr] (ark1_e) -- (dots_e);
+\draw[arr] (dots_e) -- (sb9_e);
+\draw[arr] (sb9_e)  -- (sr9_e);
+\draw[arr] (sr9_e)  -- (mc9_e);
+\draw[arr] (mc9_e)  -- (ark9_e);
+\draw[arr] (ark9_e) -- (sb10_e);
+\draw[arr] (sb10_e) -- (sr10_e);
+\draw[arr] (sr10_e) -- (nomc_e);
+\draw[arr] (nomc_e) -- (ark10_e);
+\draw[arr] (ark10_e)-- (ct_e);
+
+%---------------- DECRIPTAÇÃO VERSÃO B (coluna direita) ----------------
+\node[io] (ct_d) at ($(pt_e) + (10cm, 0)$) {Ciphertext};
+\node[ark, below=of ct_d] (ark10_d) {AddRoundKey ($K_{10}$)};
+
+\node[op, below=0.5cm of ark10_d] (isb1_d) {InvSubBytes};
+\node[op, below=of isb1_d]        (isr1_d) {InvShiftRows};
+\node[op, below=of isr1_d]        (imc1_d) {InvMixColumns};
+\node[ark, below=of imc1_d]       (arkr1_d) {AddRoundKey (IMC$(K_9)$)};
+\node[roundbox, fit=(isb1_d)(arkr1_d)] (r1_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r1_d.west) {Round 1};
+
+\node[below=0.3cm of r1_d] (dots_d) {$\vdots$};
+
+\node[op, below=0.3cm of dots_d] (isb9_d) {InvSubBytes};
+\node[op, below=of isb9_d]       (isr9_d) {InvShiftRows};
+\node[op, below=of isr9_d]       (imc9_d) {InvMixColumns};
+\node[ark, below=of imc9_d]      (arkr9_d) {AddRoundKey (IMC$(K_1)$)};
+\node[roundbox, fit=(isb9_d)(arkr9_d)] (r9_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r9_d.west) {Round 9};
+
+\node[op, below=0.5cm of r9_d]   (isb10_d) {InvSubBytes};
+\node[op, below=of isb10_d]      (isr10_d) {InvShiftRows};
+\node[trim, below=of isr10_d]    (noimc_d) {(sem InvMixColumns)};
+\node[ark, below=of noimc_d]     (arkr10_d) {AddRoundKey ($K_0$)};
+\node[roundbox, fit=(isb10_d)(arkr10_d)] (r10_d) {};
+\node[rlabel, anchor=east] at ([xshift=-3pt]r10_d.west) {Round 10};
+
+\node[io, below=0.3cm of r10_d] (pt_d) {Plaintext};
+
+\draw[arr] (ct_d)    -- (ark10_d);
+\draw[arr] (ark10_d) -- (isb1_d);
+\draw[arr] (isb1_d)  -- (isr1_d);
+\draw[arr] (isr1_d)  -- (imc1_d);
+\draw[arr] (imc1_d)  -- (arkr1_d);
+\draw[arr] (arkr1_d) -- (dots_d);
+\draw[arr] (dots_d)  -- (isb9_d);
+\draw[arr] (isb9_d)  -- (isr9_d);
+\draw[arr] (isr9_d)  -- (imc9_d);
+\draw[arr] (imc9_d)  -- (arkr9_d);
+\draw[arr] (arkr9_d) -- (isb10_d);
+\draw[arr] (isb10_d) -- (isr10_d);
+\draw[arr] (isr10_d) -- (noimc_d);
+\draw[arr] (noimc_d) -- (arkr10_d);
+\draw[arr] (arkr10_d)-- (pt_d);
+
+\end{tikzpicture}
+
+\end{document}
