@@ -1,0 +1,797 @@
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, decorations.pathreplacing}
+\usepackage{array}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+\urlstyle{same}
+
+\definecolor{graycell}{gray}{0.85}
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Estilos para os diagramas de protocolo (message sequence charts)
+%% (mesmos estilos da aula de Chave Simétrica e Kerberos)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tikzset{
+    ator/.style   = {font=\footnotesize\bfseries},
+    chave/.style  = {font=\scriptsize\itshape, text=black!55},
+    vida/.style   = {gray!55, dashed, thick},
+    msg/.style    = {-{Latex[length=2mm]}, thick, blue!55!black},
+    comp/.style   = {font=\scriptsize, draw=black!25, fill=black!4, rounded corners,
+                     inner sep=2.5pt, align=left},
+    subst/.style  = {font=\scriptsize, draw=red!40, fill=red!8, rounded corners,
+                     inner sep=2.5pt, align=left},
+    rotmsg/.style = {font=\scriptsize, fill=white, inner sep=1.5pt},
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Estilos para a hierarquia de CAs
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tikzset{
+    rootca/.style = {draw=red!60!black, fill=red!8, rounded corners, thick,
+                     font=\scriptsize\bfseries, align=center, inner sep=4pt, minimum width=1.9cm},
+    interca/.style= {draw=orange!70!black, fill=orange!10, rounded corners, thick,
+                     font=\scriptsize\bfseries, align=center, inner sep=4pt, minimum width=1.9cm},
+    issueca/.style= {draw=blue!55!black, fill=blue!8, rounded corners, thick,
+                     font=\scriptsize\bfseries, align=center, inner sep=4pt, minimum width=1.9cm},
+    usercert/.style={draw=green!50!black, fill=green!8, rounded corners,
+                     font=\scriptsize, align=center, inner sep=3pt, minimum width=1.5cm},
+    link/.style   = {-{Latex[length=1.8mm]}, thick, black!55},
+    xlink/.style  = {{Latex[length=1.8mm]}-{Latex[length=1.8mm]}, thick, red!55!black, dashed},
+}
+
+% Título da apresentação
+\title[MITM, Certificados \& PKI]{Ataque Man-in-the-Middle, Certificados e PKI}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa
+\begin{frame}[plain]
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.84\textwidth}
+    \begin{center}
+        {\LARGE\bfseries\textcolor{blue}{Ataque Man-in-the-Middle,\\[2pt] Certificados e PKI}}
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar, Jan Pelzl e Tim Güneysu pelo material. Definições normativas baseadas em publicações do NIST.}
+\end{center}
+\end{frame}
+
+% Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}{Conteúdo desta Aula}
+    \vspace{0.5em}
+    Nesta aula você vai aprender:
+    \begin{itemize}
+        \item Como a \textbf{criptografia de chave pública} estabelece chaves sem o problema $n^2$ --- e qual \textbf{novo problema} ela introduz.
+        \medskip
+        \item O \textbf{ataque Man-in-the-Middle (MITM)}: por que \emph{toda} cifra assimétrica precisa de um \textbf{canal autenticado} para distribuir chaves públicas.
+        \medskip
+        \item \textbf{Certificados}: como uma \textbf{assinatura digital} liga (\textit{binds}) uma identidade a uma chave pública, e o papel da \textbf{Autoridade Certificadora (CA)}.
+        \medskip
+        \item O padrão \textbf{X.509} e a \textbf{transferência de confiança} (\textit{chain of trust}).
+        \medskip
+        \item \textbf{Infraestrutura de Chave Pública (PKI)}: componentes, \textbf{cadeias de certificados} e hierarquias de CAs.
+        \medskip
+        \item \textbf{Revogação} de certificados: \textbf{CRLs} e \textbf{OCSP}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Onde Paramos: dos Esquemas Simétricos para a Chave Pública}
+    Na aula anterior (Kerberos/KDC) vimos as \textbf{limitações dos esquemas simétricos}:
+    \begin{itemize}
+        \footnotesize
+        \item Em geral, não oferecem \textbf{Perfect Forward Secrecy (PFS)}; exigem \textbf{canal seguro} na entrada de cada usuário; o KDC é um \textbf{ponto único de falha} e precisa ser contatado a cada sessão.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        A \textbf{criptografia de chave pública} resolve a distribuição de chaves em escala e habilita PFS (ex.: via Diffie--Hellman efêmero) --- \alert{ao custo} de exigir a \textbf{autenticação das chaves públicas}.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item O registro de uma chave consiste em \textbf{ligar (\textit{bind}) material criptográfico a uma entidade}; essa ligação é feita por uma \textbf{terceira parte confiável}.
+        \item O NIST cita como exemplos dessa terceira parte ``\emph{um servidor de \textit{realm} Kerberos ou uma \textbf{autoridade certificadora} (CA) de uma PKI}''.
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: NIST SP 800-57 Part 1 Rev.\ 5, §8.1.6 (\textit{Key Registration}); Paar et al., cap.\ 14.4.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estabelecimento de Chave com Técnicas Assimétricas}
+
+\begin{frame}{Chave Pública para Estabelecimento de Chave}
+    % [BOOK 14.4]
+    \begin{itemize}
+        \item Algoritmos de chave pública são especialmente adequados para \textbf{estabelecimento de chave} --- é, junto da assinatura digital, seu principal domínio de aplicação.
+        \medskip
+        \item Servem tanto para \textbf{transporte de chave} quanto para \textbf{acordo de chave}:
+        \begin{itemize}
+            \footnotesize
+            \item \textbf{Transporte} (\textit{key transport}): uma parte gera a chave e a envia cifrada (ex.: \textbf{RSA}, Elgamal).
+            \item \textbf{Acordo} (\textit{key agreement}): ambas contribuem para o valor final (ex.: \textbf{Diffie--Hellman} ou sua variante em curvas elípticas, \textbf{ECDH}).
+        \end{itemize}
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        Primitivas de chave pública são \textbf{lentas}. Por isso, a cifragem dos dados em si quase sempre é feita com uma cifra \textbf{simétrica} rápida (ex.: \textbf{AES}) \emph{após} o estabelecimento da chave por técnicas assimétricas.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Protocolo Básico de Transporte de Chave}
+    % [BOOK 14.4 / 6.1]
+    Bob dispõe de um par de chaves $(k_{pub}, k_{pr})$. Alice usa $k_{pub}$ para enviar uma chave de sessão $k$, e os dados seguem cifrados com AES.
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.83\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (B) at (9,0) {Bob};
+        \node[chave, below=0pt of B] {$k_{pub}, k_{pr}$};
+        \foreach \x in {0,9} \draw[vida] (\x,-0.85) -- (\x,-5.75);
+        \draw[msg] (9,-1.3) -- (0,-1.3) node[rotmsg, midway]{$k_{pub}$};
+        \node[comp, anchor=north] at (0,-1.65) {escolhe $k$ aleatória\\ $y = e_{k_{pub}}(k)$};
+        \draw[msg] (0,-2.85) -- (9,-2.85) node[rotmsg, midway]{$y$};
+        \node[comp, anchor=north] at (9,-3.2) {$k = d_{k_{pr}}(y)$};
+        \node[comp, anchor=north] at (0,-3.95) {cifra a mensagem $x$:\\ $z = \text{AES}_k(x)$};
+        \draw[msg] (0,-5.1) -- (9,-5.1) node[rotmsg, midway]{$z$};
+        \node[comp, anchor=north] at (9,-5.45) {$x = \text{AES}_k^{-1}(z)$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.1em}
+    {\footnotesize Funciona contra um atacante \emph{passivo}. Mas se $k_{pub}$ não for \textbf{autenticada}, abre-se a porta para um atacante \emph{ativo}.}
+\end{frame}
+
+\begin{frame}{Recapitulando: Diffie--Hellman (DHKE)}
+    % [BOOK 14.4 / 8.x]
+    O DHKE permite que duas partes que \emph{nunca se encontraram} concordem em um segredo compartilhado trocando mensagens por um canal inseguro.
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.9\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (B) at (9,0) {Bob};
+        \foreach \x in {0,9} \draw[vida] (\x,-0.85) -- (\x,-5.0);
+        \node[comp, anchor=north] at (0,-1.0) {$a = k_{pr,A}$ aleatório\\ $A = k_{pub,A} \equiv \alpha^{a} \bmod p$};
+        \node[comp, anchor=north] at (9,-1.0) {$b = k_{pr,B}$ aleatório\\ $B = k_{pub,B} \equiv \alpha^{b} \bmod p$};
+        \draw[msg] (0,-2.6) -- (9,-2.6) node[rotmsg, midway]{$A$};
+        \draw[msg] (9,-3.1) -- (0,-3.1) node[rotmsg, midway]{$B$};
+        \node[comp, anchor=north] at (0,-3.7) {$k_{AB} \equiv B^{a} \bmod p$};
+        \node[comp, anchor=north] at (9,-3.7) {$k_{AB} \equiv A^{b} \bmod p$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        Com parâmetros bem escolhidos (em especial um primo $p$ com \textbf{2048 bits ou mais}), o DHKE é seguro contra \textbf{escuta} (ataques \emph{passivos}).
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{O Porém: É Preciso um Canal \emph{Autenticado}}
+    % [BOOK 14.4]
+    \begin{itemize}
+        \item Parece que a chave pública resolve \emph{todos} os problemas de estabelecimento de chave. Mas há uma condição essencial:
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \centering\footnotesize
+        Todo esquema assimétrico exige um \textbf{canal autenticado} para distribuir as \textbf{chaves públicas}.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Canal seguro} (confidencial) $\neq$ \textbf{canal autenticado}. A chave pública \emph{não} é secreta --- mas sua \textbf{origem} precisa ser garantida.
+        \item O NIST é explícito: a distribuição de uma chave pública deve dar ao receptor a garantia de que ``\emph{o verdadeiro dono da chave é conhecido (i.e., o suposto dono é o dono real)}''.
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: NIST SP 800-57 Part 1 Rev.\ 5, §8.1.5.1.1 (\textit{Distribution of Public Keys}); Paar et al., cap.\ 14.4.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ataque Man-in-the-Middle}
+
+\begin{frame}{Atacante Ativo e a Ideia do MITM}
+    % [BOOK 14.4.1 + NIST]
+    Agora Oscar \emph{não} se limita a escutar: ele pode \textbf{interceptar, alterar e gerar} mensagens.
+    \medskip
+    \begin{block}{Man-in-the-Middle (MITM) --- definição (NIST)}
+        \footnotesize
+        ``Uma forma de \textbf{escuta ativa} em que o atacante intercepta e modifica seletivamente os dados comunicados para se \textbf{passar por} uma ou mais das entidades envolvidas na associação de comunicação.''
+        \hfill {\tiny (NIST CSRC Glossary; CNSSI 4009-2015 / RFC 4949)}
+    \end{block}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Ideia central:} Oscar substitui as chaves públicas de Alice e de Bob \emph{pela sua própria}.
+        \item Isso é possível \alert{sempre que as chaves públicas não são autenticadas}.
+        \item Estudaremos o ataque contra o DHKE, mas ele se aplica a \textbf{qualquer} esquema assimétrico sem proteção das chaves públicas.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{MITM contra o DHKE}
+    % [BOOK 14.4.1]
+    Oscar escolhe um expoente $o$ e injeta $\tilde{A} \equiv \tilde{B} \equiv \alpha^{o} \bmod p$ no lugar das chaves reais.
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.99\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (O) at (6,0) {Oscar};
+        \node[ator] (B) at (12,0) {Bob};
+        \foreach \x in {0,6,12} \draw[vida] (\x,-0.85) -- (\x,-7.3);
+        \node[comp, anchor=north] at (0,-1.0) {$a = k_{pr,A}$\\ $A \equiv \alpha^{a} \bmod p$};
+        \node[comp, anchor=north] at (6,-1.0) {escolhe $o$};
+        \node[comp, anchor=north] at (12,-1.0) {$b = k_{pr,B}$\\ $B \equiv \alpha^{b} \bmod p$};
+        % forward path
+        \draw[msg] (0,-2.5) -- (6,-2.5) node[rotmsg, midway]{$A$};
+        \node[subst, anchor=north] at (6,-2.85) {substitui $\tilde{A} \equiv \alpha^{o}$};
+        \draw[msg] (6,-3.9) -- (12,-3.9) node[rotmsg, midway]{$\tilde{A}$};
+        % backward path
+        \draw[msg] (12,-4.6) -- (6,-4.6) node[rotmsg, midway]{$B$};
+        \node[subst, anchor=north] at (6,-4.95) {substitui $\tilde{B} \equiv \alpha^{o}$};
+        \draw[msg] (6,-6.0) -- (0,-6.0) node[rotmsg, midway]{$\tilde{B}$};
+        % keys
+        \node[comp, anchor=north, fill=red!6, draw=red!40] at (0,-6.5) {$k_{AO} \equiv (\tilde{B})^{a} \equiv \alpha^{oa}$};
+        \node[comp, anchor=north, fill=red!6, draw=red!40] at (6,-6.5) {$k_{AO} \equiv A^{o}$\\ $k_{BO} \equiv B^{o}$};
+        \node[comp, anchor=north, fill=red!6, draw=red!40] at (12,-6.5) {$k_{BO} \equiv (\tilde{A})^{b} \equiv \alpha^{ob}$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+\end{frame}
+
+\begin{frame}{As Chaves que Cada Parte Calcula}
+    % [BOOK 14.4.1]
+    Ocorrem, na verdade, \textbf{dois DHKEs simultâneos}: Alice$\leftrightarrow$Oscar e Bob$\leftrightarrow$Oscar.
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt,title=\footnotesize Alice $\leftrightarrow$ Oscar]
+                \footnotesize
+                \[ k_{AO} = (\tilde{B})^{a} \equiv (\alpha^{o})^{a} \equiv \alpha^{oa} \]
+                \[ k_{AO} = A^{o} \equiv (\alpha^{a})^{o} \equiv \alpha^{ao} \]
+                \centering (valores idênticos)
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt,title=\footnotesize Bob $\leftrightarrow$ Oscar]
+                \footnotesize
+                \[ k_{BO} = (\tilde{A})^{b} \equiv (\alpha^{o})^{b} \equiv \alpha^{ob} \]
+                \[ k_{BO} = B^{o} \equiv (\alpha^{b})^{o} \equiv \alpha^{bo} \]
+                \centering (valores idênticos)
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        Oscar compartilha $k_{AO}$ com Alice e $k_{BO}$ com Bob. \alert{Nem Alice nem Bob percebem}: ambos acreditam ter calculado uma chave comum $k_{AB}$ \emph{um com o outro}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Manipulação de Mensagens após o MITM}
+    % [BOOK 14.4.1]
+    Estabelecidas $k_{AO}$ e $k_{BO}$, Oscar lê (e pode \textbf{alterar}) todo o tráfego, de forma \emph{imperceptível}:
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.99\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (O) at (6,0) {Oscar};
+        \node[ator] (B) at (12,0) {Bob};
+        \foreach \x in {0,6,12} \draw[vida] (\x,-0.85) -- (\x,-5.6);
+        \node[comp, anchor=north] at (0,-1.0) {mensagem $x$\\ $y = \text{AES}_{k_{AO}}(x)$};
+        \draw[msg] (0,-2.3) -- (6,-2.3) node[rotmsg, midway]{$y$};
+        \node[subst, anchor=north] at (6,-2.65) {intercepta\\ $x = \text{AES}_{k_{AO}}^{-1}(y)$\\ $y' = \text{AES}_{k_{BO}}(x)$};
+        \draw[msg] (6,-4.4) -- (12,-4.4) node[rotmsg, midway]{$y'$};
+        \node[comp, anchor=north] at (12,-4.75) {$x = \text{AES}_{k_{BO}}^{-1}(y')$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        Oscar pode \textbf{ler} $x$ e também \textbf{alterá-lo} antes de recifrar com $k_{BO}$. Consequências graves se $x$ for, por exemplo, uma \emph{transação financeira}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Consequência: o Canal Autenticado é Imprescindível}
+    % [BOOK 14.4.1 / 14.4.2]
+    \begin{itemize}
+        \item O MITM \alert{não} é restrito ao DHKE: aplica-se a \textbf{qualquer} esquema assimétrico. O ataque procede sempre da mesma forma --- Oscar intercepta a chave pública enviada e a substitui pela sua.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \centering\footnotesize
+        Ainda que esquemas de chave pública \emph{não} exijam um canal \textbf{secreto}, eles exigem um canal \textbf{autenticado} para a distribuição das chaves públicas.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item A causa raiz é que a chave $k_{A} = (k_{pub,A}, ID_A)$ \textbf{não está autenticada}.
+        \item \textbf{Caminho adiante:} aplicar um mecanismo que garanta \textbf{autenticação} da chave pública --- os \textbf{certificados}.
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: Paar et al., cap.\ 14.4.1--14.4.2.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Certificados}
+
+\begin{frame}{A Raiz do Problema: Chaves Não Autenticadas}
+    % [BOOK 14.4.2]
+    Na prática, a chave de Alice tem a forma:
+    \[ k_{A} = (k_{pub,A},\ ID_A) \]
+    onde $ID_A$ é informação identificadora (nome, e-mail\dots) e $k_{pub,A}$ é uma mera \textbf{cadeia binária} (ex.: 2048 bits).
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Num ataque MITM, Oscar troca a chave por \[ k_{A} = (k_{pub,O},\ ID_A) \]
+        \item Tudo permanece igual, \emph{exceto} a cadeia binária anônima que forma a chave $\Rightarrow$ o receptor \textbf{não tem como detectar} que ela é, na verdade, de Oscar.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        Precisamos de um mecanismo que \textbf{ligue} (\textit{bind}) a identidade $ID_A$ à chave $k_{pub,A}$ de forma verificável. Esse mecanismo é a \textbf{assinatura digital}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{A Ideia do Certificado}
+    % [BOOK 14.4.2 + NIST]
+    Como a autenticidade de $(k_{pub,A}, ID_A)$ é violada por um ataque ativo, aplicamos uma \textbf{assinatura digital} sobre essa tupla. Um certificado, em sua forma básica, é:
+    \begin{tcolorbox}[colback=gray!8,colframe=gray!60!black,boxrule=0.5pt]
+        \centering\footnotesize
+        $\text{Cert}_A = \big[\,(k_{pub,A},\ ID_A),\ \ \mathrm{sig}_{k_{pr,CA}}(k_{pub,A},\ ID_A)\,\big]$
+    \end{tcolorbox}
+    \begin{block}{Certificado de chave pública --- definição (NIST)}
+        \footnotesize
+        ``Um conjunto de dados que identifica unicamente uma entidade, contém a chave pública da entidade e possivelmente outras informações, e é \textbf{assinado digitalmente por uma parte confiável}, \textbf{ligando} assim a chave pública à entidade.''
+        \hfill {\tiny (NIST SP 800-57 Part 2 Rev.1)}
+    \end{block}
+    \begin{itemize}
+        \footnotesize
+        \item O receptor \textbf{verifica a assinatura} antes de usar a chave. Se Oscar tentar trocar $k_{pub,A}$ por $k_{pub,O}$, isso \textbf{será detectado}.
+        \item Diz-se que o certificado \textbf{liga a identidade do usuário à sua chave pública}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{A Autoridade Certificadora (CA)}
+    % [BOOK 14.4.2 + NIST]
+    Verificar um certificado exige a chave pública correta de \emph{quem o assinou}. Usar a chave de Alice recairia no mesmo problema --- por isso a assinatura vem de uma \textbf{terceira parte mutuamente confiável}.
+    \medskip
+    \begin{block}{Autoridade Certificadora (CA) --- definições (NIST)}
+        \footnotesize
+        ``A entidade, em uma PKI, que \textbf{emite certificados} para os titulares (\textit{subjects}).'' \hfill {\tiny (NIST SP 800-57 Part 1 Rev.5)}\\[2pt]
+        ``Uma CA é semelhante a um \textbf{cartório/tabelião}: confirma as identidades das partes que se comunicam.'' \hfill {\tiny (NIST SP 800-32, §3.1)}
+    \end{block}
+    \medskip
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Ponte com a aula anterior:} o NIST descreve o registro de chaves como uma \textbf{ligação feita por uma terceira parte confiável} --- citando como exemplos ``\emph{um servidor de \textit{realm} Kerberos}'' (caso simétrico) ``\emph{ou uma CA de uma PKI}'' (caso assimétrico).
+    \end{tcolorbox}
+    \smallskip
+    {\tiny Fonte: NIST SP 800-57 Part 1 Rev.5 (§2.1 e §8.1.6); NIST SP 800-32 §3.1; Paar et al., cap.\ 14.4.2.}
+\end{frame}
+
+\begin{frame}{Geração de Certificado --- chaves geradas pelo usuário}
+    % [BOOK 14.4.2]
+    Caso 1: o usuário gera seu próprio par de chaves e pede à CA apenas para \textbf{assinar} a chave pública.
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.88\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (C) at (9,0) {CA};
+        \foreach \x in {0,9} \draw[vida] (\x,-0.85) -- (\x,-5.0);
+        \node[comp, anchor=north] at (0,-1.0) {gera $k_{pr,A},\ k_{pub,A}$};
+        \draw[msg] (0,-2.0) -- (9,-2.0) node[rotmsg, midway]{$\text{RQST}(k_{pub,A},\ ID_A)$};
+        \node[comp, anchor=north] at (9,-2.35) {verifica $ID_A$\\ $s_A = \mathrm{sig}_{k_{pr,CA}}(k_{pub,A}, ID_A)$\\ $\text{Cert}_A = [(k_{pub,A}, ID_A),\ s_A]$};
+        \draw[msg] (9,-4.2) -- (0,-4.2) node[rotmsg, midway]{$\text{Cert}_A$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        A 1ª transmissão é \textbf{crítica}: $(k_{pub,A}, ID_A)$ deve ir por um \textbf{canal autenticado}; senão Oscar poderia requisitar um certificado \emph{em nome de Alice}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Geração de Certificado --- chaves geradas pela CA}
+    % [BOOK 14.4.2]
+    Caso 2: a CA também \textbf{gera o par de chaves} de cada usuário.
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.88\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (C) at (9,0) {CA};
+        \foreach \x in {0,9} \draw[vida] (\x,-0.85) -- (\x,-5.2);
+        \draw[msg] (0,-1.3) -- (9,-1.3) node[rotmsg, midway]{$\text{RQST}(ID_A)$};
+        \node[comp, anchor=north] at (9,-1.65) {verifica $ID_A$\\ gera $k_{pr,A},\ k_{pub,A}$\\ $s_A = \mathrm{sig}_{k_{pr,CA}}(k_{pub,A}, ID_A)$\\ $\text{Cert}_A = [(k_{pub,A}, ID_A),\ s_A]$};
+        \draw[msg] (9,-4.3) -- (0,-4.3) node[rotmsg, midway]{$\text{Cert}_A,\ k_{pr,A}$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        A 2ª transmissão carrega a \textbf{chave privada} $k_{pr,A}$: exige um canal não apenas autenticado, mas \textbf{secreto} (ex.: entrega \textit{out-of-band}, por USB/correio).
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{DHKE com Certificados}
+    % [BOOK 14.4.2]
+    Cada parte envia seu certificado; antes de calcular a chave, \textbf{verifica} o certificado do outro com a chave pública da CA.
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.93\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (B) at (11,0) {Bob};
+        \foreach \x in {0,11} \draw[vida] (\x,-0.85) -- (\x,-6.0);
+        \node[comp, anchor=north] at (0,-1.0) {$a = k_{pr,A}$;\ \ $A \equiv \alpha^{a}$\\ $\text{Cert}_A = [(A, ID_A), s_A]$};
+        \node[comp, anchor=north] at (11,-1.0) {$b = k_{pr,B}$;\ \ $B \equiv \alpha^{b}$\\ $\text{Cert}_B = [(B, ID_B), s_B]$};
+        \draw[msg] (0,-2.7) -- (11,-2.7) node[rotmsg, midway]{$\text{Cert}_A$};
+        \draw[msg] (11,-3.2) -- (0,-3.2) node[rotmsg, midway]{$\text{Cert}_B$};
+        \node[comp, anchor=north] at (0,-3.8) {verifica $\mathrm{ver}_{k_{pub,CA}}(\text{Cert}_B)$\\ $k_{AB} \equiv B^{a} \bmod p$};
+        \node[comp, anchor=north] at (11,-3.8) {verifica $\mathrm{ver}_{k_{pub,CA}}(\text{Cert}_A)$\\ $k_{AB} \equiv A^{b} \bmod p$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    {\footnotesize Se Oscar trocar $A$ por $\tilde{A}$, a assinatura $s_A$ \textbf{não confere} e o ataque é detectado. A verificação exige a chave pública da CA, $k_{pub,CA}$.}
+\end{frame}
+
+\begin{frame}{Transferência de Confiança}
+    % [BOOK 14.4.2 + NIST trust anchor]
+    A verificação ainda exige um \textbf{canal autenticado} para obter $k_{pub,CA}$. Parece não termos ganho nada\dots
+    \medskip
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        \dots mas a diferença é decisiva: o canal autenticado é necessário \textbf{uma única vez}, na \emph{instalação}. As chaves públicas das CAs já vêm \textbf{pré-instaladas} em navegadores e sistemas operacionais.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Sem certificados, Alice e Bob teriam de confiar \emph{diretamente} na chave um do outro.
+        \item Com certificados, basta confiar na chave da CA, $k_{pub,CA}$: tudo que a CA assina passa a ser confiável. Isso é a \textbf{cadeia de confiança} (\textit{chain of trust}) --- uma \textbf{transferência de confiança}.
+        \item O NIST chama a CA confiável de \textbf{âncora de confiança} (\textit{trust anchor}): ``\emph{a chave pública de uma CA confiável é o alicerce de todos os serviços de segurança baseados em PKI}''.
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: Paar et al., cap.\ 14.4.2; NIST SP 800-57 Part 1 Rev.5, §8.1.5.1.1.1 (\textit{trust anchor}).}
+\end{frame}
+
+\begin{frame}{Certificados X.509}
+    % [BOOK 14.4.2 "X.509 Certificates" + NIST]
+    Na prática, certificados são estruturas complexas. O padrão \textbf{X.509} é amplamente usado na internet --- em \textbf{TLS}, \textbf{IPsec} e \textbf{S/MIME}.
+    \vspace{0.4em}
+    \begin{columns}[T]
+        \begin{column}{0.52\textwidth}
+            \scriptsize
+            \begin{tcolorbox}[colback=blue!4,colframe=blue!50!black,boxrule=0.5pt,title=\scriptsize Certificado X.509 (campos)]
+            \renewcommand{\arraystretch}{1.15}
+            \begin{tabularx}{\linewidth}{@{}>{\bfseries}l@{\ \ }X@{}}
+                Nº de série & identificador único \\
+                Algoritmo de assin. & ex.: RSA c/ SHA-2 \\
+                Emissor & quem gerou o certificado \\
+                Validade & \textit{não antes} / \textit{não depois} \\
+                Titular (\textit{Subject}) & $ID_A$: nome/organização \\
+                Chave pública & valor + algoritmo + parâm. \\
+                \rowcolor{green!12} Assinatura & sobre \emph{todos} os campos \\
+            \end{tabularx}
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.46\textwidth}
+            \footnotesize
+            \begin{itemize}
+                \item \textbf{Validade limitada} (1--2 anos): reduz a janela de uso se a chave privada vazar ou o titular sair da organização.
+                \item \textbf{Dois} algoritmos: o protegido \emph{pelo} certificado e o que \emph{assina} o certificado --- podem diferir (ex.: certificado assinado com RSA-2048; chave protegida ECDH-256).
+            \end{itemize}
+            \begin{block}{X.509 (NIST)}
+                \tiny ``O certificado de chave pública X.509\dots\ conforme definido pelo padrão ISO/ITU-T X.509.'' (NIST SP 800-57 Part 1 Rev.5)
+            \end{block}
+        \end{column}
+    \end{columns}
+    \smallskip
+    {\tiny Fonte: Paar et al., cap.\ 14.4.2 (Fig.\ 14.5); NIST SP 800-32 §3.3.1; NIST SP 800-57 Part 1 Rev.5.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Infraestrutura de Chave Pública (PKI) e CAs}
+
+\begin{frame}{O que é uma PKI}
+    % [BOOK 14.5 + NIST]
+    \begin{block}{Public-Key Infrastructure (PKI) --- definição (NIST)}
+        \footnotesize
+        ``Um \textbf{arcabouço} (\textit{framework}) estabelecido para \textbf{emitir, manter e revogar} certificados de chave pública.'' \hfill {\tiny (NIST FIPS 186-5)}
+    \end{block}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Todo o sistema formado pelas \textbf{CAs} mais os mecanismos de suporte necessários é chamado de \textbf{PKI}.
+        \item Montar e operar uma PKI no mundo real é \textbf{complexo}: é preciso estabelecer com segurança a identidade dos usuários na emissão e distribuir as chaves das CAs de forma confiável.
+        \item Entre os aspectos mais complexos: a existência de \textbf{muitas CAs diferentes} e a \textbf{revogação} de certificados.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        Segundo o NIST (SP 800-32), uma PKI apoia quatro serviços básicos de segurança: \textbf{integridade}, \textbf{confidencialidade}, \textbf{identificação/autenticação} e \textbf{não-repúdio}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Componentes de uma PKI}
+    % [NIST SP 800-32 / 800-57]
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=blue!6,colframe=blue!50!black,boxrule=0.5pt,title=\footnotesize Autoridade Certificadora (CA)]
+                \footnotesize ``Entidade, em uma PKI, que \textbf{emite certificados} para os titulares.'' Assina-os com sua chave privada e também os \textbf{revoga}.
+            \end{tcolorbox}
+            \vspace{0.4em}
+            \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt,title=\footnotesize Autoridade de Registro (RA)]
+                \footnotesize ``Uma entidade confiável que \textbf{estabelece e atesta a identidade} de um usuário.'' Confirma identidades \emph{antes} da emissão.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=gray!8,colframe=gray!60!black,boxrule=0.5pt,title=\footnotesize Repositório]
+                \footnotesize Armazena e distribui certificados e \textbf{CRLs}.
+            \end{tcolorbox}
+            \vspace{0.4em}
+            \begin{tcolorbox}[colback=orange!8,colframe=orange!70!black,boxrule=0.5pt,title=\footnotesize Parte confiante (\textit{relying party})]
+                \footnotesize ``Parte que \textbf{se baseia} na segurança e autenticidade de uma chave'' --- p.ex.\ na chave pública contida em um certificado.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \smallskip
+    {\tiny Definições (tradução): NIST SP 800-57 Part 1 Rev.5 (§2.1); NIST SP 800-32 (§3.1).}
+\end{frame}
+
+\begin{frame}{Cadeias de Certificados}
+    % [BOOK 14.5.1]
+    Num mundo ideal, uma única CA emitiria certificados para todos. Na prática há \textbf{muitas CAs} (governos, empresas comerciais, corporações para seus funcionários).
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Seria inviável um usuário ter à mão a chave pública de \emph{todas} as CAs.
+        \item Solução: as CAs \textbf{certificam umas às outras} --- a \textbf{certificação cruzada} (\textit{cross-certification}).
+    \end{itemize}
+    \medskip
+    \begin{block}{Caminho de certificação (\textit{certification path}) --- NIST}
+        \footnotesize
+        ``Uma lista ordenada de certificados\dots\ que permite ao receptor verificar que o remetente e todos os certificados intermediários são \textbf{confiáveis}.''
+        \hfill {\tiny (NIST SP 800-57 Part 2 Rev.1)}
+    \end{block}
+    \medskip
+    {\footnotesize \textbf{Cenário:} o certificado de Alice foi emitido por CA1 e o de Bob por CA2. Alice tem só $k_{pub,CA1}$; ao receber $\text{Cert}_B$ (assinado pela CA2), ela \emph{não consegue} verificá-lo diretamente.}
+\end{frame}
+
+\begin{frame}{Verificação via Cadeia (certificação cruzada)}
+    % [BOOK 14.5.1]
+    Alice obtém a chave da CA2 dentro de um certificado \emph{assinado pela sua própria CA1}:
+    {\small\[ \text{Cert}_{CA2} = \big[(k_{pub,CA2}, ID_{CA2}),\ \mathrm{sig}_{k_{pr,CA1}}(k_{pub,CA2}, ID_{CA2})\big] \]}
+    \begin{center}
+    \resizebox{0.88\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (C) at (9,0) {CA2};
+        \node[chave, below=0pt of A] {possui $k_{pub,CA1}$};
+        \foreach \x in {0,9} \draw[vida] (\x,-0.85) -- (\x,-3.6);
+        \draw[msg] (0,-1.4) -- (9,-1.4) node[rotmsg, midway]{$\text{RQST}(\text{Cert}_{CA2})$};
+        \draw[msg] (9,-2.0) -- (0,-2.0) node[rotmsg, midway]{$\text{Cert}_{CA2}$};
+        \node[comp, anchor=north] at (0,-2.5) {$\mathrm{ver}_{k_{pub,CA1}}(\text{Cert}_{CA2})\ \Rightarrow\ k_{pub,CA2}$ válida\\ $\mathrm{ver}_{k_{pub,CA2}}(\text{Cert}_{B})\ \ \Rightarrow\ k_{pub,B}$ válida};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        CA1 confia em CA2 (assina sua chave) $\Rightarrow$ Alice passa a confiar na chave de Bob. A \textbf{confiança é delegada} ao longo da \textbf{cadeia}.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Hierarquia de CAs}
+    % [BOOK 14.5.1 Example 14.3, Fig 14.6]
+    Na prática, CAs se organizam \textbf{hierarquicamente}; cada CA assina a chave das CAs do nível abaixo.
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.77\textwidth}{!}{%
+    \begin{tikzpicture}[node distance=0.8cm and 1.1cm]
+        \node[rootca] (r1) {Root CA1\\ \tiny(offline)};
+        \node[rootca, right=3.2cm of r1] (r2) {Root CA2\\ \tiny(offline)};
+        \draw[xlink] (r1) -- (r2) node[midway, above, font=\tiny\itshape, text=red!55!black]{certificação cruzada};
+        \node[interca, below left=of r1] (i1) {Intermediate CA\\ \tiny(offline)};
+        \node[issueca, below right=of r1] (s1) {Issuing CA\\ \tiny(online)};
+        \node[issueca, below=1.0cm of i1] (s2) {Issuing CA\\ \tiny(online)};
+        \draw[link] (r1) -- (i1);
+        \draw[link] (r1) -- (s1);
+        \draw[link] (i1) -- (s2);
+        \node[usercert, below left=0.8cm and 0.1cm of s2] (u1) {Cert.\\ usuário};
+        \node[usercert, below right=0.8cm and 0.1cm of s2] (u2) {Cert.\\ usuário};
+        \node[usercert, below left=0.8cm and 0.1cm of s1] (u3) {Cert.\\ usuário};
+        \node[usercert, below right=0.8cm and 0.1cm of s1] (u4) {Cert.\\ usuário};
+        \draw[link] (s2) -- (u1); \draw[link] (s2) -- (u2);
+        \draw[link] (s1) -- (u3); \draw[link] (s1) -- (u4);
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.1em}
+    {\scriptsize \textbf{Root CA} (âncora de confiança): \emph{offline}, certifica raramente as CAs abaixo. \textbf{Issuing CAs}: muito expostas (online), emitem os certificados de usuário. Se uma Issuing CA é comprometida, a CA acima a \textbf{revoga} e substitui. \emph{Sempre verifique a cadeia até a Root CA.} {\tiny --- Fonte: Paar et al., cap.\ 14.5.1 (Ex.\ 14.3, Fig.\ 14.6); NIST SP 800-57 Part 1 Rev.5.}}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Revogação de Certificados}
+
+\begin{frame}{Por que Revogar um Certificado}
+    % [BOOK 14.5.2 + NIST SP 800-32]
+    \begin{itemize}
+        \item Certificados têm \textbf{data de expiração} --- mas os dados podem se tornar \textbf{não confiáveis antes} disso. É preciso um mecanismo de \emph{revogação}.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt,title=\footnotesize Motivos típicos de revogação (NIST SP 800-32 / livro)]
+        \footnotesize
+        \begin{itemize}
+            \item a \textbf{chave privada} do titular foi \textbf{perdida ou comprometida} (ex.: \textit{smart card} perdido);
+            \item o titular \textbf{deixou} a organização;
+            \item o \textbf{nome} do titular mudou.
+        \end{itemize}
+    \end{tcolorbox}
+    \medskip
+    {\footnotesize Discutiremos dois métodos para verificar a validade de um certificado: \textbf{CRLs} e \textbf{OCSP}.}
+    \smallskip\\
+    {\tiny Fonte: NIST SP 800-32 §3.1 (motivos) e §3.3.2 (expiração/CRL); Paar et al., cap.\ 14.5.2.}
+\end{frame}
+
+\begin{frame}{Listas de Revogação de Certificados (CRL)}
+    % [BOOK 14.5.2 + NIST]
+    \begin{block}{CRL --- definição (NIST)}
+        \footnotesize
+        ``Uma \textbf{lista de certificados de chave pública revogados}, criada e \textbf{assinada digitalmente} por uma autoridade certificadora.''
+        \hfill {\tiny (NIST CSRC Glossary; FIPS 201-3 / RFC 5280)}
+    \end{block}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Identifica os revogados pelo \textbf{número de série}; \emph{deve} ser assinada pela CA (senão adversários revogariam certificados maliciosamente). É o análogo da ``lista negra'' de cartões de crédito.
+        \item \textbf{Problema --- transmissão:} contatar a CA a \emph{cada} certificado recebido recria o gargalo dos esquemas com KDC (a promessa da PKI era \emph{não} precisar de contato \textit{online}).
+        \item \textbf{CRLs periódicas} criam uma janela em que o certificado já foi revogado mas o usuário ainda não sabe --- \emph{trade-off} entre tráfego de rede e segurança.
+        \item \textbf{Delta CRLs:} enviam apenas as \emph{mudanças} desde a última CRL, reduzindo o tamanho.
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: NIST SP 800-32 §3.3.2 (analogia da ``\textit{hot list}''); Paar et al., cap.\ 14.5.2.}
+\end{frame}
+
+\begin{frame}{Online Certificate Status Protocol (OCSP)}
+    % [BOOK 14.5.2 + NIST]
+    \begin{block}{OCSP --- definição (NIST)}
+        \footnotesize
+        ``Um \textbf{protocolo online} usado para determinar o \textbf{status} de um certificado de chave pública.''
+        \hfill {\tiny (NIST CSRC Glossary; FIPS 201-3 / RFC 6960)}
+    \end{block}
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.9\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (R) at (9.5,0) {Respondedor OCSP (CA)};
+        \node[chave, below=0pt of A] {possui $\text{Cert}_{Bob},\ k_{pub,CA}$};
+        \foreach \x in {0,9.5} \draw[vida] (\x,-0.95) -- (\x,-5.2);
+        \draw[msg] (0,-1.5) -- (9.5,-1.5) node[rotmsg, midway]{requisição OCSP$(\text{Cert}_{Bob})$};
+        \node[comp, anchor=north] at (9.5,-1.9) {verifica status de revogação\\ se atual: \emph{assina} a resposta};
+        \draw[msg] (9.5,-3.4) -- (0,-3.4) node[rotmsg, midway]{$\text{Cert}_{Bob}$ não revogado};
+        \node[comp, anchor=north] at (0,-3.8) {$\mathrm{ver}_{k_{pub,CA}}(\text{resposta})\ \Rightarrow\ \text{Cert}_{Bob}$ válido};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    {\footnotesize Determina o status \emph{imediatamente}, sem esperar a próxima CRL. Até a resposta chegar, a aceitação do certificado fica \textbf{suspensa}. Suportado por navegadores; publicado na \textbf{RFC 6960}.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{PKI na Prática e Lições Aprendidas}
+
+\begin{frame}{Certificados no Mundo Real}
+    % [BOOK 14.7]
+    \begin{itemize}
+        \footnotesize
+        \item Por razões técnicas e organizacionais, a maioria dos usuários \emph{não} obtém certificados pessoais. Na internet, os certificados servem sobretudo para \textbf{autenticar servidores} para os usuários (o servidor é autenticado; o usuário, em geral, não).
+        \item Esse arranjo é aceitável porque é o \emph{usuário} quem fornece a informação sensível (ex.: número do cartão). As chaves de verificação das CAs já vêm \textbf{pré-instaladas} em navegadores e SOs.
+        \item \textbf{Let's Encrypt} (ISRG) oferece uma CA \textbf{gratuita e aberta}, ampliando a adoção de certificados.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{CAs são alvos valiosos:} conhecida a chave privada da \emph{raiz}, o atacante gera certificados arbitrários. Em \textbf{2011}, um certificado falso ``\texttt{*.google.com}'' foi emitido por uma CA intermediária derivada da \textbf{Turktrust}.
+    \end{tcolorbox}
+    \medskip
+    {\footnotesize \textbf{Alternativa hierárquica:} a \textbf{teia de confiança} (\textit{web of trust}) --- baseada em relações de confiança entre pares --- usada no \textbf{PGP}/\textbf{GPG}.}
+\end{frame}
+
+\begin{frame}{Lições Aprendidas}
+    % [BOOK 14.8 - subconjunto pertinente]
+    \begin{itemize}
+        \item \textbf{Todo} protocolo assimétrico exige que as chaves públicas sejam \textbf{autenticadas} --- tipicamente com \textbf{certificados}. Caso contrário, são possíveis ataques \textbf{Man-in-the-Middle}.
+        \medskip
+        \item Um \textbf{certificado} liga a identidade de uma entidade à sua chave pública por meio de uma \textbf{assinatura digital} de uma \textbf{Autoridade Certificadora (CA)} confiável.
+        \medskip
+        \item Os certificados realizam uma \textbf{transferência de confiança}: basta confiar na chave da CA (\textbf{âncora de confiança}); o canal autenticado é necessário \emph{só na instalação}.
+        \medskip
+        \item Uma \textbf{PKI} é o arcabouço que \textbf{emite, mantém e revoga} certificados; lida com \textbf{múltiplas CAs} (cadeias/hierarquias) e com a \textbf{revogação} (\textbf{CRLs} e \textbf{OCSP}).
+        \medskip
+        \item Uma boa \textbf{gestão de chaves} é crucial e deve ser considerada por \emph{todo} o ciclo de vida do sistema.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Referências}
+    \footnotesize
+    \textbf{Livro-texto}
+    \begin{itemize}
+        \item C. Paar, J. Pelzl, T. Güneysu. \textit{Understanding Cryptography: From Established Symmetric and Asymmetric Ciphers to Post-Quantum Algorithms}. 2.\ ed., Springer, 2024 --- Cap.\ 14 (\textit{Key Management}), seções 14.4 e 14.5.
+    \end{itemize}
+    \medskip
+    \textbf{Publicações do NIST}
+    \begin{itemize}
+        \item NIST SP 800-57 Part 1 Rev.\ 5 --- \textit{Recommendation for Key Management: Part 1 -- General} (2020).
+        \item NIST SP 800-32 --- \textit{Introduction to Public Key Technology and the Federal PKI Infrastructure} (2001).
+        \item NIST FIPS 186-5; NIST SP 800-57 Part 2 Rev.\ 1; FIPS 201-3.
+        \item NIST CSRC Glossary --- \url{https://csrc.nist.gov/glossary} (termos: \textit{PKI, certification authority, registration authority, public key certificate, X.509 certificate, CRL, OCSP, man-in-the-middle attack}).
+    \end{itemize}
+    \medskip
+    \textbf{Padrões correlatos (citados):} ITU-T X.509; IETF RFC 5280 (perfil X.509/CRL); RFC 6960 (OCSP).
+\end{frame}
+
+\end{document}
