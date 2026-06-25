@@ -1,0 +1,310 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{needspace}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+%% Estilos para o diagrama de protocolo (resposta do Ex. 9)
+\tikzset{
+    ator/.style   = {font=\footnotesize\bfseries, text=black},
+    vida/.style   = {gray!55, dashed, thick},
+    msg/.style    = {-{Latex[length=2mm]}, thick, blue!55!black},
+    comp/.style   = {font=\scriptsize, draw=black!25, fill=black!4, rounded corners,
+                     inner sep=2.5pt, align=left, text=black},
+    rotmsg/.style = {font=\scriptsize, fill=white, inner sep=1.5pt, text=black},
+}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Gerenciamento de Chaves: Distribui\c{c}\~{a}o Sim\'{e}trica, MITM e PKI\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Gerenciamento de Chaves (gabarito)}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Destaque para pontos-chave dentro das respostas
+\newcommand{\alert}[1]{\textbf{\uline{#1}}}
+
+%% Cabe\c{c}alho de uma ``parte'' (bloco tem\'{a}tico da lista)
+\newcommand{\parte}[1]{%
+    \par\vspace{1.6em}\noindent
+    {\large\bfseries\color{red!55!black}#1}%
+    \par\nobreak\vspace{-0.4em}\noindent
+    {\color{red!45!black}\rule{\linewidth}{1.0pt}}%
+    \par\nobreak\vspace{0.2em}
+}
+
+%% Cabe\c{c}alho de exerc\'{i}cio (numera\c{c}\~{a}o manual; o conte\'{u}do pode quebrar p\'{a}gina)
+\newcommand{\exercicio}[1]{%
+    \Needspace{8\baselineskip}%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+
+%% Caixa de resposta (vermelha, quebr\'{a}vel entre p\'{a}ginas)
+\newmdenv[
+    linecolor=red!65!black,
+    linewidth=0.8pt,
+    roundcorner=2pt,
+    backgroundcolor=red!3,
+    skipabove=0.8em,
+    skipbelow=1.0em,
+    innertopmargin=0.7em,
+    innerbottommargin=0.7em,
+    innerleftmargin=0.8em,
+    innerrightmargin=0.8em
+]{respostabox}
+\newenvironment{resposta}{%
+    \begin{respostabox}
+    \color{red!70!black}\sloppy
+}{%
+    \end{respostabox}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 14 --- \textit{Key Management}).}
+
+\textbf{Observa\c{c}\~{a}o:} as solu\c{c}\~{o}es dos exerc\'{i}cios \emph{\'{i}mpares} seguem o manual de solu\c{c}\~{o}es dos autores; em itens discursivos, respostas equivalentes podem ser igualmente corretas.
+
+%% ════════════════════════ PARTE I ════════════════════════
+\parte{Parte I --- Distribui\c{c}\~{a}o de Chave Sim\'{e}trica (KDC e Kerberos)}
+
+\exercicio{1}
+Uma chave-mestra $k_{MK}$ \'{e} trocada de forma segura entre as partes (p.\,ex.\ via DHKE com certificados). Em seguida, chaves de sess\~{a}o s\~{a}o geradas regularmente por uma \textbf{KDF}. Considere tr\^{e}s m\'{e}todos ($h(\cdot)$ \'{e} uma fun\c{c}\~{a}o hash segura e $k_i$ \'{e} a $i$-\'{e}sima chave de sess\~{a}o): \livro{14.1}
+\[
+    \text{(1)}\ \ k_0 = k_{MK},\ \ k_{i+1} = k_i + 1
+    \qquad
+    \text{(2)}\ \ k_0 = h(k_{MK}),\ \ k_{i+1} = h(k_i)
+\]
+\[
+    \text{(3)}\ \ k_0 = h(k_{MK}),\ \ k_{i+1} = h(k_{MK} \,\|\, i \,\|\, k_i)
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Quais s\~{a}o as principais diferen\c{c}as entre os tr\^{e}s m\'{e}todos?
+    \item Qual(is) m\'{e}todo(s) oferece(m) PFS?
+    \item Se Oscar obt\'{e}m a $n$-\'{e}sima chave de sess\~{a}o, quais sess\~{o}es ele decifra em cada m\'{e}todo?
+    \item Qual m\'{e}todo permanece seguro se $k_{MK}$ for comprometida?
+\end{enumerate}
+\begin{resposta}
+\textbf{(a)} \emph{(1)} a chave de sess\~{a}o \'{e} derivada por uma opera\c{c}\~{a}o \alert{linear e invert\'{i}vel} da chave anterior; \emph{(2)} usa fun\c{c}\~{a}o hash, gerando uma correla\c{c}\~{a}o \alert{n\~{a}o-linear} entre as chaves; \emph{(3)} usa \alert{a chave-mestra e a chave anterior} em cada deriva\c{c}\~{a}o.
+
+\textbf{(b)} Os m\'{e}todos \alert{(2) e (3)}, pois as chaves de sess\~{a}o antigas n\~{a}o podem ser extra\'{i}das da chave recente (o hash \'{e} de m\~{a}o \'{u}nica).
+
+\textbf{(c)} \emph{(1)} \alert{todas} as sess\~{o}es (n\~{a}o h\'{a} PFS --- a rela\c{c}\~{a}o \'{e} linear e invert\'{i}vel); \emph{(2)} a sess\~{a}o $n$ e \alert{todas as seguintes} (pode-se iterar o hash para frente, mas n\~{a}o para tr\'{a}s); \emph{(3)} \alert{apenas a sess\~{a}o atual} (cada deriva\c{c}\~{a}o exige a chave-mestra, desconhecida).
+
+\textbf{(d)} \alert{Nenhum}: se $k_{MK}$ vazar, \emph{todas} as chaves de sess\~{a}o podem ser recalculadas (em (1), $k_0=k_{MK}$; em (2) e (3), $k_0=h(k_{MK})$ e a recorr\^{e}ncia segue a partir da\'{i}).
+\end{resposta}
+
+\exercicio{2}
+Rede ponto-a-ponto com \textbf{1000 usu\'{a}rios} que se comunicam de forma autenticada e confidencial. \livro{14.2}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantas chaves ao todo com \textbf{sim\'{e}tricos} e \textbf{sem} KDC (chave distinta por par)?
+    \item E com um \textbf{KDC}?
+    \item Qual a principal vantagem do KDC?
+    \item Quantas chaves com algoritmos \textbf{assim\'{e}tricos}?
+\end{enumerate}
+\begin{resposta}
+\textbf{(a)} Cada par precisa de uma chave pr\'{o}pria: $\binom{1000}{2} = \dfrac{1000 \cdot 999}{2} = \alert{499\,500}$ chaves.
+
+\textbf{(b)} Cada usu\'{a}rio compartilha apenas \emph{uma} KEK com o KDC: \alert{1000} chaves de longo prazo.
+
+\textbf{(c)} O n\'{u}mero de chaves de longo prazo cai de $\approx n^2/2$ para $n$; um novo usu\'{a}rio precisa de \alert{um \'{u}nico canal seguro} (com o KDC), em vez de um com cada um dos demais. (Contrapartida: o KDC vira ponto \'{u}nico de falha e gargalo.)
+
+\textbf{(d)} Cada usu\'{a}rio possui \emph{um par} de chaves: \alert{1000 pares} (2000 chaves --- 1000 p\'{u}blicas $+$ 1000 privadas), sem chave por par. Por\'{e}m, as chaves p\'{u}blicas precisam ser \textbf{autenticadas} (certificados/PKI).
+\end{resposta}
+
+\exercicio{3}
+Escolha das cifras de um \textbf{KDC} com duas classes de cifragem: $e_{k_{U,\text{KDC}}}(\cdot)$ (KEK de longo prazo) e $e_{k_{ses}}(\cdot)$ (sess\~{a}o). Dispon\'{i}veis: \textbf{PRESENT}-80 e \textbf{AES-256}, uma para cada classe. Qual para qual? Justifique. \livro{14.3}
+\begin{resposta}
+\alert{AES-256 para a KEK} (KDC$\leftrightarrow$usu\'{a}rio, longo prazo) e \alert{PRESENT para a sess\~{a}o}.
+
+\emph{Justificativa:} PRESENT-80 n\~{a}o oferece boa seguran\c{c}a de \emph{longo prazo} (embora hoje resista \`{a} for\c{c}a bruta de advers\'{a}rios n\~{a}o-estatais). Se uma chave de sess\~{a}o for quebrada --- algo prov\'{a}vel quando houver computadores qu\^{a}nticos ---, apenas \emph{aquela} sess\~{a}o \'{e} comprometida. J\'{a} o AES-256 oferece excelente seguran\c{c}a de longo prazo (mesmo contra computadores qu\^{a}nticos) e deve proteger a KEK: se uma $k_{U,\text{KDC}}$ for descoberta, \emph{toda} a comunica\c{c}\~{a}o passada e futura do usu\'{a}rio $U$ ficaria exposta --- exige-se seguran\c{c}a muito mais forte aqui.
+\end{resposta}
+
+\exercicio{4}
+Mostre que o \textbf{PFS n\~{a}o \'{e} garantido} no Kerberos simplificado: como Oscar decifra comunica\c{c}\~{o}es passadas e futuras se (a) $k_A$ \'{e} comprometida; (b) $k_B$ \'{e} comprometida. \livro{14.7}
+\begin{resposta}
+\textbf{(a)} Comprometida a KEK $k_A$ de Alice, Oscar calcula a chave de sess\~{a}o $k_{ses}$ (transmitida cifrada sob $k_A$, em $y_A = e_{k_A}(k_{ses}, \dots)$) e, assim, \alert{decifra todas as mensagens} --- passadas (se armazenou os criptogramas) e futuras.
+
+\textbf{(b)} O mesmo vale para a KEK $k_B$ de Bob.
+
+Como as chaves de sess\~{a}o s\~{a}o protegidas \emph{pelas} KEKs de longo prazo, o esquema \alert{n\~{a}o oferece PFS}.
+\end{resposta}
+
+\exercicio{5}
+Pay-TV: DH com m\'{o}dulo de 2048 bits, mas s\'{o} \textbf{DES} para os dados; deriva\c{c}\~{a}o $K^{(i)} = f(K_{AB} \,\|\, i)$. \livro{14.9}
+\begin{enumerate}[label=(\alph*)]
+    \item Quantos GB para um filme de 2\,h a 1\,Mbit/s? \'{E} realista armazenar?
+    \item Se o atacante quebra uma chave DES em 10\,min, com que frequ\^{e}ncia derivar a chave para impedir a decifragem \emph{offline} de um filme de 2\,h em menos de 30 dias?
+\end{enumerate}
+\begin{resposta}
+\textbf{(a)} Armazenamento $=$ taxa $\times$ tempo $= 10^6\,\text{bit/s} \times 2\,\text{h} = 10^6 \times 2 \times 3600 = 7{,}2 \times 10^9\,\text{bits} = 7{,}2\,\text{Gbit} = \alert{0{,}9\,\text{GB}}$. Armazenar $\approx 0{,}9$\,GB \'{e} trivial (cabe num pen drive barato) --- \alert{realista}.
+
+\textbf{(b)} Chaves recuper\'{a}veis em 30 dias: $\dfrac{30\,\text{dias}}{10\,\text{min}} = \dfrac{30 \cdot 24 \cdot 60}{10} = 4320$. Para impedir a decifragem do filme todo nesse prazo, cada chave deve cobrir no m\'{a}ximo $T = \dfrac{2\,\text{h}}{4320} \approx \alert{1{,}67\,\text{s}}$ de v\'{i}deo. Logo, deriva-se uma nova chave a cada $\approx 1{,}67$\,s. Como fun\c{c}\~{o}es hash s\~{a}o r\'{a}pidas, essa taxa \'{e} facilmente atend\'{i}vel em software.
+\end{resposta}
+
+%% ════════════════════════ PARTE II ════════════════════════
+\parte{Parte II --- Man-in-the-Middle, Certificados e PKI}
+
+\exercicio{6}
+DHKE com \textbf{MITM}: $p = 467$, $\alpha = 2$, $a = 228$ (Alice), $b = 57$ (Bob), $o = 16$ (Oscar). \livro{14.11}
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule $k_{AO}$ e $k_{BO}$ (i) como Oscar os calcula e (ii) como Alice e Bob os calculam.
+    \item O que isso mostra sobre a necessidade de autenticar as chaves p\'{u}blicas?
+\end{enumerate}
+\begin{resposta}
+Oscar injeta $\tilde{O} = \alpha^{o} = 2^{16} \equiv 156 \pmod{467}$ no lugar das chaves p\'{u}blicas reais.
+
+\textbf{(a)} \emph{Alice:} $A = 2^{228} \equiv 394$; \ $k_{AO} = \tilde{O}^{\,a} = 156^{228} \equiv \alert{243} \pmod{467}$.\\
+\emph{Bob:} $B = 2^{57} \equiv 313$; \ $k_{BO} = \tilde{O}^{\,b} = 156^{57} \equiv \alert{438} \pmod{467}$.\\
+\emph{Oscar:} $O = 2^{16} \equiv 156$; \ $k_{AO} = A^{o} = 394^{16} \equiv \alert{243}$; \ $k_{BO} = B^{o} = 313^{16} \equiv \alert{438} \pmod{467}$.
+
+\textbf{(b)} Os valores coincidem (Oscar e Alice obt\^{e}m 243; Oscar e Bob obt\^{e}m 438), mas Alice e Bob \alert{n\~{a}o} compartilham chave comum \emph{entre si} --- cada um tem uma chave com Oscar. Como as chaves p\'{u}blicas n\~{a}o foram autenticadas, o ataque passa despercebido: a \textbf{autentica\c{c}\~{a}o das chaves p\'{u}blicas} (via certificados) \'{e} imprescind\'{i}vel.
+\end{resposta}
+
+\exercicio{7}
+\textbf{DHKE com certificados}: ataque de substitui\c{c}\~{a}o. \livro{14.13}
+\begin{enumerate}[label=(\alph*)]
+    \item Oscar troca $\text{Cert}(B)$ por um $\text{Cert}(O)$ v\'{a}lido (dele). Como \'{e} detectado?
+    \item Oscar troca a chave p\'{u}blica $b_B$ por $b_O$ (mantendo $ID_B$). Como \'{e} detectado?
+\end{enumerate}
+\begin{resposta}
+\textbf{(a)} Alice detecta porque $\text{Cert}(O)$ cont\'{e}m o \alert{$ID$ de Oscar}, e n\~{a}o $ID(B)$. Ao ler o certificado, ela percebe imediatamente que aquele n\~{a}o \'{e} o certificado de Bob.
+
+\textbf{(b)} Detectado quando Alice \alert{verifica a assinatura} do certificado com $k_{pub,CA}$. Como o conte\'{u}do assinado (a tupla chave p\'{u}blica $+$ $ID$) foi alterado, a verifica\c{c}\~{a}o da assinatura \alert{falha}. (\'{E} justamente isso que os certificados garantem: \emph{ligar} a identidade \`{a} chave p\'{u}blica de forma resistente \`{a} adultera\c{c}\~{a}o.)
+\end{resposta}
+
+\exercicio{8}
+Chaves p\'{u}blicas DH certificadas por uma CA. Oscar obt\'{e}m a chave \textbf{privada} de assinatura da CA. Ele decifra mensagens antigas armazenadas? Se n\~{a}o, que outro ataque passa a poder fazer? \livro{14.15}
+\begin{resposta}
+A assinatura da CA cobre apenas a \emph{chave p\'{u}blica} do usu\'{a}rio, $k_{pub,U} = \alpha^{a_U}$. Mesmo com a chave privada da CA, Oscar \alert{n\~{a}o} consegue calcular a chave \emph{privada} de nenhum usu\'{a}rio --- isso exigiria resolver o \textbf{problema do logaritmo discreto}. Logo, ele tamb\'{e}m n\~{a}o calcula as chaves de sess\~{a}o usadas \emph{antes} do comprometimento e \alert{n\~{a}o decifra} os criptogramas antigos.
+
+Contudo, dali em diante Oscar pode \alert{se passar por qualquer usu\'{a}rio} e \alert{gerar certificados falsos} (assinando chaves p\'{u}blicas que ele controla), viabilizando ataques MITM futuros. Ou seja: o comprometimento da chave da CA n\~{a}o quebra a confidencialidade \emph{passada}, mas permite \textbf{personifica\c{c}\~{a}o} a partir de ent\~{a}o.
+\end{resposta}
+
+\exercicio{9}
+Desenhe um protocolo de \textbf{transporte de chave} com \textbf{RSA e certificado}. \livro{14.17}
+\begin{resposta}
+Bob possui $k_{pub}, k_{pr}$ e $\text{Cert}_B = [(k_{pub}, ID_B),\ \mathrm{sig}_{CA}]$.
+\begin{center}{\color{black}
+\begin{tikzpicture}[font=\footnotesize]
+    \node[ator] (A) at (0,0) {Alice};
+    \node[ator] (B) at (8.5,0) {Bob};
+    \node[comp, anchor=north, text width=3.0cm] at (8.5,-0.55) {$k_{pub}, k_{pr}$\\ $\text{Cert}_B=[(k_{pub},ID_B),\mathrm{sig}_{CA}]$};
+    \foreach \x in {0,8.5} \draw[vida] (\x,-1.7) -- (\x,-6.0);
+    \draw[msg] (8.5,-2.1) -- (0,-2.1) node[rotmsg, midway]{$k_{pub},\ \text{Cert}_B$};
+    \node[comp, anchor=north] at (0,-2.45) {verifica $\text{Cert}_B$ com $k_{pub,CA}$\\ escolhe $k$ aleat\'{o}ria\\ $y = e_{k_{pub}}(k)$};
+    \draw[msg] (0,-4.1) -- (8.5,-4.1) node[rotmsg, midway]{$y$};
+    \node[comp, anchor=north] at (8.5,-4.45) {$k = d_{k_{pr}}(y)$};
+    \node[comp, anchor=north] at (0,-4.45) {$z = \text{AES}_k(x)$};
+    \draw[msg] (0,-5.4) -- (8.5,-5.4) node[rotmsg, midway]{$z$};
+    \node[comp, anchor=north] at (8.5,-5.75) {$x = \text{AES}_k^{-1}(z)$};
+\end{tikzpicture}}
+\end{center}
+A diferen\c{c}a para o transporte b\'{a}sico \'{e} a \alert{verifica\c{c}\~{a}o do certificado} ($\text{Cert}_B$) com a chave da CA \emph{antes} de cifrar a chave de sess\~{a}o --- o que impede o MITM.
+\end{resposta}
+
+\exercicio{10}
+\textbf{PGP}: descreva o modelo de confian\c{c}a e o gerenciamento de chaves; aponte vantagem e desvantagem frente \`{a}s CAs hier\'{a}rquicas. \livro{14.19}
+\begin{resposta}
+O PGP usa a \alert{Teia de Confian\c{c}a} (\textit{Web of Trust}). Diferentemente das arquiteturas em \'{a}rvore (hier\'{a}rquicas), a teia consiste apenas em \alert{n\'{o}s (usu\'{a}rios) com direitos iguais}, em que cada n\'{o} pode \textbf{certificar} outros. A validade de um certificado vem de uma \textbf{cadeia de confian\c{c}a}: Alice confia nos certificados recebidos de algu\'{e}m que conhece (p.\,ex.\ Bob) --- idealmente verificando a \emph{impress\~{a}o digital} (\textit{fingerprint}) com ele --- e, por transitividade, tamb\'{e}m confia nos certificados em que Bob confia, e assim por diante.
+
+\alert{Vantagem:} dispensa uma CA mutuamente confi\'{a}vel. \alert{Desvantagem:} \'{e} preciso garantir que todos os usu\'{a}rios sejam honestos e n\~{a}o aceitem certificados falsos.
+\end{resposta}
+
+%% ════════════════════════ DESAFIO ════════════════════════
+\parte{Desafio --- Autentica\c{c}\~{a}o M\'{u}tua}
+
+\exercicio{11}
+Protocolo de autentica\c{c}\~{a}o m\'{u}tua por assinaturas ($n_X$ \'{e} um \emph{nonce} de $X$): \livro{14.21}
+\begin{center}\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{r c l}
+    \textbf{Alice} & & \textbf{Bob} \\
+    & $\xleftarrow{\hspace{1.2cm} n_B \hspace{1.2cm}}$ & \\
+    & $\xrightarrow{\ n_A \,\|\, \mathrm{sig}_A(n_A \,\|\, n_B \,\|\, ID_B)\ }$ & \\
+    & $\xleftarrow{\ n_B' \,\|\, \mathrm{sig}_B(n_B' \,\|\, n_A \,\|\, ID_A)\ }$ & \\
+\end{tabular}
+\end{center}
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva os passos e o objetivo de cada um.
+    \item Explique o \textbf{ataque de intercala\c{c}\~{a}o} (\textit{interleaving}) e suas consequ\^{e}ncias.
+    \item Contraste-o com o \textbf{MITM}.
+\end{enumerate}
+\begin{resposta}
+\textbf{(a)} \emph{Passos:}
+\begin{itemize}
+    \item Bob envia o nonce $n_B$ a Alice (usado adiante para evitar \emph{replay}).
+    \item Alice assina $n_B$ junto com seu pr\'{o}prio nonce $n_A$ e a identidade $ID_B$, e envia a assinatura com $n_A$ a Bob.
+    \item Bob verifica a assinatura com a chave p\'{u}blica de Alice. Se confere, ele sabe: (i) que n\~{a}o \'{e} \emph{replay}, pois Alice assinou o nonce \emph{atual} $n_B$; e (ii) que \'{e} de fato Alice se autenticando \emph{para Bob}, pois $ID_B$ foi assinado. Para confirmar, Bob assina $n_A$ com um novo nonce $n_B'$ e a identidade $ID_A$.
+    \item Alice verifica com a chave p\'{u}blica de Bob: aprende que vem de Bob (assinatura confere), que n\~{a}o \'{e} \emph{replay} (cont\'{e}m seu nonce atual $n_A$) e que Bob quer se autenticar \emph{para Alice} (pois $ID_A$ foi assinado).
+\end{itemize}
+
+\textbf{(b)} Oscar apenas \alert{repassa} as mensagens que recebe das duas partes (mantendo, em paralelo, uma sess\~{a}o com Bob e outra com Alice). Consequ\^{e}ncia: Oscar \alert{personifica Alice} perante Bob e \alert{personifica Bob} perante Alice. \'{E} dif\'{i}cil de evitar porque Oscar \emph{n\~{a}o} manipula segredos criptogr\'{a}ficos (chaves) --- apenas se interp\~{o}e numa troca leg\'{i}tima de mensagens.
+
+\textbf{(c)} O \emph{interleaving} atinge \textbf{protocolos de autentica\c{c}\~{a}o} e viola a \alert{autentica\c{c}\~{a}o de entidade}. J\'{a} o \textbf{MITM} ataca a \textbf{troca de chave} e leva ao estabelecimento incorreto de chaves. As consequ\^{e}ncias do MITM tendem a ser \alert{mais abrangentes}: chaves incorretas (conhecidas pelo atacante) permitem quebrar v\'{a}rios servi\c{c}os de seguran\c{c}a (confidencialidade, integridade etc.).
+\end{resposta}
+
+\end{document}
