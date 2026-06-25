@@ -1,0 +1,493 @@
+\documentclass{beamer}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, decorations.pathreplacing}
+\usepackage{array}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+\urlstyle{same}
+
+\definecolor{graycell}{gray}{0.85}
+\definecolor{vermelhoClaro}{RGB}{255, 200, 200}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Índice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Estilos para os diagramas de protocolo (message sequence charts)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tikzset{
+    ator/.style   = {font=\footnotesize\bfseries},
+    chave/.style  = {font=\scriptsize\itshape, text=black!55},
+    vida/.style   = {gray!55, dashed, thick},
+    msg/.style    = {-{Latex[length=2mm]}, thick, blue!55!black},
+    comp/.style   = {font=\scriptsize, draw=black!25, fill=black!4, rounded corners,
+                     inner sep=2.5pt, align=left},
+    rotmsg/.style = {font=\scriptsize, fill=white, inner sep=1.5pt},
+}
+
+% Título da apresentação
+\title[Chave Simétrica \& Kerberos]{Estabelecimento de Chave Simétrica e Kerberos}
+\author{Prof. Iaçanã Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% Slide de Capa
+\begin{frame}[plain]
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{img/Brasão_PUCRS.png}
+\end{minipage}%
+\begin{minipage}[t]{0.84\textwidth}
+    \begin{center}
+        {\LARGE\bfseries\textcolor{blue}{Estabelecimento de\\[2pt] Chave Simétrica e Kerberos}}
+    \end{center}
+\end{minipage}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Iaçanã Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Segurança de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+
+\vfill
+
+\begin{center}
+    \tiny \textit{Agradecimentos especiais ao Prof. Avelino Zorzo e aos Autores Christof Paar, Jan Pelzl e Tim Güneysu pelo material.}
+\end{center}
+\end{frame}
+
+% Índice
+\begin{frame}{Índice}
+    \tableofcontents
+\end{frame}
+
+\begin{frame}{Conteúdo desta Aula}
+    \vspace{0.5em}
+    Nesta aula você vai aprender:
+    \begin{itemize}
+        \item O \textbf{problema da distribuição de chaves} ($n^2$) e por que ele motiva uma \textbf{terceira parte confiável}.
+        \medskip
+        \item Como derivar muitas chaves de sessão a partir de um segredo: \textbf{funções de derivação de chave (KDF)} e \textbf{PBKDF2}.
+        \medskip
+        \item \textbf{Estabelecimento de chave com um KDC} (\textit{Key Distribution Center}): chaves de longo prazo (\textbf{KEK}) \emph{vs.}\ chaves de \textbf{sessão}.
+        \medskip
+        \item Os \textbf{ataques} ao protocolo básico: \textit{replay} e confirmação de chave.
+        \medskip
+        \item O protocolo \textbf{Needham--Schroeder} e o \textbf{Kerberos}.
+        \medskip
+        \item As \textbf{limitações} dos esquemas simétricos (sem PFS, ponto único de falha, escala).
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{O Problema da Distribuição de Chaves}
+
+\begin{frame}{Motivação: como duas partes obtêm uma chave secreta?}
+    \begin{itemize}
+        \item Durante quase todo o curso, assumimos que cifras simétricas \emph{já dispõem} de uma chave secreta compartilhada, distribuída por um ``canal seguro''.
+        \medskip
+        \item Mas \alert{como} essa chave chega às partes? Em uma rede com muitos usuários isso vira um problema sério.
+        \medskip\pause
+        \item Suponha $n$ usuários em que \emph{cada par} precisa de uma chave secreta própria $k_{AB}$ (conhecida só pelos dois). Então:
+        \begin{itemize}
+            \footnotesize
+            \item cada usuário guarda $n-1$ chaves;
+            \item há $\binom{n}{2} = \dfrac{n(n-1)}{2} \approx \dfrac{n^2}{2}$ pares de chaves na rede;
+            \item ao entrar um novo usuário, é preciso um \textbf{canal seguro com cada} um dos demais para instalar as novas chaves.
+        \end{itemize}
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        Isto é o \textbf{problema da distribuição de $n^2$ chaves}: o número de chaves cresce com o \emph{quadrado} do número de usuários.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Exemplo: uma empresa de porte médio}
+    \begin{exampleblock}{Exemplo 14.1 (Livro)}
+        \footnotesize
+        Uma empresa com \textbf{800 funcionários} quer comunicação segura entre todos os pares, com mecanismos simétricos (confidencialidade por cifra; autenticação/integridade por MAC). Então:
+        \begin{itemize}
+            \item são necessários $\dfrac{800 \cdot 799}{2} = \mathbf{319\,600}$ \textbf{pares} de chaves simétricas;
+            \item ao todo, $800 \cdot 799 = 639\,200$ chaves devem ser distribuídas por canais seguros;
+            \item se o funcionário 801 entra, \textbf{801 canais seguros} precisam ser estabelecidos (um para cada um dos 800 já existentes, mais o novo).
+        \end{itemize}
+    \end{exampleblock}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Inviável para redes médias/grandes --- e impensável para ``toda a internet''.
+        \item \textbf{Ideia:} introduzir uma \textbf{terceira parte confiável} que reduza o número de chaves de longo prazo de $\approx n^2/2$ para apenas $n$.
+    \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Derivação de Chaves (KDF)}
+
+\begin{frame}{Funções de Derivação de Chave (KDF)}
+    \textbf{Problema:} muitas vezes precisamos gerar \emph{várias} chaves a partir de um único segredo (ex.: uma chave-mestra pré-compartilhada), garantindo \textbf{frescor} (\textit{freshness}).
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Uma \textbf{KDF} computa uma chave derivada $k_d$ a partir de um segredo $k$ e de um valor público $s$ (contador ou \textit{nonce}):
+        \[
+            k_d = \text{KDF}(k, s)
+        \]
+        \item Para cada $s$ diferente, uma chave $k_d$ diferente $\Rightarrow$ Alice e Bob, partindo de um segredo comum, derivam \textbf{múltiplas chaves de sessão} (ex.: com um contador sincronizado).
+        \item Internamente, a KDF usa uma \textbf{PRF} (função pseudoaleatória), em geral construída a partir de hash ou cifra de bloco. Exemplo com HMAC:
+        \[
+            k_d = \text{KDF}(k, s) = \text{HMAC}_k(s)
+        \]
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Frescor:} se uma chave de sessão for comprometida, o atacante decifra apenas uma quantidade \emph{limitada} de tráfego.
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{KDF Baseada em Senha: \texttt{PBKDF2}}
+    Uma aplicação central de KDFs: derivar chaves de \textbf{senhas} (fáceis de lembrar, mas de baixa entropia). Em vez de guardar a senha, guarda-se a saída da KDF.
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Mão única:} a partir do arquivo de hashes de senha, o atacante não recupera as senhas --- só pode \emph{adivinhar} (força bruta / dicionário / \textit{rainbow tables}).
+        \item \textbf{Defesa 1 --- \textit{salt}:} valor aleatório e individual usado como $s$. Garante que senhas iguais gerem hashes diferentes e \alert{anula tabelas pré-computadas}.
+        \item \textbf{Defesa 2 --- lentidão:} \emph{iterar} a PRF (ex.: milhares de vezes) torna a busca por força bruta proporcionalmente mais cara.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=gray!8,colframe=gray!60!black,boxrule=0.5pt]
+        \centering\footnotesize
+        $k_d = \texttt{PBKDF2}_{\text{PRF}}(\textit{Pwd},\ s,\ i,\ k_{\text{Len}})$
+    \end{tcolorbox}
+    \smallskip
+    {\footnotesize $\textit{Pwd}$ = senha; \ $s$ = \textit{salt}; \ $i$ = nº de itera\c{c}ões (1024--4096, ou centenas de milhares para segurança de longo prazo); \ $k_{\text{Len}}$ = tamanho da chave. PRF típica: HMAC com SHA-256.}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Estabelecimento com um KDC}
+
+\begin{frame}{Centro de Distribuição de Chaves (KDC)}
+    \begin{itemize}
+        \item Um \textbf{KDC} (\textit{Key Distribution Center}) é um servidor \textbf{plenamente confiável} por todos os usuários.
+        \item Ele \textbf{compartilha uma chave secreta com cada usuário} $U$: a \textbf{KEK} (\textit{Key Encryption Key}) $k_U$, pré-distribuída \emph{uma única vez} por canal seguro.
+        \item A KEK é usada para transmitir, de forma segura, as \textbf{chaves de sessão} $k_{ses}$.
+    \end{itemize}
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt,title=\footnotesize KEK $k_U$ (longo prazo)]
+                \footnotesize
+                Não muda. Forma um ``canal secreto'' permanente entre o KDC e cada usuário.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \begin{tcolorbox}[colback=blue!6,colframe=blue!50!black,boxrule=0.5pt,title=\footnotesize Chave de sessão $k_{ses}$ (efêmera)]
+                \footnotesize
+                Muda a cada sessão (ex.: vida de 1 minuto). Usada para cifrar os dados de fato.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    {\footnotesize Estes protocolos fazem \textbf{transporte de chave} (\textit{key transport}): o KDC \emph{gera} a chave e a entrega --- não há negociação.}
+\end{frame}
+
+\begin{frame}{Protocolo Básico com KDC}
+    O KDC gera $k_{ses}$ e a envia cifrada sob cada KEK: \ $y_A = e_{k_A}(k_{ses})$, \ $y_B = e_{k_B}(k_{ses})$.
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.96\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        % atores
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (K) at (6,0) {KDC};
+        \node[ator] (B) at (12,0) {Bob};
+        \node[chave, below=0pt of A] {KEK: $k_A$};
+        \node[chave, below=0pt of K] {KEK: $k_A, k_B$};
+        \node[chave, below=0pt of B] {KEK: $k_B$};
+        % linhas de vida
+        \foreach \x in {0,6,12} \draw[vida] (\x,-0.85) -- (\x,-6.6);
+        % mensagens
+        \draw[msg] (0,-1.4) -- (6,-1.4) node[rotmsg, midway]{$\text{RQST}(ID_A, ID_B)$};
+        \node[comp, anchor=north] at (6,-1.9) {gera $k_{ses}$ aleatório\\ $y_A = e_{k_A}(k_{ses})$\\ $y_B = e_{k_B}(k_{ses})$};
+        \draw[msg] (6,-3.5) -- (0,-3.5) node[rotmsg, midway]{$y_A$};
+        \draw[msg] (6,-3.9) -- (12,-3.9) node[rotmsg, midway]{$y_B$};
+        \node[comp, anchor=north] at (0,-4.3) {$k_{ses} = e_{k_A}^{-1}(y_A)$};
+        \node[comp, anchor=north] at (12,-4.3) {$k_{ses} = e_{k_B}^{-1}(y_B)$};
+        % comunicacao usando kses
+        \draw[{Latex[length=2mm]}-{Latex[length=2mm]}, thick, black!60] (0,-5.8) -- (12,-5.8)
+            node[rotmsg, midway]{$y = e_{k_{ses}}(x)$ \quad (Alice e Bob trocam dados)};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    {\footnotesize Pode-se ver as KEKs como ``canais secretos'' KDC$\leftrightarrow$usuário; o KDC simplesmente envia $k_{ses}$ por esses canais.}
+\end{frame}
+
+\begin{frame}{Protocolo com KDC (versão otimizada)}
+    Economiza uma comunicação: o KDC manda \emph{ambos} $y_A, y_B$ para Alice, que repassa $y_B$ a Bob junto com a mensagem.
+    \vspace{0.3em}
+    \begin{center}
+    \resizebox{0.94\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (K) at (6,0) {KDC};
+        \node[ator] (B) at (12,0) {Bob};
+        \node[chave, below=0pt of A] {KEK: $k_A$};
+        \node[chave, below=0pt of K] {KEK: $k_A, k_B$};
+        \node[chave, below=0pt of B] {KEK: $k_B$};
+        \foreach \x in {0,6,12} \draw[vida] (\x,-0.85) -- (\x,-6.6);
+        \draw[msg] (0,-1.4) -- (6,-1.4) node[rotmsg, midway]{$\text{RQST}(ID_A, ID_B)$};
+        \node[comp, anchor=north] at (6,-1.9) {gera $k_{ses}$\\ $y_A = e_{k_A}(k_{ses})$\\ $y_B = e_{k_B}(k_{ses})$};
+        \draw[msg] (6,-3.5) -- (0,-3.5) node[rotmsg, midway]{$y_A,\ y_B$};
+        \node[comp, anchor=north] at (0,-3.9) {$k_{ses} = e_{k_A}^{-1}(y_A)$\\ $y = e_{k_{ses}}(x)$};
+        \draw[msg] (0,-5.4) -- (12,-5.4) node[rotmsg, midway]{$y_B,\ y$};
+        \node[comp, anchor=north] at (12,-5.8) {$k_{ses} = e_{k_B}^{-1}(y_B)$;\ \ $x = e_{k_{ses}}^{-1}(y)$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Vantagem-chave:} apenas \textbf{$n$ chaves de longo prazo} no sistema (não $\approx n^2/2$). Cada usuário guarda só a \emph{sua} KEK; um novo usuário Noah precisa de \textbf{um único} canal seguro (com o KDC).
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Exemplo Prático: TV por assinatura}
+    \begin{itemize}
+        \item Como as KEKs são de \textbf{longo prazo} e as chaves de sessão são \textbf{efêmeras}, costuma-se usar cifras diferentes para cada tipo de chave.
+    \end{itemize}
+    \medskip
+    \begin{exampleblock}{Pay-TV}
+        \footnotesize
+        \begin{itemize}
+            \item As KEKs $k_U$ usam \textbf{AES} para distribuir as chaves de sessão $k_{ses}$.
+            \item Cada $k_{ses}$ vive $\approx$ \textbf{1 minuto} e cifra o sinal de TV com uma cifra \emph{leve e rápida} (ex.: PRESENT com chave de 80 bits).
+            \item Se uma chave de sessão vazar, o atacante decifra apenas \textbf{1 minuto} de conteúdo.
+        \end{itemize}
+    \end{exampleblock}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Mas atenção:} se uma \textbf{KEK} for comprometida, \emph{todo} o tráfego passado e futuro daquele usuário pode ser decifrado. A KEK é o elo crítico.
+    \end{tcolorbox}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ataques ao KDC Básico}
+
+\begin{frame}{O Protocolo Básico Não Resiste a um Atacante Ativo}
+    Os protocolos anteriores protegem contra um atacante \emph{passivo} (que só escuta), mas \alert{falham} contra um atacante \textbf{ativo}, que manipula e injeta mensagens. Dois ataques:
+    \medskip
+    \begin{enumerate}
+        \item \textbf{Ataque de \textit{replay} (repetição):} nem Alice nem Bob sabem se a chave de sessão recebida é \emph{nova}.
+        \begin{itemize}
+            \footnotesize
+            \item Se Oscar obteve uma chave de sessão \emph{antiga} (vazada, ou cuja cifra ficou fraca), ele se passa pelo KDC e \textbf{reenvia} os antigos $y_A, y_B$.
+            \item Como ele conhece aquela $k_{ses}$, decifra tudo o que Alice/Bob cifrarem com ela. Falta \textbf{frescor de chave}.
+        \end{itemize}
+        \medskip
+        \item \textbf{Ataque de confirmação de chave:} Alice não tem garantia de que a chave recebida é para uma sessão \emph{com Bob} (próximo slide).
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Ataque de Confirmação de Chave}
+    Oscar é um usuário \emph{legítimo mas malicioso}. Ele troca a requisição $\text{RQST}(ID_A, ID_B)$ por $\text{RQST}(ID_A, ID_O)$.
+    \vspace{0.2em}
+    \begin{center}
+    \resizebox{0.99\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (O) at (4.2,0) {Oscar};
+        \node[ator] (K) at (9,0) {KDC};
+        \node[ator] (B) at (13,0) {Bob};
+        \node[chave, below=0pt of A] {$k_A$};
+        \node[chave, below=0pt of O] {$k_O$};
+        \node[chave, below=0pt of K] {$k_A, k_B, k_O$};
+        \node[chave, below=0pt of B] {$k_B$};
+        \foreach \x in {0,4.2,9,13} \draw[vida] (\x,-0.85) -- (\x,-5.7);
+        \draw[msg] (0,-1.2) -- (4.2,-1.2) node[rotmsg, midway]{$\text{RQST}(ID_A, ID_B)$};
+        \node[comp, anchor=north, fill=red!8, draw=red!40] at (4.2,-1.55) {substitui $ID_B \to ID_O$};
+        \draw[msg] (4.2,-2.5) -- (9,-2.5) node[rotmsg, midway]{$\text{RQST}(ID_A, ID_O)$};
+        \node[comp, anchor=north] at (9,-2.85) {gera $k_{ses}$\\ $y_A = e_{k_A}(k_{ses})$\\ $y_O = e_{k_O}(k_{ses})$};
+        \draw[msg] (9,-4.3) -- (0,-4.3) node[rotmsg, near start]{$y_A,\ y_O$};
+        \node[comp, anchor=north west] at (0.15,-4.65) {$k_{ses}=e_{k_A}^{-1}(y_A)$; \emph{pensa que $y_O$ é $y_B$}};
+        \draw[msg] (0,-5.4) -- (4.2,-5.4) node[rotmsg, midway]{$y_O,\ y = e_{k_{ses}}(x)$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+    \vspace{-0.2em}
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        O KDC cria uma sessão Alice$\leftrightarrow$Oscar, mas Alice \emph{acredita} falar com Bob; Oscar intercepta $y$ e decifra. \textbf{Causa raiz:} não há \textbf{confirmação de chave}.
+    \end{tcolorbox}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Needham--Schroeder e Kerberos}
+
+\begin{frame}{Protocolo Needham--Schroeder}
+    \begin{itemize}
+        \item Esquema mais avançado que protege contra \textit{replay} \textbf{e} confirmação de chave.
+        \item É a \textbf{base do Kerberos}, protocolo de autenticação muito usado em redes (RFC, 1993). O KDC é chamado de \textbf{servidor de autenticação} (\textit{authentication server}).
+        \item \textbf{Ideia central:} introduzir \textit{nonces} ($n_A$, $n_B$) --- ``\textit{numbers used once}'' --- para garantir \textbf{frescor} via \textbf{desafio--resposta} (\textit{challenge--response}).
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Duas garantias de frescor:}
+        \begin{itemize}
+            \item Alice gera $n_A$ e o recebe de volta cifrado $\Rightarrow$ sabe que $k_{ses}$ foi gerada \emph{após} seu pedido.
+            \item Bob gera $n_B$, recebe $n_B + 1$ de Alice $\Rightarrow$ confirma que Alice tem a \emph{mesma} $k_{ses}$.
+        \end{itemize}
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Needham--Schroeder: o Protocolo}
+    \begin{center}
+    \resizebox{0.86\textwidth}{!}{%
+    \begin{tikzpicture}[font=\footnotesize]
+        \node[ator] (A) at (0,0) {Alice};
+        \node[ator] (K) at (6.5,0) {KDC};
+        \node[ator] (B) at (13,0) {Bob};
+        \node[chave, below=0pt of A] {KEK: $k_A$};
+        \node[chave, below=0pt of K] {KEK: $k_A, k_B$};
+        \node[chave, below=0pt of B] {KEK: $k_B$};
+        \foreach \x in {0,6.5,13} \draw[vida] (\x,-0.85) -- (\x,-9.7);
+        \node[comp, anchor=north] at (0,-1.0) {gera \textit{nonce} $n_A$};
+        \draw[msg] (0,-1.75) -- (6.5,-1.75) node[rotmsg, midway]{$\text{RQST}(ID_A, ID_B, n_A)$};
+        \node[comp, anchor=north] at (6.5,-2.2) {gera $k_{ses}$\\ $y_A = e_{k_A}(k_{ses}, n_A, ID_B)$\\ $y_B = e_{k_B}(k_{ses}, ID_A)$};
+        \draw[msg] (6.5,-4.0) -- (0,-4.0) node[rotmsg, midway]{$y_A,\ y_B$};
+        \node[comp, anchor=north] at (0,-4.45) {$(k_{ses}, n_A', ID_B) = e_{k_A}^{-1}(y_A)$\\ verifica $n_A' = n_A$ e $ID_B$};
+        \draw[msg] (0,-5.9) -- (13,-5.9) node[rotmsg, near end]{$y_B$};
+        \node[comp, anchor=north] at (13,-6.35) {$(k_{ses}, ID_A) = e_{k_B}^{-1}(y_B)$\\ verifica $ID_A$; gera $n_B$\\ $y_{BA} = e_{k_{ses}}(n_B)$};
+        \draw[msg] (13,-7.85) -- (0,-7.85) node[rotmsg, midway]{$y_{BA}$};
+        \node[comp, anchor=north] at (0,-8.3) {$n_B' = e_{k_{ses}}^{-1}(y_{BA})$\\ $y_{AB} = e_{k_{ses}}(n_B' + 1)$};
+        \draw[msg] (0,-9.3) -- (13,-9.3) node[rotmsg, near end]{$y_{AB}$};
+        \node[comp, anchor=north east] at (13.9,-9.0) {verifica\\ $n_B'+1$};
+    \end{tikzpicture}%
+    }
+    \end{center}
+\end{frame}
+
+\begin{frame}{Por que Needham--Schroeder Funciona}
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{Frescor / anti-\textit{replay}:} o \textit{nonce} $n_A$ devolvido dentro de $y_A$ prova que $k_{ses}$ foi gerada \emph{depois} do pedido de Alice (não é chave reutilizada).
+        \item \textbf{Autenticação do KDC (desafio--resposta):} Alice desafia o KDC a cifrar $n_A$ sob $k_A$; se o $n_A'$ retornado bate, ela sabe que $y_A$ veio mesmo do KDC.
+        \item \textbf{Confirmação de chave:} incluir $ID_B$ em $y_A$ garante a Alice que a chave é para uma sessão \emph{com Bob}; incluir $ID_A$ em $y_B$ garante a Bob que a chave é para falar \emph{com Alice}. (Resolve o ataque do slide anterior.)
+        \item \textbf{Autenticação mútua:} a troca de $n_B$ e $n_B+1$ confirma a Bob que Alice de fato possui $k_{ses}$.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=red!5,colframe=red!60!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Ainda há um \textit{replay} possível:} se Oscar comprometeu uma $k_{ses}$ \emph{antiga}, ele reenvia o antigo $y_B$ a Bob, intercepta $y_{BA}$ e gera um $y_{AB}$ válido. Bob acredita estar em sessão com Alice. \emph{(A vulnerabilidade migra para o comprometimento de chaves de sessão antigas.)}
+    \end{tcolorbox}
+\end{frame}
+
+\begin{frame}{Kerberos}
+    \begin{columns}[T]
+        \begin{column}{0.58\textwidth}
+            \begin{itemize}
+                \footnotesize
+                \item Nasceu no \textbf{MIT} nos anos \textbf{1980}, como protocolo de autenticação em redes.
+                \item É \textbf{baseado no Needham--Schroeder}; o KDC é o \emph{servidor de autenticação}.
+                \item A \textbf{versão 5} (Steve Miller e Clifford Neuman) foi publicada como \textbf{RFC em 1993} e atualizada na \textbf{RFC 4120}.
+                \item Originalmente usava \textbf{DES}; substituído por \textbf{AES em 2005}. \alert{Cuidado} com implementações legadas em DES (quebrável).
+                \item Amplamente usado: \textbf{Windows}, \textbf{macOS}, \textbf{Linux}, OpenBSD/FreeBSD.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.42\textwidth}
+            \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt,title=\footnotesize Escala]
+                \footnotesize
+                Na prática, Kerberos roda com \textbf{dezenas de milhares} de usuários. Para aliviar a carga, aumenta-se a \emph{vida} das chaves de sessão. Ainda assim, não escala para ``toda a internet''.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Problemas Remanescentes}
+
+\begin{frame}{Problemas dos Esquemas Baseados em KDC}
+    Mesmo o Needham--Schroeder/Kerberos têm limitações gerais dos esquemas \emph{simétricos}:
+    \medskip
+    \begin{enumerate}
+        \footnotesize
+        \item \textbf{Sem \textit{Perfect Forward Secrecy} (PFS).} Se uma KEK $k_A$ vaza, Oscar decifra todo o tráfego \emph{futuro} de Alice e, se guardou mensagens antigas $y_A$ e $y$, também o tráfego \emph{passado}. Parar de usar a KEK não desfaz o estrago.
+        \medskip
+        \item \textbf{Canal seguro na inicialização.} Todo esquema com KDC exige um canal seguro quando um novo usuário entra (para instalar sua KEK).
+        \medskip
+        \item \textbf{Requisitos de comunicação.} O KDC precisa ser contatado a cada nova sessão $\Rightarrow$ gargalo em redes com muitos usuários (problema de desempenho).
+        \medskip
+        \item \textbf{Ponto único de falha.} A base de dados de KEKs do KDC é crítica: se o \textbf{KDC for comprometido}, \emph{todas} as KEKs caem e precisam ser reestabelecidas por canais seguros.
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Perfect Forward Secrecy (PFS)}
+    \begin{block}{Definição 14.3.1 --- Perfect Forward Secrecy}
+        Um protocolo criptográfico possui \textbf{Perfect Forward Secrecy (PFS)} se o \emph{comprometimento de chaves de longo prazo não permite} a um atacante obter \textbf{chaves de sessão passadas}.
+    \end{block}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Nem o Needham--Schroeder nem os protocolos simétricos mais simples oferecem PFS: as chaves de sessão são protegidas \emph{pelas} KEKs de longo prazo; comprometer a KEK expõe as sessões passadas.
+        \item O mecanismo principal para obter PFS é o uso de \textbf{técnicas de chave pública} (ex.: Diffie--Hellman efêmero).
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=green!5,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        \textbf{Caminho adiante:} a criptografia de \textbf{chave pública} resolve a distribuição de chaves em escala e habilita PFS --- ao custo de exigir \textbf{autenticação das chaves públicas} (certificados / PKI).
+    \end{tcolorbox}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Lições Aprendidas}
+
+\begin{frame}{Lições Aprendidas}
+    \begin{itemize}
+        \item Protocolos de \textbf{transporte de chave} transferem com segurança uma chave gerada por uma parte; em \textbf{acordo de chave}, todas as partes contribuem para o valor final.
+        \medskip
+        \item Na maioria dos protocolos simétricos há uma \textbf{terceira parte confiável} (KDC); o canal seguro com ela costuma ser necessário \emph{só na inicialização}.
+        \medskip
+        \item Esquemas simétricos \alert{não escalam bem} para redes muito grandes e, em geral, \alert{não oferecem PFS}.
+        \medskip
+        \item \textbf{KDFs} permitem derivar muitas chaves de sessão de uma chave inicial e são amplamente usadas para gerar chaves a partir de \textbf{senhas} (ex.: PBKDF2).
+        \medskip
+        \item \textbf{Kerberos} (baseado em Needham--Schroeder) é o protocolo simétrico de autenticação mais usado na prática.
+        \medskip
+        \item Uma \textbf{boa gestão de chaves} é crucial e deve ser considerada por \emph{todo o ciclo de vida} do sistema.
+    \end{itemize}
+\end{frame}
+
+\end{document}
