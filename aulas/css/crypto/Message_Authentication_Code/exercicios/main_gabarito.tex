@@ -1,0 +1,303 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{needspace}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\C\'{o}digos de Autentica\c{c}\~{a}o de Mensagem (MACs)\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: MACs (gabarito)}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Destaque para pontos-chave dentro das respostas (classe article n\~{a}o tem o \alert do Beamer)
+\newcommand{\alert}[1]{\textbf{\uline{#1}}}
+
+%% Cabe\c{c}alho de exerc\'{i}cio (numera\c{c}\~{a}o manual; o conte\'{u}do pode quebrar p\'{a}gina)
+\newcommand{\exercicio}[1]{%
+    \Needspace{8\baselineskip}%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+
+%% Caixa de resposta (vermelha, quebr\'{a}vel entre p\'{a}ginas)
+\newmdenv[
+    linecolor=red!65!black,
+    linewidth=0.8pt,
+    roundcorner=2pt,
+    backgroundcolor=red!3,
+    skipabove=0.8em,
+    skipbelow=1.0em,
+    innertopmargin=0.7em,
+    innerbottommargin=0.7em,
+    innerleftmargin=0.8em,
+    innerrightmargin=0.8em
+]{respostabox}
+\newenvironment{resposta}{%
+    \begin{respostabox}
+    \color{red!70!black}\sloppy
+}{%
+    \end{respostabox}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 13).}
+
+\textbf{Observa\c{c}\~{a}o:} esta vers\~{a}o cont\'{e}m os enunciados e uma proposta de solu\c{c}\~{a}o. Em itens discursivos, respostas equivalentes podem ser igualmente corretas.
+
+%% ══════════════════════════════ 1 ══════════════════════════════
+\exercicio{1}
+Queremos contrastar dois protocolos que protegem uma mensagem $x$: um baseado em MAC e outro em assinatura digital. Em ambos, o remetente calcula e envia $y$, onde \livro{13.1}
+\[
+    \text{Protocolo A:}\quad y = e_{k_1}\!\big[\, x \,\|\, h(k_2 \,\|\, x) \,\big]
+    \qquad\qquad
+    \text{Protocolo B:}\quad y = e_{k}\!\big[\, x \,\|\, \mathrm{sig}_{k_{pr}}(h(x)) \,\big]
+\]
+($k_1, k_2$ s\~{a}o chaves sim\'{e}tricas secretas conhecidas s\'{o} pelas duas partes; $k_{pr}/k_{pub}$ \'{e} o par assim\'{e}trico do remetente.)
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, \textbf{passo a passo}, o que o receptor faz ao receber $y$ em cada protocolo.
+    \item Quais \textbf{servi\c{c}os de seguran\c{c}a} cada protocolo oferece?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a) Protocolo A} (autentica\c{c}\~{a}o sim\'{e}trica):
+\begin{enumerate}[label=\arabic*., topsep=1pt]
+    \item Decifra a camada externa: $x' \,\|\, t' = d_{k_1}(y)$. Como a sa\'{i}da do hash tem tamanho fixo conhecido (ex.: 256 bits), separa os \'{u}ltimos bits como a \textit{tag} recebida $t'$ e o restante como a mensagem $x'$.
+    \item Recalcula o MAC com a chave $k_2$ que tamb\'{e}m possui: $t^{*} = h(k_2 \,\|\, x')$.
+    \item Compara $t^{*}$ com $t'$ (idealmente em tempo constante). Se iguais, aceita $x'$ como \'{i}ntegra e aut\^{e}ntica; sen\~{a}o, rejeita.
+\end{enumerate}
+\textbf{Protocolo B} (assinatura digital):
+\begin{enumerate}[label=\arabic*., topsep=1pt]
+    \item Decifra: $x' \,\|\, s' = d_{k}(y)$. Separa a mensagem $x'$ e a assinatura $s'$ (tamanho conhecido).
+    \item Recalcula o hash da mensagem recebida: $z^{*} = h(x')$.
+    \item Verifica a assinatura com a \emph{chave p\'{u}blica do remetente}: $\mathrm{ver}_{k_{pub}}(s', z^{*})$. \'{E} essencial confrontar $s'$ com $z^{*}=h(x')$ da mensagem recebida (n\~{a}o basta ``abrir'' a assinatura). Se v\'{a}lida, aceita; sen\~{a}o, rejeita.
+\end{enumerate}
+
+\textbf{(b)} \emph{Ambos} oferecem \textbf{confidencialidade} (camada $e_{k_1}$/$e_k$), \textbf{integridade} e \textbf{autentica\c{c}\~{a}o de origem}. A diferen\c{c}a essencial \'{e} o \textbf{n\~{a}o rep\'{u}dio}, que \alert{s\'{o} o Protocolo B} oferece. Raz\~{a}o: o n\~{a}o rep\'{u}dio exige \emph{assimetria} entre gerar e verificar a prova de autoria. Em B, a assinatura usa a chave privada $k_{pr}$, que \emph{s\'{o} o remetente} possui (e qualquer um verifica com $k_{pub}$); ela vincula a mensagem unicamente ao remetente, que n\~{a}o pode neg\'{a}-la diante de um \'{a}rbitro. Em A, o MAC usa a chave \emph{sim\'{e}trica} $k_2$, compartilhada: como emissor \emph{e} receptor podem gerar $h(k_2\|x)$, eles s\~{a}o indistingu\'{i}veis e o emissor sempre pode alegar que foi o outro quem forjou a mensagem. MACs sim\'{e}tricos, por constru\c{c}\~{a}o, nunca d\~{a}o n\~{a}o rep\'{u}dio.
+
+{\footnotesize\textit{Notas para o professor:} (i) o n\~{a}o rep\'{u}dio de B s\'{o} vale perante terceiros se $k_{pub}$ estiver autenticada (certificado/PKI). (ii) O construtor $h(k_2\|x)$ \'{e} de \emph{prefixo secreto}: em hash Merkle--Damg\r{a}rd sofre \textit{length extension} (ver Ex.~3); na pr\'{a}tica usar-se-ia HMAC/KMAC. Isso n\~{a}o altera a classifica\c{c}\~{a}o de servi\c{c}os.}
+\end{resposta}
+
+%% ══════════════════════════════ 2 ══════════════════════════════
+\exercicio{2}
+Para fun\c{c}\~{o}es hash \'{e} crucial ter uma sa\'{i}da longa (p.\,ex.\ 256 bits) para frustrar ataques baseados no paradoxo do anivers\'{a}rio. No entanto, comprimentos bem menores --- p.\,ex.\ \textbf{128 bits} --- costumam ser suficientes para \textbf{MACs}. \livro{13.2}
+\begin{enumerate}[label=(\alph*)]
+    \item Suponha que a mensagem $x$ trafega em claro junto com seu MAC, isto \'{e}, o par $(x, \text{MAC}_k(x))$. Esclare\c{c}a \textbf{exatamente} o que Oscar (que n\~{a}o conhece $k$) precisa fazer para forjar uma mensagem aceita pelo receptor.
+    \item Por que o paradoxo do anivers\'{a}rio \textbf{n\~{a}o} ajuda Oscar nesse cen\'{a}rio? Compare o custo do ataque (\emph{online} vs.\ \emph{offline}) e conclua qual o n\'{i}vel de seguran\c{c}a de uma \textit{tag} de MAC de 128 bits comparada a um hash de 128 bits.
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Oscar quer produzir um par $(x', m')$ com $x'$ nova e $m' = \text{MAC}_k(x')$, de modo que o receptor (que tem $k$) aceite. Sem a chave, ele tem duas op\c{c}\~{o}es de for\c{c}a bruta: (i) adivinhar a chave $k$, custo $\approx 2^{|k|}$; ou (ii) adivinhar diretamente a \textit{tag} de uma $x'$ escolhida, com probabilidade de acerto $2^{-n}$ por palpite ($n$ = tamanho da \textit{tag}). O ponto \textbf{crucial}: para saber se um palpite $m'$ est\'{a} certo, Oscar \alert{precisa submeter $(x', m')$ ao verificador}, pois sozinho ele n\~{a}o consegue calcular $\text{MAC}_k(\cdot)$. Logo a falsifica\c{c}\~{a}o exige $\approx 2^{n}$ tentativas \textbf{online}.
+
+\textbf{(b)} O paradoxo do anivers\'{a}rio \emph{n\~{a}o} se aplica porque ele pressup\~{o}e que o atacante consiga \emph{computar a fun\c{c}\~{a}o por conta pr\'{o}pria} e reconhecer colis\~{o}es:
+\begin{itemize}
+    \item \textbf{Hash (colis\~{a}o) = offline.} $h$ \'{e} p\'{u}blica e sem chave; Oscar calcula $h(\cdot)$ na pr\'{o}pria m\'{a}quina, em paralelo e em sil\^{e}ncio. O anivers\'{a}rio garante uma colis\~{a}o ap\'{o}s $\approx 2^{n/2}$ avalia\c{c}\~{o}es. Seguran\c{c}a efetiva $\approx 2^{n/2}$.
+    \item \textbf{MAC (forja) = online.} Sem $k$, Oscar n\~{a}o computa $\text{MAC}_k$ sozinho nem reconhece colis\~{o}es offline; cada tentativa exige uma consulta real ao detentor da chave. Isso \'{e} lento, n\~{a}o paraleliz\'{a}vel fora do sistema, control\'{a}vel e \emph{detect\'{a}vel} (uma rajada de MACs inv\'{a}lidos dispara \textit{rate-limiting}/bloqueio). Seguran\c{c}a $\approx 2^{n}$.
+\end{itemize}
+\textbf{Conclus\~{a}o:} a chave secreta transfere a verifica\c{c}\~{a}o para algo que \emph{s\'{o} o defensor} pode fazer, empurrando Oscar de um ataque offline barato ($2^{n/2}$) para um ataque online caro e detect\'{a}vel ($2^{n}$). Por isso uma \textit{tag} de MAC de \textbf{128 bits} oferece $\approx 2^{128}$ de seguran\c{c}a, enquanto um \textbf{hash} de 128 bits oferece apenas $\approx 2^{64}$ contra colis\~{a}o (da\'{i} hashes pedirem $\geq 256$ bits). De forma geral, a seguran\c{c}a do MAC \'{e} $\min(2^{\text{tag}}, 2^{|k|})$.
+
+{\footnotesize\textit{Nota para o professor:} o valor $\approx 2^{n}$ pressup\~{o}e um MAC \emph{sem fraqueza estrutural}. Se houver, valem ataques espec\'{i}ficos que o anivers\'{a}rio \emph{volta} a habilitar --- \textit{length extension} no prefixo secreto, colis\~{a}o no sufixo secreto (Ex.~3), falsifica\c{c}\~{a}o existencial no CBC-MAC puro (Ex.~5) --- e \'{e} por isso que se usam HMAC/KMAC e CMAC.}
+\end{resposta}
+
+%% ══════════════════════════════ 3 ══════════════════════════════
+\exercicio{3}
+Considere MACs constru\'{i}dos a partir de uma fun\c{c}\~{a}o hash $H$ criptograficamente forte baseada na constru\c{c}\~{a}o de \textbf{Merkle--Damg\r{a}rd}. Mostre os \textbf{dois ataques principais} contra as constru\c{c}\~{o}es ing\^{e}nuas de prefixo secreto e sufixo secreto: \livro{13.7}
+\[
+    \text{MAC}_k(x) = H(k \,\|\, x) \ \text{(prefixo secreto)}
+    \qquad\qquad
+    \text{MAC}_k(x) = H(x \,\|\, k) \ \text{(sufixo secreto)}
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Prefixo secreto:} descreva como o atacante forja um MAC v\'{a}lido para uma mensagem \emph{estendida}, sem conhecer $k$. Que nome tem esse ataque?
+    \item \textbf{Sufixo secreto:} descreva como o atacante explora uma colis\~{a}o do hash para forjar um MAC v\'{a}lido.
+    \item Por que o \textbf{SHA-3} (constru\c{c}\~{a}o esponja) n\~{a}o sofre o ataque do item (a)?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a) Prefixo secreto --- \textit{length extension}.} Numa fun\c{c}\~{a}o Merkle--Damg\r{a}rd, a sa\'{i}da $m = H(k\|x)$ \'{e} \emph{exatamente o estado interno de encadeamento} ap\'{o}s absorver $k\|x$ (com seu \textit{padding}). Conhecendo apenas $(x, m)$ --- e os par\^{a}metros p\'{u}blicos $IV$, tamanho de bloco, regra de \textit{padding} e o comprimento $|k|$ --- o atacante usa $m$ como estado inicial e \textbf{continua} a itera\c{c}\~{a}o, anexando um sufixo arbitr\'{a}rio $s$. Obt\'{e}m
+\[
+    m' = H\big(\, \underbrace{k \,\|\, x \,\|\, \text{pad}(k\|x)}_{\text{prefixo original + ``glue''}} \,\|\, s \,\big)
+\]
+isto \'{e}, um MAC v\'{a}lido para a mensagem estendida $x_{\text{forj}} = x \,\|\, \text{pad}(k\|x) \,\|\, s$, \alert{sem jamais conhecer $k$}. \'{E} a \textbf{falsifica\c{c}\~{a}o por extens\~{a}o de comprimento} (\textit{length extension attack}); o sufixo $s$ poderia ser, p.\,ex., um ap\^{e}ndice malicioso a um contrato.
+
+\textbf{(b) Sufixo secreto --- colis\~{a}o.} Aqui o \textit{length extension} n\~{a}o serve ($k$ vem por \'{u}ltimo). Em vez disso, o atacante busca \textbf{offline} (sem chave) uma colis\~{a}o $h(x_1) = h(x_2)$ com $x_1 \neq x_2$ (custo $\approx 2^{n/2}$ pelo anivers\'{a}rio). Como o estado de encadeamento ap\'{o}s $x_1$ e $x_2$ \'{e} o mesmo, e $k$ \'{e} absorvido \emph{depois} de forma id\^{e}ntica nas duas, segue
+\[
+    m = h(x_1 \,\|\, k) = h(x_2 \,\|\, k) \quad\Rightarrow\quad \text{MAC}_k(x_1) = \text{MAC}_k(x_2).
+\]
+O atacante obt\'{e}m o MAC leg\'{i}timo de $x_1$ (uma \'{u}nica consulta) e apresenta $(x_2, m)$, que ser\'{a} aceito. As duas mensagens podem ser, p.\,ex., duas vers\~{o}es de um contrato.
+
+\textbf{(c) SHA-3 (esponja) \'{e} imune ao \textit{length extension}.} O estado tem largura $b = r + c$ (\textit{rate} + \textit{capacity}); a sa\'{i}da exp\~{o}e apenas bits lidos do \textit{rate}, e os $c$ bits de \textbf{capacidade nunca s\~{a}o revelados}. Para continuar a hash, o atacante precisaria do estado completo, mas recuperar os $c$ bits ocultos custa $\approx 2^{c}$ (p.\,ex.\ $2^{512}$ no SHA3-256), invi\'{a}vel. Por isso o \textbf{KMAC} ($\approx \text{SHA3}(k\|x)$) \'{e} seguro \emph{sem} o envelope do HMAC, e o NIST o padronizou diretamente sobre o Keccak. Com SHA-1/SHA-2 (Merkle--Damg\r{a}rd), o aninhamento externo chaveado do \textbf{HMAC} $= H\big((k\oplus\texttt{opad}) \,\|\, H((k\oplus\texttt{ipad})\,\|\,x)\big)$ ``fecha'' a sa\'{i}da interna e anula o ganho do \textit{length extension}.
+
+{\footnotesize\textit{Notas para o professor:} (i) a mensagem forjada em (a) inclui o \emph{glue padding} $\text{pad}(k\|x)$ \emph{embutido no meio} --- ele \'{e} parte essencial da forja, e reconstru\'{i}-lo exige conhecer $|k|$ (sen\~{a}o, itera-se sobre os poucos comprimentos plaus\'{i}veis). (ii) Em (b), para o argumento ser exato a colis\~{a}o deve ter o \emph{mesmo comprimento em blocos} (colis\~{a}o de estado interno), de modo que o alinhamento de $k$ e do \textit{padding} final seja id\^{e}ntico nas duas mensagens.}
+\end{resposta}
+
+%% ══════════════════════════════ 4 ══════════════════════════════
+\exercicio{4}
+MACs tamb\'{e}m s\~{a}o, em princ\'{i}pio, vulner\'{a}veis a ataques de colis\~{a}o. \livro{13.5}
+\begin{enumerate}[label=(\alph*)]
+    \item Suponha que Oscar encontrou uma colis\~{a}o entre duas mensagens, isto \'{e}, $\text{MAC}_k(x_1) = \text{MAC}_k(x_2)$ com $x_1 \neq x_2$. Considere uma troca de mensagens autenticadas (\textbf{sem} encripta\c{c}\~{a}o) entre Alice e Bob. Mostre o que Oscar precisa fazer para explorar a colis\~{a}o, lembrando que ele \textbf{n\~{a}o} possui a chave $k$.
+    \item Embora o paradoxo do anivers\'{a}rio ainda possa ser usado para construir colis\~{o}es, por que \'{e} muito mais dif\'{i}cil constru\'{i}-las na pr\'{a}tica para MACs do que para fun\c{c}\~{o}es hash? Em consequ\^{e}ncia, que seguran\c{c}a oferece um MAC de sa\'{i}da de 128 bits comparado a uma fun\c{c}\~{a}o hash de sa\'{i}da de 128 bits?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Como Oscar \alert{n\~{a}o} tem $k$, ele n\~{a}o consegue gerar nenhuma \textit{tag} v\'{a}lida sozinho; o \'{u}nico recurso \'{e} \textbf{reaproveitar} uma \textit{tag} leg\'{i}tima. O ataque (substitui\c{c}\~{a}o por colis\~{a}o):
+\begin{enumerate}[label=\arabic*., topsep=1pt]
+    \item Oscar induz Alice a enviar uma das mensagens da colis\~{a}o, $x_1$ (tipicamente a \emph{benigna} --- p.\,ex., ``transferir R\$ 10''); Alice calcula $m = \text{MAC}_k(x_1)$ e transmite $(x_1, m)$.
+    \item Como n\~{a}o h\'{a} encripta\c{c}\~{a}o, Oscar l\^{e} $x_1$ e \emph{copia} a \textit{tag} $m$ em claro.
+    \item Oscar substitui a mensagem mantendo a \emph{mesma} \textit{tag}: injeta $(x_2, m)$ para Bob, onde $x_2$ \'{e} a vers\~{a}o fraudulenta (p.\,ex., ``transferir R\$ 10000'').
+    \item Bob recalcula $\text{MAC}_k(x_2)$; pela colis\~{a}o, o resultado \'{e} $m$ --- exatamente o valor recebido. Bob \textbf{aceita} $x_2$ como aut\^{e}ntica.
+\end{enumerate}
+\begin{center}\footnotesize
+\begin{tabular}{ccc}
+\textbf{Alice} & \textbf{Oscar} & \textbf{Bob}\\
+$m = \text{MAC}_k(x_1)$ & & \\
+$\xrightarrow{\ (x_1,\, m)\ }$ & \emph{troca!} & $\xrightarrow{\ (x_2,\, m)\ }$ \\
+& & $\text{MAC}_k(x_2) = m \Rightarrow$ aceita
+\end{tabular}
+\end{center}
+A forja \'{e} bem-sucedida \emph{sem} Oscar conhecer $k$; ela depende de Alice enviar a parceira $x_1$ da colis\~{a}o, e a aus\^{e}ncia de encripta\c{c}\~{a}o \'{e} o que lhe permite ler/copiar a \textit{tag}.
+
+\textbf{(b)} Para construir uma colis\~{a}o por anivers\'{a}rio s\~{a}o necess\'{a}rias $\approx 2^{n/2}$ avalia\c{c}\~{o}es da fun\c{c}\~{a}o. Para um \textbf{hash}, Oscar faz isso \emph{offline}, sozinho, pois a fun\c{c}\~{a}o \'{e} sem chave. Para um \textbf{MAC}, ele n\~{a}o tem $k$, ent\~{a}o teria de \emph{enganar Alice/Bob} para que computassem essa quantidade enorme de MACs --- um ataque \emph{online}, lento, control\'{a}vel e detect\'{a}vel, invi\'{a}vel para $n$ grande. Logo, um MAC de 128 bits oferece $\approx 2^{128}$ de seguran\c{c}a (colis\~{o}es n\~{a}o aplic\'{a}veis na pr\'{a}tica), enquanto um hash de 128 bits oferece apenas $\approx 2^{64}$.
+\end{resposta}
+
+%% ══════════════════════════════ 5 ══════════════════════════════
+\exercicio{5}
+Estudamos um ataque adaptativo de texto-claro escolhido contra o \textbf{CBC-MAC}, mostrando que ele pode ser inseguro. Assuma um $IV$ todo-zero e que Oscar tem acesso a um or\'{a}culo $\mathcal{O}$ que calcula o MAC de mensagens de tamanho arbitr\'{a}rio com uma chave $k$ desconhecida. Cada bloco $x_i$ tem a largura do bloco da cifra. \livro{13.8}
+\begin{enumerate}[label=(\alph*)]
+    \item O objetivo de Oscar \'{e} construir um MAC v\'{a}lido para a mensagem $X' = x_1\,x_2\,x_3$ \textbf{sem} pedir $\text{MAC}(X')$ ao or\'{a}culo. Ele primeiro pede o MAC de $X = x_1\,x_2$ e obt\'{e}m $m$. Que \textbf{outra mensagem} ele precisa enviar ao or\'{a}culo para passar a conhecer $\text{MAC}(X')$?
+    \item Explique por que o ataque funciona, isto \'{e}, qual \'{e} o aspecto problem\'{a}tico do CBC-MAC.
+    \item O ataque ainda \'{e} poss\'{i}vel se for usado o esquema \textbf{CMAC}? Justifique sua resposta.
+\end{enumerate}
+
+\begin{resposta}
+Lembre o CBC-MAC com $IV = 0$: \ $t_1 = e_k(x_1)$, \ $t_i = e_k(x_i \oplus t_{i-1})$, \ e $\text{MAC} = $ \'{u}ltimo bloco.
+
+\textbf{(a)} Oscar faz \textbf{duas} consultas. Primeiro pede $m = \mathcal{O}(x_1\,x_2)$, internamente $m = e_k(x_2 \oplus e_k(x_1))$. A \emph{segunda mensagem} \'{e} o \textbf{bloco \'{u}nico} $\;Q = x_3 \oplus m$. Como $IV = 0$, o or\'{a}culo devolve
+\[
+    \mathcal{O}(Q) = e_k(Q \oplus 0) = e_k(x_3 \oplus m).
+\]
+Mas a cadeia de $X' = x_1\,x_2\,x_3$ daria justamente $t_3 = e_k(x_3 \oplus t_2) = e_k(x_3 \oplus m)$. Logo
+\[
+    \text{MAC}(X') = e_k(x_3 \oplus m) = \mathcal{O}(Q),
+\]
+e o par $(X',\, \mathcal{O}(Q))$ \'{e} uma falsifica\c{c}\~{a}o v\'{a}lida, sem nunca consultar $X'$.
+
+\textbf{(b)} O ataque funciona porque, no CBC-MAC puro com $IV$ fixo, \alert{a \textit{tag} \'{e} o pr\'{o}prio valor de encadeamento} exposto na sa\'{i}da, e \emph{nada amarra a \textit{tag} ao comprimento} da mensagem. Conhecendo $m = t_2$, ``continuar a cadeia por fora'' com um bloco $x_3$ equivale a calcular $e_k(x_3 \oplus m)$ --- que \'{e} o MAC da mensagem de um bloco $x_3\oplus m$ (pois $IV=0$ faz a primeira rodada ser $e_k$ da pr\'{o}pria entrada). \'{E} a cl\'{a}ssica \textbf{falsifica\c{c}\~{a}o existencial por extens\~{a}o}: o CBC-MAC puro s\'{o} \'{e} seguro para mensagens de comprimento \emph{fixo} e previamente acordado.
+
+\textbf{(c)} N\~{a}o, o ataque \alert{n\~{a}o} funciona contra o \textbf{CMAC}. No CMAC, deriva-se de $k$ uma subchave secreta $k_1$ (a partir de $e_k(0)$) que \'{e} somada (XOR) \emph{apenas no \'{u}ltimo bloco} antes da cifragem final. Consequ\^{e}ncias:
+\begin{itemize}
+    \item A \textit{tag} de $x_1\,x_2$ passa a ser $m = e_k(x_2 \oplus t_1 \oplus k_1)$, que \alert{n\~{a}o} \'{e} o valor de encadeamento ``cru'' $t_2 = e_k(x_2 \oplus t_1)$. Oscar n\~{a}o consegue recuperar $t_2$ a partir de $m$ (precisaria inverter $e_k$).
+    \item Para $X' = x_1\,x_2\,x_3$, o \'{u}ltimo bloco \'{e} $x_3$, ent\~{a}o $\text{MAC}(X') = e_k(x_3 \oplus t_2 \oplus k_1)$, com $t_2$ \emph{sem} $k_1$ (pois agora o 2\textsuperscript{o} bloco n\~{a}o \'{e} o \'{u}ltimo). E a consulta de $Q = x_3 \oplus m$ devolveria $e_k(x_3 \oplus m \oplus k_1)$, sem rela\c{c}\~{a}o com o alvo.
+\end{itemize}
+Como $k_1$ \'{e} secreto e o tratamento do \'{u}ltimo bloco depende do comprimento, a \textit{tag} fica \textbf{amarrada ao comprimento} e n\~{a}o pode ser reaproveitada como valor de encadeamento --- o que elimina a falsifica\c{c}\~{a}o por extens\~{a}o. \'{E} exatamente a fraqueza que o CMAC foi projetado para corrigir.
+
+{\footnotesize\textit{Nota para o professor:} a segunda consulta \'{e} uma mensagem de \emph{um \'{u}nico bloco} $x_3\oplus m$, n\~{a}o o par $(x_3, m)$. Isso depende de $IV=0$; com um $IV \neq 0$ conhecido, consultar-se-ia $Q = x_3 \oplus m \oplus IV$.}
+\end{resposta}
+
+%% ══════════════════════════════ 6 ══════════════════════════════
+\exercicio{6}
+Vamos analisar uma constru\c{c}\~{a}o de MAC \emph{ad hoc}, eficiente mas criptograficamente fraca. A mensagem $X = x_1 \,\|\, x_2 \,\|\, \cdots \,\|\, x_z$ tem $z$ blocos independentes, cada $x_i$ de 8 bits, que entram numa fun\c{c}\~{a}o de compress\~{a}o
+\[
+    c_i = h(c_{i-1}, x_i) = c_{i-1} \oplus x_i, \qquad \text{com } c_i, x_i \text{ de 8 bits},
+\]
+e o MAC \'{e} calculado a partir da \'{u}ltima sa\'{i}da $c_z$:
+\[
+    \text{MAC}_k(X) \equiv c_z + k \pmod{2^8}, \qquad k \text{ \'{e} uma chave compartilhada de 64 bits.}
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva como a parte \emph{efetiva} da chave $k$ pode ser calculada com apenas \textbf{uma} mensagem conhecida $X$ (e seu MAC).
+    \item Realize o ataque e determine $k$ para: \ $X = \texttt{HELLO ALICE!}$ \ (string ASCII, um bloco de 8 bits por caractere, \emph{incluindo o espa\c{c}o}), \ $c_0 = \texttt{1111\,1111}_2$ \ e \ $\text{MAC}_k(X) = \texttt{1001\,1101}_2$. Mostre o c\'{a}lculo.
+    \item Qual \'{e} o comprimento \textbf{efetivo} da chave $k$?
+\end{enumerate}
+
+\begin{resposta}
+\textbf{(a)} Como $c_i = c_{i-1} \oplus x_i$ e o XOR \'{e} associativo e comutativo, desenrolando a cadeia:
+\[
+    c_z = c_0 \oplus x_1 \oplus x_2 \oplus \cdots \oplus x_z,
+\]
+que depende \emph{apenas} de dados p\'{u}blicos ($c_0$ e a mensagem $X$) --- \alert{n\~{a}o depende da chave}. De posse de um par conhecido $(X, \text{MAC}_k(X))$, o atacante calcula $c_z$ sozinho e isola $k$ invertendo a soma modular:
+\[
+    k \equiv \text{MAC}_k(X) - c_z \pmod{2^8}.
+\]
+Uma \'{u}nica mensagem conhecida basta (sem busca!) para recuperar os 8 bits efetivos de $k$, com os quais ele forja o MAC de \emph{qualquer} mensagem nova.
+
+\textbf{(b)} C\'{o}digos ASCII de \texttt{HELLO ALICE!} (12 blocos, incluindo o espa\c{c}o $\texttt{0x20}$):
+\begin{center}\footnotesize\ttfamily
+H=48\quad E=45\quad L=4C\quad L=4C\quad O=4F\quad \textvisiblespace=20\quad A=41\quad L=4C\quad I=49\quad C=43\quad E=45\quad !=21
+\end{center}
+O XOR de todos os 12 bytes \'{e} $\texttt{0x01}$, logo
+\[
+    c_z = c_0 \oplus \big(\textstyle\bigoplus_i x_i\big) = \texttt{0xFF} \oplus \texttt{0x01} = \texttt{0xFE} = 254.
+\]
+Recuperando a chave (m\'{o}dulo $2^8$):
+\[
+    k \equiv \text{MAC} - c_z = \texttt{0x9D} - \texttt{0xFE} = 157 - 254 = -97 \equiv 159 \pmod{256} = \texttt{0x9F} = \texttt{1001\,1111}_2.
+\]
+Confer\^{e}ncia: $(c_z + k) \bmod 256 = (254 + 159) \bmod 256 = 413 - 256 = 157 = \texttt{0x9D}_{\phantom{2}} = \texttt{1001\,1101}_2 = \text{MAC}$. \checkmark
+
+\textbf{(c)} O comprimento \textbf{efetivo} \'{e} de apenas \textbf{8 bits}. Embora $k$ tenha 64 bits nominais, a opera\c{c}\~{a}o $(c_z + k) \bmod 2^8$ s\'{o} usa os 8 bits menos significativos de $k$; os 56 bits superiores nunca influenciam a \textit{tag}. O espa\c{c}o de chave \'{u}til \'{e} $2^8 = 256$ --- e o ataque sequer precisa de busca exaustiva, pois uma \'{u}nica equa\c{c}\~{a}o fornece $k$ diretamente.
+\end{resposta}
+
+\end{document}

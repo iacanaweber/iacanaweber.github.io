@@ -1,0 +1,156 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\C\'{o}digos de Autentica\c{c}\~{a}o de Mensagem (MACs)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: MACs}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Cada exerc\'{i}cio \'{e} um bloco indivis\'{i}vel (tcolorbox `blanker', sem moldura):
+%% se n\~{a}o couber no restante da p\'{a}gina, o bloco inteiro vai para a pr\'{o}xima.
+\newtcolorbox[auto counter]{exercicio}[1][]{%
+    blanker,
+    before skip=26pt plus 6pt minus 2pt,
+    after skip=8pt,
+    before upper={%
+        \noindent
+        {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+        \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio \thetcbcounter}%
+        \par\nobreak\vspace{-0.4em}
+        \noindent{\color{black!35}\rule{\linewidth}{0.4pt}}%
+        \par\nobreak\vspace{0.35em}\noindent
+    },
+    #1
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{../../Cifras_de_Fluxo/exercicios/img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 13).}
+
+\begin{exercicio}
+Queremos contrastar dois protocolos que protegem uma mensagem $x$: um baseado em MAC e outro em assinatura digital. Em ambos, o remetente calcula e envia $y$, onde \livro{13.1}
+\[
+    \text{Protocolo A:}\quad y = e_{k_1}\!\big[\, x \,\|\, h(k_2 \,\|\, x) \,\big]
+    \qquad\qquad
+    \text{Protocolo B:}\quad y = e_{k}\!\big[\, x \,\|\, \mathrm{sig}_{k_{pr}}(h(x)) \,\big]
+\]
+($k_1, k_2$ s\~{a}o chaves sim\'{e}tricas secretas conhecidas s\'{o} pelas duas partes; $k_{pr}/k_{pub}$ \'{e} o par assim\'{e}trico do remetente.)
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva, \textbf{passo a passo}, o que o receptor faz ao receber $y$ em cada protocolo (pode desenhar um diagrama de blocos do lado do receptor).
+    \item Quais \textbf{servi\c{c}os de seguran\c{c}a} cada protocolo oferece?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Para fun\c{c}\~{o}es hash \'{e} crucial ter uma sa\'{i}da longa (p.\,ex.\ 256 bits) para frustrar ataques baseados no paradoxo do anivers\'{a}rio. No entanto, comprimentos bem menores --- p.\,ex.\ \textbf{128 bits} --- costumam ser suficientes para \textbf{MACs}. \livro{13.2}
+\begin{enumerate}[label=(\alph*)]
+    \item Suponha que a mensagem $x$ trafega em claro junto com seu MAC, isto \'{e}, o par $(x, \text{MAC}_k(x))$. Esclare\c{c}a \textbf{exatamente} o que Oscar (que n\~{a}o conhece $k$) precisa fazer para forjar uma mensagem aceita pelo receptor.
+    \item Por que o paradoxo do anivers\'{a}rio \textbf{n\~{a}o} ajuda Oscar nesse cen\'{a}rio? Compare o custo do ataque (\emph{online} vs.\ \emph{offline}) e conclua qual o n\'{i}vel de seguran\c{c}a de uma \textit{tag} de MAC de 128 bits comparada a um hash de 128 bits.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Considere MACs constru\'{i}dos a partir de uma fun\c{c}\~{a}o hash $H$ criptograficamente forte baseada na constru\c{c}\~{a}o de \textbf{Merkle--Damg\r{a}rd}. Mostre os \textbf{dois ataques principais} contra as constru\c{c}\~{o}es ing\^{e}nuas de prefixo secreto e sufixo secreto: \livro{13.7}
+\[
+    \text{MAC}_k(x) = H(k \,\|\, x) \ \text{(prefixo secreto)}
+    \qquad\qquad
+    \text{MAC}_k(x) = H(x \,\|\, k) \ \text{(sufixo secreto)}
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{Prefixo secreto:} descreva concretamente como o atacante forja um MAC v\'{a}lido para uma mensagem \emph{estendida}, sem conhecer $k$. Que nome tem esse ataque?
+    \item \textbf{Sufixo secreto:} descreva como o atacante explora uma colis\~{a}o do hash para forjar um MAC v\'{a}lido.
+    \item Por que o \textbf{SHA-3} (constru\c{c}\~{a}o esponja) n\~{a}o sofre o ataque do item (a)?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+MACs tamb\'{e}m s\~{a}o, em princ\'{i}pio, vulner\'{a}veis a ataques de colis\~{a}o. \livro{13.5}
+\begin{enumerate}[label=(\alph*)]
+    \item Suponha que Oscar encontrou uma colis\~{a}o entre duas mensagens, isto \'{e}, $\text{MAC}_k(x_1) = \text{MAC}_k(x_2)$ com $x_1 \neq x_2$. Considere uma troca de mensagens autenticadas (\textbf{sem} encripta\c{c}\~{a}o) entre Alice e Bob. Mostre o que Oscar precisa fazer para explorar a colis\~{a}o, lembrando que ele \textbf{n\~{a}o} possui a chave $k$.
+    \item Embora o paradoxo do anivers\'{a}rio ainda possa ser usado para construir colis\~{o}es, por que \'{e} muito mais dif\'{i}cil constru\'{i}-las na pr\'{a}tica para MACs do que para fun\c{c}\~{o}es hash? Em consequ\^{e}ncia, que seguran\c{c}a oferece um MAC de sa\'{i}da de 128 bits comparado a uma fun\c{c}\~{a}o hash de sa\'{i}da de 128 bits?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Estudamos um ataque adaptativo de texto-claro escolhido contra o \textbf{CBC-MAC}, mostrando que ele pode ser inseguro. Assuma um $IV$ todo-zero e que Oscar tem acesso a um or\'{a}culo $\mathcal{O}$ que calcula o MAC de mensagens de tamanho arbitr\'{a}rio com uma chave $k$ desconhecida. Cada bloco $x_i$ tem a largura do bloco da cifra. \livro{13.8}
+\begin{enumerate}[label=(\alph*)]
+    \item O objetivo de Oscar \'{e} construir um MAC v\'{a}lido para a mensagem $X' = x_1\,x_2\,x_3$ \textbf{sem} pedir $\text{MAC}(X')$ ao or\'{a}culo. Ele primeiro pede o MAC de $X = x_1\,x_2$ e obt\'{e}m $m$. Que \textbf{outra mensagem} ele precisa enviar ao or\'{a}culo para passar a conhecer $\text{MAC}(X')$?
+    \item Explique por que o ataque funciona, isto \'{e}, qual \'{e} o aspecto problem\'{a}tico do CBC-MAC.
+    \item O ataque ainda \'{e} poss\'{i}vel se for usado o esquema \textbf{CMAC}? Justifique sua resposta.
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Vamos analisar uma constru\c{c}\~{a}o de MAC \emph{ad hoc}, eficiente mas criptograficamente fraca. A mensagem $X = x_1 \,\|\, x_2 \,\|\, \cdots \,\|\, x_z$ tem $z$ blocos independentes, cada $x_i$ de 8 bits, que entram numa fun\c{c}\~{a}o de compress\~{a}o
+\[
+    c_i = h(c_{i-1}, x_i) = c_{i-1} \oplus x_i, \qquad \text{com } c_i, x_i \text{ de 8 bits},
+\]
+e o MAC \'{e} calculado a partir da \'{u}ltima sa\'{i}da $c_z$:
+\[
+    \text{MAC}_k(X) \equiv c_z + k \pmod{2^8}, \qquad k \text{ \'{e} uma chave compartilhada de 64 bits.}
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Descreva como a parte \emph{efetiva} da chave $k$ pode ser calculada com apenas \textbf{uma} mensagem conhecida $X$ (e seu MAC).
+    \item Realize o ataque e determine $k$ para: \ $X = \texttt{HELLO ALICE!}$ \ (string ASCII, um bloco de 8 bits por caractere, \emph{incluindo o espa\c{c}o}), \ $c_0 = \texttt{1111\,1111}_2$ \ e \ $\text{MAC}_k(X) = \texttt{1001\,1101}_2$. Mostre o c\'{a}lculo.
+    \item Qual \'{e} o comprimento \textbf{efetivo} da chave $k$?
+\end{enumerate}
+\end{exercicio}
+
+\end{document}
