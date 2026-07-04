@@ -34,7 +34,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
-\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Gerenciamento de Chaves}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ \textperiodcentered\ Lista: Gerenciamento de Chaves}
 \fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
 
 %% Refer\^{e}ncia discreta ao problema correspondente do livro
@@ -91,10 +91,10 @@
 \par
 \vspace{0.03in}
 
-{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 14 --- \textit{Key Management}). Cobre as aulas de \textbf{Estabelecimento de Chave Sim\'{e}trica/Kerberos} e de \textbf{MITM, Certificados e PKI}.}
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 14, \textit{Key Management}). Cobre as aulas de \textbf{Estabelecimento de Chave Sim\'{e}trica/Kerberos} e de \textbf{MITM, Certificados e PKI}.}
 
 %% ════════════════════════ PARTE I ════════════════════════
-\parte{Parte I --- Distribui\c{c}\~{a}o de Chave Sim\'{e}trica (KDC e Kerberos)}
+\parte{Parte I: Distribui\c{c}\~{a}o de Chave Sim\'{e}trica (KDC e Kerberos)}
 
 \begin{exercicio}
 Uma chave-mestra $k_{MK}$ \'{e} trocada de forma segura entre as partes (p.\,ex.\ via DHKE com certificados). Em seguida, chaves de sess\~{a}o s\~{a}o geradas regularmente por uma \textbf{KDF}, garantindo \emph{frescor} caso uma chave de sess\~{a}o seja comprometida. Considere tr\^{e}s m\'{e}todos ($h(\cdot)$ \'{e} uma fun\c{c}\~{a}o hash segura e $k_i$ \'{e} a $i$-\'{e}sima chave de sess\~{a}o): \livro{14.1}
@@ -127,10 +127,10 @@ Imagine uma rede ponto-a-ponto em que \textbf{1000 usu\'{a}rios} desejam se comu
 \begin{exercicio}
 Voc\^{e} deve escolher os algoritmos criptogr\'{a}ficos de um \textbf{KDC} no qual ocorrem duas classes de cifragem: \livro{14.3}
 \begin{itemize}
-    \item $e_{k_{U,\text{KDC}}}(\cdot)$, onde $U$ \'{e} um n\'{o} (usu\'{a}rio) qualquer da rede --- a \textbf{KEK} de longo prazo;
-    \item $e_{k_{ses}}(\cdot)$, para a comunica\c{c}\~{a}o entre dois usu\'{a}rios --- a chave de \textbf{sess\~{a}o}.
+    \item $e_{k_{U,\text{KDC}}}(\cdot)$, onde $U$ \'{e} um n\'{o} (usu\'{a}rio) qualquer da rede, a \textbf{KEK} de longo prazo;
+    \item $e_{k_{ses}}(\cdot)$, para a comunica\c{c}\~{a}o entre dois usu\'{a}rios, a chave de \textbf{sess\~{a}o}.
 \end{itemize}
-Voc\^{e} disp\~{o}e de implementa\c{c}\~{o}es de duas cifras --- \textbf{PRESENT} com chave de 80 bits e \textbf{AES-256} --- e foi orientado a usar algoritmos diferentes para cada classe. Qual cifra voc\^{e} usa para cada classe? Justifique sua resposta.
+Voc\^{e} disp\~{o}e de implementa\c{c}\~{o}es de duas cifras (\textbf{PRESENT} com chave de 80 bits e \textbf{AES-256}) e foi orientado a usar algoritmos diferentes para cada classe. Qual cifra voc\^{e} usa para cada classe? Justifique sua resposta.
 \end{exercicio}
 
 \begin{exercicio}
@@ -154,7 +154,7 @@ onde $f$ \'{e} uma fun\c{c}\~{a}o de m\~{a}o \'{u}nica.
 \end{exercicio}
 
 %% ════════════════════════ PARTE II ════════════════════════
-\parte{Parte II --- Man-in-the-Middle, Certificados e PKI}
+\parte{Parte II: Man-in-the-Middle, Certificados e PKI}
 
 \begin{exercicio}
 Considere o Diffie--Hellman e suponha que Oscar execute um \textbf{ataque Man-in-the-Middle}, como visto em aula. Use os par\^{a}metros $p = 467$, $\alpha = 2$, com $a = 228$ (Alice) e $b = 57$ (Bob); Oscar usa o expoente $o = 16$. \livro{14.11}
@@ -187,7 +187,7 @@ O \textbf{Pretty Good Privacy (PGP)} \'{e} um esquema amplamente usado para prot
 \end{exercicio}
 
 %% ════════════════════════ DESAFIO ════════════════════════
-\parte{Desafio --- Autentica\c{c}\~{a}o M\'{u}tua}
+\parte{Desafio: Autentica\c{c}\~{a}o M\'{u}tua}
 
 \begin{exercicio}
 Analise o protocolo a seguir, com o qual dois usu\'{a}rios se autenticam mutuamente. Assume-se que cada usu\'{a}rio possui um algoritmo de assinatura digital e que as chaves p\'{u}blicas de verifica\c{c}\~{a}o j\'{a} foram corretamente distribu\'{i}das. ($n_X$ \'{e} um \emph{nonce} gerado pelo usu\'{a}rio $X$.) \livro{14.21}
