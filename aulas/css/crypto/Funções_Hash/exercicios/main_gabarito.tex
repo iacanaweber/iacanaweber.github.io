@@ -37,7 +37,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0pt}
-\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Fun\c{c}\~{o}es Hash, SHA-2 e SHA-3 (gabarito)}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ \textperiodcentered\ Lista: Fun\c{c}\~{o}es Hash, SHA-2 e SHA-3 (gabarito)}
 \fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
 
 %% Refer\^{e}ncia discreta ao problema correspondente do livro
@@ -115,13 +115,13 @@ Sistemas de autentica\c{c}\~{a}o costumam armazenar $h(\text{senha})$ em vez da 
 
 \begin{resposta}
 \textbf{(a)}
-\textbf{Ataque A} --- \'{e} o ataque devastador: invertendo $h$, o atacante recupera diretamente a senha correspondente a cada hash da lista e consegue se passar por \emph{qualquer} usu\'{a}rio do sistema.
+\textbf{Ataque A.} Este \'{e} o caso mais grave: invertendo $h$, o atacante recupera diretamente a senha correspondente a cada hash da lista e consegue se passar por \emph{qualquer} usu\'{a}rio do sistema.
 
-\textbf{Ataque B} --- encontrar uma segunda pr\'{e}-imagem significa: \emph{dado um par conhecido} $(x_1, h(x_1))$, achar $x_2 \neq x_1$ com $h(x_2) = h(x_1)$. O atacante, por\'{e}m, s\'{o} possui os hashes --- ele n\~{a}o conhece nenhuma senha $x_1$ dos outros usu\'{a}rios. O ataque s\'{o} \'{e} \'{u}til se ele j\'{a} tiver uma senha v\'{a}lida que produza o hash-alvo (e, nesse caso, ele j\'{a} teria o acesso). Logo, n\~{a}o permite recuperar senhas a partir da lista.
+\textbf{Ataque B.} Encontrar uma segunda pr\'{e}-imagem significa: \emph{dado um par conhecido} $(x_1, h(x_1))$, achar $x_2 \neq x_1$ com $h(x_2) = h(x_1)$. O atacante, por\'{e}m, s\'{o} possui os hashes, e n\~{a}o conhece nenhuma senha $x_1$ dos outros usu\'{a}rios. O ataque s\'{o} \'{e} \'{u}til se ele j\'{a} tiver uma senha v\'{a}lida que produza o hash-alvo (e, nesse caso, ele j\'{a} teria o acesso). Logo, n\~{a}o permite recuperar senhas a partir da lista.
 
-\textbf{Ataque C} --- numa colis\~{a}o, o atacante escolhe livremente \emph{ambas} as mensagens $x_1 \neq x_2$ com $h(x_1) = h(x_2)$. Nada garante que algum desses valores coincida com um hash j\'{a} armazenado na lista; portanto, colis\~{o}es n\~{a}o ajudam a personificar usu\'{a}rios existentes.
+\textbf{Ataque C.} Numa colis\~{a}o, o atacante escolhe livremente \emph{ambas} as mensagens $x_1 \neq x_2$ com $h(x_1) = h(x_2)$. Nada garante que algum desses valores coincida com um hash j\'{a} armazenado na lista; portanto, colis\~{o}es n\~{a}o ajudam a personificar usu\'{a}rios existentes.
 
-\textbf{(b)} Sem \textit{salt}, dois usu\'{a}rios com a mesma senha t\^{e}m o mesmo hash: o atacante detecta senhas repetidas e, pior, pode usar tabelas pr\'{e}-computadas (ex.: \textit{rainbow tables}) v\'{a}lidas para todos os usu\'{a}rios de todos os sistemas. Com um \textit{salt} aleat\'{o}rio e individual, $h(\text{senha} \,\|\, \text{salt})$ quebra essa rela\c{c}\~{a}o determin\'{i}stica e obriga o atacante a atacar cada conta separadamente. Os tr\^{e}s ataques gen\'{e}ricos do item (a), entretanto, \emph{n\~{a}o s\~{a}o afetados} em sua ess\^{e}ncia: o \textit{salt} \'{e} armazenado em claro junto ao hash, ent\~{a}o ele n\~{a}o aumenta a resist\^{e}ncia a pr\'{e}-imagem de uma conta espec\'{i}fica --- apenas impede ataques em lote/pr\'{e}-computados.
+\textbf{(b)} Sem \textit{salt}, dois usu\'{a}rios com a mesma senha t\^{e}m o mesmo hash: o atacante detecta senhas repetidas e, pior, pode usar tabelas pr\'{e}-computadas (ex.: \textit{rainbow tables}) v\'{a}lidas para todos os usu\'{a}rios de todos os sistemas. Com um \textit{salt} aleat\'{o}rio e individual, $h(\text{senha} \,\|\, \text{salt})$ quebra essa rela\c{c}\~{a}o determin\'{i}stica e obriga o atacante a atacar cada conta separadamente. Os tr\^{e}s ataques gen\'{e}ricos do item (a), entretanto, \emph{n\~{a}o s\~{a}o afetados} em sua ess\^{e}ncia: o \textit{salt} \'{e} armazenado em claro junto ao hash, ent\~{a}o ele n\~{a}o aumenta a resist\^{e}ncia a pr\'{e}-imagem de uma conta espec\'{i}fica, apenas impede ataques em lote/pr\'{e}-computados.
 
 \textbf{(c)} Sim. A aplica\c{c}\~{a}o exige apenas \textbf{m\~{a}o \'{u}nica} (e resist\^{e}ncia a segunda pr\'{e}-imagem); resist\^{e}ncia a colis\~{o}es \emph{n\~{a}o} \'{e} necess\'{a}ria, pois colis\~{o}es n\~{a}o comprometem senhas armazenadas (item a). Como o ataque do anivers\'{a}rio n\~{a}o se aplica, a seguran\c{c}a efetiva \'{e} de $2^{80}$ passos (busca de pr\'{e}-imagem), e n\~{a}o $2^{40}$. \textit{Nota:} $2^{80}$ \'{e} considerado o limiar m\'{i}nimo hoje; em sistemas novos recomenda-se sa\'{i}da maior (e fun\c{c}\~{o}es lentas dedicadas a senhas, como bcrypt/Argon2, cf. Se\c{c}\~{a}o 11.6 do livro).
 \end{resposta}
@@ -185,7 +185,7 @@ A atualiza\c{c}\~{a}o dos registradores \'{e} $A_1 = T_1 + T_2$, $E_1 = D_0 + T_
     A_1 = E_1 = \texttt{428A2F99}_{\text{hex}}, \qquad B_1 = C_1 = D_1 = F_1 = G_1 = H_1 = \texttt{00000000}_{\text{hex}}.
 \]
 
-\textbf{(c)} Sem as constantes $K_j$, uma entrada toda nula com estado todo nulo produziria $T_1 = T_2 = 0$ e o estado permaneceria nulo \emph{em todas as rodadas} --- a fun\c{c}\~{a}o de compress\~{a}o teria um ``ponto fixo'' trivial e degenerado. As constantes de rodada quebram essa simetria e garantem que mesmo entradas degeneradas (todas nulas, todas em 1, padr\~{o}es repetitivos) sejam misturadas; \'{e} o mesmo papel que as constantes $RC[i]$ da etapa $\iota$ desempenham no Keccak-$f$.
+\textbf{(c)} Sem as constantes $K_j$, uma entrada toda nula com estado todo nulo produziria $T_1 = T_2 = 0$ e o estado permaneceria nulo \emph{em todas as rodadas}: a fun\c{c}\~{a}o de compress\~{a}o teria um ``ponto fixo'' trivial e degenerado. As constantes de rodada quebram essa simetria e garantem que mesmo entradas degeneradas (todas nulas, todas em 1, padr\~{o}es repetitivos) sejam misturadas; \'{e} o mesmo papel que as constantes $RC[i]$ da etapa $\iota$ desempenham no Keccak-$f$.
 \end{resposta}
 
 %% ══════════════════════════════ 4 ══════════════════════════════
@@ -203,9 +203,9 @@ Use uma ferramenta de linha de comando para calcular o hash SHA-512 das mensagen
     \qquad\qquad
     \text{SHA-512}(m_2) = \texttt{E7 82 FE 26}\ldots
 \]
-\textit{Nota para o professor:} se o aluno usar \texttt{echo} sem \texttt{-n}, um \texttt{\textbackslash n} \'{e} anexado \`{a} mensagem e os hashes mudam completamente --- vale aceitar a resposta se o procedimento estiver coerente, mas \'{e} uma boa oportunidade para discutir que o hash \'{e} sobre \emph{bytes exatos}, n\~{a}o sobre o ``texto''.
+\textit{Nota para o professor:} se o aluno usar \texttt{echo} sem \texttt{-n}, um \texttt{\textbackslash n} \'{e} anexado \`{a} mensagem e os hashes mudam; vale aceitar a resposta se o procedimento estiver coerente, mas \'{e} uma boa oportunidade para discutir que o hash \'{e} sobre \emph{bytes exatos}, n\~{a}o sobre o ``texto''.
 
-\textbf{(b)} Os dois hashes s\~{a}o completamente diferentes, sem qualquer semelhan\c{c}a vis\'{i}vel, embora as mensagens difiram em um \'{u}nico caractere. Esse comportamento \'{e} o \textbf{efeito avalanche} (difus\~{a}o): a altera\c{c}\~{a}o de 1 bit da entrada inverte, em m\'{e}dia, metade dos bits da sa\'{i}da. Ele \'{e} desej\'{a}vel porque o hash n\~{a}o deve vazar informa\c{c}\~{a}o sobre a entrada --- em particular, mensagens parecidas n\~{a}o podem produzir hashes parecidos, sen\~{a}o um atacante poderia inferir conte\'{u}do ou procurar colis\~{o}es por aproxima\c{c}\~{a}o.
+\textbf{(b)} Os dois hashes s\~{a}o diferentes, sem qualquer semelhan\c{c}a vis\'{i}vel, embora as mensagens difiram em um \'{u}nico caractere. Esse comportamento \'{e} o \textbf{efeito avalanche} (difus\~{a}o): a altera\c{c}\~{a}o de 1 bit da entrada inverte, em m\'{e}dia, metade dos bits da sa\'{i}da. Ele \'{e} desej\'{a}vel porque o hash n\~{a}o deve vazar informa\c{c}\~{a}o sobre a entrada; em particular, mensagens parecidas n\~{a}o podem produzir hashes parecidos, sen\~{a}o um atacante poderia inferir conte\'{u}do ou procurar colis\~{o}es por aproxima\c{c}\~{a}o.
 \end{resposta}
 
 %% ══════════════════════════════ 5 ══════════════════════════════
@@ -219,7 +219,7 @@ O Keccak-$f$ \'{e} uma \textbf{fun\c{c}\~{a}o de permuta\c{c}\~{a}o}: cada um do
 \end{enumerate}
 
 \begin{resposta}
-\textbf{(a)} Existem apenas $2! = 2$ permuta\c{c}\~{o}es de bits: a \emph{identidade} (bit 1 $\to$ bit 1, bit 2 $\to$ bit 2) e o \emph{cruzamento} (bit 1 $\to$ bit 2, bit 2 $\to$ bit 1):
+\textbf{(a)} Existem apenas $2! = 2$ permuta\c{c}\~{o}es de bits: a \emph{identidade} (mant\'{e}m bit 1 e bit 2 em suas posi\c{c}\~{o}es) e o \emph{cruzamento} (troca as posi\c{c}\~{o}es de bit 1 e bit 2):
 \begin{center}
 \begin{tabular}{cc@{\qquad\qquad}cc}
 $b_1 \longrightarrow b_1$ & & $b_1 \searrow b_2$ &\\[-2pt]
@@ -242,9 +242,9 @@ entrada & sa\'{i}da & entrada & sa\'{i}da\\
 11 & 11 & 11 & 11\\
 \end{tabular}
 \end{center}
-Note que toda permuta\c{c}\~{a}o de bits fixa $00$ e $11$ --- por isso a maioria das bije\c{c}\~{o}es \emph{n\~{a}o} pode ser obtida apenas reposicionando bits.
+Note que toda permuta\c{c}\~{a}o de bits fixa $00$ e $11$; por isso a maioria das bije\c{c}\~{o}es \emph{n\~{a}o} pode ser obtida apenas reposicionando bits.
 
-\textbf{(d)} Para $d$ bits: $d!$ permuta\c{c}\~{o}es de bits contra $(2^d)!$ fun\c{c}\~{o}es de permuta\c{c}\~{a}o. Para o Keccak-$f$ ($b = 1600$): $1600!$ contra $(2^{1600})!$ --- o segundo n\'{u}mero \'{e} inimaginavelmente maior. Permuta\c{c}\~{o}es de bits formam uma fra\c{c}\~{a}o \'{i}nfima e estruturalmente pobre (s\~{a}o lineares e n\~{a}o criam \emph{confus\~{a}o}); j\'{a} o Keccak-$f$ \'{e} projetado para se comportar como uma permuta\c{c}\~{a}o ``gen\'{e}rica'' desse espa\c{c}o gigantesco, o que fundamenta a seguran\c{c}a da constru\c{c}\~{a}o esponja.
+\textbf{(d)} Para $d$ bits: $d!$ permuta\c{c}\~{o}es de bits contra $(2^d)!$ fun\c{c}\~{o}es de permuta\c{c}\~{a}o. Para o Keccak-$f$ ($b = 1600$): $1600!$ contra $(2^{1600})!$. O segundo n\'{u}mero \'{e} maior por muitas ordens de grandeza. Permuta\c{c}\~{o}es de bits formam uma fra\c{c}\~{a}o \'{i}nfima e estruturalmente pobre (s\~{a}o lineares e n\~{a}o criam \emph{confus\~{a}o}); j\'{a} o Keccak-$f$ \'{e} projetado para se comportar como uma permuta\c{c}\~{a}o ``gen\'{e}rica'' desse espa\c{c}o, o que fundamenta a seguran\c{c}a da constru\c{c}\~{a}o esponja.
 \end{resposta}
 
 %% ══════════════════════════════ 6 ══════════════════════════════
@@ -256,14 +256,14 @@ Suponha que o SHA-3 \'{e} usado em uma aplica\c{c}\~{a}o com sa\'{i}da de 256 bi
 \end{enumerate}
 
 \begin{resposta}
-\textbf{(a)} Na fase de absor\c{c}\~{a}o, cada invoca\c{c}\~{a}o de Keccak-$f$ processa exatamente $r$ bits da mensagem (o estado \'{e} sempre de $b = 1600$ bits; o que muda \'{e} a parcela $r$ dispon\'{i}vel para a mensagem, pois $c = b - r$ cresce com o n\'{i}vel de seguran\c{c}a). Como o custo de Keccak-$f$ independe de $r$, absorver a mesma mensagem com $r$ menor exige \emph{mais} invoca\c{c}\~{o}es --- da\'{i} a queda de vaz\~{a}o.
+\textbf{(a)} Na fase de absor\c{c}\~{a}o, cada invoca\c{c}\~{a}o de Keccak-$f$ processa exatamente $r$ bits da mensagem (o estado \'{e} sempre de $b = 1600$ bits; o que muda \'{e} a parcela $r$ dispon\'{i}vel para a mensagem, pois $c = b - r$ cresce com o n\'{i}vel de seguran\c{c}a). Como o custo de Keccak-$f$ independe de $r$, absorver a mesma mensagem com $r$ menor exige \emph{mais} invoca\c{c}\~{o}es, da\'{i} a queda de vaz\~{a}o.
 
 \textbf{(b)} A vaz\~{a}o \'{e} proporcional a $r$:
 \[
     120 \ \text{MByte/s} \times \frac{832}{1088} \approx 91{,}8 \ \text{MByte/s} \approx 92 \ \text{MByte/s}.
 \]
 
-\textit{Nota para o professor:} o manual oficial de solu\c{c}\~{o}es responde $97$~MByte/s usando $r = 1344$ e $r = 1088$ --- mas essas s\~{a}o as linhas erradas da Tabela 11.3 do livro ($1344$ \'{e} a taxa do SHAKE128; a do SHA3-256 \'{e} $1088$ e a do SHA3-384 \'{e} $832$). O c\'{a}lculo acima segue a tabela do livro (e o padr\~{a}o FIPS 202).
+\textit{Nota para o professor:} o manual oficial de solu\c{c}\~{o}es responde $97$~MByte/s usando $r = 1344$ e $r = 1088$, mas essas s\~{a}o as linhas erradas da Tabela 11.3 do livro ($1344$ \'{e} a taxa do SHAKE128; a do SHA3-256 \'{e} $1088$ e a do SHA3-384 \'{e} $832$). O c\'{a}lculo acima segue a tabela do livro (e o padr\~{a}o FIPS 202).
 \end{resposta}
 
 %% ══════════════════════════════ 7 ══════════════════════════════
@@ -301,7 +301,7 @@ com \'{i}ndices $x$ m\'{o}dulo 5 e $z$ m\'{o}dulo 64. \livro{11.15}
 \end{enumerate}
 
 \begin{resposta}
-\textbf{(a)} S\~{a}o $5 \times 5 = \mathbf{25}$ bits em $1$: todos os bits do plano $z = 0$. Na representa\c{c}\~{a}o tridimensional do estado, esse plano \'{e} chamado de \textbf{fatia} (\textit{slice}) --- aqui, a primeira fatia.
+\textbf{(a)} S\~{a}o $5 \times 5 = \mathbf{25}$ bits em $1$: todos os bits do plano $z = 0$. Na representa\c{c}\~{a}o tridimensional do estado, esse plano \'{e} chamado de \textbf{fatia} (\textit{slice}); aqui, trata-se da primeira fatia.
 
 \textbf{(b)} Analisando $A'[x,y,z] = A[x,y,z] \oplus P(x{-}1, z) \oplus P(x{+}1, z{-}1)$, onde $P(x,z) = \bigoplus_{y'} A[x,y',z]$ \'{e} a paridade da coluna $(x,z)$. No estado dado, toda coluna da fatia $z=0$ tem cinco $1$s, logo $P(x, 0) = 1$ para todo $x$; todas as demais fatias t\^{e}m paridade $0$.
 \begin{itemize}
@@ -309,7 +309,7 @@ com \'{i}ndices $x$ m\'{o}dulo 5 e $z$ m\'{o}dulo 64. \livro{11.15}
     \item \textbf{Bits com $z = 1$:} \ $A' = \underbrace{0}_{A[x,y,1]} \oplus \underbrace{0}_{P(x-1,\,1)} \oplus \underbrace{1}_{P(x+1,\,0)} = 1$.
     \item \textbf{Bits com $z \ge 2$:} \ todos os tr\^{e}s termos s\~{a}o $0$, logo $A' = 0$.
 \end{itemize}
-Resultado: o novo estado $A'$ tem exatamente os $25$ bits da fatia $z = 1$ em $1$ e todos os demais em $0$ --- a fatia ``acesa'' deslocou-se de $z=0$ para $z=1$. (O exemplo tamb\'{e}m ilustra como $\theta$ propaga informa\c{c}\~{a}o entre fatias vizinhas.)
+Resultado: o novo estado $A'$ tem exatamente os $25$ bits da fatia $z = 1$ em $1$ e todos os demais em $0$; a fatia ``acesa'' deslocou-se de $z=0$ para $z=1$. (O exemplo tamb\'{e}m ilustra como $\theta$ propaga informa\c{c}\~{a}o entre fatias vizinhas.)
 \end{resposta}
 
 \end{document}
