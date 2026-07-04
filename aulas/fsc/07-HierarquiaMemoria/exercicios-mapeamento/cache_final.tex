@@ -1,0 +1,117 @@
+\documentclass[10pt, a4paper]{article}
+
+% ── Codificação e idioma ──
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ── Layout ──
+\usepackage[margin=1.4cm, top=1.2cm, bottom=1.1cm]{geometry}
+\usepackage{enumitem}
+\usepackage{multicol}
+
+% ── Espaçamento ──
+\setlength{\parskip}{1.5pt plus 1pt}
+\setlength{\parindent}{0pt}
+\setlength{\multicolsep}{2pt plus 1pt minus 1pt}
+
+% ── Matemática ──
+\usepackage{amsmath, amssymb}
+
+% ── Tabelas e gráficos ──
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{graphicx}
+\usepackage[breakable]{tcolorbox}
+
+% ── Cabeçalho e rodapé ──
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small Fundamentos de Sistemas Computacionais}
+\rhead{\small Mapeamento de Cache}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── Configurações de listas ──
+\setlist[enumerate,1]{label=\textbf{\arabic*.}, leftmargin=*, itemsep=6pt, topsep=3pt, parsep=0pt}
+\setlist[enumerate,2]{label=\alph*), leftmargin=1.5em, itemsep=2pt, topsep=3pt, parsep=0pt}
+\setlist[itemize]{itemsep=1pt, topsep=2pt, parsep=0pt}
+
+% ── Caixas de destaque ──
+\newtcolorbox{dica}{
+  colback=blue!5!white,
+  colframe=blue!50!black,
+  title={\textbf{Dica}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+\newtcolorbox{formulario}{
+  colback=gray!5!white,
+  colframe=gray!60!black,
+  title={\textbf{Formul\'{a}rio}},
+  fonttitle=\small,
+  sharp corners,
+  boxrule=0.5pt,
+  left=4pt, right=4pt, top=2pt, bottom=2pt,
+  before skip=4pt, after skip=4pt
+}
+
+% ══════════════════════════════════════════
+\begin{document}
+
+\begin{center}
+  {\Large \textbf{Lista de Exerc\'{i}cios}}\\[2pt]
+  {\large Mapeamento Associativo e Conjunto Associativo}\\[3pt]
+  {\normalsize 98800-04 -- Fundamentos de Sistemas Computacionais\ \ $\cdot$\ \ Prof.\ Ia\c{c}an\~{a} Ianiski Weber}
+\end{center}
+
+\vspace{1pt}
+\hrule
+\vspace{4pt}
+
+\begin{formulario}
+\small
+$\text{AMAT} = \text{Hit time} + \text{Miss rate}\times\text{Miss penalty}$
+\end{formulario}
+
+\begin{enumerate}
+
+% ── 1: Conceitual (fácil) ──
+\item Em uma frase cada, explique a diferen\c{c}a entre \textbf{mapeamento direto}, \textbf{totalmente associativo} e \textbf{conjunto associativo $N$-way} quanto a \emph{em quais posi\c{c}\~{o}es da cache} um bloco da mem\'{o}ria principal pode ser alojado. Em seguida, justifique a afirma\c{c}\~{a}o: \emph{``mapeamento direto e totalmente associativo s\~{a}o apenas casos especiais do conjunto associativo''}, indicando qual valor de $N$ corresponde a cada um.
+
+% ── 2: Bits no totalmente associativo (médio) ──
+\item Considere um espa\c{c}o de endere\c{c}amento de \textbf{256\,MB}, uma cache \textbf{totalmente associativa} de \textbf{1024 linhas} e \textbf{blocos de 16 bytes}.
+\begin{enumerate}
+  \item Mostre a divis\~{a}o dos bits do endere\c{c}o (\emph{tag} e \emph{offset}) e explique \textbf{por que n\~{a}o existe campo de linha/\'{i}ndice} neste mapeamento.
+  \item Quantos bytes de \textbf{dados \'{u}teis} a cache armazena efetivamente?
+  \item Qual o tamanho (em bits) da \textbf{mem\'{o}ria associativa}, sabendo que cada entrada guarda a \emph{tag} mais um \emph{bit de validade}?
+\end{enumerate}
+
+% ── 3: Bits no conjunto associativo (médio-difícil) ──
+\item Uma cache \textbf{conjunto associativa 4-way} possui \textbf{32\,KB}, \textbf{blocos de 64 bytes} e endere\c{c}os de \textbf{32 bits}.
+\begin{enumerate}
+  \item Quantos \textbf{blocos} cabem na cache? Quantos \textbf{conjuntos} ela possui?
+  \item Determine o n\'{u}mero de bits de \textbf{offset}, \textbf{\'{i}ndice} e \textbf{tag}.
+  \item Quantos \textbf{comparadores de tag} atuam \emph{simultaneamente} em uma busca? Por que esse n\'{u}mero independe do tamanho total da cache?
+\end{enumerate}
+
+% ── 4: Custo / comparadores (médio) ──
+\item Para uma cache de \textbf{64\,KB} com \textbf{blocos de 4 bytes}, calcule quantos \textbf{comparadores de tag} seriam necess\'{a}rios se ela fosse \textbf{totalmente associativa} e quantos seriam necess\'{a}rios se fosse \textbf{8-way}. Use os valores para explicar por que o mapeamento conjunto associativo \emph{viabiliza caches maiores} sem estourar o custo da mem\'{o}ria associativa.
+
+% ── 5: AMAT com L2 (difícil) ──
+\item Um sistema tem \textbf{L1} (hit time $=2$ ciclos, miss rate $=8\%$) e \textbf{L2} (hit time $=12$ ciclos, miss rate $=20\%$); uma falha na L2 vai \`{a} \textbf{DRAM} com penalidade de \textbf{150 ciclos}.
+\begin{enumerate}
+  \item Calcule a \emph{miss penalty} da L1 e o \textbf{AMAT} do sistema (em ciclos).
+  \item Recalcule o AMAT \textbf{removendo a L2} (a L1 passa a falhar direto para a DRAM). Quantas vezes a presen\c{c}a da L2 deixou o acesso m\'{e}dio mais r\'{a}pido?
+\end{enumerate}
+
+\end{enumerate}
+
+\end{document}
