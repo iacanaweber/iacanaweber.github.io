@@ -1,0 +1,259 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{mdframed}
+\usepackage{booktabs}
+\usepackage{needspace}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Introdu\c{c}\~{a}o \`{a} Criptografia P\'{o}s-Qu\^{a}ntica\\(Com Respostas)\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Criptografia P\'{o}s-Qu\^{a}ntica (gabarito)}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Destaque para pontos-chave dentro das respostas
+\newcommand{\alert}[1]{\textbf{\uline{#1}}}
+
+%% Cabe\c{c}alho de uma ``parte'' (bloco tem\'{a}tico da lista)
+\newcommand{\parte}[1]{%
+    \par\vspace{1.6em}\noindent
+    {\large\bfseries\color{red!55!black}#1}%
+    \par\nobreak\vspace{-0.4em}\noindent
+    {\color{red!45!black}\rule{\linewidth}{1.0pt}}%
+    \par\nobreak\vspace{0.2em}
+}
+
+%% Cabe\c{c}alho de exerc\'{i}cio (numera\c{c}\~{a}o manual; o conte\'{u}do pode quebrar p\'{a}gina)
+\newcommand{\exercicio}[1]{%
+    \Needspace{8\baselineskip}%
+    \par\vspace{1.2em}
+    \noindent
+    {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+    \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio #1}
+    \par\vspace{-0.4em}
+    \noindent{\color{black!35}\rule{\textwidth}{0.4pt}}
+    \par\vspace{0.35em}
+}
+
+%% Caixa de resposta (vermelha, quebr\'{a}vel entre p\'{a}ginas)
+\newmdenv[
+    linecolor=red!65!black,
+    linewidth=0.8pt,
+    roundcorner=2pt,
+    backgroundcolor=red!3,
+    skipabove=0.8em,
+    skipbelow=1.0em,
+    innertopmargin=0.7em,
+    innerbottommargin=0.7em,
+    innerleftmargin=0.8em,
+    innerrightmargin=0.8em
+]{respostabox}
+\newenvironment{resposta}{%
+    \begin{respostabox}
+    \color{red!70!black}\sloppy
+}{%
+    \end{respostabox}
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 12 --- \textit{Post-Quantum Cryptography}).}
+
+\textbf{Observa\c{c}\~{a}o:} em itens discursivos, respostas equivalentes podem ser igualmente corretas. Os valores num\'{e}ricos foram conferidos por c\'{a}lculo.
+
+%% ════════════════════════ PARTE I ════════════════════════
+\parte{Parte I --- A Amea\c{c}a Qu\^{a}ntica e Fundamentos}
+
+\exercicio{1}
+``O computador qu\^{a}ntico vai quebrar \emph{toda} a criptografia'' --- avalie criticamente.\begin{resposta}
+\textbf{(a)} O algoritmo de \textbf{Shor} resolve \alert{fatora\c{c}\~{a}o de inteiros} e \alert{logaritmo discreto} em tempo \textbf{polinomial}. Como RSA, DH e ECC baseiam sua seguran\c{c}a nesses problemas, todos se tornam \alert{completamente inseguros}. Aumentar o tamanho da chave \alert{n\~{a}o} resolve: o ataque \'{e} polinomial, ent\~{a}o chaves maiores custam pouco ao atacante.
+
+\textbf{(b)} \textbf{Grover} busca em $\approx\sqrt{N}$ passos. Contra uma chave de $k$ bits, reduz a busca de $2^{k}$ para $\approx 2^{k/2}$ --- ou seja, corta a seguran\c{c}a \emph{pela metade} (em bits). Basta \alert{dobrar o tamanho da chave} ($k \to 2k$) para restaurar a seguran\c{c}a original.
+
+\textbf{(c)} \alert{Quebrados} (Shor): RSA-3072, ECDSA P-256. \alert{Apenas enfraquecidos} (Grover): AES-128 ($\sim$64 bits $\Rightarrow$ migre p/ AES-256). \alert{Seguros}: AES-256 ($\sim$128 bits efetivos) e SHA-256.
+
+\textbf{(d)} A afirma\c{c}\~{a}o \'{e} \alert{incorreta/exagerada}: a sim\'{e}trica e as fun\c{c}\~{o}es hash \emph{sobrevivem} apenas aumentando par\^{a}metros. O problema \alert{urgente} \'{e} a criptografia de \textbf{chave p\'{u}blica} (troca de chave e assinatura).
+\end{resposta}
+
+\exercicio{2}
+``Colher agora, decifrar depois'' e a desigualdade de Mosca ($X+Y>Z$).\begin{resposta}
+\textbf{(a)} O atacante pode \alert{gravar hoje} o tr\'{a}fego cifrado e \alert{decifr\'{a}-lo no futuro}, quando dispuser de um CRQC. Como \'{e} um ataque \emph{passivo} sobre dados de \textbf{longo prazo de sigilo}, o risco existe \emph{agora} --- mesmo sem CRQC.
+
+\textbf{(b)} $X + Y = 25 + 6 = \alert{31}$ anos, que \'{e} $> Z = 15$. Logo, \alert{sim}, a organiza\c{c}\~{a}o deve se preocupar imediatamente: dados cifrados hoje (com sigilo exigido de 25 anos) estariam expostos por volta do ano~15, antes do fim do per\'{i}odo de sigilo.
+
+\textbf{(c)} Para \emph{concluir} uma migra\c{c}\~{a}o de $Y=6$ anos \textbf{antes} do CRQC ($Z=15$), \'{e} preciso \alert{come\c{c}ar no m\'{a}ximo no ano $Z - Y = 9$}. Por\'{e}m, dado o ``\textit{harvest now, decrypt later}'', o correto \'{e} \textbf{come\c{c}ar j\'{a}}.
+\end{resposta}
+
+\exercicio{3}
+``PQC e QKD s\~{a}o a mesma coisa'' --- diferencie.\begin{resposta}
+\textbf{(a)} \textbf{PQC} \'{e} \alert{software / matem\'{a}tica cl\'{a}ssica}: algoritmos que rodam em computadores comuns. \textbf{QKD} \'{e} \alert{hardware qu\^{a}ntico}: usa propriedades f\'{i}sicas (f\'{o}tons) e exige equipamento e fibra dedicados.
+
+\textbf{(b)} Por ser ``s\'{o}'' um algoritmo novo, a PQC \alert{roda em qualquer CPU atual} (notebook, celular, servidor) --- basta atualizar bibliotecas/protocolos.
+
+\textbf{(c)} Limita\c{c}\~{a}o da QKD: \alert{alcance curto} e necessidade de \textbf{hardware/fibra dedicados} (cara; n\~{a}o faz assinatura digital). Por isso NIST e NSA recomendam a \textbf{PQC} como caminho principal.
+\end{resposta}
+
+%% ════════════════════════ PARTE II ════════════════════════
+\parte{Parte II --- Reticulados e C\'{o}digos}
+
+\exercicio{4}
+Resolver $A\,\mathbf{s}\equiv\mathbf{b}\pmod 7$, com $A=\left[\begin{smallmatrix}4&0&2\\0&5&4\\6&1&2\end{smallmatrix}\right]$, $\mathbf{b}=(4,5,0)$. \livro{12.1}
+\begin{resposta}
+Por elimina\c{c}\~{a}o de Gauss em $\mathbb{Z}_7$ (multiplicando linhas por inversos mod 7: $4^{-1}=2$, $5^{-1}=3$ etc.) chega-se \`{a} forma reduzida
+\[
+\left[\begin{array}{ccc|c}1&0&0&1\\0&1&0&1\\0&0&1&0\end{array}\right]
+\quad\Rightarrow\quad \mathbf{s} = \alert{(1,\,1,\,0)}.
+\]
+\textbf{Verifica\c{c}\~{a}o:} $A\,\mathbf{s} = (4\cdot1+2\cdot0,\ 5\cdot1+4\cdot0,\ 6\cdot1+1\cdot1) = (4,\,5,\,7)\equiv(4,5,0)\pmod 7$. \checkmark
+\end{resposta}
+
+\exercicio{5}
+Mesma $A$; segredo $\mathbf{s}=(1,1,0)$; erro $\mathbf{e}=(1,0,0)$; publica-se $\mathbf{b}'\equiv A\mathbf{s}+\mathbf{e}$. \livro{12.3}
+\begin{resposta}
+\textbf{(a)} $A\mathbf{s} = (4,5,0)$ (do Ex.~4). Somando $\mathbf{e}=(1,0,0)$: $\mathbf{b}' = \alert{(5,\,5,\,0)}$.
+
+\textbf{(b)} Resolvendo $A\mathbf{s}'\equiv(5,5,0)\pmod 7$ exatamente (Gauss), obt\'{e}m-se $\mathbf{s}' = \alert{(2,\,5,\,2)}$.
+
+\textbf{(c)} Um erro \textbf{min\'{u}sculo} ($+1$ em uma \'{u}nica equa\c{c}\~{a}o) levou a uma solu\c{c}\~{a}o $(2,5,2)$ \alert{totalmente diferente} do segredo verdadeiro $(1,1,0)$. Em dimens\~{o}es altas isso \'{e} o cerne do \textbf{LWE}: com ru\'{i}do, a \'{a}lgebra linear ``f\'{a}cil'' vira busca em um reticulado gigante --- \alert{recuperar $\mathbf{s}$ torna-se invi\'{a}vel}, inclusive para computadores qu\^{a}nticos.
+\end{resposta}
+
+\exercicio{6}
+Hamming $[7,4]$; recebe $\mathbf{r}=(1\,0\,0\,1\,0\,1\,0)$ (at\'{e} 1 erro). \livro{12.9}
+\begin{resposta}
+\textbf{(a)} S\'{i}ndrome $\mathbf{s}=H\mathbf{r}^{\mathsf T}\bmod 2$:
+\[
+s_1 = 1{+}0{+}0{+}0{+}0{+}0{+}0 = 1,\qquad
+s_2 = 1{+}0{+}0{+}1{+}0{+}1{+}0 = 3\equiv 1,
+\]
+\[
+s_3 = 1{+}0{+}0{+}1{+}0{+}0{+}0 = 2\equiv 0
+\qquad\Rightarrow\qquad \mathbf{s} = (1,1,0).
+\]
+Logo $\mathbf{s} = \alert{(1,1,0)}$.
+
+\textbf{(b)} $(1,1,0)^{\mathsf T}$ \'{e} exatamente a \alert{3\textsuperscript{a} coluna} de $H$ $\Rightarrow$ erro na \textbf{posi\c{c}\~{a}o 3}. Corrigindo (inverte o bit 3): $\hat{\mathbf{c}} = (1\,0\,\mathbf{1}\,1\,0\,1\,0)$.
+
+\textbf{(c)} Como $G$ \'{e} sistem\'{a}tica, a mensagem s\~{a}o os 4 primeiros bits: $\mathbf{m} = \alert{(1,0,1,1)}$.
+
+\textbf{(d)} No \textbf{McEliece}, a chave p\'{u}blica \'{e} um c\'{o}digo \emph{embaralhado} ($\hat{G}=SGP$) que \alert{parece aleat\'{o}rio}. Decodificar um c\'{o}digo linear \emph{gen\'{e}rico} com erros \'{e} o \textbf{problema da decodifica\c{c}\~{a}o de s\'{i}ndrome}, \emph{NP-dif\'{i}cil}. S\'{o} o dono conhece $S,P$, que revelam a estrutura Goppa e permitem corrigir os erros facilmente.
+\end{resposta}
+
+%% ════════════════════════ PARTE III ════════════════════════
+\parte{Parte III --- Assinaturas Baseadas em Hash}
+
+\exercicio{7}
+Lamport com $f(x)=x^2\bmod 253$; $k_{pr}=[(17,23)_0,(31,45)_1,(9,50)_2]$. \livro{12.15}
+\begin{resposta}
+\textbf{(a)} Chave p\'{u}blica $=$ $f$ aplicado a cada valor ($f(x)=x^2\bmod 253$):
+\[
+f(17)=289\equiv 36,\ f(23)=23;\quad f(31)=202,\ f(45)=1;\quad f(9)=81,\ f(50)=223.
+\]
+Logo $k_{pub} = \big[(36,23)_0,\ (202,1)_1,\ (81,223)_2\big]$.
+
+\textbf{(b)} Para $\mathbf{m}=(1,0,1)$, revela-se, em cada posi\c{c}\~{a}o, o valor privado correspondente ao bit: $\big(x_{0,1},\,x_{1,0},\,x_{2,1}\big) = \alert{(23,\ 31,\ 50)}$.
+
+\textbf{(c)} Verifica\c{c}\~{a}o: $f(23)=23$ ($=k_{pub}[0][1]$, bit 1); $f(31)=202$ ($=k_{pub}[1][0]$, bit 0); $f(50)=223$ ($=k_{pub}[2][1]$, bit 1). Todos batem. \checkmark
+
+\textbf{(d)} \alert{Uso \'{u}nico:} assinar duas mensagens diferentes revela, para algum bit, \emph{ambos} os valores privados $(x_{i,0}$ e $x_{i,1})$. Com isso Oscar pode \alert{combinar} pr\'{e}-imagens j\'{a} reveladas e \textbf{forjar} assinaturas de outras mensagens.
+\end{resposta}
+
+\exercicio{8}
+Winternitz e \'{a}rvore de Merkle (conceitual). \livro{12.13}
+\begin{resposta}
+\textbf{(a)} O \textbf{Winternitz} assina \alert{blocos de $w$ bits} aplicando $f$ \emph{repetidamente} (cadeias de hash), em vez de um par por bit. Isso \alert{reduz o tamanho} da assinatura; o \textbf{custo} \'{e} mais computa\c{c}\~{a}o (at\'{e} $2^{w}-1$ aplica\c{c}\~{o}es de $f$ por bloco).
+
+\textbf{(b)} A \textbf{\'{a}rvore de Merkle} combina as $2^{t}$ chaves p\'{u}blicas de uso \'{u}nico, \emph{hash a hash}, em uma \alert{\'{u}nica raiz}, que passa a ser a \textbf{chave p\'{u}blica}. Cada assinatura carrega a assinatura OTS \emph{mais} o \textbf{caminho de autentica\c{c}\~{a}o} at\'{e} a raiz.
+
+\textbf{(c)} Altura $t=20 \Rightarrow 2^{20} \approx \alert{1{,}05\ \text{milh\~{a}o}}$ de assinaturas. \'{E} \textbf{com estado} (\textit{stateful}) porque \'{e} preciso \alert{lembrar quais folhas j\'{a} foram usadas} --- reutilizar uma folha (OTS) quebraria a seguran\c{c}a.
+\end{resposta}
+
+\exercicio{9}
+Merkle: folhas $v_0=(105,470,42,158)$; $h(a,b)=f(a+b)$, $f(x)=x^2\bmod 511$. \livro{12.19}
+\begin{resposta}
+\textbf{(a)} $v_1[0]=f(105+470)=f(575)=575^2 \bmod 511 = \alert{8}$;\quad
+$v_1[1]=f(42+158)=f(200)=200^2\bmod 511 = \alert{142}$.
+
+\textbf{(b)} $\text{raiz}=f(v_1[0]+v_1[1])=f(8+142)=f(150)=150^2\bmod 511 = \alert{16}$. Essa raiz \'{e} a \textbf{chave p\'{u}blica} de todas as chaves OTS da \'{a}rvore.
+
+\textbf{(c)} Caminho de autentica\c{c}\~{a}o da folha $Y_0$: os \emph{irm\~{a}os} no trajeto at\'{e} a raiz $= \{\,v_0[1]=470\ (\text{irm\~{a}o da folha}),\ v_1[1]=142\ (\text{irm\~{a}o no n\'{i}vel 1})\,\}$. O verificador recomputa: $f\big(f(105+470)+142\big) = f(8+142) = f(150) = \alert{16} = \text{raiz}$. \checkmark
+\end{resposta}
+
+%% ════════════════════════ PARTE IV ════════════════════════
+\parte{Parte IV --- Padr\~{o}es e Cen\'{a}rio Global}
+
+\exercicio{10}
+Padr\~{o}es do NIST.\begin{resposta}
+\textbf{(a)} \textbf{FIPS 203 (ML-KEM)} $=$ reticulados, \alert{encapsulamento de chave (KEM)}; \textbf{FIPS 204 (ML-DSA)} $=$ reticulados, \alert{assinatura}; \textbf{FIPS 205 (SLH-DSA)} $=$ \alert{hash}, assinatura.
+
+\textbf{(b)} Apesar de nunca quebrado, o Classic McEliece tem \alert{chave p\'{u}blica de $\sim$1\,MB} --- invi\'{a}vel para muitos cen\'{a}rios (handshakes TLS, dispositivos restritos). O \textbf{tamanho} \'{e} o impeditivo.
+
+\textbf{(c)} O \textbf{HQC} baseia-se em \alert{c\'{o}digos}, matem\'{a}tica \textbf{independente} dos reticulados do ML-KEM. \'{E} uma \alert{reserva estrat\'{e}gica}: se um dia os reticulados forem quebrados, ainda haver\'{a} um KEM padronizado de fam\'{i}lia distinta (\emph{diversifica\c{c}\~{a}o de portf\'{o}lio}).
+\end{resposta}
+
+\exercicio{11}
+Compara\c{c}\~{a}o entre pot\^{e}ncias globais.\begin{resposta}
+\textbf{(a)} A \textbf{abordagem h\'{i}brida} roda \alert{cl\'{a}ssico $+$ p\'{o}s-qu\^{a}ntico} em paralelo; a chave s\'{o} cai se \alert{ambos} ca\'{i}rem. Protege contra \textbf{dois riscos}: (i) uma falha na PQC \emph{nova} (ainda pouco testada) e (ii) o computador qu\^{a}ntico contra o esquema cl\'{a}ssico.
+
+\textbf{(b)} \textbf{NSA (PQC puro):} menos complexidade e menor superf\'{i}cie de bugs; confia nos padr\~{o}es que ela pr\'{o}pria endossa. \textbf{BSI/ANSSI (h\'{i}brido):} conservadorismo --- a PQC \'{e} recente e pode ter falhas; \alert{defesa em profundidade} durante a transi\c{c}\~{a}o.
+
+\textbf{(c)} \textbf{T\'{e}cnica:} n\~{a}o depender de escolhas de projeto de terceiros e explorar fam\'{i}lias distintas (China: reticulados \emph{``n\~{a}o-estruturados''}). \textbf{Geopol\'{i}tica:} \alert{soberania criptogr\'{a}fica}, desconfian\c{c}a de poss\'{i}veis \textit{backdoors} e independ\^{e}ncia tecnol\'{o}gica.
+
+\textbf{(d)} O fator comum \'{e} o \alert{``colher agora, decifrar depois''}: dados sens\'{i}veis j\'{a} podem estar sendo coletados hoje, o que torna a migra\c{c}\~{a}o urgente para \emph{todos}.
+\end{resposta}
+
+\end{document}

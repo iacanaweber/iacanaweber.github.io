@@ -1,0 +1,226 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage[normalem]{ulem}
+\usepackage{indentfirst}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+\geometry{margin=2.2cm, footskip=1.0cm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.45em}
+\raggedbottom
+\setlist[enumerate]{topsep=3pt, itemsep=3pt}
+\setlist[itemize]{topsep=2pt, itemsep=1pt}
+
+\renewcommand\ULthickness{1.0pt}
+\setlength\ULdepth{1.3ex}
+
+\newcommand{\nomedisciplina}{Confiabilidade e Seguran\c{c}a de Software}
+\newcommand{\codigodadisciplina}{98G08-04}
+\newcommand{\nomedaavaliacao}{\begin{tabular}{c}Lista de Exerc\'{i}cios\\Introdu\c{c}\~{a}o \`{a} Criptografia P\'{o}s-Qu\^{a}ntica\end{tabular}}
+\newcommand{\nomedoprofessor}{Ia\c{c}an\~{a} Ianiski Weber}
+
+%% Rodap\'{e} discreto com numera\c{c}\~{a}o de p\'{a}ginas
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\footnotesize\color{black!60}\nomedisciplina\ --- Lista: Criptografia P\'{o}s-Qu\^{a}ntica}
+\fancyfoot[R]{\footnotesize\color{black!60}P\'{a}gina \thepage\ de \pageref{LastPage}}
+
+%% Refer\^{e}ncia discreta ao problema correspondente do livro
+\newcommand{\livro}[1]{{\footnotesize\color{black!50}(Livro, Problema #1)}}
+
+%% Cabe\c{c}alho de uma ``parte'' (bloco tem\'{a}tico da lista)
+\newcommand{\parte}[1]{%
+    \par\vspace{1.6em}\noindent
+    {\large\bfseries\color{red!55!black}#1}%
+    \par\nobreak\vspace{-0.4em}\noindent
+    {\color{red!45!black}\rule{\linewidth}{1.0pt}}%
+    \par\nobreak\vspace{0.2em}
+}
+
+%% Cada exerc\'{i}cio \'{e} um bloco indivis\'{i}vel (tcolorbox `blanker', sem moldura)
+\newtcolorbox[auto counter]{exercicio}[1][]{%
+    blanker,
+    before skip=26pt plus 6pt minus 2pt,
+    after skip=8pt,
+    before upper={%
+        \noindent
+        {\color{black!55}\rule[-0.25em]{3pt}{1.6em}}%
+        \hspace{0.6em}{\Large\bfseries Exerc\'{i}cio \thetcbcounter}%
+        \par\nobreak\vspace{-0.4em}
+        \noindent{\color{black!35}\rule{\linewidth}{0.4pt}}%
+        \par\nobreak\vspace{0.35em}\noindent
+    },
+    #1
+}
+
+\begin{document}
+
+\noindent
+\makebox[0pt][l]{%
+    \begin{minipage}[l]{0.1\textwidth}
+        \noindent
+        \includegraphics[width=1.3\textwidth]{img/brasao_pucrs.png}
+    \end{minipage}%
+}%
+\begin{minipage}[c]{\textwidth}
+    \begin{center}
+        {\large Pontif\'{i}cia Universidade Cat\'{o}lica do Rio Grande do Sul \par
+        \large \nomedisciplina \par
+        \large \textbf{\codigodadisciplina}\par
+        \vspace{0.4em}
+        \large \textbf{\nomedaavaliacao}}
+    \end{center}
+\end{minipage}
+\par
+\vspace{0.12in}
+\noindent
+\uline{\textit{Prof. \nomedoprofessor} \hfill}
+\par
+\vspace{0.03in}
+
+{\footnotesize Exerc\'{i}cios adaptados de Paar, Pelzl e G\"{u}neysu, \textit{Understanding Cryptography}, 2\textsuperscript{a}~ed., Springer, 2024 (Cap\'{i}tulo 12 --- \textit{Post-Quantum Cryptography}), complementados por publica\c{c}\~{o}es do NIST, NSA, BSI, ANSSI e NCSC. Nos exerc\'{i}cios de contas, todos os valores num\'{e}ricos foram conferidos.}
+
+%% ════════════════════════ PARTE I ════════════════════════
+\parte{Parte I --- A Amea\c{c}a Qu\^{a}ntica e Fundamentos}
+
+\begin{exercicio}
+Um advers\'{a}rio afirma que ``o computador qu\^{a}ntico vai quebrar \emph{toda} a criptografia''. Avalie criticamente essa afirma\c{c}\~{a}o.
+\begin{enumerate}[label=(\alph*)]
+    \item Explique o que o algoritmo de \textbf{Shor} resolve e por que isso torna \textbf{RSA}, \textbf{Diffie--Hellman} e \textbf{ECC} inseguros. Aumentar o tamanho da chave resolve o problema? Justifique.
+    \item Explique o efeito do algoritmo de \textbf{Grover} sobre uma cifra sim\'{e}trica de chave de $k$ bits. Por que se diz que ``basta dobrar o par\^{a}metro''?
+    \item Classifique cada primitiva como \textbf{quebrada} ou \textbf{apenas enfraquecida} por um computador qu\^{a}ntico: RSA-3072, AES-128, ECDSA (P-256), AES-256, SHA-256.
+    \item Conclua: a afirma\c{c}\~{a}o do advers\'{a}rio est\'{a} correta? Onde est\'{a}, de fato, o problema urgente?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+O ataque \textbf{``colher agora, decifrar depois''} (\textit{harvest now, decrypt later}) motiva a urg\^{e}ncia da migra\c{c}\~{a}o. Michele Mosca prop\^{o}s a regra: se $X + Y > Z$, os dados ser\~{a}o expostos, onde $X$ = anos de sigilo necess\'{a}rio, $Y$ = anos para migrar, $Z$ = anos at\'{e} surgir um computador qu\^{a}ntico relevante (CRQC).
+\begin{enumerate}[label=(\alph*)]
+    \item Explique, com suas palavras, por que a amea\c{c}a existe \textbf{hoje}, mesmo sem existir ainda um CRQC.
+    \item Uma organiza\c{c}\~{a}o precisa manter prontu\'{a}rios m\'{e}dicos secretos por $X = 25$ anos, estima $Y = 6$ anos para migrar e considera $Z = 15$ anos at\'{e} um CRQC. Ela deve se preocupar \emph{agora}? Justifique com a desigualdade.
+    \item Dado o item (b), qual \'{e} o \textbf{prazo m\'{a}ximo} para \emph{come\c{c}ar} a migra\c{c}\~{a}o de modo a ainda proteger esses dados?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+Um colega diz: ``Criptografia P\'{o}s-Qu\^{a}ntica (PQC) e Distribui\c{c}\~{a}o Qu\^{a}ntica de Chave (QKD) s\~{a}o a mesma coisa.''
+\begin{enumerate}[label=(\alph*)]
+    \item Aponte a diferen\c{c}a \textbf{fundamental} entre PQC e QKD quanto ao que cada uma exige para funcionar (\emph{software} vs.\ \emph{hardware}).
+    \item Por que a PQC pode ser implantada \textbf{hoje}, no seu notebook e celular, sem equipamento especial?
+    \item Cite uma \textbf{limita\c{c}\~{a}o pr\'{a}tica} da QKD e diga por que o NIST/NSA recomendam a \textbf{PQC} como caminho principal.
+\end{enumerate}
+\end{exercicio}
+
+%% ════════════════════════ PARTE II ════════════════════════
+\parte{Parte II --- Reticulados e C\'{o}digos}
+
+\begin{exercicio}
+\textbf{(Reticulados / LWE --- sem ru\'{i}do.)} Resolva o sistema linear a seguir \textbf{m\'{o}dulo 7} (todas as opera\c{c}\~{o}es em $\mathbb{Z}_7$): \livro{12.1}
+\[
+\begin{cases}
+4s_1 + 0s_2 + 2s_3 \equiv 4 \pmod 7\\
+0s_1 + 5s_2 + 4s_3 \equiv 5 \pmod 7\\
+6s_1 + 1s_2 + 2s_3 \equiv 0 \pmod 7
+\end{cases}
+\]
+Em forma matricial, $A\,\mathbf{s} \equiv \mathbf{b}$ com $A=\left[\begin{smallmatrix}4&0&2\\0&5&4\\6&1&2\end{smallmatrix}\right]$ e $\mathbf{b}=(4,5,0)^{\mathsf T}$. Use elimina\c{c}\~{a}o de Gauss em $\mathbb{Z}_7$. \emph{(Este \'{e} o caso ``f\'{a}cil'', sem ru\'{i}do.)}
+\end{exercicio}
+
+\begin{exercicio}
+\textbf{(Reticulados / LWE --- com ru\'{i}do.)} Usando a mesma matriz $A$ do exerc\'{i}cio anterior, o segredo verdadeiro \'{e} $\mathbf{s} = (1,1,0)$, mas agora somamos um \textbf{pequeno erro} $\mathbf{e} = (1,0,0)$: publica-se $\mathbf{b}' \equiv A\,\mathbf{s} + \mathbf{e} \pmod 7$. \livro{12.3}
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule $\mathbf{b}'$.
+    \item Um atacante que \textbf{ignora} a exist\^{e}ncia do erro tenta resolver $A\,\mathbf{s}' \equiv \mathbf{b}' \pmod 7$ exatamente. Encontre $\mathbf{s}'$.
+    \item Compare $\mathbf{s}'$ com o segredo verdadeiro $\mathbf{s}=(1,1,0)$. O que este exemplo (em min\'{i}atura) ilustra sobre a dureza do problema \textbf{LWE}?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+\textbf{(C\'{o}digos / decodifica\c{c}\~{a}o de s\'{i}ndrome.)} Considere o c\'{o}digo de Hamming $[7,4]$ com matriz de paridade $H$ e matriz geradora $G$ (opera\c{c}\~{o}es em $\mathbb{Z}_2$): \livro{12.9}
+\[
+H=\begin{bmatrix}1&1&1&0&1&0&0\\1&0&1&1&0&1&0\\1&1&0&1&0&0&1\end{bmatrix},
+\qquad
+G=\begin{bmatrix}1&0&0&0&1&1&1\\0&1&0&0&1&0&1\\0&0&1&0&1&1&0\\0&0&0&1&0&1&1\end{bmatrix}.
+\]
+Bob recebe a palavra $\mathbf{r} = (1\,0\,0\,1\,0\,1\,0)$, que cont\'{e}m \textbf{no m\'{a}ximo um erro} de bit.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule a \textbf{s\'{i}ndrome} $\mathbf{s} = H\,\mathbf{r}^{\mathsf T} \bmod 2$.
+    \item Localize a \textbf{posi\c{c}\~{a}o do erro} (dica: a s\'{i}ndrome coincide com uma \emph{coluna} de $H$) e \textbf{corrija} a palavra.
+    \item Extraia a \textbf{mensagem} de 4 bits (os 4 primeiros bits da palavra corrigida, pois $G$ est\'{a} em forma sistem\'{a}tica).
+    \item Relacione: no criptossistema de \textbf{McEliece}, por que decodificar sem conhecer a estrutura do c\'{o}digo \'{e} um problema \emph{dif\'{i}cil}?
+\end{enumerate}
+\end{exercicio}
+
+%% ════════════════════════ PARTE III ════════════════════════
+\parte{Parte III --- Assinaturas Baseadas em Hash}
+
+\begin{exercicio}
+\textbf{(Assinatura de uso \'{u}nico de Lamport.)} Use a fun\c{c}\~{a}o de m\~{a}o \'{u}nica de Rabin $f(x) = x^2 \bmod 253$ (com $253 = 11 \cdot 23$). Para assinar mensagens de \textbf{3 bits}, a chave privada \'{e} um par por bit: \livro{12.15}
+\[
+k_{pr} = \big[\,(17,\,23)_0,\ \ (31,\,45)_1,\ \ (9,\,50)_2\,\big].
+\]
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule a \textbf{chave p\'{u}blica} $k_{pub}$ (aplique $f$ a cada valor privado).
+    \item \textbf{Assine} a mensagem $\mathbf{m} = (1,0,1)$: quais valores s\~{a}o revelados?
+    \item Mostre a \textbf{verifica\c{c}\~{a}o} feita pelo destinat\'{a}rio.
+    \item Por que o esquema \'{e} de \textbf{uso \'{u}nico}? O que Oscar poderia fazer se a mesma chave assinasse duas mensagens diferentes?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+\textbf{(Winternitz e \'{a}rvore de Merkle --- conceitual.)} \livro{12.13}
+\begin{enumerate}[label=(\alph*)]
+    \item Na assinatura de \textbf{Lamport}, a assinatura \'{e} grande. Explique como o \textbf{Winternitz (W-OTS)} reduz o tamanho da assinatura e qual \'{e} o \textbf{custo} dessa redu\c{c}\~{a}o.
+    \item Tanto Lamport quanto Winternitz s\~{a}o de \textbf{uso \'{u}nico}. Explique como a \textbf{\'{a}rvore de Merkle (MSS)} permite assinar muitas mensagens publicando \textbf{uma \'{u}nica} chave p\'{u}blica.
+    \item Uma \'{a}rvore de Merkle de altura $t = 20$ permite assinar quantas mensagens? Por que o esquema \'{e} dito \textbf{``com estado''} (\textit{stateful})?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+\textbf{(\'{A}rvore de Merkle --- c\'{a}lculo.)} As quatro \textbf{folhas} de uma \'{a}rvore de Merkle (cada folha \'{e} o \emph{hash} de uma chave p\'{u}blica de uso \'{u}nico) s\~{a}o \livro{12.19}
+\[
+v_0 = (\,105,\ 470,\ 42,\ 158\,).
+\]
+A fun\c{c}\~{a}o de combina\c{c}\~{a}o de dois n\'{o}s \'{e} $h(a,b) = f(a+b)$, com $f(x) = x^2 \bmod 511$.
+\begin{enumerate}[label=(\alph*)]
+    \item Calcule os n\'{o}s intermedi\'{a}rios $v_1[0] = h(v_0[0], v_0[1])$ e $v_1[1] = h(v_0[2], v_0[3])$.
+    \item Calcule a \textbf{raiz} $\text{raiz} = h(v_1[0], v_1[1])$. O que essa raiz representa?
+    \item Escreva o \textbf{caminho de autentica\c{c}\~{a}o} necess\'{a}rio para verificar uma assinatura feita com a \textbf{folha 0} ($Y_0$), e mostre como o verificador \textbf{recomputa a raiz}.
+\end{enumerate}
+\end{exercicio}
+
+%% ════════════════════════ PARTE IV ════════════════════════
+\parte{Parte IV --- Padr\~{o}es e Cen\'{a}rio Global}
+
+\begin{exercicio}
+\textbf{(Padr\~{o}es do NIST.)}
+\begin{enumerate}[label=(\alph*)]
+    \item Associe cada padr\~{a}o \`{a} sua \textbf{fam\'{i}lia} e \textbf{fun\c{c}\~{a}o}: \textbf{FIPS 203 (ML-KEM)}, \textbf{FIPS 204 (ML-DSA)}, \textbf{FIPS 205 (SLH-DSA)}.
+    \item O \textbf{Classic McEliece} existe desde 1978 e nunca foi quebrado. Por que, mesmo assim, o NIST \textbf{n\~{a}o} o escolheu como KEM principal? (dica: consulte o gr\'{a}fico de tamanhos da aula.)
+    \item Em 2025 o NIST selecionou o \textbf{HQC} (baseado em c\'{o}digos) como KEM adicional, apesar de j\'{a} ter o ML-KEM. Qual \'{e} a l\'{o}gica estrat\'{e}gica dessa escolha?
+\end{enumerate}
+\end{exercicio}
+
+\begin{exercicio}
+\textbf{(Compara\c{c}\~{a}o entre pot\^{e}ncias globais.)} Diferentes pa\'{i}ses adotam \emph{filosofias} distintas na transi\c{c}\~{a}o p\'{o}s-qu\^{a}ntica.
+\begin{enumerate}[label=(\alph*)]
+    \item Explique a \textbf{abordagem h\'{i}brida} (cl\'{a}ssico $+$ p\'{o}s-qu\^{a}ntico) e por que ela protege contra \emph{dois} riscos ao mesmo tempo.
+    \item A \textbf{NSA} (EUA, CNSA 2.0) \textbf{n\~{a}o} exige h\'{i}brido para sistemas nacionais, enquanto \textbf{BSI} (Alemanha) e \textbf{ANSSI} (Fran\c{c}a) o \textbf{exigem}. Apresente um argumento a favor de cada postura.
+    \item A \textbf{China} (ICCS, sob a OSCCA) e a \textbf{R\'{u}ssia} (TC26) optaram por desenvolver \textbf{padr\~{o}es pr\'{o}prios} em vez de adotar os do NIST. Cite uma motiva\c{c}\~{a}o \textbf{t\'{e}cnica} e uma \textbf{geopol\'{i}tica} para essa decis\~{a}o.
+    \item Apesar das diverg\^{e}ncias, quase todas as pot\^{e}ncias convergem para prazos de $\sim$2030--2035. Qual \'{e} o \textbf{fator comum} que explica essa urg\^{e}ncia compartilhada?
+\end{enumerate}
+\end{exercicio}
+
+\end{document}
