@@ -2,14 +2,15 @@
 title: "Fundamentos de Sistemas Computacionais"
 shortName: "FSC"
 description: "Fundamentals of computer systems: processor architecture, assembly programming, memory hierarchy, and I/O systems. Emphasis on RISC-V architecture and the hardware-software interface."
-semester: "2026/1"
-schedules:
-  - id: "lm"
-    label: "Turma 31 (LM)"
-    url: "https://sarc.pucrs.br/Default/Export.aspx?id=22f37e91-6a13-4e90-86f8-8246492866e2&ano=2026&sem=1"
-  - id: "np"
-    label: "Turma 30 (NP)"
-    url: "https://sarc.pucrs.br/Default/Export.aspx?id=435a8c94-ee49-42e9-8672-5a6d4de6e877&ano=2026&sem=1"
+semester: "2026/2"
+scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=7ce14b98-351e-4a12-96ac-389c436b98a1&ano=2026&sem=2"
+sections:
+  - id: "310"
+    label: "Turma 310"
+    moodleUrl: "https://moodle.pucrs.br/course/view.php?id=95146"
+  - id: "320"
+    label: "Turma 320"
+    moodleUrl: "https://moodle.pucrs.br/course/view.php?id=95150"
 color: "#2563eb"
 order: 2
 objectives:

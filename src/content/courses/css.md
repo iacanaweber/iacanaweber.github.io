@@ -2,8 +2,9 @@
 title: "Confiabilidade e Segurança de Software"
 shortName: "CSS"
 description: "Dependabilidade de software: disponibilidade, confiabilidade, segurança e resiliência. Teste de software, análise estática, criptografia e segurança de sistemas."
-semester: "2026/1"
-scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=27ed33a5-ede6-4d8d-ab09-f703ad1b993b&ano=2026&sem=1"
+semester: "2026/2"
+scheduleUrl: "https://sarc.pucrs.br/Default/Export.aspx?id=42b132f9-03c0-471e-9d69-d4a0fd9f4b1c&ano=2026&sem=2"
+moodleUrl: "https://moodle.pucrs.br/course/view.php?id=95111"
 color: "#dc2626"
 order: 3
 objectives:

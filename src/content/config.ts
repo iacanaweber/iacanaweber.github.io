@@ -9,10 +9,12 @@ const courses = defineCollection({
     semester: z.string(),
     schedule: z.string().optional(),
     scheduleUrl: z.string().optional(),
-    schedules: z.array(z.object({
+    moodleUrl: z.string().optional(),
+    sections: z.array(z.object({
       id: z.string(),
       label: z.string(),
-      url: z.string(),
+      moodleUrl: z.string(),
+      scheduleUrl: z.string().optional(),
     })).optional(),
     objectives: z.array(z.string()).optional(),
     bibliography: z.array(z.string()).optional(),

@@ -98,6 +98,9 @@ export const translations: Record<string, Record<string, string>> = {
     'courses.title': 'Courses',
     'courses.intro': 'Browse course materials, notes, exercises, and exams for all available courses.',
     'courses.viewCourse': 'View Course',
+    'courses.movedToMoodle': 'This course is now run through Moodle. Class materials and activities are managed there.',
+    'courses.accessMoodle': 'Access on Moodle',
+    'courses.viewSchedule': 'View Schedule',
 
     // Course overview
     'course.objectives': 'Objectives',
@@ -247,6 +250,9 @@ export const translations: Record<string, Record<string, string>> = {
     'courses.title': 'Disciplinas',
     'courses.intro': 'Navegue pelos materiais de curso, notas de aula, exercícios e provas de todas as disciplinas disponíveis.',
     'courses.viewCourse': 'Ver Disciplina',
+    'courses.movedToMoodle': 'Esta disciplina agora é conduzida pelo Moodle. Os materiais e atividades são gerenciados por lá.',
+    'courses.accessMoodle': 'Acessar no Moodle',
+    'courses.viewSchedule': 'Ver Cronograma',
 
     // Course overview
     'course.objectives': 'Objetivos',
