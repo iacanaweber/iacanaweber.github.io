@@ -1,0 +1,2438 @@
+\documentclass{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, calc, fit, shapes.geometric, shapes.misc, backgrounds, decorations.pathreplacing, trees}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    filecolor=magenta,
+    urlcolor=cyan,
+    linkcolor=.,
+    pdfpagemode=FullScreen,
+}
+\urlstyle{same}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Paleta semantica da aula
+%%   vermelho = ameacas (faltas, erros, falhas)
+%%   verde    = meios (prevencao, tolerancia, remocao, previsao)
+%%   azul     = atributos e definicoes do paper
+%%   laranja  = atencao, armadilha conceitual, checkpoint
+%%   cinza    = estrutura neutra
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\definecolor{depAzul}{RGB}{31,78,121}
+\definecolor{depVermelho}{RGB}{155,35,35}
+\definecolor{depVerde}{RGB}{34,110,60}
+\definecolor{depLaranja}{RGB}{193,120,20}
+\definecolor{depCinza}{RGB}{95,95,95}
+
+\input{diagramas.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Macros de vocabulario
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Termo original em ingles, para o aluno reconhecer no paper.
+\newcommand{\en}[1]{{\color{depCinza}\textit{#1}}}
+% Referencia de secao do paper, alinhada a direita no rodape do slide.
+\newcommand{\sect}[1]{\par\smallskip\hfill{\tiny\color{black!55}Avi\v{z}ienis et al.\ (2004), #1}}
+\newcommand{\fonte}[1]{\par\smallskip{\tiny\color{black!55}#1}}
+\newcommand{\Avz}{Avi\v{z}ienis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Caixas padronizadas
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtcolorbox{defi}[1][Defini\c{c}\~ao do paper]{%
+  colback=depAzul!5, colframe=depAzul!70, boxrule=0.6pt, arc=1.5pt,
+  fonttitle=\scriptsize\bfseries, title={#1}, left=3pt, right=3pt, top=3pt, bottom=3pt}
+
+\newtcolorbox{armadilha}[1][Armadilha]{%
+  colback=depLaranja!8, colframe=depLaranja!75, boxrule=0.6pt, arc=1.5pt,
+  fonttitle=\scriptsize\bfseries, title={#1}, left=3pt, right=3pt, top=3pt, bottom=3pt}
+
+\newtcolorbox{pratica}[1][Na pr\'atica]{%
+  colback=depVerde!6, colframe=depVerde!60, boxrule=0.6pt, arc=1.5pt,
+  fonttitle=\scriptsize\bfseries, title={#1}, left=3pt, right=3pt, top=3pt, bottom=3pt}
+
+\newtcolorbox{ancora}{%
+  colback=black!4, colframe=black!45, boxrule=0.6pt, arc=1.5pt,
+  left=3pt, right=3pt, top=3pt, bottom=3pt}
+
+\newtcolorbox{checkpoint}[1][Checkpoint]{%
+  colback=depVermelho!5, colframe=depVermelho!70, boxrule=0.8pt, arc=1.5pt,
+  fonttitle=\scriptsize\bfseries, title={#1}, left=3pt, right=3pt, top=3pt, bottom=3pt}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{\'Indice}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\title[Taxonomia de Dependabilidade]{Conceitos B\'asicos e Taxonomia de\\Computa\c{c}\~ao Depend\'avel e Segura}
+\author{Prof. Ia\c{c}an\~a Ianiski Weber}
+\institute{PUCRS}
+\date{CSS (98G08-4)}
+
+\begin{document}
+
+% =====================================================================
+% CAPA
+% =====================================================================
+\begin{frame}[plain]
+\noindent
+\begin{minipage}[t]{0.15\textwidth}
+    \includegraphics[width=\linewidth]{../img/brasao_pucrs.png}
+\end{minipage}%
+\begin{minipage}[t]{0.84\textwidth}
+    \begin{center}
+        {\LARGE\bfseries\textcolor{blue}{Dependabilidade}}\\[6pt]
+        {\large\bfseries\textcolor{blue}{Conceitos B\'asicos e Taxonomia}}
+    \end{center}
+\end{minipage}
+
+\vspace{1.0cm}
+
+\begin{center}
+    \normalsize Um guia de leitura do artigo\\[4pt]
+    {\footnotesize\itshape ``Basic Concepts and Taxonomy of Dependable and Secure Computing''}\\[2pt]
+    {\footnotesize \Avz, Laprie, Randell \& Landwehr\\ IEEE Transactions on Dependable and Secure Computing, v.\ 1, n.\ 1, 2004}
+\end{center}
+
+\vspace{0.7cm}
+
+\begin{center}
+    \Large \textbf{Prof. Dr. Ia\c{c}an\~a Ianiski Weber} \\
+    \vspace{0.2cm}
+    \normalsize \textit{Confiabilidade e Seguran\c{c}a de Software} \\
+    \vspace{0.2cm}
+    \large 98G08-4
+\end{center}
+\end{frame}
+
+\begin{frame}{\'Indice}
+    \tableofcontents
+\end{frame}
+
+% =====================================================================
+\section{Por que este artigo}
+% =====================================================================
+
+\begin{frame}{O contrato desta aula}
+    \footnotesize
+    Vamos percorrer um artigo inteiro, se\c{c}\~ao por se\c{c}\~ao. Ao final voc\^e deve conseguir:
+    \begin{itemize}
+        \item distinguir \textbf{falta}, \textbf{erro} e \textbf{falha} \en{(fault, error, failure)} e explicar como um vira o outro;
+        \item classificar qualquer falta nas \textbf{oito dimens\~oes} da taxonomia;
+        \item nomear os \textbf{seis atributos} de dependabilidade e dizer qual deles um incidente violou;
+        \item escolher entre os \textbf{quatro meios} (preven\c{c}\~ao, toler\^ancia, remo\c{c}\~ao, previs\~ao de faltas) com justificativa;
+        \item ler o artigo sozinho, sem travar no vocabul\'ario.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{A ficha t\'ecnica do artigo}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.55\textwidth}
+            \begin{itemize}
+                \item Publicado no \textbf{volume 1, n\'umero 1} da \textbf{IEEE TDSC} (jan-mar 2004), p.\ 11-33. \'E o artigo que abre o peri\'odico.
+                \item \textbf{TDSC}: \textit{IEEE Transactions on Dependable and Secure Computing}, o peri\'odico da IEEE Computer Society dedicado a dependabilidade e seguran\c{c}a. Repare que o nome do peri\'odico j\'a carrega a tese do artigo: os dois campos tratados juntos.
+                \item N\~ao \'e um artigo de resultados. \'E um artigo de \textbf{vocabul\'ario}: prop\~oe um conjunto de conceitos e as rela\c{c}\~oes entre eles.
+                \item Os autores declaram dois p\'ublicos-alvo: \textbf{organiza\c{c}\~oes de padroniza\c{c}\~ao} e \textbf{ensino}.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.43\textwidth}
+            \begin{defi}[Como o artigo se define]
+                \scriptsize
+                ``Uma tentativa de documentar um consenso m\'inimo sobre conceitos dentro de v\'arias especialidades, para facilitar intera\c{c}\~oes t\'ecnicas fecundas.''
+            \end{defi}
+            \smallskip
+            \begin{armadilha}[Aviso dos pr\'oprios autores]
+                \scriptsize
+                O artigo n\~ao documenta o estado da arte e n\~ao trata de implementa\c{c}\~ao. Ele trata de \textbf{conceitos}.
+            \end{armadilha}
+        \end{column}
+    \end{columns}
+    \sect{\S1}
+\end{frame}
+
+\begin{frame}{Vinte e quatro anos de discuss\~ao antes da primeira linha}
+    \footnotesize
+    A taxonomia n\~ao nasceu deste artigo. Ela \'e o resultado de um comit\^e:
+    \medskip
+    \begin{itemize}
+        \item \textbf{1980}: comit\^e conjunto ``Fundamental Concepts and Terminology'', formado pelo TC on Fault-Tolerant Computing (IEEE CS) e pelo IFIP WG 10.4.
+        \item \textbf{1982}: sete artigos de posi\c{c}\~ao numa sess\~ao especial do FTCS-12.
+        \item \textbf{1985}: s\'intese apresentada no FTCS-15 por Laprie, antecessora direta deste artigo.
+        \item \textbf{1992}: o livro \textit{Dependability: Basic Concepts and Terminology}. Nesta etapa entram \textbf{seguran\c{c}a} como atributo e as \textbf{faltas maliciosas} na taxonomia.
+        \item \textbf{1995 em diante}: esfor\c{c}o cont\'inuo de expandir, refinar e simplificar, que resulta neste artigo de 2004.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Quando um vocabul\'ario leva 24 anos para estabilizar, o problema n\~ao era achar palavras bonitas. Era decidir \textbf{quais distin\c{c}\~oes valem a pena fazer}.
+    \end{ancora}
+    \sect{\S1, ``Preceding Work and Goals for the Future''}
+\end{frame}
+
+\begin{frame}{Quem s\~ao os quatro autores}
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}p{2.6cm} p{2.4cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Autor} & \textbf{Institui\c{c}\~ao (2004)} & \textbf{O que traz para a mesa} \\
+        \midrule
+        Algirdas \Avz{} & UCLA / Vytautas Magnus & Projeto de computadores tolerantes a faltas desde 1967; \textbf{programa\c{c}\~ao em N vers\~oes} e diversidade de projeto; taxonomia de faltas de projeto em microprocessadores comerciais. \\
+        \addlinespace
+        Jean-Claude Laprie & LAAS-CNRS, Toulouse & Autor da s\'intese de 1985 e editor do livro de 1992; respons\'avel por consolidar \textit{dependability} como conceito guarda-chuva. \\
+        \addlinespace
+        Brian Randell & Univ.\ de Newcastle & Tradi\c{c}\~ao de toler\^ancia a faltas em software e recupera\c{c}\~ao por retorno a estado salvo. \\
+        \addlinespace
+        Carl Landwehr & Univ.\ de Maryland / NSF & Vem da comunidade de \textbf{seguran\c{c}a}: autor de uma taxonomia de falhas de seguran\c{c}a em programas (1994), base das defini\c{c}\~oes de l\'ogica maliciosa deste artigo. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Tr\^es autores vêm de \textbf{toler\^ancia a faltas} e um vem de \textbf{seguran\c{c}a}. Essa composi\c{c}\~ao explica a tese central: os dois campos estavam resolvendo o mesmo problema com nomes diferentes.
+    \end{ancora}
+    \fonte{Refer\^encias [3], [4], [5], [6], [39], [40], [41] do pr\'oprio artigo.}
+\end{frame}
+
+\begin{frame}{A tese: dois campos convergindo}
+    \footnotesize
+    O artigo abre com um diagn\'ostico hist\'orico.
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Dependabilidade percebeu que...}]
+                \scriptsize
+                ...restringir-se a faltas \textbf{n\~ao maliciosas} resolvia s\'o parte do problema. Um sistema que tolera raio c\'osmico mas n\~ao tolera um invasor n\~ao \'e depend\'avel.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depAzul!6,colframe=depAzul!60,boxrule=0.6pt,title={\scriptsize\bfseries Seguran\c{c}a percebeu que...}]
+                \scriptsize
+                ...o foco hist\'orico em \textbf{confidencialidade} precisava ser acompanhado de integridade e disponibilidade. Elas sempre estiveram nas defini\c{c}\~oes, mas recebiam menos aten\c{c}\~ao.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Um ataque, na linguagem do artigo, \'e apenas uma \textbf{falta externa maliciosa}. Nada mais. Isso permite tratar um invasor com o mesmo ferramental que trata um bit flip.
+    \end{ancora}
+    \medskip
+    {\scriptsize Os autores reconhecem uma limita\c{c}\~ao: por restri\c{c}\~ao de espa\c{c}o, confidencialidade n\~ao recebe no artigo a aten\c{c}\~ao que merece.}
+    \sect{\S1 e \S3.5}
+\end{frame}
+
+\begin{frame}{O mapa da aula: a \'arvore da dependabilidade}
+    \centering
+    \diagArvore
+    \vspace{0.2em}
+    \begin{ancora}
+        \scriptsize
+        Tr\^es perguntas, tr\^es ramos. \textbf{Atributos}: o que eu quero do sistema? \textbf{Amea\c{c}as}: o que pode dar errado? \textbf{Meios}: como eu chego l\'a? A aula segue exatamente esta ordem.
+    \end{ancora}
+    \sect{Fig.\ 2, \S2.5}
+\end{frame}
+
+% =====================================================================
+\section{Conceitos b\'asicos: sistema, servi\c{c}o e as tr\^es amea\c{c}as}
+% =====================================================================
+
+\begin{frame}{Sistema, ambiente, fronteira}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        Um \textbf{sistema} \en{(system)} \'e uma entidade que interage com outras entidades: outros sistemas, hardware, software, humanos e o mundo f\'isico. Essas outras entidades s\~ao o \textbf{ambiente} \en{(environment)}. A \textbf{fronteira do sistema} \en{(system boundary)} \'e a divisa comum entre os dois.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item A defini\c{c}\~ao \'e deliberadamente ampla: cobre de uma porta l\'ogica a uma rede de computadores com operadores humanos.
+        \item O artigo distingue \textbf{sistemas de computa\c{c}\~ao e comunica\c{c}\~ao} de \textbf{sistemas baseados em computador} \en{(computer-based systems)}, que incluem tamb\'em os humanos e as organiza\c{c}\~oes ao redor.
+        \item Propriedades fundamentais de um sistema: \textbf{funcionalidade}, \textbf{desempenho}, \textbf{dependabilidade e seguran\c{c}a}, \textbf{custo}.
+    \end{itemize}
+    \medskip
+    \begin{armadilha}[Observe que]
+        \scriptsize
+        Quase toda confus\~ao nesta \'area vem de \textbf{n\~ao declarar onde est\'a a fronteira}. A mesma ocorr\^encia \'e falta interna para um observador e falta externa para outro, dependendo de onde ele desenhou a linha.
+    \end{armadilha}
+    \sect{\S2.1}
+\end{frame}
+
+\begin{frame}{Estrutura: a recurs\~ao para e onde voc\^e mandar}
+    \footnotesize
+    \begin{itemize}
+        \item Um sistema \'e composto de \textbf{componentes} \en{(components)} ligados para interagir. Cada componente \'e, ele mesmo, outro sistema.
+        \item A recurs\~ao para quando um componente \'e considerado \textbf{at\^omico} \en{(atomic)}: sua estrutura interna n\~ao pode ser discernida, ou n\~ao interessa e pode ser ignorada.
+        \item Consequ\^encia direta: o \textbf{estado total} do sistema \'e o conjunto dos estados externos de seus componentes at\^omicos.
+    \end{itemize}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        ``At\^omico'' \'e uma decis\~ao de an\'alise, n\~ao um fato da natureza. Ao analisar um servi\c{c}o, voc\^e pode declarar o banco de dados at\^omico. Para o time do banco de dados, ele \'e um sistema com dezenas de componentes.
+    \end{pratica}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        A taxonomia \'e \textbf{recursiva e relativa ao observador}. Isso n\~ao \'e imprecis\~ao: \'e o que a torna aplic\'avel de uma porta l\'ogica a uma constela\c{c}\~ao de sat\'elites.
+    \end{ancora}
+    \sect{\S2.1}
+\end{frame}
+
+\begin{frame}{Quatro palavras que n\~ao s\~ao sin\^onimos}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{@{}p{2.5cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Fun\c{c}\~ao} \en{(function)} & O que o sistema \textbf{deveria} fazer. Descrita pela \textbf{especifica\c{c}\~ao funcional}, em termos de funcionalidade e desempenho. \\
+        \addlinespace
+        \textbf{Comportamento} \en{(behavior)} & O que o sistema \textbf{faz} para implementar a fun\c{c}\~ao. Descrito por uma sequ\^encia de estados. \\
+        \addlinespace
+        \textbf{Estrutura} \en{(structure)} & O que \textbf{permite} ao sistema gerar o comportamento. Os componentes e suas liga\c{c}\~oes. \\
+        \addlinespace
+        \textbf{Servi\c{c}o} \en{(service)} & O comportamento \textbf{tal como percebido pelo usu\'ario}. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        Comportamento e servi\c{c}o n\~ao s\~ao a mesma coisa. O comportamento inclui tudo o que acontece dentro. O servi\c{c}o \'e s\'o a parte que atravessa a interface e chega ao usu\'ario. \'E por isso que um sistema pode estar internamente errado e ainda assim entregar servi\c{c}o correto.
+    \end{armadilha}
+    \sect{\S2.1}
+\end{frame}
+
+\begin{frame}{Estado total, estado externo, estado interno}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        O \textbf{estado total} \en{(total state)} de um sistema \'e o conjunto de: computa\c{c}\~ao, comunica\c{c}\~ao, informa\c{c}\~ao armazenada, interconex\~ao e condi\c{c}\~ao f\'isica.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item A parte do estado total \textbf{percept\'ivel na interface de servi\c{c}o} \'e o \textbf{estado externo} \en{(external state)}.
+        \item O resto \'e o \textbf{estado interno} \en{(internal state)}.
+        \item O \textbf{servi\c{c}o entregue} \'e a sequ\^encia dos estados externos do provedor.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Repare que ``condi\c{c}\~ao f\'isica'' est\'a no estado. Temperatura, tens\~ao e desgaste fazem parte do estado do sistema, n\~ao s\~ao detalhes de outra disciplina.
+    \end{ancora}
+    \sect{\S2.1}
+\end{frame}
+
+\begin{frame}{Provedor, usu\'ario e as duas interfaces}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.50\textwidth}
+            \begin{itemize}
+                \item O \textbf{provedor} \en{(provider)} entrega servi\c{c}o. O \textbf{usu\'ario} \en{(user)} \'e outro sistema que recebe esse servi\c{c}o.
+                \item A parte da fronteira do provedor onde a entrega ocorre \'e a \textbf{interface de servi\c{c}o} \en{(service interface)}.
+                \item A interface do usu\'ario onde ele recebe o servi\c{c}o \'e a \textbf{interface de uso} \en{(use interface)}.
+                \item Um mesmo sistema pode ser provedor e usu\'ario, simultaneamente ou em sequ\^encia.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.46\textwidth}
+            \centering
+            \begin{tikzpicture}[scale=0.85, transform shape,
+                cx/.style={draw=depCinza!80, fill=black!4, rounded corners, thick, minimum width=2.4cm, minimum height=1.1cm, align=center, font=\scriptsize\bfseries},
+                seta/.style={-{Latex[length=2mm]}, thick, depAzul!70!black}]
+                \node[cx] (a) {Sistema A\\{\tiny provedor}};
+                \node[cx, below=1.5cm of a] (b) {Sistema B\\{\tiny usu\'ario}};
+                \draw[seta] (a.south) -- node[right, font=\tiny, align=left] {servi\c{c}o} (b.north);
+                \node[font=\tiny, left=1pt of a.south west, anchor=east, text=depVermelho!80!black, align=right] {interface\\de servi\c{c}o};
+                \node[font=\tiny, left=1pt of b.north west, anchor=east, text=depVerde!60!black, align=right] {interface\\de uso};
+            \end{tikzpicture}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Um sistema geralmente implementa mais de uma fun\c{c}\~ao e entrega mais de um servi\c{c}o. O artigo chama essas partes de \textbf{itens de fun\c{c}\~ao} e \textbf{itens de servi\c{c}o}, e usa o plural quando precisa distingui-los.
+    \end{pratica}
+    \sect{\S2.1}
+\end{frame}
+
+\begin{frame}{Servi\c{c}o correto e falha de servi\c{c}o}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        \textbf{Servi\c{c}o correto} \en{(correct service)} \'e entregue quando o servi\c{c}o implementa a fun\c{c}\~ao do sistema.\\[3pt]
+        Uma \textbf{falha de servi\c{c}o} \en{(service failure)} \'e um \textbf{evento} que ocorre quando o servi\c{c}o entregue desvia do servi\c{c}o correto.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item A falha \'e a \textbf{transi\c{c}\~ao} de servi\c{c}o correto para servi\c{c}o incorreto.
+        \item O per\'iodo de entrega de servi\c{c}o incorreto \'e a \textbf{interrup\c{c}\~ao} \en{(service outage)}.
+        \item A transi\c{c}\~ao de volta \'e a \textbf{restaura\c{c}\~ao} \en{(service restoration)}.
+    \end{itemize}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        Falha \'e \textbf{evento} (instant\^aneo), interrup\c{c}\~ao \'e \textbf{per\'iodo} (tem dura\c{c}\~ao). Confundir os dois estraga qualquer conversa sobre disponibilidade, porque disponibilidade se mede em dura\c{c}\~ao, n\~ao em contagem de eventos.
+    \end{armadilha}
+    \sect{\S2.2}
+\end{frame}
+
+\begin{frame}{Duas maneiras de um servi\c{c}o falhar}
+    \footnotesize
+    O artigo faz aqui uma distin\c{c}\~ao que muita gente ignora a vida inteira:
+    \medskip
+    \begin{enumerate}
+        \item O servi\c{c}o \textbf{n\~ao cumpre a especifica\c{c}\~ao funcional}. Caso comum, e o que todo mundo chama de bug.
+        \item O servi\c{c}o \textbf{cumpre a especifica\c{c}\~ao}, mas a \textbf{especifica\c{c}\~ao n\~ao descrevia adequadamente a fun\c{c}\~ao} do sistema.
+    \end{enumerate}
+    \medskip
+    \begin{defi}[Consequ\^encia formal]
+        \scriptsize
+        A ocorr\^encia de uma falha \'e definida em rela\c{c}\~ao \`a \textbf{fun\c{c}\~ao} do sistema, n\~ao em rela\c{c}\~ao \`a descri\c{c}\~ao dessa fun\c{c}\~ao na especifica\c{c}\~ao. Uma entrega que cumpre a especifica\c{c}\~ao pode ser inaceit\'avel para o usu\'ario, revelando uma \textbf{falta de especifica\c{c}\~ao} \en{(specification fault)}.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Por isso o artigo admite que falhas podem ser \textbf{subjetivas e discut\'iveis}: \`as vezes s\'o se reconhece que houve falha depois, pelas consequ\^encias.
+    \end{ancora}
+    \sect{\S2.2 e \S3.3.1}
+\end{frame}
+
+\begin{frame}{Erro e falta: as outras duas amea\c{c}as}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        \textbf{Erro} \en{(error)}: a parte do estado total do sistema que pode levar a uma falha de servi\c{c}o subsequente.\\[3pt]
+        \textbf{Falta} \en{(fault)}: a causa \textbf{julgada ou hipotetizada} de um erro.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item ``Julgada ou hipotetizada'' \en{(adjudged or hypothesized)} n\~ao \'e enfeite. A falta \'e o resultado de um \textbf{diagn\'ostico}, e diagn\'osticos podem estar errados.
+        \item Uma falta \'e \textbf{ativa} \en{(active)} quando causa um erro; caso contr\'ario \'e \textbf{dormente} \en{(dormant)}.
+        \item Faltas podem ser \textbf{internas} ou \textbf{externas} ao sistema.
+        \item Na maioria dos casos a falta primeiro causa erro no estado de um \textbf{componente}, e o estado externo do sistema n\~ao \'e afetado de imediato.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        \textbf{Muitos erros nunca alcan\c{c}am o estado externo e nunca causam falha.} Guarde essa frase: ela sustenta metade da \S5.
+    \end{ancora}
+    \sect{\S2.2}
+\end{frame}
+
+\begin{frame}{Vulnerabilidade: a ponte entre o externo e o interno}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        Uma \textbf{vulnerabilidade} \en{(vulnerability)} \'e uma \textbf{falta interna} que permite que uma \textbf{falta externa} cause dano ao sistema.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item A presen\c{c}a pr\'evia de uma vulnerabilidade \'e \textbf{necess\'aria} para que uma falta externa cause erro e, possivelmente, falha.
+        \item Vulnerabilidades podem ser faltas de desenvolvimento ou operacionais; podem ser maliciosas ou n\~ao maliciosas.
+        \item Uma vulnerabilidade pode resultar de uma \textbf{falta deliberada de desenvolvimento}, por raz\~oes econ\^omicas ou de usabilidade, que resulta em prote\c{c}\~ao limitada ou ausente.
+    \end{itemize}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        O artigo aponta a analogia: h\'a semelhan\c{c}a entre uma tentativa de intrus\~ao e uma falta f\'isica externa que ``explora'' a falta de blindagem. Nos dois casos, sem a vulnerabilidade interna, o agente externo n\~ao produz efeito.
+    \end{pratica}
+    \sect{\S2.2 e \S3.2.5}
+\end{frame}
+
+\begin{frame}{Falha parcial e modo degradado}
+    \footnotesize
+    \begin{itemize}
+        \item Quando a especifica\c{c}\~ao funcional inclui v\'arias fun\c{c}\~oes, a falha de uma delas pode deixar o sistema em \textbf{modo degradado} \en{(degraded mode)}, ainda oferecendo um subconjunto \'util de servi\c{c}os.
+        \item A pr\'opria especifica\c{c}\~ao pode identificar esses modos: servi\c{c}o lento, servi\c{c}o limitado, servi\c{c}o de emerg\^encia.
+        \item Nesse caso o sistema sofreu uma \textbf{falha parcial} \en{(partial failure)} de funcionalidade ou de desempenho.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Modo degradado s\'o \'e modo degradado se estiver \textbf{na especifica\c{c}\~ao}. Se n\~ao estiver, \'e comportamento incorreto que algu\'em resolveu chamar de degrada\c{c}\~ao depois do fato.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Falhas de desenvolvimento e falhas de dependabilidade, que veremos na \S3.3, tamb\'em podem ser parciais.
+    \end{pratica}
+    \sect{\S2.2}
+\end{frame}
+
+\begin{frame}{Dependabilidade: duas defini\c{c}\~oes, dois usos}
+    \footnotesize
+    \begin{tcolorbox}[colback=depAzul!5,colframe=depAzul!70,boxrule=0.6pt,title={\scriptsize\bfseries Defini\c{c}\~ao original}]
+        \scriptsize
+        \textbf{Dependabilidade} \'e a capacidade de entregar servi\c{c}o em que se possa \textbf{justificadamente} confiar.
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Defini\c{c}\~ao alternativa}]
+        \scriptsize
+        \textbf{Dependabilidade} \'e a capacidade de um sistema de \textbf{evitar falhas de servi\c{c}o mais frequentes ou mais severas do que \'e aceit\'avel}.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \item A primeira \textbf{generaliza} as no\c{c}\~oes cl\'assicas (confiabilidade, disponibilidade, seguran\c{c}a...), que viram atributos.
+        \item A segunda fornece um \textbf{crit\'erio de decis\~ao}: um sistema falha e mesmo assim continua depend\'avel; a partir de quando deixa de ser?
+    \end{itemize}
+    \smallskip
+    \begin{armadilha}
+        \scriptsize
+        A palavra ``justificadamente'' carrega o artigo inteiro. Confian\c{c}a sem evid\^encia \'e otimismo, n\~ao dependabilidade. Remo\c{c}\~ao e previs\~ao de faltas existem para produzir essa justificativa.
+    \end{armadilha}
+    \sect{\S2.3 e \S4.1}
+\end{frame}
+
+\begin{frame}{Depend\^encia e confian\c{c}a}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        A \textbf{depend\^encia} \en{(dependence)} do sistema A em rela\c{c}\~ao ao sistema B \'e a extens\~ao em que a dependabilidade de A \'e (ou seria) afetada pela de B.\\[3pt]
+        \textbf{Confian\c{c}a} \en{(trust)} \'e \textbf{depend\^encia aceita}.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item A depend\^encia varia de \textbf{total} (qualquer falha de B faz A falhar) a \textbf{independ\^encia completa} (B n\~ao consegue fazer A falhar).
+        \item Se a dependabilidade de B for insuficiente para o que A precisa, h\'a tr\^es sa\'idas: melhorar B, reduzir a depend\^encia de A, ou acrescentar toler\^ancia a faltas em A.
+        \item A aceita\c{c}\~ao pode ser expl\'icita (contrato), impl\'icita, irrefletida, ou at\'e involunt\'aria, quando A n\~ao tem alternativa.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        A medida operacional proposta pelo artigo \'e desconfort\'avel e certeira: \textbf{a extens\~ao em que A deixa de prover meios de tolerar as falhas de B \'e a medida da confian\c{c}a de A em B}.
+    \end{ancora}
+    \sect{\S2.3 e \S4.2}
+\end{frame}
+
+\begin{frame}{Os seis atributos}
+    \centering
+    \diagAtributos
+    \vspace{0.3em}
+    \begin{ancora}
+        \scriptsize
+        Dependabilidade e seguran\c{c}a n\~ao s\~ao conjuntos disjuntos nem um cont\'em o outro. Elas \textbf{compartilham} disponibilidade e integridade, e cada uma tem \^enfases pr\'oprias.
+    \end{ancora}
+    \sect{Fig.\ 1 e Fig.\ 14, \S2.3 e \S4.1}
+\end{frame}
+
+\begin{frame}{Os seis atributos, em uma linha cada}
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}p{3.3cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Disponibilidade} \en{(availability)} & Prontid\~ao para servi\c{c}o correto. \\
+        \textbf{Confiabilidade} \en{(reliability)} & Continuidade de servi\c{c}o correto. \\
+        \textbf{Seguran\c{c}a f\'isica} \en{(safety)} & Aus\^encia de consequ\^encias catastr\'oficas sobre os usu\'arios e o ambiente. \\
+        \textbf{Integridade} \en{(integrity)} & Aus\^encia de altera\c{c}\~oes impr\'oprias do sistema. \\
+        \textbf{Manutenibilidade} \en{(maintainability)} & Capacidade de sofrer modifica\c{c}\~oes e reparos. \\
+        \midrule
+        \textbf{Confidencialidade} \en{(confidentiality)} & Aus\^encia de divulga\c{c}\~ao n\~ao autorizada de informa\c{c}\~ao. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{armadilha}[Disponibilidade n\~ao \'e confiabilidade]
+        \scriptsize
+        \textbf{Prontid\~ao} versus \textbf{continuidade}. Um sistema que cai por 1 segundo a cada minuto tem disponibilidade de 98,3\%\ e confiabilidade sofr\'ivel para qualquer tarefa que dure mais de um minuto. Um sistema que cai uma vez por ano por 10 horas tem confiabilidade alta e disponibilidade pior em termos de dura\c{c}\~ao total.
+    \end{armadilha}
+    \medskip
+    {\scriptsize A confidencialidade entra separada porque \'e o atributo que ganha destaque quando se trata de \textbf{seguran\c{c}a}.}
+    \sect{\S2.3}
+\end{frame}
+
+\begin{frame}{Seguran\c{c}a \'e um composto, n\~ao um atributo}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        \textbf{Seguran\c{c}a} \en{(security)} \'e um composto dos atributos de \textbf{confidencialidade}, \textbf{integridade} e \textbf{disponibilidade}, exigindo a exist\^encia concomitante de:
+        \begin{enumerate}
+            \item disponibilidade \textbf{apenas para a\c{c}\~oes autorizadas};
+            \item confidencialidade;
+            \item integridade, com ``impr\'oprio'' significando ``n\~ao autorizado''.
+        \end{enumerate}
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Na \S4.1 os autores oferecem uma defini\c{c}\~ao unificada: seguran\c{c}a \'e a \textbf{aus\^encia de acesso ou manipula\c{c}\~ao n\~ao autorizada do estado do sistema}.
+        \item Repare no mecanismo: os mesmos atributos, restritos pela no\c{c}\~ao de \textbf{autoriza\c{c}\~ao}, viram seguran\c{c}a.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Isso resolve elegantemente a tri\'ade CIA: ela n\~ao \'e uma lista arbitr\'aria, \'e o que sobra dos atributos de dependabilidade quando voc\^e acrescenta a palavra ``autorizado''.
+    \end{ancora}
+    \sect{\S2.3 e \S4.1}
+\end{frame}
+
+\begin{frame}{Os quatro meios, em uma linha cada}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{@{}p{4.2cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Preven\c{c}\~ao de faltas} \en{(fault prevention)} & Impedir a ocorr\^encia ou a introdu\c{c}\~ao de faltas. \\
+        \textbf{Toler\^ancia a faltas} \en{(fault tolerance)} & Evitar falhas de servi\c{c}o \textbf{na presen\c{c}a} de faltas. \\
+        \textbf{Remo\c{c}\~ao de faltas} \en{(fault removal)} & Reduzir o n\'umero e a severidade das faltas. \\
+        \textbf{Previs\~ao de faltas} \en{(fault forecasting)} & Estimar o n\'umero presente, a incid\^encia futura e as consequ\^encias prov\'aveis das faltas. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt]
+        \footnotesize
+        Preven\c{c}\~ao e toler\^ancia \textbf{fornecem} a capacidade de entregar servi\c{c}o confi\'avel.\\
+        Remo\c{c}\~ao e previs\~ao \textbf{constroem confian\c{c}a} nessa capacidade, justificando que as especifica\c{c}\~oes s\~ao adequadas e que o sistema provavelmente as cumpre.
+    \end{tcolorbox}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Volte \`a defini\c{c}\~ao original: servi\c{c}o em que se possa \textbf{justificadamente} confiar. Dois meios produzem o servi\c{c}o; dois meios produzem a justificativa.
+    \end{ancora}
+    \sect{\S2.4}
+\end{frame}
+
+\begin{frame}{A especifica\c{c}\~ao de dependabilidade e seguran\c{c}a}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        A \textbf{especifica\c{c}\~ao de dependabilidade e seguran\c{c}a} deve incluir os requisitos para os atributos em termos da \textbf{frequ\^encia e severidade aceit\'aveis} de falhas de servi\c{c}o, para \textbf{classes de faltas especificadas} e um \textbf{ambiente de uso dado}.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Um ou mais atributos podem simplesmente \textbf{n\~ao ser exigidos} para um dado sistema.
+        \item Essa especifica\c{c}\~ao tamb\'em pode conter faltas: omitir classes de faltas relevantes, descrever mal o ambiente de uso, ou exigir requisitos altos demais sem justificativa, o que encarece o desenvolvimento.
+    \end{itemize}
+    \medskip
+    \begin{pratica}[Exemplo do pr\'oprio artigo]
+        \scriptsize
+        No sistema AAS da avia\c{c}\~ao civil norte-americana, o limite inicial de indisponibilidade total era de \textbf{3 segundos por ano}. Em 1994 ele foi renegociado para \textbf{5 minutos por ano} no novo contrato. Um requisito mal calibrado \'e, ele pr\'oprio, uma falta.
+    \end{pratica}
+    \sect{\S2.3 e \S3.3.3}
+\end{frame}
+
+\begin{frame}{Checkpoint 1}
+    \footnotesize
+    \begin{checkpoint}[Classifique, com a taxonomia da \S2]
+        \scriptsize
+        Um servi\c{c}o web mant\'em um contador de sess\~oes ativas. Por um erro de arredondamento, o contador guarda 41 quando o valor correto seria 42. O contador s\'o \'e usado para dimensionar um \textit{pool} interno, e nesse dia o \textit{pool} tinha folga. Nenhum usu\'ario percebeu qualquer diferen\c{c}a.
+        \medskip
+        \begin{enumerate}
+            \item Houve \textbf{falta}? Houve \textbf{erro}? Houve \textbf{falha}?
+            \item O sistema esteve \textbf{depend\'avel} durante esse per\'iodo?
+        \end{enumerate}
+    \end{checkpoint}
+    \medskip
+    \pause
+    \begin{ancora}
+        \scriptsize
+        \textbf{Falta}: sim, o defeito no c\'odigo de arredondamento (dormente at\'e ser ativado).\\
+        \textbf{Erro}: sim, o contador com 41 \'e parte do estado total que \textbf{poderia} levar a falha.\\
+        \textbf{Falha}: n\~ao. O erro nunca alcan\c{c}ou o estado externo. N\~ao houve desvio do servi\c{c}o.\\
+        \textbf{Depend\'avel}: sim, pelo crit\'erio da segunda defini\c{c}\~ao, porque n\~ao houve falha de servi\c{c}o. Mas o erro latente \'e risco acumulado, e o sistema chegou perto.
+    \end{ancora}
+\end{frame}
+
+% =====================================================================
+\section{Amea\c{c}as I: a taxonomia das faltas}
+% =====================================================================
+
+\begin{frame}{O ciclo de vida tem duas fases, e ambas produzem faltas}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depAzul!6,colframe=depAzul!60,boxrule=0.6pt,title={\scriptsize\bfseries Fase de desenvolvimento}]
+                \scriptsize
+                Da concep\c{c}\~ao inicial do usu\'ario at\'e a decis\~ao de que o sistema passou em todos os testes de aceita\c{c}\~ao e est\'a pronto para entregar servi\c{c}o.\\[3pt]
+                Aqui entram as \textbf{faltas de desenvolvimento} \en{(development faults)}.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Fase de uso}]
+                \scriptsize
+                Come\c{c}a quando o sistema \'e aceito e passa a entregar servi\c{c}o. Alterna tr\^es per\'iodos: \textbf{entrega de servi\c{c}o}, \textbf{interrup\c{c}\~ao} \en{(outage)} e \textbf{desligamento} \en{(shutdown)}.\\[3pt]
+                Aqui entram as \textbf{faltas operacionais} \en{(operational faults)}.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{itemize}
+        \item A interrup\c{c}\~ao \'e causada por uma falha. O \textbf{desligamento} \'e uma parada \textbf{intencional} por entidade autorizada.
+        \item A\c{c}\~oes de manuten\c{c}\~ao podem ocorrer em qualquer um dos tr\^es per\'iodos.
+    \end{itemize}
+    \sect{\S3.1}
+\end{frame}
+
+\begin{frame}{Os dois ambientes, elemento por elemento}
+    \scriptsize
+    \begin{columns}[T]
+        \begin{column}{0.46\textwidth}
+            \textbf{Ambiente de desenvolvimento}
+            \begin{enumerate}
+                \item o mundo f\'isico e seus fen\^omenos naturais;
+                \item \textbf{desenvolvedores humanos}, alguns possivelmente sem compet\^encia ou com objetivos maliciosos;
+                \item \textbf{ferramentas de desenvolvimento}, software e hardware;
+                \item \textbf{instala\c{c}\~oes de produ\c{c}\~ao e teste}.
+            \end{enumerate}
+        \end{column}
+        \begin{column}{0.52\textwidth}
+            \textbf{Ambiente de uso}
+            \begin{enumerate}
+                \item o mundo f\'isico e seus fen\^omenos naturais;
+                \item \textbf{administradores} (inclusive mantenedores), que t\^em autoridade para gerenciar, modificar, reparar e usar; alguns podem n\~ao ter compet\^encia ou ter objetivos maliciosos;
+                \item \textbf{usu\'arios}, que recebem servi\c{c}o;
+                \item \textbf{provedores}, que entregam servi\c{c}o ao sistema;
+                \item \textbf{infraestrutura}: fontes de informa\c{c}\~ao (hora, GPS), enlaces de comunica\c{c}\~ao, energia, refrigera\c{c}\~ao;
+                \item \textbf{intrusos}: \textit{hackers}, v\^andalos, insiders corruptos, agentes de governos ou organiza\c{c}\~oes hostis, e software malicioso.
+            \end{enumerate}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \scriptsize
+        O intruso \'e listado como \textbf{elemento normal do ambiente de uso}, ao lado da refrigera\c{c}\~ao e do rel\'ogio. \'E assim que seguran\c{c}a entra na taxonomia sem precisar de um arcabou\c{c}o separado.
+    \end{ancora}
+    \sect{\S3.1}
+\end{frame}
+
+\begin{frame}{Manuten\c{c}\~ao \'e um processo de desenvolvimento}
+    \centering
+    \diagManutencao
+    \vspace{0.2em}
+    \begin{columns}[T]
+        \begin{column}{0.58\textwidth}
+            \scriptsize
+            ``Manuten\c{c}\~ao'' aqui inclui n\~ao apenas reparos, mas \textbf{todas} as modifica\c{c}\~oes do sistema durante a fase de uso. Portanto, manuten\c{c}\~ao \'e desenvolvimento, e tudo o que vale para desenvolvimento vale para ela.
+        \end{column}
+        \begin{column}{0.40\textwidth}
+            \begin{armadilha}[Reparo x toler\^ancia]
+                \scriptsize
+                A distin\c{c}\~ao \'e uma s\'o: \textbf{manuten\c{c}\~ao exige um agente externo} (t\'ecnico, equipamento de teste, recarga remota de software). Toler\^ancia a faltas \'e feita pelo pr\'oprio sistema.
+            \end{armadilha}
+        \end{column}
+    \end{columns}
+    \fonte{Repare na recurs\~ao: reparo pode ser visto como toler\^ancia a faltas de um sistema maior, que inclui o sistema reparado mais as pessoas que o reparam.}
+    \sect{Fig.\ 3, \S3.1}
+\end{frame}
+
+\begin{frame}{As oito dimens\~oes de classifica\c{c}\~ao de faltas}
+    \centering
+    \diagOitoDimensoes
+    \vspace{0.2em}
+    \begin{ancora}
+        \scriptsize
+        Toda falta que existe pode ser posicionada nessas oito dimens\~oes. Este \'e o instrumento central do artigo, e o que voc\^e vai usar nos exerc\'icios.
+    \end{ancora}
+    \sect{Fig.\ 4, \S3.2.1}
+\end{frame}
+
+\begin{frame}{De 256 possibilidades para 31 classes plaus\'iveis}
+    \footnotesize
+    \begin{itemize}
+        \item Oito dimens\~oes bin\'arias dariam $2^8 = 256$ combina\c{c}\~oes.
+        \item Nem todo crit\'erio se aplica a toda classe. Faltas naturais, por exemplo, n\~ao podem ser classificadas por objetivo, inten\c{c}\~ao e capacidade: n\~ao h\'a humano envolvido.
+        \item Os autores identificam \textbf{31 combina\c{c}\~oes prov\'aveis}, e dizem que outras podem ser identificadas no futuro.
+        \item Essas 31 classes se agrupam em \textbf{tr\^es conjuntos parcialmente sobrepostos}.
+    \end{itemize}
+    \medskip
+    \begin{pratica}[Por que isso importa]
+        \scriptsize
+        Conhecer as classes poss\'iveis permite ao projetista \textbf{decidir quais delas entram na especifica\c{c}\~ao} de dependabilidade e seguran\c{c}a. Voc\^e n\~ao tolera faltas em abstrato: voc\^e tolera classes declaradas.
+    \end{pratica}
+    \sect{\S3.2.1, Fig.\ 5}
+\end{frame}
+
+\begin{frame}{Os tr\^es grandes grupos}
+    \centering
+    \diagTresGrupos
+    \vspace{0.2em}
+    \begin{ancora}
+        \scriptsize
+        Os grupos se \textbf{sobrep\~oem}. Uma falta f\'isica pode ser de desenvolvimento (defeito de produ\c{c}\~ao) e uma falta de intera\c{c}\~ao pode ser f\'isica (interfer\^encia). N\~ao s\~ao gavetas exclusivas.
+    \end{ancora}
+    \sect{Fig.\ 5, \S3.2.1}
+\end{frame}
+
+\begin{frame}{Faltas naturais}
+    \footnotesize
+    Faltas f\'isicas causadas por fen\^omenos naturais, \textbf{sem participa\c{c}\~ao humana}.
+    \medskip
+    \begin{itemize}
+        \item \textbf{Defeitos de produ\c{c}\~ao} \en{(production defects)}: faltas naturais que se originam durante o desenvolvimento.
+        \item Durante a opera\c{c}\~ao, as faltas naturais s\~ao:
+        \begin{itemize}
+            \item \textbf{internas}, por processos naturais de deteriora\c{c}\~ao f\'isica;
+            \item \textbf{externas}, por processos que se originam fora da fronteira e causam interfer\^encia f\'isica, seja penetrando a fronteira de hardware (radia\c{c}\~ao), seja entrando pelas interfaces de uso (transientes de alimenta\c{c}\~ao, linhas de entrada ruidosas).
+        \end{itemize}
+    \end{itemize}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        Humanos tamb\'em causam faltas f\'isicas. ``Falta f\'isica'' e ``falta natural'' n\~ao s\~ao sin\^onimos: a primeira \'e a \textbf{dimens\~ao} afetada, a segunda \'e a \textbf{causa fenomenol\'ogica}.
+    \end{armadilha}
+    \sect{\S3.2.2}
+\end{frame}
+
+\begin{frame}{Faltas humanas: tr\^es cortes sucessivos}
+    \scriptsize
+    Primeiro por \textbf{objetivo}, depois por \textbf{inten\c{c}\~ao}, depois por \textbf{capacidade}.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{2.6cm} p{3.1cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Objetivo} & \textbf{Inten\c{c}\~ao} & \textbf{Capacidade} \\
+        \midrule
+        \multirow{2}{2.6cm}{\textbf{N\~ao maliciosas}} & \textbf{N\~ao deliberadas} (\textit{mistakes}): a\c{c}\~oes n\~ao intencionais das quais a pessoa n\~ao tem consci\^encia & \textbf{Acidentais} ou \textbf{de incompet\^encia} \\
+        \addlinespace
+         & \textbf{Deliberadas} (\textit{bad decisions}): a\c{c}\~oes intencionais que est\~ao erradas e causam faltas & \textbf{Acidentais} ou \textbf{de incompet\^encia} \\
+        \midrule
+        \textbf{Maliciosas} & Sempre deliberadas & N\~ao se aplica \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{itemize}
+        \item Faltas de desenvolvimento deliberadas e n\~ao maliciosas resultam em geral de \textbf{compromissos}: preservar desempenho aceit\'avel, facilitar o uso, ou considera\c{c}\~oes econ\^omicas.
+        \item Faltas de intera\c{c}\~ao deliberadas e n\~ao maliciosas v\^em de um operador tentando contornar uma situa\c{c}\~ao imprevista, ou violando um procedimento sem perceber as consequ\^encias.
+        \item Elas costumam ser \textbf{reconhecidas como faltas s\'o depois} de um comportamento inaceit\'avel, ou seja, depois da falha.
+    \end{itemize}
+    \sect{Fig.\ 6, \S3.2.3}
+\end{frame}
+
+\begin{frame}{A categoria mais desconfort\'avel: faltas de incompet\^encia}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        \textbf{Faltas de incompet\^encia} \en{(incompetence faults)} resultam da falta de compet\^encia profissional do humano autorizado, ou da inadequa\c{c}\~ao da organiza\c{c}\~ao de desenvolvimento.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Os autores argumentam: nem todo erro e nem toda m\'a decis\~ao de pessoas n\~ao maliciosas \'e um \textbf{acidente}. Algumas v\^em de quem n\~ao tinha compet\^encia para o trabalho que assumiu.
+        \item ``Uma taxonomia completa n\~ao deve ocultar essa causa de faltas.''
+        \item Como se reconhece uma? Quando as consequ\^encias envolvem perdas econ\^omicas, les\~oes ou mortes, decidir se houve m\'a pr\'atica profissional costuma exigir \textbf{comiss\~ao de inqu\'erito independente ou processo judicial}.
+        \item Existe tamb\'em a \textbf{incompet\^encia organizacional}: a equipe ou a empresa inteira n\~ao tinha condi\c{c}\~oes de fazer o trabalho. O exemplo dado \'e a falha completa de desenvolvimento do sistema AAS.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Esta \'e uma contribui\c{c}\~ao nova de 2004 sobre as vers\~oes anteriores da taxonomia. Ela existe para permitir falar de \textbf{compet\^encia} sem eufemismo.
+    \end{ancora}
+    \sect{\S3.2.1 e \S3.2.3}
+\end{frame}
+
+\begin{frame}{Tr\^es fontes de faltas que engenheiros subestimam}
+    \footnotesize
+    \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Errata de hardware}]
+        \scriptsize
+        Em hardware, especialmente em microprocessadores, faltas de desenvolvimento s\~ao descobertas \textbf{depois} de a produ\c{c}\~ao come\c{c}ar. Elas se chamam \textit{errata} e s\~ao listadas em atualiza\c{c}\~oes de especifica\c{c}\~ao, publicadas periodicamente durante toda a vida do processador.
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Componentes de prateleira (OTS)}]
+        \scriptsize
+        Componentes \textit{off-the-shelf} chegam com faltas de desenvolvimento conhecidas e podem conter faltas desconhecidas. As especifica\c{c}\~oes deles podem ser incompletas ou incorretas. O problema \'e pior com componentes \textbf{legados}, que precisam ser mantidos por exig\^encia do usu\'ario.
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Envelhecimento de software \en{(software aging)}}]
+        \scriptsize
+        Condi\c{c}\~oes de erro acumuladas progressivamente que resultam em degrada\c{c}\~ao de desempenho ou falha completa. Exemplos do artigo: incha\c{c}o e vazamento de mem\'oria, \textit{threads} n\~ao encerradas, travas de arquivo n\~ao liberadas, corrup\c{c}\~ao de dados, fragmenta\c{c}\~ao de armazenamento e ac\'umulo de erros de arredondamento.
+    \end{tcolorbox}
+    \fonte{Algumas faltas de desenvolvimento existem porque as pr\'oprias \textbf{ferramentas} usadas s\~ao faltosas.\hfill Avi\v{z}ienis et al.\ (2004), \S3.2.3}
+\end{frame}
+
+\begin{frame}{Faltas maliciosas: duas classes}
+    \footnotesize
+    Introduzidas com o objetivo de alterar o funcionamento do sistema durante o uso. Por causa do objetivo, classificar por \textbf{inten\c{c}\~ao} e \textbf{capacidade} n\~ao se aplica.
+    \medskip
+    Os alvos s\~ao tr\^es: interromper ou parar o servi\c{c}o (nega\c{c}\~ao de servi\c{c}o), acessar informa\c{c}\~ao confidencial, ou modificar o sistema indevidamente.
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!70,boxrule=0.6pt,title={\scriptsize\bfseries 1. L\'ogica maliciosa}]
+                \scriptsize
+                Abrange faltas de \textbf{desenvolvimento} (cavalo de Troia, bomba l\'ogica, alçapão) e faltas \textbf{operacionais} (v\'irus, vermes, \textit{zombies}).
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!70,boxrule=0.6pt,title={\scriptsize\bfseries 2. Tentativas de intrus\~ao}]
+                \scriptsize
+                S\~ao faltas \textbf{operacionais externas}. O car\'ater externo n\~ao exclui que sejam feitas por operadores ou administradores excedendo seus direitos. Podem usar meios f\'isicos: flutua\c{c}\~ao de energia, radia\c{c}\~ao, grampo, aquecimento e resfriamento.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Note a assimetria: o intruso \textbf{externo} pode ser um funcion\'ario \textbf{interno}. ``Externo'' aqui \'e sobre a fronteira do sistema, n\~ao sobre o crach\'a de quem age.
+    \end{ancora}
+    \sect{\S3.2.4}
+\end{frame}
+
+\begin{frame}{As seis defini\c{c}\~oes de l\'ogica maliciosa}
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}p{2.5cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Bomba l\'ogica} \en{(logic bomb)} & L\'ogica maliciosa que permanece dormente no sistema hospedeiro at\'e certo instante, evento ou condi\c{c}\~ao, e ent\~ao apaga arquivos, degrada ou derruba o hospedeiro. \\
+        \addlinespace
+        \textbf{Cavalo de Troia} \en{(Trojan horse)} & L\'ogica maliciosa que executa, ou pode executar, uma a\c{c}\~ao ileg\'itima dando a impress\~ao de ser leg\'itima. A a\c{c}\~ao pode ser divulga\c{c}\~ao ou modifica\c{c}\~ao de informa\c{c}\~ao, ou uma bomba l\'ogica. \\
+        \addlinespace
+        \textbf{Al\c{c}ap\~ao} \en{(trapdoor)} & L\'ogica maliciosa que fornece um meio de contornar mecanismos de controle de acesso. \\
+        \addlinespace
+        \textbf{V\'irus} \en{(virus)} & L\'ogica maliciosa que se replica e se junta a outro programa quando executada, transformando-o em cavalo de Troia. Pode carregar uma bomba l\'ogica. \\
+        \addlinespace
+        \textbf{Verme} \en{(worm)} & L\'ogica maliciosa que se replica e se propaga \textbf{sem} que os usu\'arios percebam. Tamb\'em pode carregar uma bomba l\'ogica. \\
+        \addlinespace
+        \textbf{Zumbi} \en{(zombie)} & L\'ogica maliciosa que pode ser disparada por um atacante para montar um ataque coordenado. \\
+        \bottomrule
+    \end{tabularx}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        As defini\c{c}\~oes s\~ao \textbf{composicionais}: v\'irus vira cavalo de Troia, cavalo de Troia pode conter bomba l\'ogica, verme pode carregar bomba l\'ogica. S\~ao pe\c{c}as que se encaixam, n\~ao r\'otulos de cat\'alogo.
+    \end{ancora}
+    \sect{Fig.\ 7, \S3.2.4}
+\end{frame}
+
+\begin{frame}{``Exploit'' traduzido para a taxonomia}
+    \footnotesize
+    O pr\'oprio artigo classifica tr\^es objetos do dia a dia de seguran\c{c}a. Use isto para calibrar o vocabul\'ario:
+    \smallskip
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}p{3.4cm} >{\raggedright\arraybackslash}X p{1.3cm}@{}}
+        \toprule
+        \textbf{Objeto} & \textbf{Classifica\c{c}\~ao} & \textbf{Classes} \\
+        \midrule
+        \rowcolor{depVermelho!7} Invocar um \textit{exploit} & operacional, externa, humana, software, \textbf{maliciosa}, de intera\c{c}\~ao & 24-25 \\
+        \rowcolor{depVermelho!7} Aquecer a RAM com secador para provocar erros de mem\'oria & externa, humana, \textbf{hardware}, maliciosa, de intera\c{c}\~ao & 22-23 \\
+        \rowcolor{depAzul!7} A vulnerabilidade explorada (ex.: c\'opia de \textit{buffer} sem verifica\c{c}\~ao de limite) & \textbf{desenvolvimento}, interna, humana, software, \textbf{n\~ao} maliciosa, n\~ao deliberada, permanente & 1-2 \\
+        \bottomrule
+    \end{tabularx}
+    \smallskip
+    {\scriptsize Um \textit{exploit} \'e, na defini\c{c}\~ao do artigo, um script que exercita uma vulnerabilidade e d\'a ao invasor acesso, \`as vezes controle, do sistema.}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        O ataque e a vulnerabilidade s\~ao \textbf{faltas distintas}, de classes distintas, criadas por pessoas distintas, em fases distintas do ciclo de vida. Chamar as duas de ``o bug'' apaga essa estrutura.
+    \end{ancora}
+    \sect{\S3.2.4}
+\end{frame}
+
+\begin{frame}{Faltas de intera\c{c}\~ao}
+    \footnotesize
+    \begin{itemize}
+        \item Ocorrem na fase de uso, logo s\~ao todas \textbf{operacionais}. S\~ao causadas por elementos do ambiente de uso interagindo com o sistema, logo s\~ao todas \textbf{externas}.
+        \item A maioria surge de alguma a\c{c}\~ao humana, logo s\~ao \textbf{humanas}. A exce\c{c}\~ao s\~ao as faltas naturais externas (raios c\'osmicos, tempestades solares), em que a natureza interage com o sistema sem participa\c{c}\~ao humana.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Uma subclasse que domina a opera\c{c}\~ao moderna]
+        \scriptsize
+        \textbf{Faltas de configura\c{c}\~ao} \en{(configuration faults)}: ajuste errado de par\^ametros que afetam seguran\c{c}a, rede, armazenamento, \textit{middleware}. Quando ocorrem durante mudan\c{c}as de configura\c{c}\~ao feitas em manuten\c{c}\~ao adaptativa ou aumentativa concorrente com a opera\c{c}\~ao (por exemplo, subir uma nova vers\~ao de software num servidor), s\~ao chamadas de \textbf{faltas de reconfigura\c{c}\~ao} \en{(reconfiguration faults)}.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Faltas de intera\c{c}\~ao precisam de uma vulnerabilidade pr\'evia para dar certo. \'E por isso que endurecer o sistema reduz o efeito de erros de opera\c{c}\~ao, e n\~ao apenas o de ataques.
+    \end{ancora}
+    \sect{\S3.2.5}
+\end{frame}
+
+\begin{frame}{Checkpoint 2}
+    \footnotesize
+    \begin{checkpoint}[Classifique nas oito dimens\~oes]
+        \scriptsize
+        Um engenheiro de opera\c{c}\~oes, com pressa e sem ler o procedimento, aplica em produ\c{c}\~ao uma regra de \textit{firewall} que ele sabe ser mais permissiva do que a pol\'itica manda, para destravar um cliente. Dois meses depois, um invasor usa exatamente essa porta para entrar.
+        \medskip
+        Classifique \textbf{duas} faltas separadas: a a\c{c}\~ao do engenheiro e a a\c{c}\~ao do invasor.
+    \end{checkpoint}
+    \smallskip
+    \pause
+    \scriptsize
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \textbf{A regra permissiva}
+            \begin{itemize}
+                \item operacional (fase de uso)
+                \item externa (vem do ambiente de uso)
+                \item humana
+                \item software
+                \item \textbf{n\~ao maliciosa}
+                \item \textbf{deliberada} (ele sabia)
+                \item acidental ou de incompet\^encia, a decidir
+                \item permanente
+            \end{itemize}
+            Vira uma \textbf{vulnerabilidade}: falta interna que habilita uma falta externa.
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \textbf{A intrus\~ao}
+            \begin{itemize}
+                \item operacional
+                \item externa
+                \item humana
+                \item software
+                \item \textbf{maliciosa}
+                \item deliberada (ver nota)
+                \item n\~ao se aplica
+                \item permanente ou transiente, conforme o caso
+            \end{itemize}
+            Sem a primeira falta, a segunda n\~ao produz erro.
+        \end{column}
+    \end{columns}
+    \smallskip
+    \begin{armadilha}[Nota: uma tens\~ao interna do pr\'oprio artigo]
+        \scriptsize
+        A \S3.2.4 afirma que \textbf{inten\c{c}\~ao e capacidade n\~ao se aplicam} a faltas maliciosas. A Fig.\ 6, por\'em, desenha as faltas maliciosas sob o ramo \textit{Deliberate}, omitindo apenas a capacidade. Vale registrar a diverg\^encia em vez de escond\^e-la: nem taxonomia consolidada por 24 anos fica perfeitamente consistente.
+    \end{armadilha}
+\end{frame}
+
+% =====================================================================
+\section{Amea\c{c}as II: falhas, erros e a patologia da falha}
+% =====================================================================
+
+\begin{frame}{Modos de falha: quatro perguntas sobre uma mesma falha}
+    \centering
+    \diagModosFalha
+    \vspace{0.2em}
+    \begin{ancora}
+        \scriptsize
+        Toda falha de servi\c{c}o pode ser descrita respondendo \textbf{quatro} perguntas: em que \textbf{dom\'inio} ela ocorreu, se foi \textbf{sinalizada}, se foi \textbf{consistente} entre usu\'arios, e qual a \textbf{consequ\^encia}.
+    \end{ancora}
+    \sect{Fig.\ 9, \S3.3.1}
+\end{frame}
+
+\begin{frame}{Dom\'inio da falha: o qu\^e e o quando}
+    \centering
+    \diagDominioFalha
+    \vspace{0.1em}
+    \scriptsize
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \begin{itemize}
+                \item \textbf{Conte\'udo} \en{(content)}: o conte\'udo da informa\c{c}\~ao entregue desvia da fun\c{c}\~ao. O conte\'udo pode ser num\'erico ou n\~ao (alfabetos, gr\'aficos, cores, sons).
+                \item \textbf{Tempo} \en{(timing)}: o instante de chegada ou a dura\c{c}\~ao desvia. Pode ser \textbf{adiantado} ou \textbf{atrasado}.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+            \begin{itemize}
+                \item \textbf{Parada} \en{(halt)}: o estado externo fica constante; nenhuma atividade \'e percept\'ivel. O caso particular em que \textbf{nenhum} servi\c{c}o \'e entregue \'e o \textbf{sil\^encio} \en{(silence)}.
+                \item \textbf{Err\'atica} \en{(erratic)}: o servi\c{c}o \'e entregue, mas de forma err\'atica. O exemplo do artigo \'e o \textit{babbling}, o componente que fala sem parar.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    \smallskip
+    \begin{armadilha}
+        \scriptsize
+        Parada e sil\^encio n\~ao s\~ao a mesma coisa. Um n\'o parado pode continuar mantendo uma conex\~ao TCP aberta e respondendo \textit{keepalive}. Para quem detecta por ``ele ainda responde?'', a diferen\c{c}a decide se a detec\c{c}\~ao funciona.
+    \end{armadilha}
+    \sect{Fig.\ 8, \S3.3.1}
+\end{frame}
+
+\begin{frame}{Detectabilidade: quem detecta tamb\'em falha}
+    \footnotesize
+    \begin{itemize}
+        \item A sinaliza\c{c}\~ao na interface de servi\c{c}o vem de mecanismos internos que checam a corre\c{c}\~ao do servi\c{c}o entregue.
+        \item Se a perda \'e detectada e sinalizada por um aviso, ocorre uma \textbf{falha sinalizada} \en{(signaled failure)}. Caso contr\'ario, \textbf{n\~ao sinalizada} \en{(unsignaled failure)}.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Os dois modos de falha do pr\'oprio detector]
+        \scriptsize
+        \begin{enumerate}
+            \item sinalizar perda de fun\c{c}\~ao quando nenhuma falha ocorreu: \textbf{falso alarme} \en{(false alarm)};
+            \item n\~ao sinalizar uma perda de fun\c{c}\~ao que ocorreu: \textbf{falha n\~ao sinalizada}.
+        \end{enumerate}
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Quando as falhas resultam em modos reduzidos de servi\c{c}o, o sistema sinaliza um \textbf{modo degradado} ao usu\'ario. Esses modos v\~ao de redu\c{c}\~oes menores at\'e servi\c{c}o de emerg\^encia e desligamento seguro.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        O mecanismo de detec\c{c}\~ao \'e ele pr\'oprio um sistema, com seus pr\'oprios modos de falha. Essa recurs\~ao vai reaparecer na \S5 sob o nome de \textbf{cobertura}.
+    \end{ancora}
+    \sect{\S3.3.1}
+\end{frame}
+
+\begin{frame}{Consist\^encia: a defini\c{c}\~ao real de ``bizantino''}
+    \footnotesize
+    Faz sentido perguntar isso quando o sistema tem \textbf{dois ou mais usu\'arios}.
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Falha consistente}]
+                \scriptsize
+                O servi\c{c}o incorreto \'e percebido \textbf{identicamente} por todos os usu\'arios.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!6,colframe=depVermelho!65,boxrule=0.6pt,title={\scriptsize\bfseries Falha inconsistente}]
+                \scriptsize
+                Alguns ou todos os usu\'arios percebem servi\c{c}os incorretos \textbf{diferentes}. Alguns podem at\'e perceber servi\c{c}o \textbf{correto}. S\~ao as chamadas \textbf{falhas bizantinas} \en{(Byzantine failures)}.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        Bizantino n\~ao significa malicioso. Significa \textbf{percep\c{c}\~oes divergentes entre usu\'arios}, por qualquer causa: corrup\c{c}\~ao de mem\'oria, rel\'ogio local divergente, caminho de rede diferente. Um n\'o pode ser bizantino sem que ningu\'em o tenha atacado.
+    \end{armadilha}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Se voc\^e precisa de acordo entre componentes n\~ao falhos sobre um dado de \textbf{fonte \'unica} (um sensor local, um rel\'ogio local), voc\^e caiu no problema do consenso. Voltaremos a ele na \S5.
+    \end{ancora}
+    \sect{\S3.3.1, ref.\ [38] Lamport, Shostak \& Pease}
+\end{frame}
+
+\begin{frame}{Consequ\^encias: severidade \'e sempre relativa \`a aplica\c{c}\~ao}
+    \footnotesize
+    Os modos de falha s\~ao ordenados em \textbf{n\'iveis de severidade}, a cada um dos quais se associa uma probabilidade m\'axima aceit\'avel de ocorr\^encia. O n\'umero, os r\'otulos e as defini\c{c}\~oes desses n\'iveis dependem da aplica\c{c}\~ao.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.0cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Atributo} & \textbf{Crit\'erio que define a severidade} \\
+        \midrule
+        Disponibilidade & dura\c{c}\~ao da interrup\c{c}\~ao \\
+        Seguran\c{c}a f\'isica \en{(safety)} & possibilidade de vidas humanas serem postas em risco \\
+        Confidencialidade & tipo de informa\c{c}\~ao indevidamente divulgada \\
+        Integridade & extens\~ao da corrup\c{c}\~ao dos dados e capacidade de se recuperar dela \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{defi}[Os dois n\'iveis-limite]
+        \scriptsize
+        \textbf{Falhas menores} \en{(minor failures)}: as consequ\^encias nocivas t\^em custo \textbf{semelhante} ao benef\'icio do servi\c{c}o correto.\\[3pt]
+        \textbf{Falhas catastr\'oficas} \en{(catastrophic failures)}: o custo das consequ\^encias \'e \textbf{ordens de grandeza} maior, ou incomensuravelmente maior, que o benef\'icio do servi\c{c}o correto.
+    \end{defi}
+    \sect{\S3.3.1}
+\end{frame}
+
+\begin{frame}{Sistemas de falha controlada}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        Sistemas projetados e implementados de modo que falhem \textbf{apenas} nos modos descritos na especifica\c{c}\~ao de dependabilidade e seguran\c{c}a, e apenas em extens\~ao aceit\'avel, s\~ao \textbf{sistemas de falha controlada} \en{(fail-controlled systems)}.
+    \end{defi}
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.2cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{fail-halt} / \textbf{fail-stop} & as falhas s\~ao, em extens\~ao aceit\'avel, apenas de \textbf{parada} \\
+        \textbf{fail-passive} & situa\c{c}\~ao de sa\'ida travada \en{(stuck service)} \\
+        \textbf{fail-silent} & situa\c{c}\~ao de \textbf{sil\^encio}: nenhum servi\c{c}o entregue \\
+        \textbf{fail-safe} & as falhas s\~ao, em extens\~ao aceit\'avel, todas \textbf{menores} \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Os tr\^es primeiros restringem o \textbf{dom\'inio} da falha. O \'ultimo restringe a \textbf{severidade}. S\~ao eixos diferentes, e os nomes se parecem demais para o pr\'oprio bem.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Prefer\^encias t\'ipicas do artigo: sa\'ida travada em vez de valores err\'aticos; sil\^encio em vez de \textit{babbling}; falha consistente em vez de inconsistente.
+    \end{pratica}
+    \sect{\S3.3.1}
+\end{frame}
+
+\begin{frame}{Interrup\c{c}\~ao, restaura\c{c}\~ao e desligamento}
+    \footnotesize
+    \begin{itemize}
+        \item A entrega de servi\c{c}o incorreto \'e uma \textbf{interrup\c{c}\~ao}, que dura at\'e a \textbf{restaura\c{c}\~ao do servi\c{c}o}.
+        \item A dura\c{c}\~ao varia muito conforme a a\c{c}\~ao de restaura\c{c}\~ao:
+        \begin{enumerate}
+            \item recupera\c{c}\~ao, reinicializa\c{c}\~ao ou \textit{reboot}, autom\'aticos ou assistidos por operador;
+            \item manuten\c{c}\~ao corretiva.
+        \end{enumerate}
+        \item A corre\c{c}\~ao de faltas de desenvolvimento, por corre\c{c}\~oes ou contornos, costuma ser feita \textbf{fora de linha}, ap\'os a restaura\c{c}\~ao. Os componentes corrigidos entram depois, com ou sem interrupção da opera\c{c}\~ao.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Duas palavras que a opera\c{c}\~ao usa todo dia]
+        \scriptsize
+        Interromper a opera\c{c}\~ao de forma preemptiva, para atualiza\c{c}\~ao ou manuten\c{c}\~ao preventiva, \'e um \textbf{desligamento de servi\c{c}o}, tamb\'em chamado \textbf{interrup\c{c}\~ao planejada} \en{(planned outage)}.\\[3pt]
+        A interrup\c{c}\~ao consecutiva a uma falha \'e a \textbf{interrup\c{c}\~ao n\~ao planejada} \en{(unplanned outage)}.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Janela de manuten\c{c}\~ao \textbf{n\~ao \'e falha}. \'E parada intencional por entidade autorizada. Isso muda como ela entra no c\'alculo de disponibilidade.
+    \end{ancora}
+    \sect{\S3.1 e \S3.3.1}
+\end{frame}
+
+\begin{frame}{Falhas de desenvolvimento: o projeto que n\~ao nasce}
+    \footnotesize
+    Uma \textbf{falha completa de desenvolvimento} encerra o processo antes de o sistema ser aceito para uso. O artigo distingue dois aspectos:
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!65,boxrule=0.6pt,title={\scriptsize\bfseries Falha de or\c{c}amento}]
+                \scriptsize
+                Os fundos alocados se esgotam antes de o sistema passar no teste de aceita\c{c}\~ao.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!65,boxrule=0.6pt,title={\scriptsize\bfseries Falha de cronograma}]
+                \scriptsize
+                A entrega escorrega para um ponto no futuro em que o sistema estaria tecnologicamente obsoleto ou funcionalmente inadequado.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    E duas formas \textbf{parciais}: \textbf{estouro} \en{(overrun)} de or\c{c}amento ou prazo com o desenvolvimento conclu\'ido, e \textbf{rebaixamento} \en{(downgrading)}, quando o sistema \'e entregue com menos funcionalidade, menos desempenho, ou dependabilidade prevista menor que a exigida.
+    \medskip
+    \begin{pratica}[Causas principais, segundo o artigo]
+        \scriptsize
+        Especifica\c{c}\~oes incompletas ou faltosas; excesso de mudan\c{c}as de especifica\c{c}\~ao pedidas pelo usu\'ario; projeto inadequado; faltas de desenvolvimento demais; capacidade insuficiente de remo\c{c}\~ao de faltas; previs\~ao de dependabilidade insuficiente; estimativas erradas de custo. \textbf{Todas, em geral, por subestimar a complexidade do sistema a ser constru\'ido.}
+    \end{pratica}
+    \sect{\S3.3.2}
+\end{frame}
+
+\begin{frame}{Falhas de dependabilidade e seguran\c{c}a}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        Uma \textbf{falha de dependabilidade ou de seguran\c{c}a} ocorre quando o sistema sofre falhas de servi\c{c}o \textbf{mais frequentemente ou mais severamente} do que \'e aceit\'avel.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item \'E a diferen\c{c}a entre \textbf{falhar} (evento pontual, esperado) e \textbf{ser inaceit\'avel} (padr\~ao acumulado ao longo do tempo).
+        \item A especifica\c{c}\~ao explicita as classes de faltas esperadas e o ambiente de uso; pode exigir salvaguardas contra condi\c{c}\~oes perigosas e pode exigir t\'ecnicas espec\'ificas de preven\c{c}\~ao ou toler\^ancia.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Esta \'e uma das sete contribui\c{c}\~oes novas de 2004: separar \textbf{falha de servi\c{c}o} de \textbf{falha de dependabilidade}. A primeira \'e um evento. A segunda \'e um julgamento sobre uma s\'erie de eventos.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Se voc\^e trabalha com objetivos de n\'ivel de servi\c{c}o, j\'a viu isso: um erro isolado n\~ao viola o objetivo; violar o or\c{c}amento de erro do trimestre, sim.
+    \end{pratica}
+    \sect{\S3.3.3}
+\end{frame}
+
+\begin{frame}{Erros: latentes, detectados e os que nunca importam}
+    \footnotesize
+    \begin{itemize}
+        \item Um erro \'e \textbf{detectado} \en{(detected)} se sua presen\c{c}a \'e indicada por uma mensagem ou sinal de erro. Erros presentes e n\~ao detectados s\~ao \textbf{latentes} \en{(latent)}.
+        \item Quando o erro atinge o estado externo de um \textbf{componente}, ocorre falha de servi\c{c}o \textbf{desse componente}, mas o erro permanece interno ao sistema inteiro.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Se um erro vira falha depende de dois fatores]
+        \scriptsize
+        \textbf{1. A estrutura do sistema}, em especial a redund\^ancia que existe nele:
+        \begin{itemize}
+            \item \textbf{redund\^ancia protetora}, introduzida de prop\'osito para tolerar faltas;
+            \item \textbf{redund\^ancia n\~ao intencional}, porque \'e dif\'icil ou imposs\'ivel construir um sistema sem alguma forma de redund\^ancia, e ela pode ter o mesmo efeito, de forma inesperada.
+        \end{itemize}
+        \textbf{2. O comportamento do sistema}: a parte do estado que cont\'em o erro pode nunca ser necess\'aria para o servi\c{c}o, ou o erro pode ser eliminado (por sobrescrita) antes de levar a uma falha.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Alguns dos seus sistemas em produ\c{c}\~ao est\~ao funcionando por causa de \textbf{redund\^ancia n\~ao intencional}. \'E uma sorte que ningu\'em projetou, e que uma refatora\c{c}\~ao pode remover sem aviso.
+    \end{ancora}
+    \sect{\S3.4}
+\end{frame}
+
+\begin{frame}{Propaga\c{c}\~ao de erro: dentro e entre componentes}
+    \centering
+    \diagPropagacao
+    \vspace{0.1em}
+    \begin{ancora}
+        \scriptsize
+        Propaga\c{c}\~ao \textbf{interna}: o processo de computa\c{c}\~ao transforma sucessivamente um erro em outros erros.\\
+        Propaga\c{c}\~ao \textbf{externa}: o erro alcan\c{c}a a interface de servi\c{c}o de A; o servi\c{c}o de A para B fica incorreto; essa falha de A aparece como \textbf{falta externa} para B e entra por sua interface de uso.
+    \end{ancora}
+    \sect{Fig.\ 10, \S3.5}
+\end{frame}
+
+\begin{frame}{A cadeia fundamental das amea\c{c}as}
+    \centering
+    \vspace{0.4em}
+    \diagCadeia
+    \vspace{0.6em}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!65,boxrule=0.5pt,title={\tiny\bfseries Ativa\c{c}\~ao}]
+                \scriptsize
+                Aplica\c{c}\~ao de uma entrada (o \textbf{padr\~ao de ativa\c{c}\~ao}) que faz uma falta dormente ficar ativa.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.5pt,title={\tiny\bfseries Propaga\c{c}\~ao}]
+                \scriptsize
+                O erro \'e transformado sucessivamente em outros erros, at\'e alcan\c{c}ar (ou n\~ao) a interface de servi\c{c}o.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.32\textwidth}
+            \begin{tcolorbox}[colback=depAzul!5,colframe=depAzul!65,boxrule=0.5pt,title={\tiny\bfseries Causa\c{c}\~ao}]
+                \scriptsize
+                A falha de um componente causa falta, permanente ou transiente, no sistema que o cont\'em, e nos sistemas que recebem seu servi\c{c}o.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        As setas devem ser lidas \textbf{genericamente}: por propaga\c{c}\~ao, v\'arios erros podem ser gerados antes de haver falha. A cadeia se instancia por intera\c{c}\~ao entre componentes, por composi\c{c}\~ao de componentes em um sistema, e pela cria\c{c}\~ao ou modifica\c{c}\~ao de um sistema.
+    \end{ancora}
+    \sect{Fig.\ 11, \S3.5}
+\end{frame}
+
+\begin{frame}{Patologia da falha: quatro exemplos do artigo}
+    \scriptsize
+    \begin{enumerate}
+        \item Um \textbf{curto-circuito} num circuito integrado \'e uma \textbf{falha} do circuito. A consequ\^encia (conex\~ao travada em um valor booleano, fun\c{c}\~ao alterada) \'e uma \textbf{falta} que fica dormente at\'e ser ativada. Ativada, produz \textbf{erro}, que propaga. Se o erro afetar o servi\c{c}o entregue, ocorre \textbf{falha}.
+        \medskip
+        \item O erro de um \textbf{programador} leva a uma \textbf{falha} em escrever a instru\c{c}\~ao correta, que resulta em \textbf{falta dormente} no software. Ativada, produz erro; o erro que afeta o servi\c{c}o produz falha. \textbf{O mesmo vale para uma bomba l\'ogica}, criada por um programador malicioso: dormente at\'e a data marcada, ent\~ao produz erro que pode causar nega\c{c}\~ao de servi\c{c}o.
+        \medskip
+        \item O erro de um \textbf{especificador} leva a uma \textbf{falha} em descrever a fun\c{c}\~ao, que resulta em \textbf{falta na especifica\c{c}\~ao}. O sistema implementado n\~ao incorpora a subfun\c{c}\~ao ausente. Quando os dados de entrada exigem esse servi\c{c}o, o usu\'ario percebe erro, e ocorre falha.
+        \medskip
+        \item Um \textbf{al\c{c}ap\~ao} inserido no sistema \'e uma \textbf{falta de desenvolvimento}, que pode ficar dormente at\'e algu\'em mal-intencionado us\'a-lo para entrar. O \textit{login} do intruso \'e uma \textbf{falta de intera\c{c}\~ao deliberada}. J\'a dentro, ele cria \textbf{erro} deliberadamente, por exemplo modificando um arquivo. Quando um usu\'ario autorizado usa esse arquivo, ocorre \textbf{falha}.
+    \end{enumerate}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        Repare no padr\~ao que atravessa os quatro: a \textbf{falha de um} \'e a \textbf{falta de outro}. A cadeia atravessa fronteiras de sistema, incluindo a fronteira entre pessoas e artefatos.
+    \end{ancora}
+    \sect{Fig.\ 12, \S3.5}
+\end{frame}
+
+\begin{frame}{Reprodutibilidade de ativa\c{c}\~ao: s\'olidas e evasivas}
+    \centering
+    \diagSolidoIntermitente
+    \vspace{0.1em}
+    \scriptsize
+    \begin{itemize}
+        \item \textbf{S\'olidas} \en{(solid, hard)}: a ativa\c{c}\~ao \'e reproduz\'ivel.
+        \item \textbf{Evasivas} \en{(elusive, soft)}: a ativa\c{c}\~ao n\~ao \'e sistematicamente reproduz\'ivel.
+        \item \textbf{A maior parte das faltas de desenvolvimento residuais em software grande e complexo \'e evasiva}: as condi\c{c}\~oes de ativa\c{c}\~ao dependem de combina\c{c}\~oes intrincadas de estado interno e requisi\c{c}\~oes externas, que ocorrem raramente e s\~ao dif\'iceis de reproduzir.
+        \item Outros exemplos de faltas evasivas: faltas sens\'iveis a padr\~ao em mem\'orias semicondutoras; mudan\c{c}as em par\^ametros de componentes de hardware (varia\c{c}\~ao de temperatura, atraso por capacit\^ancia parasita); condi\c{c}\~oes que ocorrem s\'o quando a carga do sistema passa de certo n\'ivel, causando temporiza\c{c}\~ao e sincroniza\c{c}\~ao marginais.
+    \end{itemize}
+    \smallskip
+    \begin{defi}[Por que agrupar]
+        \scriptsize
+        A manifesta\c{c}\~ao de faltas de desenvolvimento evasivas se parece com a de faltas f\'isicas transientes. As duas classes s\~ao agrupadas como \textbf{faltas intermitentes} \en{(intermittent faults)}, e os erros que elas produzem s\~ao chamados de \textbf{erros suaves} \en{(soft errors)}.
+    \end{defi}
+    \sect{Fig.\ 13, \S3.5}
+\end{frame}
+
+\begin{frame}{Faltas m\'ultiplas e falhas de modo comum}
+    \footnotesize
+    \begin{itemize}
+        \item \textbf{Falta \'unica} \en{(single fault)}: causada por um evento f\'isico adverso ou uma a\c{c}\~ao humana nociva.
+        \item \textbf{Faltas m\'ultiplas}: duas ou mais faltas \'unicas, concorrentes, sobrepostas ou sequenciais, cujos \textbf{erros se sobrep\~oem no tempo}.
+    \end{itemize}
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.5cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Faltas independentes} & atribu\'idas a causas diferentes; \textbf{em geral} causam \textbf{erros distintos} \\
+        \textbf{Faltas relacionadas} & atribu\'idas a uma causa comum; \textbf{em geral} causam \textbf{erros similares} \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{defi}
+        \scriptsize
+        \textbf{Erros similares} s\~ao erros que os mecanismos de detec\c{c}\~ao empregados \textbf{n\~ao conseguem distinguir}. As falhas causadas por erros similares s\~ao \textbf{falhas de modo comum} \en{(common-mode failures)}.
+    \end{defi}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        As correspond\^encias n\~ao s\~ao r\'igidas: faltas independentes, especialmente omiss\~oes, podem levar a erros similares, e faltas relacionadas podem levar a erros distintos. O artigo diz ``em geral'', e a exce\c{c}\~ao \'e exatamente o que derruba redund\^ancia.
+    \end{armadilha}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Tr\^es r\'eplicas do mesmo bin\'ario com o mesmo defeito erram \textbf{junto} e o votador aprova por unanimidade. Redund\^ancia id\^entica n\~ao protege contra falta id\^entica.
+    \end{ancora}
+    \sect{\S3.5}
+\end{frame}
+
+\begin{frame}{Tr\^es observa\c{c}\~oes sobre as pr\'oprias palavras}
+    \footnotesize
+    \begin{enumerate}
+        \item \textbf{``Amea\c{c}as'' \en{(threats)}} aqui \'e mais amplo do que na seguran\c{c}a, onde a palavra guarda a no\c{c}\~ao de \textbf{potencialidade}. No artigo ela tem essa dimens\~ao (falta ainda n\~ao ativa) e tamb\'em uma dimens\~ao de \textbf{realiza\c{c}\~ao} (falta ativa, erro presente, falha ocorrida). \\
+        {\scriptsize Em termos de seguran\c{c}a: \textbf{uma falta externa maliciosa \'e um ataque}.}
+        \medskip
+        \item O uso exclusivo de falta, erro e falha \textbf{n\~ao pro\'ibe} usar palavras espec\'ificas quando elas designam de forma breve e inequ\'ivoca uma classe de amea\c{c}a. Para faltas: \textit{bug}, defeito, defici\^encia, falha de projeto, \textit{erratum}. Para falhas: pane, mau funcionamento, nega\c{c}\~ao de servi\c{c}o.
+        \medskip
+        \item A atribui\c{c}\~ao dos termos segue o \textbf{uso corrente}: fala-se em \textbf{preven\c{c}\~ao, toler\^ancia e diagn\'ostico de faltas}; em \textbf{detec\c{c}\~ao e corre\c{c}\~ao de erros}; e em \textbf{taxa de falhas}. Os nomes n\~ao s\~ao arbitr\'arios: cada um j\'a era usado com aquele objeto.
+    \end{enumerate}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Ou seja: voc\^e pode dizer ``bug''. Desde que saiba que est\'a dizendo \textbf{falta}, e n\~ao erro nem falha.
+    \end{ancora}
+    \sect{\S3.5}
+\end{frame}
+
+\begin{frame}{Checkpoint 3}
+    \footnotesize
+    \begin{checkpoint}[Classifique os quatro incidentes]
+        \scriptsize
+        Um controlador de n\'ivel de tanque publica leituras a cada 100 ms para dois supervisores, S1 e S2.
+        \begin{enumerate}
+            \item[(i)] Publica 3,2 m quando o n\'ivel real \'e 3,2 m, mas 400 ms atrasado.
+            \item[(ii)] Para de publicar e acende um LED de erro no painel.
+            \item[(iii)] Publica 3,2 m para S1 e 8,7 m para S2, sem qualquer aviso.
+            \item[(iv)] Publica valores plaus\'iveis a 50 Hz em vez de 10 Hz, saturando o barramento.
+        \end{enumerate}
+        Classifique cada um nos quatro pontos de vista da Fig.\ 9. O sistema pode ser chamado de \textbf{fail-silent}?
+    \end{checkpoint}
+    \pause
+    \smallskip
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}c p{2.6cm} p{2.2cm} p{2.4cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        & \textbf{Dom\'inio} & \textbf{Detectab.} & \textbf{Consist\^encia} & \textbf{Consequ\^encia} \\
+        \midrule
+        (i) & tempo, atrasada & n\~ao sinalizada & consistente & depende da malha \\
+        (ii) & parada (sil\^encio) & \textbf{sinalizada} & consistente & definida pelo projeto \\
+        (iii) & conte\'udo & n\~ao sinalizada & \textbf{inconsistente (bizantina)} & potencialmente cat.\ \\
+        (iv) & err\'atica & n\~ao sinalizada & consistente & afeta os demais n\'os \\
+        \bottomrule
+    \end{tabularx}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        \textbf{Fail-silent? N\~ao.} Os incidentes (i), (iii) e (iv) violam a hip\'otese. O (iii) contradiz qualquer hip\'otese de falha controlada. Chamar o sistema de fail-silent seria uma \textbf{hip\'otese de falta} que ningu\'em garantiu.
+    \end{ancora}
+\end{frame}
+
+% =====================================================================
+\section{Atributos revisitados e conceitos vizinhos}
+% =====================================================================
+
+\begin{frame}{As defini\c{c}\~oes do artigo diante das normas}
+    \footnotesize
+    Os autores comparam explicitamente sua defini\c{c}\~ao com as que existiam em normas:
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{2.0cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{ISO} & ``O termo coletivo usado para descrever o desempenho de disponibilidade e seus fatores de influ\^encia: desempenho de confiabilidade, de manutenibilidade e de suporte \`a manuten\c{c}\~ao.'' \\
+        \addlinespace
+        \textbf{IEC} & ``A extens\~ao em que se pode confiar que o sistema realiza exclusiva e corretamente as tarefas, sob condi\c{c}\~oes operacionais e ambientais definidas, ao longo de um per\'iodo ou em um dado instante.'' \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{itemize}
+        \item A defini\c{c}\~ao da ISO \'e \textbf{centrada em disponibilidade}. Isso se explica pela origem: ela remonta \`a defini\c{c}\~ao do CCITT, do tempo em que disponibilidade era a preocupa\c{c}\~ao central das operadoras de telefonia.
+        \item A defini\c{c}\~ao da IEC introduz a no\c{c}\~ao de \textbf{confian\c{c}a depositada} \en{(reliance)}, e por isso est\'a bem mais pr\'oxima da do artigo.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Uma norma \'e um retrato do que preocupava a ind\'ustria quando foi escrita. Ler a defini\c{c}\~ao da ISO revela o que era prioridade na telefonia dos anos 1980, n\~ao um erro dos seus autores.
+    \end{ancora}
+    \sect{\S4.1}
+\end{frame}
+
+\begin{frame}{Depend\^encia e confian\c{c}a, com mais precis\~ao}
+    \footnotesize
+    \begin{itemize}
+        \item A rela\c{c}\~ao cl\'assica \textbf{``depende de''} da literatura de modulariza\c{c}\~ao diz: o componente $a$ depende do componente $b$ se a corre\c{c}\~ao da entrega de $b$ \'e necess\'aria para a corre\c{c}\~ao da entrega de $a$.
+        \item O artigo aponta a limita\c{c}\~ao: essa rela\c{c}\~ao \'e expressa em termos do conceito estreito de \textbf{corre\c{c}\~ao}, e por isso \'e apenas \textbf{bin\'aria}. A no\c{c}\~ao de depend\^encia do artigo pode assumir valores num espa\c{c}o \textbf{mensur\'avel}.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Sobre ``depend\^encia aceita'']
+        \scriptsize
+        O julgamento de que o n\'ivel de depend\^encia \'e aceit\'avel pode ser expl\'icito, at\'e registrado em contrato. Mas pode ser apenas impl\'icito, ou irrefletido. Pode at\'e ser \textbf{involunt\'ario}, quando A n\~ao tem outra op\c{c}\~ao sen\~ao depositar sua confian\c{c}a em B.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        ``Na medida em que A confia em B, A n\~ao precisa assumir a responsabilidade de tolerar as falhas de B. De fato, \textbf{a extens\~ao em que A deixa de prover meios de tolerar as falhas de B \'e uma medida da confian\c{c}a de A em B}.''
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Procure no seu c\'odigo uma chamada externa sem \textit{timeout}, sem \textit{retry} e sem caminho alternativo. Voc\^e acabou de encontrar, escrita, a medida da sua confian\c{c}a naquele servi\c{c}o.
+    \end{pratica}
+    \sect{\S4.2}
+\end{frame}
+
+\begin{frame}{Nada aqui \'e absoluto}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        A extens\~ao em que um sistema possui os atributos deve ser considerada em sentido \textbf{relativo e probabil\'istico}, n\~ao em sentido \textbf{absoluto e determin\'istico}. Por causa da presen\c{c}a ou ocorr\^encia inevit\'avel de faltas, \textbf{sistemas nunca s\~ao totalmente dispon\'iveis, confi\'aveis, seguros}.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Disponibilidade, integridade e manutenibilidade s\~ao \textbf{geralmente exigidas}, em graus vari\'aveis conforme a aplica\c{c}\~ao.
+        \item Confiabilidade, seguran\c{c}a f\'isica e confidencialidade \textbf{podem ou n\~ao} ser exigidas, conforme a aplica\c{c}\~ao.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Se algu\'em prometer um sistema ``seguro'' ou ``confi\'avel'' sem um n\'umero e sem uma classe de faltas declarada, a promessa n\~ao \'e verific\'avel. E o que n\~ao \'e verific\'avel n\~ao produz confian\c{c}a \textbf{justificada}.
+    \end{ancora}
+    \sect{\S4.3}
+\end{frame}
+
+\begin{frame}{Integridade e manutenibilidade v\~ao al\'em do usual}
+    \footnotesize
+    \begin{tcolorbox}[colback=depAzul!5,colframe=depAzul!65,boxrule=0.6pt,title={\scriptsize\bfseries Integridade: ``aus\^encia de altera\c{c}\~oes impr\'oprias do estado do sistema''}]
+        \scriptsize
+        As defini\c{c}\~oes usuais falam em \textbf{a\c{c}\~oes autorizadas} e focam em \textbf{informa\c{c}\~ao}. A do artigo \'e mais ampla em tr\^es pontos:
+        \begin{enumerate}
+            \item quando o sistema implementa uma pol\'itica de autoriza\c{c}\~ao, ``impr\'oprio'' naturalmente engloba ``n\~ao autorizado'';
+            \item ``altera\c{c}\~oes impr\'oprias'' englobam a\c{c}\~oes que \textbf{impedem} atualiza\c{c}\~oes corretas da informa\c{c}\~ao;
+            \item ``estado do sistema'' inclui \textbf{modifica\c{c}\~oes e danos ao pr\'oprio sistema}, n\~ao apenas aos dados.
+        \end{enumerate}
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Manutenibilidade: quatro formas, n\~ao duas}]
+        \scriptsize
+        A defini\c{c}\~ao vai al\'em de manuten\c{c}\~ao corretiva e preventiva, e engloba tamb\'em as formas \textbf{adaptativa} (ajuste a mudan\c{c}as no ambiente) e \textbf{aumentativa} (amplia\c{c}\~ao da fun\c{c}\~ao do sistema).
+    \end{tcolorbox}
+    \smallskip
+    {\scriptsize O artigo observa que o objetivo principal da \textbf{computa\c{c}\~ao aut\^onoma} \en{(autonomic computing)} \'e prover alta manutenibilidade a grandes sistemas em rede, automatizando sua gest\~ao.}
+    \sect{\S4.3}
+\end{frame}
+
+\begin{frame}{Atributos secund\'arios}
+    \footnotesize
+    Al\'em dos seis atributos principais, o artigo admite atributos \textbf{secund\'arios}, que refinam ou especializam os primeiros.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.5cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Robustez} \en{(robustness)} & Dependabilidade em rela\c{c}\~ao a \textbf{faltas externas}. Caracteriza a rea\c{c}\~ao do sistema a uma classe espec\'ifica de faltas. \\
+        \midrule
+        \multicolumn{2}{@{}l}{\textit{Especialmente relevantes para seguran\c{c}a, baseados em distinguir tipos de informa\c{c}\~ao:}} \\
+        \midrule
+        \textbf{Responsabiliza\c{c}\~ao} \en{(accountability)} & \textbf{Disponibilidade e integridade} da identidade de quem realizou uma opera\c{c}\~ao. \\
+        \textbf{Autenticidade} \en{(authenticity)} & \textbf{Integridade} do conte\'udo e da origem de uma mensagem, e possivelmente de outras informa\c{c}\~oes, como o instante de emiss\~ao. \\
+        \textbf{N\~ao rep\'udio} \en{(nonrepudiability)} & \textbf{Disponibilidade e integridade} da identidade do remetente (n\~ao rep\'udio da origem) ou do destinat\'ario (n\~ao rep\'udio da recep\c{c}\~ao). \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Repare na economia da constru\c{c}\~ao: autenticidade, responsabiliza\c{c}\~ao e n\~ao rep\'udio n\~ao s\~ao conceitos novos. S\~ao \textbf{combina\c{c}\~oes} dos atributos b\'asicos aplicadas a tipos espec\'ificos de informa\c{c}\~ao.
+    \end{ancora}
+    \sect{\S4.3}
+\end{frame}
+
+\begin{frame}{Pol\'itica de seguran\c{c}a \'e especifica\c{c}\~ao}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        Uma \textbf{pol\'itica de seguran\c{c}a} \en{(security policy)} \'e um conjunto de restri\c{c}\~oes motivadas por seguran\c{c}a, a serem seguidas por uma organiza\c{c}\~ao ou por um sistema. Elas podem ser impostas por controles t\'ecnicos, gerenciais ou operacionais.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item O artigo conclui: uma pol\'itica de seguran\c{c}a \'e, \textbf{na pr\'atica, uma especifica\c{c}\~ao parcial do sistema}. N\~ao ader\^encia a ela \'e considerada uma \textbf{falha de seguran\c{c}a}.
+        \item Costuma haver uma \textbf{hierarquia} de pol\'iticas, refletindo uma hierarquia de sistemas: a empresa, o departamento de TI, os indiv\'iduos e as m\'aquinas do departamento.
+        \item Algumas pol\'iticas restringem tamb\'em \textbf{como a informa\c{c}\~ao pode fluir} dentro do sistema, e n\~ao apenas os estados permitidos.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Consequ\^encia direta: se uma atividade viola a pol\'itica, a falha de seguran\c{c}a pode ser \textbf{do sistema} ou \textbf{da pol\'itica}, que descreveu mal o requisito pretendido. \'E o mesmo racioc\'inio das faltas de especifica\c{c}\~ao da \S2.2.
+    \end{ancora}
+    \medskip
+    {\scriptsize Por isso h\'a pesquisa extensa em m\'etodos para expressar e analisar pol\'iticas de seguran\c{c}a formalmente. Quest\~oes de completude, consist\^encia e exatid\~ao valem aqui como valem para qualquer especifica\c{c}\~ao.}
+    \sect{\S4.3}
+\end{frame}
+
+\begin{frame}{Os atributos entram em conflito}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        As varia\c{c}\~oes de \^enfase nos diferentes atributos influenciam diretamente o equil\'ibrio entre as t\'ecnicas (preven\c{c}\~ao, toler\^ancia, remo\c{c}\~ao, previs\~ao) a empregar. O problema \'e agravado porque \textbf{alguns atributos s\~ao conflitantes}, exigindo compromissos.
+    \end{defi}
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Disponibilidade x seguran\c{c}a f\'isica}]
+                \scriptsize
+                Manter o servi\c{c}o de p\'e pode significar operar em condi\c{c}\~oes em que o desligamento seria a op\c{c}\~ao segura. Um sistema \textbf{fail-safe} sacrifica disponibilidade por constru\c{c}\~ao.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Disponibilidade x confidencialidade}]
+                \scriptsize
+                Cada r\'eplica, \textit{backup} e \textit{cache} que aumenta disponibilidade \'e mais uma c\'opia do dado sens\'ivel a proteger.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Aqui est\'a a raz\~ao pr\'atica de o artigo insistir tanto nos \textbf{meios}: eles s\~ao muito mais \textbf{ortogonais entre si} do que os atributos. Voc\^e negocia atributos; voc\^e combina meios.
+    \end{ancora}
+    \medskip
+    {\scriptsize As classes de dependabilidade e seguran\c{c}a s\~ao geralmente definidas analisando frequ\^encias e severidades de falha e dura\c{c}\~oes de interrup\c{c}\~ao, diretamente ou por meio de \textbf{avalia\c{c}\~ao de risco}.}
+    \sect{\S4.3}
+\end{frame}
+
+\begin{frame}{Quatro conceitos, o mesmo objetivo}
+    \tiny
+    \begin{tabularx}{\linewidth}{@{}p{1.05cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        & \textbf{Dependability} & \textbf{High Confidence} & \textbf{Survivability} & \textbf{Trustworthiness} \\
+        \midrule
+        \textbf{Objetivo}
+        & Capacidade de entregar servi\c{c}o em que se possa justificadamente confiar; capacidade de evitar falhas mais frequentes ou severas que o aceit\'avel
+        & As consequ\^encias do comportamento do sistema s\~ao bem compreendidas e previs\'iveis
+        & Capacidade de o sistema cumprir sua miss\~ao de forma tempestiva
+        & Garantia de que o sistema se comportar\'a como esperado \\
+        \addlinespace
+        \textbf{Amea\c{c}as tratadas}
+        & Faltas de desenvolvimento, faltas f\'isicas, faltas de intera\c{c}\~ao
+        & Amea\c{c}as internas e externas; perigos naturais e ataques maliciosos de advers\'ario sofisticado e bem financiado
+        & Ataques (intrus\~oes, sondagens, nega\c{c}\~ao de servi\c{c}o); falhas (eventos internos); acidentes (eventos externos, como desastres naturais)
+        & Ataques hostis (de invasores ou de pessoal interno); rupturas ambientais; erros humanos e de operador \\
+        \addlinespace
+        \textbf{Origem}
+        & Este artigo
+        & \textit{Blue Book 2000} (EUA)
+        & \textit{Survivable network systems} (CMU/SEI)
+        & \textit{Trust in cyberspace} \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \scriptsize
+        A conclus\~ao dos autores, ap\'os a compara\c{c}\~ao lado a lado: \textbf{os quatro conceitos s\~ao essencialmente equivalentes em seus objetivos e tratam amea\c{c}as similares}. A diferen\c{c}a est\'a na comunidade que cunhou cada um.
+    \end{ancora}
+    \medskip
+    {\scriptsize Isso explica a irrita\c{c}\~ao registrada na \S1 com a ``introdu\c{c}\~ao cont\'inua e desnecessariamente confusa de conceitos supostamente novos para descrever os mesmos meios, atributos e amea\c{c}as''.}
+    \sect{Fig.\ 15, \S4.4}
+\end{frame}
+
+% =====================================================================
+\section{Os meios: preven\c{c}\~ao, toler\^ancia, remo\c{c}\~ao e previs\~ao}
+% =====================================================================
+
+\begin{frame}{Preven\c{c}\~ao de faltas}
+    \footnotesize
+    O artigo dedica meia coluna a este meio, com uma justificativa explícita: preven\c{c}\~ao de faltas \'e \textbf{parte da engenharia em geral}, e n\~ao \'e espec\'ifica desta \'area.
+    \medskip
+    \begin{itemize}
+        \item Preven\c{c}\~ao de \textbf{faltas de desenvolvimento} \'e objetivo \'obvio das metodologias de desenvolvimento:
+        \begin{itemize}
+            \item em software: ocultamento de informa\c{c}\~ao, modulariza\c{c}\~ao, linguagens fortemente tipadas;
+            \item em hardware: regras de projeto.
+        \end{itemize}
+        \item A \textbf{melhoria dos processos} de desenvolvimento vai um passo al\'em: baseia-se em \textbf{registrar as faltas} encontradas nos produtos e eliminar as causas delas por meio de modifica\c{c}\~oes no processo.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Prevenir uma classe de faltas exige saber que ela existe. \'E por isso que a taxonomia da \S3 vem antes: sem ela, ``melhorar o processo'' vira palpite.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Verificador de limites na linguagem, an\'alise est\'atica no \textit{pipeline} e revis\~ao com \textit{checklist} atacam classes de faltas identific\'aveis. Um treinamento gen\'erico de ``qualidade'' n\~ao ataca classe nenhuma.
+    \end{pratica}
+    \sect{\S5.1}
+\end{frame}
+
+\begin{frame}{Toler\^ancia a faltas: o mapa completo}
+    \centering
+    \diagTolerancia
+    \vspace{0.1em}
+    \begin{ancora}
+        \scriptsize
+        Toler\^ancia a faltas visa \textbf{evitar falhas}, e se realiza por \textbf{detec\c{c}\~ao de erro} e \textbf{recupera\c{c}\~ao do sistema}. Guarde os dois ramos da recupera\c{c}\~ao: \textbf{tratar o erro} limpa o estado; \textbf{tratar a falta} impede a pr\'oxima ativa\c{c}\~ao.
+    \end{ancora}
+    \sect{Fig.\ 16, \S5.2.1}
+\end{frame}
+
+\begin{frame}{Detec\c{c}\~ao de erro: durante ou fora do servi\c{c}o}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Detec\c{c}\~ao concorrente}]
+                \scriptsize
+                Ocorre \textbf{durante} a entrega normal do servi\c{c}o.
+                \smallskip
+                Exemplos t\'ipicos: verifica\c{c}\~ao de soma, c\'odigos detectores de erro, checagens de sanidade, \textit{watchdog}, compara\c{c}\~ao entre vias.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depAzul!6,colframe=depAzul!60,boxrule=0.6pt,title={\scriptsize\bfseries Detec\c{c}\~ao preemptiva}]
+                \scriptsize
+                Ocorre \textbf{enquanto a entrega normal est\'a suspensa}. Verifica o sistema em busca de \textbf{erros latentes} e \textbf{faltas dormentes}.
+                \smallskip
+                Exemplos citados pelo artigo: verifica\c{c}\~ao na energiza\c{c}\~ao \en{(power up)}, checagem de reservas \en{(spare checking)}, varredura de mem\'oria \en{(memory scrubbing)}, programas de auditoria.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{defi}[Rejuvenescimento de software \en{(software rejuvenation)}]
+        \scriptsize
+        Caso particular de detec\c{c}\~ao e tratamento preemptivos, destinado a \textbf{remover os efeitos do envelhecimento de software antes que levem a falha}. Na pr\'atica: reiniciar o processo antes que o vazamento de mem\'oria o derrube.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        A detec\c{c}\~ao preemptiva \'e a \'unica que enxerga o que est\'a \textbf{dormindo}. Sem ela, voc\^e s\'o descobre a falta dormente quando ela acorda, junto com a pr\'oxima.
+    \end{ancora}
+    \sect{Fig.\ 16, \S5.2.1}
+\end{frame}
+
+\begin{frame}{Tratamento de erro: tr\^es formas de limpar o estado}
+    \footnotesize
+    Objetivo: \textbf{eliminar erros do estado do sistema}.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.2cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Retorno} \en{(rollback)} & Traz o sistema de volta a um estado salvo que existia \textbf{antes} da ocorr\^encia do erro. O estado salvo \'e o \textbf{ponto de recupera\c{c}\~ao} \en{(checkpoint)}. \\
+        \addlinespace
+        \textbf{Avan\c{c}o} \en{(rollforward)} & O estado sem erros detectados \'e um estado \textbf{novo}. N\~ao se volta ao passado: constr\'oi-se um presente limpo. \\
+        \addlinespace
+        \textbf{Compensa\c{c}\~ao} \en{(compensation)} & O estado err\^oneo cont\'em \textbf{redund\^ancia suficiente} para permitir que o erro seja \textbf{mascarado}. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{itemize}
+        \item Retorno e avan\c{c}o s\~ao invocados \textbf{sob demanda}, depois da detec\c{c}\~ao. A compensa\c{c}\~ao pode ser aplicada sob demanda \textbf{ou sistematicamente}, em instantes predeterminados, independentemente da presen\c{c}a de erro detectado.
+        \item Os dois n\~ao s\~ao mutuamente exclusivos: pode-se tentar retorno primeiro e, se o erro persistir, tentar avan\c{c}o.
+    \end{itemize}
+    \medskip
+    \begin{armadilha}
+        \scriptsize
+        \textit{Rollforward} n\~ao \'e ``tentar de novo seguindo em frente''. \'E ir para um estado \textbf{novo}, aceito como sem erros detectados, abandonando o estado contaminado. Descartar uma amostra corrompida e seguir com a pr\'oxima \'e avan\c{c}o.
+    \end{armadilha}
+    \sect{Fig.\ 16, \S5.2.1}
+\end{frame}
+
+\begin{frame}{Tratamento de falta: impedir a pr\'oxima ativa\c{c}\~ao}
+    \footnotesize
+    Objetivo: \textbf{impedir que as faltas sejam ativadas novamente}.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{3.4cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Diagn\'ostico} \en{(diagnosis)} & Identifica e registra as causas dos erros, em termos de \textbf{localiza\c{c}\~ao} e \textbf{tipo}. \\
+        \textbf{Isolamento} \en{(isolation)} & Exclus\~ao f\'isica ou l\'ogica dos componentes faltosos de participar da entrega de servi\c{c}o, ou seja, \textbf{torna a falta dormente}. \\
+        \textbf{Reconfigura\c{c}\~ao} \en{(reconfiguration)} & Aciona componentes reservas ou reatribui tarefas entre os componentes n\~ao falhos. \\
+        \textbf{Reinicializa\c{c}\~ao} \en{(reinitialization)} & Verifica, atualiza e registra a nova configura\c{c}\~ao, e atualiza tabelas e registros do sistema. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{itemize}
+        \item O tratamento de falta costuma ser seguido de \textbf{manuten\c{c}\~ao corretiva}, que remove as faltas isoladas. A distin\c{c}\~ao continua a mesma: manuten\c{c}\~ao exige agente externo.
+        \item \textbf{Faltas intermitentes n\~ao exigem isolamento nem reconfigura\c{c}\~ao}. Identificar se a falta \'e intermitente pode ser feito pelo tratamento de erro (a recorr\^encia indica que n\~ao \'e), ou por diagn\'ostico quando se usa avan\c{c}o.
+        \item O tratamento de falta pode seguir \textbf{diretamente} \`a detec\c{c}\~ao, sem tratamento de erro.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Sistemas fechados]
+        \scriptsize
+        \textbf{Sistemas fechados} \en{(closed systems)} s\~ao aqueles em que a remo\c{c}\~ao de faltas n\~ao pode ser praticamente implementada. O exemplo do artigo \'e o hardware de uma sonda de espa\c{c}o profundo.
+    \end{defi}
+    \sect{Fig.\ 16, \S5.2.1}
+\end{frame}
+
+\begin{frame}{As quatro estrat\'egias}
+    \centering
+    \diagEstrategias
+    \vspace{0.1em}
+    \scriptsize
+    \begin{itemize}
+        \item \textbf{Recupera\c{c}\~ao do sistema} \en{(system recovery)} \'e tratamento de erro sob demanda seguido de tratamento de falta. Da\'i o nome da estrat\'egia: \textbf{detec\c{c}\~ao e recupera\c{c}\~ao}.
+        \item \textbf{Mascaramento} \en{(masking)} resulta do uso \textbf{sistem\'atico} da compensa\c{c}\~ao.
+    \end{itemize}
+    \sect{Fig.\ 17, \S5.2.1}
+\end{frame}
+
+\begin{frame}{O aviso sobre mascaramento}
+    \footnotesize
+    \begin{armadilha}[O trecho mais importante da \S5.2.1]
+        \scriptsize
+        ``O mascaramento vai \textbf{ocultar} uma perda de redund\^ancia protetora possivelmente progressiva e, no limite, fatal. Por isso, implementa\c{c}\~oes pr\'aticas de mascaramento geralmente envolvem detec\c{c}\~ao de erro (e possivelmente tratamento de falta), levando a \textbf{mascaramento e recupera\c{c}\~ao}.''
+    \end{armadilha}
+    \medskip
+    \begin{itemize}
+        \item Um votador 2-de-3 silencioso funciona perfeitamente enquanto perde a primeira via, e continua funcionando perfeitamente enquanto perde a segunda.
+        \item O sistema opera sem margem alguma, e ningu\'em sabe, at\'e a terceira falhar. A\'i n\~ao h\'a mais o que mascarar.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        \textbf{Mascarar sem detectar troca uma falha vis\'ivel hoje por uma falha invis\'ivel amanh\~a.} Um mecanismo de toler\^ancia que n\~ao reporta o que est\'a tolerando \'e um mecanismo que consome margem em segredo.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Todo mecanismo de toler\^ancia deve ter uma m\'etrica de ``quantas vezes fui acionado''. Se essa m\'etrica n\~ao existe, voc\^e n\~ao sabe se ele j\'a est\'a no limite.
+    \end{pratica}
+    \sect{\S5.2.1}
+\end{frame}
+
+\begin{frame}{Hip\'otese de falta: nada se tolera em abstrato}
+    \footnotesize
+    \begin{defi}
+        \scriptsize
+        A escolha das t\'ecnicas de detec\c{c}\~ao, tratamento de erro e tratamento de falta, e a implementa\c{c}\~ao delas, \textbf{dependem diretamente da hip\'otese de falta} \en{(fault assumption) } adotada: as classes de faltas que efetivamente podem ser toleradas dependem da hip\'otese considerada no processo de desenvolvimento. E ela se ap\'oia na \textbf{independ\^encia das redund\^ancias} em rela\c{c}\~ao ao processo de cria\c{c}\~ao e ativa\c{c}\~ao de faltas.
+    \end{defi}
+    \medskip
+    Um m\'etodo bastante usado \'e realizar \textbf{computa\c{c}\~oes m\'ultiplas por canais m\'ultiplos}, em sequ\^encia ou concorrentemente.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{4.2cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Faltas f\'isicas} & Os canais podem ter \textbf{projeto id\^entico}, sob a hip\'otese de que componentes de hardware falham independentemente. \\
+        \addlinespace
+        \textbf{Faltas de desenvolvimento evasivas} & Canais id\^enticos com \textbf{retorno} \en{(rollback)} t\^em se mostrado adequados, porque a reexecu\c{c}\~ao n\~ao reencontra a combina\c{c}\~ao rara. \\
+        \addlinespace
+        \textbf{Faltas de desenvolvimento s\'olidas} & Canais id\^enticos \textbf{n\~ao servem}. Exigem que os canais implementem a mesma fun\c{c}\~ao por \textbf{projetos e implementa\c{c}\~oes separados}, ou seja, \textbf{diversidade de projeto} \en{(design diversity)}. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Esta tabela \'e a resposta para ``por que tr\^es c\'opias do mesmo servi\c{c}o n\~ao resolvem meu problema''. Depende da classe de falta que voc\^e est\'a tentando tolerar.
+    \end{ancora}
+    \sect{\S5.2.2}
+\end{frame}
+
+\begin{frame}{Componentes autotestáveis, confinamento e consenso}
+    \footnotesize
+    \begin{defi}[Componente autotest\'avel \en{(self-checking component)}]
+        \scriptsize
+        Prover, dentro de um componente, a capacidade de processamento funcional exigida \textbf{junto com} mecanismos de detec\c{c}\~ao concorrente de erro. Vale para hardware e para software.\\[3pt]
+        Benef\'icio principal apontado pelo artigo: permite definir com clareza as \textbf{\'areas de confinamento de erro} \en{(error confinement areas)}.
+    \end{defi}
+    \medskip
+    \begin{defi}[O problema do consenso \en{(consensus problem)}]
+        \scriptsize
+        Quando um componente precisa comunicar aos demais uma \textbf{informa\c{c}\~ao de fonte \'unica} \en{(single-source information)}, como dados de um sensor local, o valor de um rel\'ogio local, ou a vis\~ao local do estado dos outros componentes, os componentes n\~ao falhos precisam \textbf{chegar a um acordo} sobre como usar essa informa\c{c}\~ao de forma mutuamente consistente.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        \textbf{Toler\^ancia a faltas \'e recursiva}: os mecanismos que a implementam precisam ser protegidos contra as faltas que podem afet\'a-los. Exemplos do artigo: replica\c{c}\~ao do votador, verificadores autotest\'aveis, mem\'oria ``est\'avel'' para os programas e dados de recupera\c{c}\~ao.
+    \end{ancora}
+    \medskip
+    {\scriptsize A introdu\c{c}\~ao sistem\'atica de toler\^ancia costuma ser facilitada por sistemas de apoio dedicados: monitores em software, processadores de servi\c{c}o, enlaces de comunica\c{c}\~ao dedicados.}
+    \sect{\S5.2.2}
+\end{frame}
+
+\begin{frame}{Cobertura: a medida de efic\'acia, e as tr\^es formas de err\'a-la}
+    \centering
+    \diagCobertura
+    \vspace{0.2em}
+    \scriptsize
+    \begin{itemize}
+        \item \textbf{Cobertura} \en{(coverage)} \'e a medida de efic\'acia de uma dada t\'ecnica de toler\^ancia a faltas. As imperfei\c{c}\~oes da toler\^ancia, ou seja, a \textbf{falta de cobertura}, limitam severamente o ganho de dependabilidade poss\'ivel.
+        \item \textbf{Cobertura de tratamento de erro e falta}: faltas de desenvolvimento nos pr\'oprios mecanismos de toler\^ancia, em rela\c{c}\~ao \`as hip\'oteses declaradas. Definida como \textbf{probabilidade condicional} de a t\'ecnica ser eficaz, dado que os erros ou faltas ocorreram.
+        \item \textbf{Cobertura da hip\'otese de falta}: as hip\'oteses diferem das faltas que realmente ocorrem em opera\c{c}\~ao. Se divide em:
+        \begin{itemize}
+            \item \textbf{cobertura de modo de falha}: os componentes falhos n\~ao se comportam como suposto;
+            \item \textbf{cobertura de independ\^encia de falha}: ocorrem falhas de modo comum onde se supunha independ\^encia.
+        \end{itemize}
+    \end{itemize}
+    \smallskip
+    \begin{armadilha}
+        \scriptsize
+        Cobertura aqui \textbf{n\~ao \'e} percentual de linhas de c\'odigo exercitadas por teste. \'E a probabilidade de a defesa funcionar quando for necess\'aria.
+    \end{armadilha}
+    \sect{Fig.\ 18, \S5.2.2}
+\end{frame}
+
+\begin{frame}{Quando ser conservador piora o sistema}
+    \footnotesize
+    \begin{defi}[Um resultado contraintuitivo da \S5.2.2]
+        \scriptsize
+        Hip\'oteses de falta conservadoras (por exemplo, supor faltas bizantinas) resultam em \textbf{cobertura de modo de falha maior}, \`as custas de exigir \textbf{aumento de redund\^ancia} e \textbf{mecanismos de toler\^ancia mais complexos}, o que pode levar a uma \textbf{diminui\c{c}\~ao geral} da dependabilidade e da seguran\c{c}a do sistema.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item Mecanismos mais complexos cont\^em mais faltas de desenvolvimento, o que degrada a \textbf{cobertura de tratamento de erro e falta}.
+        \item Voc\^e melhora uma esp\'ecie de cobertura e piora outra. N\~ao h\'a escolha gratuita.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Um protocolo bizantino mal implementado \'e pior do que um protocolo simples correto. A hip\'otese de falta n\~ao \'e opini\~ao: \'e um requisito que algu\'em precisa \textbf{fazer valer}, por constru\c{c}\~ao do componente ou pagando redund\^ancia no protocolo.
+    \end{ancora}
+    \medskip
+    \begin{pratica}
+        \scriptsize
+        Alternativa defens\'avel: adotar hip\'otese fail-silent \textbf{e torn\'a-la verdadeira por constru\c{c}\~ao}, com componentes autotest\'aveis e \'areas de confinamento bem definidas. Migrar para hip\'otese bizantina apenas se o perfil de faltas incluir faltas maliciosas de intera\c{c}\~ao sobre os n\'os.
+    \end{pratica}
+    \sect{\S5.2.2}
+\end{frame}
+
+\begin{frame}{Toler\^ancia se aplica a todas as classes de faltas}
+    \footnotesize
+    \begin{itemize}
+        \item A prote\c{c}\~ao contra intrus\~oes envolve tradicionalmente criptografia e \textit{firewalls}. Alguns mecanismos de detec\c{c}\~ao de erro servem tanto para faltas n\~ao maliciosas quanto para maliciosas, como as t\'ecnicas de prote\c{c}\~ao de acesso \`a mem\'oria.
+        \item A detec\c{c}\~ao de intrus\~ao \'e usualmente feita por \textbf{checagens de verossimilhan\c{c}a} \en{(likelihood checks)}.
+        \item O artigo lista esquemas propostos para tolerar:
+        \begin{itemize}
+            \item \textbf{intrus\~oes e faltas f\'isicas}, por fragmenta\c{c}\~ao e dispers\~ao de informa\c{c}\~ao;
+            \item \textbf{l\'ogica maliciosa}, em especial v\'irus, por verifica\c{c}\~ao de fluxo de controle ou por diversidade de projeto;
+            \item \textbf{intrus\~oes, l\'ogica maliciosa e vulnerabilidades} devidas a faltas f\'isicas ou de desenvolvimento, por diversidade de servidores.
+        \end{itemize}
+    \end{itemize}
+    \medskip
+    \begin{defi}[Sin\^onimos que voc\^e vai encontrar por a\'i]
+        \scriptsize
+        O artigo registra que existem v\'arios sin\^onimos para toler\^ancia a faltas: \textbf{autorreparo} \en{(self-repair)}, \textbf{autocura} \en{(self-healing)} e \textbf{resili\^encia} \en{(resilience)}.\\[3pt]
+        Registra tamb\'em que \textbf{computa\c{c}\~ao orientada \`a recupera\c{c}\~ao} \en{(recovery-oriented computing)} \'e, em ess\^encia, uma abordagem de toler\^ancia a faltas no n\'ivel acima do computador individual, em que as falhas dos computadores individuais s\~ao as faltas a serem toleradas.
+    \end{defi}
+    \sect{\S5.2.2}
+\end{frame}
+
+\begin{frame}{Remo\c{c}\~ao de faltas durante o desenvolvimento}
+    \footnotesize
+    Tr\^es passos: \textbf{verifica\c{c}\~ao}, \textbf{diagn\'ostico}, \textbf{corre\c{c}\~ao}.
+    \medskip
+    \begin{defi}
+        \scriptsize
+        \textbf{Verifica\c{c}\~ao} \en{(verification)} \'e o processo de checar se o sistema adere a propriedades dadas, chamadas \textbf{condi\c{c}\~oes de verifica\c{c}\~ao}. Se n\~ao adere, \'e preciso \textbf{diagnosticar} as faltas que impediram a ades\~ao e realizar as \textbf{corre\c{c}\~oes}.\\[3pt]
+        Depois da corre\c{c}\~ao, a verifica\c{c}\~ao deve ser \textbf{repetida}, para checar que a remo\c{c}\~ao n\~ao teve consequ\^encias indesejadas. Essa etapa \'e a \textbf{verifica\c{c}\~ao de n\~ao regress\~ao} \en{(nonregression verification)}.
+    \end{defi}
+    \medskip
+    \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Valida\c{c}\~ao \'e outra coisa}]
+        \scriptsize
+        \textbf{Checar a especifica\c{c}\~ao} \'e o que se chama \textbf{valida\c{c}\~ao} \en{(validation)}. Faltas de especifica\c{c}\~ao podem ser descobertas em \textbf{qualquer} est\'agio do desenvolvimento: na pr\'opria fase de especifica\c{c}\~ao, ou em fases posteriores, quando se encontra evid\^encia de que o sistema n\~ao implementar\'a sua fun\c{c}\~ao, ou de que a implementa\c{c}\~ao n\~ao \'e vi\'avel a custo aceit\'avel.
+    \end{tcolorbox}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Verifica\c{c}\~ao pergunta ``constru\'i o que o documento manda?''. Valida\c{c}\~ao pergunta ``o documento manda a coisa certa?''.
+    \end{ancora}
+    \sect{\S5.3.1}
+\end{frame}
+
+\begin{frame}{As abordagens de verifica\c{c}\~ao}
+    \centering
+    \diagVerificacao
+    \vspace{0.1em}
+    \scriptsize
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \textbf{Est\'atica} (sem executar o sistema)
+            \begin{itemize}
+                \item sobre o \textbf{pr\'oprio sistema}: an\'alise est\'atica (inspe\c{c}\~oes, \textit{walk-through}, an\'alise de fluxo de dados, an\'alise de complexidade, interpreta\c{c}\~ao abstrata, checagens do compilador, busca de vulnerabilidades) e \textbf{prova de teoremas};
+                \item sobre um \textbf{modelo do comportamento}, em geral um modelo de transi\c{c}\~ao de estados (redes de Petri, aut\^omatos finitos ou infinitos): \textbf{verifica\c{c}\~ao de modelos} \en{(model checking)}.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+            \textbf{Din\^amica} (exercitando o sistema)
+            \begin{itemize}
+                \item entradas \textbf{simb\'olicas}: \textbf{execu\c{c}\~ao simb\'olica} \en{(symbolic execution)};
+                \item entradas \textbf{reais}: \textbf{teste} \en{(testing)}.
+            \end{itemize}
+            \smallskip
+            \begin{armadilha}
+                \scriptsize
+                \textit{Model checking} n\~ao \'e teste. Ele verifica um \textbf{modelo} do comportamento, sem executar o sistema.
+            \end{armadilha}
+        \end{column}
+    \end{columns}
+    \smallskip
+    {\scriptsize Os m\'etodos podem ser combinados: execu\c{c}\~ao simb\'olica para determinar padr\~oes de teste, prova de teoremas para checar propriedades de modelos de estado infinito, teste de muta\c{c}\~ao para comparar estrat\'egias de teste.}
+    \sect{Fig.\ 19, \S5.3.1}
+\end{frame}
+
+\begin{frame}{Teste: como escolher e como gerar as entradas}
+    \footnotesize
+    Teste exaustivo em rela\c{c}\~ao a todas as entradas poss\'iveis \'e, em geral, invi\'avel. Os m\'etodos de determina\c{c}\~ao dos padr\~oes de teste se classificam por dois pontos de vista.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{2.8cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \multicolumn{2}{@{}l}{\textbf{1. Crit\'erio de sele\c{c}\~ao das entradas}} \\
+        \midrule
+        Objetivo do teste & \textbf{conformidade} (verificar a capacidade de entregar o servi\c{c}o especificado) ou \textbf{busca de faltas} \\
+        Modelo do sistema & \textbf{funcional} (a partir da fun\c{c}\~ao) ou \textbf{estrutural} (a partir da estrutura interna) \\
+        Modelo de faltas & \textbf{baseado em faltas} \en{(fault-based)} ou \textbf{baseado em crit\'erios} \en{(criteria-based)} \\
+        \midrule
+        \multicolumn{2}{@{}l}{\textbf{2. Gera\c{c}\~ao das entradas}} \\
+        \midrule
+        \textbf{Determin\'istica} & Os padr\~oes s\~ao predeterminados por escolha seletiva. \\
+        \textbf{Aleat\'oria} ou \textbf{estat\'istica} & Os padr\~oes s\~ao selecionados segundo uma distribui\c{c}\~ao de probabilidade definida sobre o dom\'inio de entrada. A distribui\c{c}\~ao e a quantidade de dados s\~ao determinadas conforme o modelo de faltas ou os crit\'erios adotados. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        \textbf{Hardware e software testam por raz\~oes diferentes.} O teste de hardware visa sobretudo remover \textbf{faltas de produ\c{c}\~ao}, e \'e tipicamente baseado em faltas. O teste de software se ocupa apenas de \textbf{faltas de desenvolvimento}, e \'e baseado em crit\'erios, com a exce\c{c}\~ao do teste de muta\c{c}\~ao, que \'e baseado em faltas.
+    \end{ancora}
+    \sect{Fig.\ 20, \S5.3.1}
+\end{frame}
+
+\begin{frame}{O problema do or\'aculo, e quatro t\'ecnicas nomeadas}
+    \footnotesize
+    \begin{defi}[Problema do or\'aculo \en{(oracle problem)}]
+        \scriptsize
+        Observar as sa\'idas do teste e decidir se elas satisfazem ou n\~ao as condi\c{c}\~oes de verifica\c{c}\~ao. Gerar entradas \'e a parte f\'acil; decidir se a sa\'ida est\'a certa \'e o problema.
+    \end{defi}
+    \medskip
+    \begin{itemize}
+        \item As condi\c{c}\~oes podem se aplicar a todo o conjunto de sa\'idas ou a uma fun\c{c}\~ao compacta delas, como uma \textbf{assinatura} do sistema ao testar faltas f\'isicas, ou um \textbf{or\'aculo parcial} ao testar faltas de desenvolvimento de software.
+        \item Ao testar \textbf{faltas f\'isicas}, os resultados esperados s\~ao obtidos por simula\c{c}\~ao ou de um sistema de refer\^encia, a \textbf{unidade padr\~ao} \en{(golden unit)}.
+        \item Ao testar \textbf{faltas de desenvolvimento}, a refer\^encia \'e em geral a especifica\c{c}\~ao. Pode tamb\'em ser um prot\'otipo, ou outra implementa\c{c}\~ao da mesma especifica\c{c}\~ao obtida por diversidade de projeto: \textbf{teste costas com costas} \en{(back-to-back testing)}.
+    \end{itemize}
+    \medskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt]
+        \scriptsize
+        As mesmas t\'ecnicas se aplicam \`a verifica\c{c}\~ao dos \textbf{pr\'oprios mecanismos de toler\^ancia a faltas}, por dois caminhos: verifica\c{c}\~ao est\'atica formal, e teste em que faltas ou erros fazem parte dos padr\~oes de teste, o que se chama \textbf{inje\c{c}\~ao de faltas} \en{(fault injection)}.\\[3pt]
+        Verificar que o sistema \textbf{n\~ao faz mais do que o especificado} \'e particularmente importante para seguran\c{c}a f\'isica e para seguran\c{c}a, e da\'i o \textbf{teste de penetra\c{c}\~ao} \en{(penetration testing)}.
+    \end{tcolorbox}
+    \smallskip
+    {\scriptsize Projetar o sistema para facilitar sua verifica\c{c}\~ao \'e \textbf{projeto para verificabilidade}. Em hardware, para faltas f\'isicas, isso se chama \textbf{projeto para testabilidade}.}
+    \sect{\S5.3.1}
+\end{frame}
+
+\begin{frame}{Remo\c{c}\~ao de faltas durante o uso}
+    \footnotesize
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depAzul!6,colframe=depAzul!60,boxrule=0.6pt,title={\scriptsize\bfseries Manuten\c{c}\~ao corretiva}]
+                \scriptsize
+                Remove faltas que \textbf{j\'a produziram} um ou mais erros e foram \textbf{reportadas}.
+                \smallskip
+                Para faltas de desenvolvimento, costuma ser feita em est\'agios: a falta \'e primeiro \textbf{isolada} (por um contorno ou uma corre\c{c}\~ao pontual) antes da remo\c{c}\~ao efetiva.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Manuten\c{c}\~ao preventiva}]
+                \scriptsize
+                Descobre e remove faltas \textbf{antes} que causem erros na opera\c{c}\~ao normal. Alcan\c{c}a:
+                \begin{enumerate}
+                    \item faltas f\'isicas ocorridas desde a \'ultima a\c{c}\~ao preventiva;
+                    \item \textbf{faltas de desenvolvimento que causaram erros em outros sistemas similares}.
+                \end{enumerate}
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{itemize}
+        \item As duas formas se aplicam tanto a sistemas n\~ao tolerantes a faltas quanto a sistemas tolerantes.
+        \item Sistemas tolerantes podem ser mantidos \textbf{em linha}, sem interromper a entrega de servi\c{c}o, ou \textbf{fora de linha}, durante uma interrup\c{c}\~ao.
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        O item 2 \'e uma das raz\~oes de existirem boletins de seguran\c{c}a e listas de \textit{errata}: uma falta que derrubou o sistema de outra pessoa \'e informa\c{c}\~ao acion\'avel sobre o seu.
+    \end{ancora}
+    \sect{\S5.3.2}
+\end{frame}
+
+\begin{frame}{Previs\~ao de faltas: duas avalia\c{c}\~oes}
+    \footnotesize
+    Previs\~ao de faltas \'e conduzida avaliando o comportamento do sistema em rela\c{c}\~ao \`a ocorr\^encia ou \`a ativa\c{c}\~ao de faltas. A avalia\c{c}\~ao tem dois aspectos.
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depAzul!6,colframe=depAzul!60,boxrule=0.6pt,title={\scriptsize\bfseries Qualitativa (ordinal)}]
+                \scriptsize
+                Identificar, classificar e ordenar os modos de falha, ou as combina\c{c}\~oes de eventos (falhas de componentes, condi\c{c}\~oes ambientais) que levariam a falhas do sistema.
+                \smallskip
+                M\'etodo espec\'ifico citado: \textbf{an\'alise de modos de falha e efeitos} \en{(FMEA)}.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+            \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Quantitativa (probabil\'istica)}]
+                \scriptsize
+                Avaliar, em termos de probabilidades, a extens\~ao em que alguns atributos s\~ao satisfeitos. Os atributos passam ent\~ao a ser vistos como \textbf{medidas}.
+                \smallskip
+                M\'etodos espec\'ificos citados: \textbf{cadeias de Markov} e \textbf{redes de Petri estoc\'asticas}.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Alguns m\'etodos servem \`as duas: \textbf{diagramas de blocos de confiabilidade} e \textbf{\'arvores de falha}.
+    \end{ancora}
+    \medskip
+    {\scriptsize Lembrete da \S1: os autores declaram que \textbf{n\~ao h\'a consenso ainda} sobre as \textbf{medidas} de dependabilidade e seguran\c{c}a, e que esse ponto exigia elabora\c{c}\~ao adicional. \'E o buraco declarado da taxonomia.}
+    \sect{\S5.4}
+\end{frame}
+
+\begin{frame}{Modelagem e teste de avalia\c{c}\~ao}
+    \footnotesize
+    As duas abordagens principais para obter estimativas probabil\'isticas s\~ao \textbf{modelagem} e \textbf{teste de avalia\c{c}\~ao}. Elas s\~ao complementares: a modelagem precisa de dados sobre os processos b\'asicos modelados, que podem vir do teste ou do processamento de dados de falha.
+    \medskip
+    \begin{itemize}
+        \item A modelagem tem duas fases: \textbf{construir} o modelo do sistema a partir dos processos estoc\'asticos elementares dos componentes (falha, restaura\c{c}\~ao incluindo reparo, ciclo de opera\c{c}\~ao), e \textbf{process\'a-lo} para obter as express\~oes e os valores das medidas.
+        \item \textbf{Modelos de crescimento de confiabilidade} \en{(reliability growth models)}, para hardware, software ou ambos, fazem predi\c{c}\~oes a partir de dados sobre falhas passadas.
+        \item Medidas relacionadas a desempenho s\~ao subsumidas na no\c{c}\~ao de \textbf{performabilidade} \en{(performability)}.
+    \end{itemize}
+    \medskip
+    \begin{defi}[Teste operacional \en{(operational testing)}]
+        \scriptsize
+        O teste de avalia\c{c}\~ao \'e conformidade, funcional, n\~ao baseado em faltas, estat\'istico. A preocupa\c{c}\~ao central \'e que o \textbf{perfil de entrada seja representativo do perfil operacional}. Da\'i o nome usual.
+    \end{defi}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Ao avaliar sistemas tolerantes a faltas, a \textbf{cobertura} dos mecanismos tem influ\^encia dr\'astica sobre as medidas. Avaliar cobertura se faz por modelagem ou por \textbf{inje\c{c}\~ao de faltas}.
+    \end{ancora}
+    \medskip
+    {\scriptsize Um \textbf{benchmark de dependabilidade e seguran\c{c}a} \'e um procedimento para avaliar medidas do comportamento de um sistema \textbf{na presen\c{c}a de faltas}, permitindo caracterizar um sistema e comparar solu\c{c}\~oes alternativas.}
+    \sect{\S5.4}
+\end{frame}
+
+\begin{frame}{As rela\c{c}\~oes entre os quatro meios}
+    \centering
+    \diagMeiosAgrupados
+    \vspace{0.2em}
+    \scriptsize
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \textbf{Primeiro eixo: o que se obt\'em}
+            \begin{itemize}
+                \item \textbf{Provis\~ao} (preven\c{c}\~ao + toler\^ancia): fornece a capacidade de entregar servi\c{c}o confi\'avel.
+                \item \textbf{An\'alise} (remo\c{c}\~ao + previs\~ao): alcan\c{c}a \textbf{confian\c{c}a} nessa capacidade.
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+            \textbf{Segundo eixo: a postura diante da falta}
+            \begin{itemize}
+                \item \textbf{Evita\c{c}\~ao} (preven\c{c}\~ao + remo\c{c}\~ao): buscar sistemas livres de faltas.
+                \item \textbf{Aceita\c{c}\~ao} (toler\^ancia + previs\~ao): conviver com sistemas sujeitos a faltas.
+            \end{itemize}
+        \end{column}
+    \end{columns}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        Quando se foca em seguran\c{c}a, a an\'alise de dependabilidade e seguran\c{c}a recebe o nome de \textbf{avalia\c{c}\~ao de seguran\c{c}a} \en{(security evaluation)}.
+    \end{ancora}
+    \sect{Fig.\ 21, \S5.5}
+\end{frame}
+
+\begin{frame}{Por que os quatro meios precisam uns dos outros}
+    \footnotesize
+    O argumento da \S5.5 \'e uma cadeia de imperfei\c{c}\~oes. Todos os ``como fazer'' das defini\c{c}\~oes s\~ao \textbf{objetivos}, raramente alcan\c{c}ados por completo, porque todas as atividades de projeto e an\'alise s\~ao atividades \textbf{humanas} e, portanto, imperfeitas.
+    \medskip
+    \begin{enumerate}
+        \item Apesar da \textbf{preven\c{c}\~ao} por metodologias e regras de constru\c{c}\~ao (elas pr\'oprias imperfeitas, para serem execut\'aveis), faltas ocorrem. Logo, \'e preciso \textbf{remo\c{c}\~ao}.
+        \item A \textbf{remo\c{c}\~ao} tamb\'em \'e imperfeita: nem todas as faltas s\~ao encontradas, e novas faltas podem ser introduzidas ao remover uma. Al\'em disso, componentes de prateleira cont\^em faltas. Logo, \'e preciso \textbf{previs\~ao}.
+        \item A depend\^encia crescente em sistemas computacionais exige \textbf{toler\^ancia}, que por sua vez se ap\'oia em regras de constru\c{c}\~ao. Logo, \'e preciso aplicar \textbf{remo\c{c}\~ao e previs\~ao aos pr\'oprios mecanismos de toler\^ancia}.
+        \item E o processo \'e ainda mais recursivo: os sistemas atuais s\~ao t\~ao complexos que seu projeto e implementa\c{c}\~ao precisam de ferramentas de software e hardware. \textbf{Essas ferramentas t\^em elas pr\'oprias de ser depend\'aveis e seguras}, e assim por diante.
+    \end{enumerate}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        \'E s\'o a \textbf{utiliza\c{c}\~ao combinada} dos quatro meios, de prefer\^encia em cada etapa do projeto e da implementa\c{c}\~ao, que leva a um sistema depend\'avel e seguro.
+    \end{ancora}
+    \sect{\S5.5}
+\end{frame}
+
+\begin{frame}{A avalia\c{c}\~ao da avalia\c{c}\~ao}
+    \footnotesize
+    \begin{defi}[Cobertura, num sentido mais geral]
+        \scriptsize
+        Aqui \textbf{cobertura} passa a significar a medida da \textbf{representatividade das situa\c{c}\~oes} a que o sistema \'e submetido durante a an\'alise, comparadas \`as situa\c{c}\~oes reais que ele enfrentar\'a na vida operacional.
+    \end{defi}
+    \medskip
+    Julgar se um sistema \'e de fato depend\'avel vai al\'em das t\'ecnicas de an\'alise, por tr\^es limites:
+    \medskip
+    \begin{enumerate}
+        \item Checar com precis\~ao a cobertura das hip\'oteses de projeto e valida\c{c}\~ao em rela\c{c}\~ao \`a realidade exigiria dom\'inio da tecnologia e do uso pretendido \textbf{muito al\'em do que \'e geralmente alcan\c{c}\'avel}.
+        \item Avaliar alguns atributos, em especial seguran\c{c}a diante de certas classes de faltas, \'e hoje considerado invi\'avel ou pouco significativo, porque as bases probabil\'isticas \textbf{n\~ao existem ou n\~ao s\~ao amplamente aceitas}. Exemplos: seguran\c{c}a f\'isica diante de faltas acidentais de desenvolvimento; seguran\c{c}a diante de faltas intencionais.
+        \item As especifica\c{c}\~oes contra as quais a an\'alise \'e feita \textbf{provavelmente cont\^em faltas}, como qualquer sistema.
+    \end{enumerate}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Duas consequ\^encias pr\'aticas: a \^enfase em avaliar o \textbf{processo} de desenvolvimento (m\'etodos, t\'ecnicas, e como foram empregados), \`as vezes atribuindo uma nota ao sistema; e a presen\c{c}a, nas especifica\c{c}\~oes, de uma \textbf{lista de tipos e n\'umeros de faltas a tolerar}, cl\'assica em aeroespacial na forma de concatena\c{c}\~oes como FO/FS ou FO/FO/FS.
+    \end{ancora}
+    \sect{\S5.5}
+\end{frame}
+
+\begin{frame}{Checkpoint 4}
+    \footnotesize
+    \begin{checkpoint}[Classifique cada atividade num meio e nos dois eixos da Fig.\ 21]
+        \scriptsize
+        \begin{enumerate}
+            \item Migrar m\'odulos legados para uma linguagem com tipagem forte e checagem de limites.
+            \item \textit{Model checking} do protocolo de sincroniza\c{c}\~ao.
+            \item Derrubar n\'os ao acaso em homologa\c{c}\~ao para observar a reconfigura\c{c}\~ao.
+            \item Cadeia de Markov do \textit{cluster}, com taxas de falha e de reparo, para estimar disponibilidade anual.
+            \item Voto majorit\'ario 2-de-3 nos m\'odulos de decis\~ao.
+            \item Rodar a su\'ite com perfil de entrada representativo da produ\c{c}\~ao e medir taxa de falha.
+        \end{enumerate}
+    \end{checkpoint}
+    \pause
+    \smallskip
+    \scriptsize
+    \begin{tabularx}{\linewidth}{@{}c p{4.6cm} p{1.8cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        & \textbf{Meio} & \textbf{Eixo 1} & \textbf{Eixo 2} \\
+        \midrule
+        1 & preven\c{c}\~ao de faltas & provis\~ao & evita\c{c}\~ao \\
+        2 & remo\c{c}\~ao (verifica\c{c}\~ao est\'atica sobre modelo) & an\'alise & evita\c{c}\~ao \\
+        3 & inje\c{c}\~ao de faltas, com \textbf{papel duplo} & an\'alise & ver abaixo \\
+        4 & previs\~ao quantitativa (modelagem) & an\'alise & aceita\c{c}\~ao \\
+        5 & toler\^ancia (compensa\c{c}\~ao, portanto mascaramento) & provis\~ao & aceita\c{c}\~ao \\
+        6 & previs\~ao por teste operacional & an\'alise & aceita\c{c}\~ao \\
+        \bottomrule
+    \end{tabularx}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        O item 3 tem papel duplo, e o artigo trata os dois: como \textbf{verifica\c{c}\~ao dos mecanismos de toler\^ancia}, \'e remo\c{c}\~ao de faltas (evita\c{c}\~ao); como \textbf{avalia\c{c}\~ao de cobertura}, \'e previs\~ao de faltas (aceita\c{c}\~ao). O crit\'erio n\~ao \'e a ferramenta, \'e o objetivo.
+    \end{ancora}
+\end{frame}
+
+% =====================================================================
+\section{S\'intese e guia de leitura}
+% =====================================================================
+
+\begin{frame}{A \'arvore refinada: a mesma figura, agora com folhas}
+    \centering
+    \diagArvoreRefinada
+    \sect{Fig.\ 22, \S6}
+\end{frame}
+
+\begin{frame}{A taxonomia aplicada a incidentes reais}
+    \scriptsize
+    Quatro casos. Os dois \'ultimos s\~ao citados pelo pr\'oprio artigo.
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{2.0cm} p{1.9cm} >{\raggedright\arraybackslash}X p{2.0cm}@{}}
+        \toprule
+        \textbf{Caso} & \textbf{Classe da falta} & \textbf{O que a taxonomia ilumina} & \textbf{Atributo violado} \\
+        \midrule
+        \rowcolor{depVermelho!7} Ariane 5, voo 501 (1996) & desenvolvimento, s\'olida & Redund\^ancia id\^entica n\~ao protege contra falta id\^entica: falha de modo comum \\
+        \rowcolor{depVermelho!7} & & & confiabilidade \\
+        \rowcolor{depLaranja!8} Therac-25 (1985-87) & desenvolvimento, evasiva & Detec\c{c}\~ao existia mas a sinaliza\c{c}\~ao era in\'util; remo\c{c}\~ao de barreiras f\'isicas & seguran\c{c}a f\'isica \\
+        \rowcolor{depAzul!7} \textit{Errata} de microprocessador & desenvolvimento, permanente & Faltas de desenvolvimento em hardware descobertas ap\'os a produ\c{c}\~ao & integridade \\
+        \rowcolor{depVerde!7} Sistema AAS (anos 1990) & incompet\^encia organizacional & Falha \textbf{completa de desenvolvimento}: o projeto n\~ao chega ao uso & (nem chegou a operar) \\
+        \bottomrule
+    \end{tabularx}
+    \smallskip
+    \begin{ancora}
+        \scriptsize
+        O exerc\'icio n\~ao \'e decorar os casos. \'E perceber que, uma vez classificado o incidente, \textbf{o meio adequado quase se escreve sozinho}.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{Ariane 5, voo 501: quando duas c\'opias falham juntas}
+    \footnotesize
+    \begin{itemize}
+        \item \textbf{Os fatos.} Em 4 de junho de 1996, o primeiro voo do Ariane 5 foi destru\'ido cerca de 40 segundos ap\'os a decolagem. O sistema de refer\^encia inercial reaproveitava software do Ariane 4. Uma convers\~ao de um valor de ponto flutuante de 64 bits para inteiro de 16 bits transbordou, porque a trajet\'oria do Ariane 5 produzia valores fora do envelope do Ariane 4. A exce\c{c}\~ao n\~ao era tratada. As \textbf{duas} unidades, principal e reserva, rodavam \textbf{o mesmo software} e pararam com poucos instantes de diferen\c{c}a. O computador de bordo interpretou dados de diagn\'ostico como dados de voo.
+    \end{itemize}
+    \medskip
+    \begin{tabularx}{\linewidth}{@{}p{2.6cm} >{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Falta} & Desenvolvimento, interna, humana, software, n\~ao maliciosa. \textbf{Deliberada}: a prote\c{c}\~ao havia sido omitida por decis\~ao de projeto, justificada por margem de carga do processador. Permanente e \textbf{s\'olida}. \\
+        \textbf{Falta associada} & \textbf{Falta de especifica\c{c}\~ao}: a hip\'otese do envelope de trajet\'oria do Ariane 4 nunca foi revalidada para o Ariane 5. \\
+        \textbf{Erro} & O resultado da convers\~ao transbordada no estado da unidade inercial. \\
+        \textbf{Falha} & Parada das duas unidades, seguida de conte\'udo incorreto entregue ao computador de bordo. \\
+        \bottomrule
+    \end{tabularx}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Canais id\^enticos cobrem faltas f\'isicas independentes. Contra uma falta \textbf{s\'olida} de desenvolvimento, eles produzem \textbf{erros similares}, e a falha de modo comum atravessa a redund\^ancia inteira. Era caso de \textbf{diversidade de projeto}, ou de n\~ao assumir a hip\'otese de independ\^encia.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{Therac-25: detec\c{c}\~ao sem sinaliza\c{c}\~ao \'util}
+    \footnotesize
+    \begin{itemize}
+        \item \textbf{Os fatos.} Entre 1985 e 1987, o acelerador de radioterapia Therac-25 aplicou doses de radia\c{c}\~ao muito acima da prescrita em pelo menos seis acidentes, com mortes. O modelo anterior tinha \textbf{intertravamentos f\'isicos} que impediam a configura\c{c}\~ao perigosa; no Therac-25 essa prote\c{c}\~ao passou a ser feita apenas por software. Uma condi\c{c}\~ao de corrida, ativada quando o operador editava a tela de comando com rapidez incomum, deixava a m\'aquina em estado inconsistente. O sistema exibia mensagens de erro num\'ericas sem significado documentado, e o procedimento usual era simplesmente mandar continuar.
+    \end{itemize}
+    \medskip
+    \begin{columns}[T]
+        \begin{column}{0.49\textwidth}
+            \begin{tcolorbox}[colback=depVermelho!5,colframe=depVermelho!65,boxrule=0.6pt,title={\scriptsize\bfseries A cadeia}]
+                \scriptsize
+                \textbf{Falta}: condi\c{c}\~ao de corrida, de desenvolvimento, \textbf{evasiva} (ativa\c{c}\~ao dependia de temporiza\c{c}\~ao rara e n\~ao era reproduz\'ivel em bancada).\\
+                \textbf{Erro}: estado de configura\c{c}\~ao inconsistente.\\
+                \textbf{Falha}: conte\'udo incorreto de dose, com severidade \textbf{catastr\'ofica}.
+            \end{tcolorbox}
+        \end{column}
+        \begin{column}{0.49\textwidth}
+            \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries O que a taxonomia expõe}]
+                \scriptsize
+                A detec\c{c}\~ao \textbf{existia}: a falha era \textbf{sinalizada}. Mas a sinaliza\c{c}\~ao n\~ao permitia ao operador distinguir condi\c{c}\~ao perigosa de ru\'ido, e o efeito pr\'atico foi o de uma falha \textbf{n\~ao sinalizada}.\\
+                Remover os intertravamentos trocou uma barreira de \textbf{preven\c{c}\~ao} por uma promessa de \textbf{corre\c{c}\~ao} em software, sem a cobertura correspondente.
+            \end{tcolorbox}
+        \end{column}
+    \end{columns}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        Um mecanismo de detec\c{c}\~ao cuja sa\'ida ningu\'em consegue interpretar tem \textbf{cobertura efetiva pr\'oxima de zero}, por mais que dispare corretamente.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{Dois casos que o pr\'oprio artigo usa}
+    \footnotesize
+    \begin{tcolorbox}[colback=depAzul!5,colframe=depAzul!65,boxrule=0.6pt,title={\scriptsize\bfseries \textit{Errata} de microprocessador}]
+        \scriptsize
+        O artigo cita como classe de faltas as \textit{errata}: faltas de desenvolvimento em hardware descobertas \textbf{depois} do in\'icio da produ\c{c}\~ao, publicadas em atualiza\c{c}\~oes de especifica\c{c}\~ao ao longo de toda a vida do processador. O caso p\'ublico mais conhecido \'e o da divis\~ao em ponto flutuante de um processador de 1994, cuja tabela de consulta incompleta produzia resultados incorretos em divis\~oes raras, e cujo programa de substitui\c{c}\~ao custou centenas de milh\~oes de d\'olares ao fabricante.
+        \smallskip
+        \textbf{Leitura taxon\^omica}: falta de desenvolvimento, interna, humana, \textbf{hardware}, n\~ao maliciosa, n\~ao deliberada, permanente, \textbf{s\'olida}. Atributo violado: \textbf{integridade} do resultado. Meio aplic\'avel depois de descoberta: \textbf{remo\c{c}\~ao} (recall) ou \textbf{toler\^ancia} (contorno em software).
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries O sistema AAS de controle de tr\'afego a\'ereo}]
+        \scriptsize
+        Citado duas vezes no artigo. Primeiro como exemplo de \textbf{incompet\^encia organizacional}: uma equipe ou organiza\c{c}\~ao inteira sem condi\c{c}\~oes de fazer o trabalho. Depois como exemplo de \textbf{falha completa de desenvolvimento}, com desperd\'icio de US\$ 1,5 bilh\~ao. E ainda como exemplo de \textbf{falta na pr\'opria especifica\c{c}\~ao de dependabilidade}: o limite inicial de 3 segundos de indisponibilidade por ano foi renegociado para 5 minutos por ano em 1994.
+        \smallskip
+        \textbf{Leitura taxon\^omica}: o sistema nunca entrou em uso, logo n\~ao houve falha de servi\c{c}o. Houve falha de \textbf{desenvolvimento}, nas duas formas: or\c{c}amento e cronograma.
+    \end{tcolorbox}
+    \fonte{Os n\'umeros do AAS s\~ao os do pr\'oprio artigo (\S3.2.3, \S3.3.2 e \S3.3.3, ref.\ [67]).}
+\end{frame}
+
+\begin{frame}{Usando a taxonomia num projeto real}
+    \footnotesize
+    Um roteiro de sete perguntas, na ordem em que o artigo as constr\'oi:
+    \medskip
+    \begin{enumerate}
+        \item \textbf{Onde est\'a a fronteira do sistema?} Escreva em uma frase. Depois mova-a para incluir o operador humano e veja o que muda de classifica\c{c}\~ao.
+        \item \textbf{Qual \'e a fun\c{c}\~ao, e onde est\'a a especifica\c{c}\~ao?} Se n\~ao houver especifica\c{c}\~ao escrita, ainda assim h\'a fun\c{c}\~ao, e falhas continuar\~ao ocorrendo em rela\c{c}\~ao a ela.
+        \item \textbf{Quais atributos importam, e em que grau?} Nomeie os que \textbf{n\~ao} importam. E identifique os conflitos entre os que importam.
+        \item \textbf{Quais classes de faltas est\~ao na especifica\c{c}\~ao?} Use as oito dimens\~oes. O que ficou de fora \'e o que voc\^e decidiu n\~ao tolerar.
+        \item \textbf{Quais modos de falha s\~ao aceit\'aveis?} Dom\'inio, detectabilidade, consist\^encia, severidade. Isso define se o sistema \'e fail-silent, fail-safe, ou nenhum dos dois.
+        \item \textbf{Que hip\'oteses de falta est\~ao implícitas no seu c\'odigo?} Liste tr\^es que nunca foram escritas. Para cada uma, diga que esp\'ecie de cobertura cai se ela for falsa.
+        \item \textbf{Os quatro meios est\~ao equilibrados?} Coloque suas atividades nos quadrantes da Fig.\ 21. O quadrante vazio \'e o seu risco.
+    \end{enumerate}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        A taxonomia n\~ao \'e um \textit{checklist} de conformidade. \'E um instrumento para descobrir o que voc\^e assumiu sem perceber.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{Como ler o artigo: tr\^es passadas, fora de ordem}
+    \scriptsize
+    \begin{tcolorbox}[colback=depAzul!5,colframe=depAzul!65,boxrule=0.6pt,title={\scriptsize\bfseries Passada 1, cerca de 60 min: o esqueleto}]
+        \scriptsize
+        \begin{enumerate}
+            \item \textbf{\S2 inteira} (p.\ 12-14). Devagar, com l\'apis. \'E o vocabul\'ario de todo o resto. Ao terminar, desenhe de mem\'oria o par provedor-usu\'ario com as duas interfaces.
+            \item \textbf{\S3.5 e Fig.\ 10, 11, 12} (p.\ 20-21). \textbf{Fora de ordem, de prop\'osito.} A patologia fecha o entendimento da tr\'iade antes de voc\^e enfrentar a taxonomia de faltas.
+            \item \textbf{Fig.\ 2} (p.\ 14). Guarde como mapa e volte a ela ao fim de cada se\c{c}\~ao.
+        \end{enumerate}
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depVerde!6,colframe=depVerde!60,boxrule=0.6pt,title={\scriptsize\bfseries Passada 2, cerca de 90 min: as tr\^es grandes classifica\c{c}\~oes}]
+        \scriptsize
+        \textbf{\S3.1} como \textit{checklist} de projeto. \textbf{\S3.2 com a Fig.\ 4 aberta ao lado}; depois \S3.2.2 a \S3.2.5 com a Fig.\ 5. \textbf{N\~ao decore os 31 n\'umeros}: o que importa s\~ao os oito crit\'erios, os tr\^es agrupamentos e o fato de que nem todo crit\'erio se aplica. \textbf{\S3.3 com as Fig.\ 8 e 9}. \textbf{\S3.4}, curta. \textbf{\S5.2 com as Fig.\ 16, 17 e 18}: \'e a se\c{c}\~ao mais aplicada do artigo.
+    \end{tcolorbox}
+    \smallskip
+    \begin{tcolorbox}[colback=depLaranja!8,colframe=depLaranja!70,boxrule=0.6pt,title={\scriptsize\bfseries Passada 3, cerca de 60 min: completar e comparar}]
+        \scriptsize
+        \textbf{\S4.1 e \S4.2}: o ``porqu\^e'' da defini\c{c}\~ao alternativa e do par depend\^encia/confian\c{c}a. \textbf{\S5.3 e \S5.4} com as Fig.\ 19 e 20; a \S5.3.1 merece leitura cuidadosa at\'e o problema do or\'aculo. \textbf{\S5.5 e \S6} com as Fig.\ 21 e 22.
+    \end{tcolorbox}
+    \smallskip
+    {\scriptsize \textbf{Pode ir r\'apido em}: o hist\'orico da \S1; a compara\c{c}\~ao com ISO/CCITT e IEC na \S4.1; a \S4.4 (a conclus\~ao est\'a em uma frase); a \S5.1 (meia coluna); biografias e refer\^encias.}
+\end{frame}
+
+\begin{frame}{Cinco perguntas para responder enquanto voc\^e l\^e}
+    \footnotesize
+    Responda por escrito, no m\'aximo cinco linhas cada, usando um sistema que voc\^e conhe\c{c}a: um projeto da disciplina, um est\'agio, um servi\c{c}o que voc\^e usa todo dia.
+    \medskip
+    \begin{enumerate}
+        \item \textbf{Onde est\'a a fronteira?} Escreva a fronteira em uma frase. Depois mova-a para incluir o operador humano e liste duas faltas que mudaram de classifica\c{c}\~ao.
+        \medskip
+        \item \textbf{Qual erro nunca virou falha?} Descreva um caso, do seu pr\'oprio c\'odigo, em que houve erro no estado e nenhuma falha de servi\c{c}o. Qual dos dois fatores da \S3.4 explica isso: a estrutura ou o comportamento?
+        \medskip
+        \item \textbf{Qual hip\'otese de falta o seu sistema assume sem ter escrito?} Liste tr\^es. Para cada uma, diga que esp\'ecie de cobertura da Fig.\ 18 est\'a em jogo se ela for falsa.
+        \medskip
+        \item \textbf{Onde a sua confian\c{c}a est\'a codificada?} Ache um ponto em que voc\^e depende de outro sistema e n\~ao trata a falha dele. Segundo a \S4.2, essa \'e a medida da sua confian\c{c}a. Voc\^e assinaria essa medida?
+        \medskip
+        \item \textbf{Os quatro meios est\~ao equilibrados?} Liste as atividades de qualidade do seu projeto nos quadrantes da Fig.\ 21. Qual est\'a vazio, e o que a \S5.5 diz sobre isso?
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}{Exerc\'icios (1/3): classificar nas oito dimens\~oes}
+    \footnotesize
+    \textbf{E1.} Um programador escreveu, sem perceber, uma c\'opia de \textit{buffer} sem verifica\c{c}\~ao de limite em um servi\c{c}o de rede. Dois anos depois, um atacante externo dispara um script que explora essa c\'opia e obt\'em acesso privilegiado na m\'aquina.\\
+    Classifique \textbf{as duas} faltas envolvidas nos oito crit\'erios da Fig.\ 4, e diga o grupo de cada uma.
+    \medskip
+    \textbf{E2.} Compare dois casos de hardware que parecem iguais:
+    \begin{itemize}
+        \item[(a)] uma solda fria n\~ao detectada na linha de montagem deixa uma trilha em curto desde o primeiro dia de uso;
+        \item[(b)] durante a opera\c{c}\~ao, varia\c{c}\~ao de temperatura altera o atraso de propaga\c{c}\~ao de um bloco combinacional, e o circuito s\'o viola o tempo de estabelecimento quando a carga passa de 80\%.
+    \end{itemize}
+    Classifique os dois nas oito dimens\~oes. Qual \'e s\'olida e qual \'e evasiva? Que consequ\^encia isso tem para a estrat\'egia de teste?
+    \medskip
+    \textbf{E3.} Para fechar um chamado urgente, um administrador desabilita a verifica\c{c}\~ao de certificado em um cliente de integra\c{c}\~ao e esquece de reverter. Ele sabia que estava enfraquecendo a verifica\c{c}\~ao e julgou o risco aceit\'avel. Seis meses depois, um ataque de intermedi\'ario l\^e o tr\'afego dessa integra\c{c}\~ao.\\
+    Classifique a a\c{c}\~ao do administrador nas oito dimens\~oes, diga o grupo, e explique o papel dela na falha de confidencialidade.
+\end{frame}
+
+\begin{frame}{Exerc\'icios (2/3): cadeia, modos de falha e decis\~ao de projeto}
+    \footnotesize
+    \textbf{E4.} Um microsservi\c{c}o de pagamento P consome um servi\c{c}o de c\^ambio C. C tem um arredondamento errado que produz cota\c{c}\~oes com duas casas a menos em moedas de baixa denomina\c{c}\~ao. P usa a cota\c{c}\~ao, grava o valor convertido no banco e devolve um recibo ao cliente final.\\
+    Desenhe a cadeia falta $\rightarrow$ erro $\rightarrow$ falha para C \textbf{e} para P. Marque onde h\'a propaga\c{c}\~ao interna e onde h\'a propaga\c{c}\~ao externa, e indique em que momento existe erro latente.
+    \medskip
+    \textbf{E5.} Volte ao Checkpoint 3 (controlador de n\'ivel de tanque). Escreva a \textbf{especifica\c{c}\~ao de dependabilidade} que tornaria o sistema aceit\'avel: quais modos de falha voc\^e admite, com que severidade m\'axima, e sob que classes de faltas. Depois diga que mecanismo de detec\c{c}\~ao cada admiss\~ao exige.
+    \medskip
+    \textbf{E6.} Voc\^e projeta a camada de toler\^ancia de um controlador de voo. O perfil de faltas esperado tem tr\^es componentes: (a) faltas f\'isicas transientes por radia\c{c}\~ao; (b) faltas de desenvolvimento evasivas, ativadas por combina\c{c}\~oes raras de estado e carga; (c) faltas de desenvolvimento \textbf{s\'olidas} no algoritmo de controle.\\
+    Escolha, para cada componente, entre \textbf{replica\c{c}\~ao de canais id\^enticos com retorno} e \textbf{diversidade de projeto com compara\c{c}\~ao}. Justifique pela \S5.2.2 e discuta o custo em termos de cobertura.
+\end{frame}
+
+\begin{frame}{Exerc\'icios (3/3): hip\'oteses e equil\'ibrio dos meios}
+    \footnotesize
+    \textbf{E7.} Um \textit{cluster} de cinco n\'os replica um servi\c{c}o de estado. O arquiteto prop\~oe adotar hip\'otese de falta bizantina com o protocolo de acordo correspondente. Um colega prop\~oe hip\'otese fail-silent, com detec\c{c}\~ao por \textit{heartbeat} e um protocolo bem mais simples.\\
+    Argumente pelos dois lados usando \textbf{hip\'otese de falta}, \textbf{cobertura de modo de falha} e \textbf{complexidade}. Diga o que voc\^e decidiria e \textbf{sob que condi\c{c}\~ao} mudaria de ideia.
+    \medskip
+    \textbf{E8.} Liste as atividades de qualidade de um projeto que voc\^e conhe\c{c}a e classifique cada uma:
+    \begin{enumerate}
+        \item em um dos \textbf{quatro meios} (\S2.4);
+        \item nos \textbf{dois eixos} da Fig.\ 21 (provis\~ao ou an\'alise; evita\c{c}\~ao ou aceita\c{c}\~ao).
+    \end{enumerate}
+    Depois responda: \textbf{(a)} h\'a algum quadrante vazio? \textbf{(b)} o que a \S5.5 diz sobre a consequ\^encia de deixar um quadrante vazio?
+    \medskip
+    \begin{ancora}
+        \scriptsize
+        Em E1, E3 e E7 h\'a mais de uma resposta defens\'avel. O que se avalia \'e a \textbf{justificativa pela taxonomia}, n\~ao a coincid\^encia com um gabarito. Em E1, registre tamb\'em a diverg\^encia entre a \S3.2.4 e a Fig.\ 6 quanto \`a inten\c{c}\~ao das faltas maliciosas.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{O que fica}
+    \footnotesize
+    \begin{enumerate}
+        \item \textbf{Falha \'e desvio do servi\c{c}o em rela\c{c}\~ao \`a fun\c{c}\~ao}, n\~ao em rela\c{c}\~ao ao documento. O documento tamb\'em pode estar errado.
+        \item \textbf{A cadeia atravessa fronteiras}: a falha de um \'e a falta de outro. Toda a taxonomia \'e relativa \`a fronteira que voc\^e desenhou.
+        \item \textbf{Muitos erros nunca viram falha.} Estrutura e comportamento decidem, e parte disso \'e sorte que ningu\'em projetou.
+        \item \textbf{Seguran\c{c}a n\~ao \'e um campo separado}: um ataque \'e uma falta externa maliciosa, e seguran\c{c}a \'e o que sobra dos atributos quando se acrescenta a palavra ``autorizado''.
+        \item \textbf{Voc\^e nunca tolera faltas em abstrato}: tolera uma hip\'otese declarada, e paga em cobertura quando ela \'e falsa.
+        \item \textbf{Os quatro meios s\~ao imperfeitos e se sustentam mutuamente.} Dois fornecem a capacidade, dois fornecem a justificativa.
+    \end{enumerate}
+    \medskip
+    \begin{ancora}
+        \footnotesize
+        A \S1 termina antecipando que novos desafios vir\~ao de forma inesperada, ``talvez como as chamadas propriedades emergentes, como as do computador HAL de \textit{2001: Uma Odisseia no Espa\c{c}o}'', \`a medida que a complexidade dos sistemas homem-m\'aquina que conseguimos construir exceder nossa capacidade de compreend\^e-los. Em 2004, isso era uma nota de rodap\'e.
+    \end{ancora}
+\end{frame}
+
+\begin{frame}{Refer\^encias}
+    \footnotesize
+    \begin{itemize}
+        \item A. \Avz{}, J.-C. Laprie, B. Randell, C. Landwehr. \textit{Basic Concepts and Taxonomy of Dependable and Secure Computing}. IEEE Transactions on Dependable and Secure Computing, v.\ 1, n.\ 1, p.\ 11-33, jan-mar 2004.\\
+        {\scriptsize \url{https://www.landwehr.org/2004-aviz-laprie-randell.pdf}}
+        \medskip
+        \item Refer\^encias internas citadas nesta aula, todas da lista do pr\'oprio artigo:
+        \begin{itemize}
+            \scriptsize
+            \item [3] A. \Avz. \textit{Design of Fault-Tolerant Computers}, 1967.
+            \item [4], [6] \Avz{} et al., sobre programa\c{c}\~ao em N vers\~oes e diversidade de projeto, 1977 e 1984.
+            \item [5] \Avz{} \& He. \textit{Microprocessor Entomology: A Taxonomy of Design Faults in COTS Microprocessors}, 1999.
+            \item [27] Huang et al. \textit{Software Rejuvenation}, 1995.
+            \item [38] Lamport, Shostak \& Pease. \textit{The Byzantine Generals Problem}, 1982.
+            \item [39] Landwehr et al. \textit{A Taxonomy of Computer Program Security Flaws}, 1994.
+            \item [40], [41] Laprie: a s\'intese do FTCS-15 (1985) e o livro \textit{Dependability: Basic Concepts and Terminology} (1992).
+            \item [67] An\'alise da falha completa de desenvolvimento do sistema AAS.
+        \end{itemize}
+    \end{itemize}
+    \medskip
+    \begin{ancora}
+        \scriptsize
+        O ap\^endice do artigo traz um \textbf{\'indice de defini\c{c}\~oes} com a se\c{c}\~ao em que cada termo \'e definido. Use-o como dicion\'ario enquanto l\^e.
+    \end{ancora}
+\end{frame}
+
+\end{document}

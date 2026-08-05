@@ -22,6 +22,10 @@ items:
     pdfPath: "/aulas/css/dependability/03_safety_security_resiliencia/03-safety-security-resiliencia.pdf"
     order: 30
     class: 3
+  - title: "Taxonomia de Dependabilidade e Segurança (Avizienis et al., 2004)"
+    type: "slides"
+    pdfPath: "/aulas/css/dependability/avizienis/taxonomia-dependabilidade.pdf"
+    order: 35
   - title: "Teste de Software"
     type: "slides"
     pdfPath: "/aulas/css/dependability/04_teste_software/04-teste-software.pdf"

@@ -131,6 +131,16 @@
       "order": 30
     },
     {
+      "id": "css-taxonomia-dependabilidade",
+      "title": "Taxonomia de Dependabilidade e Segurança (Avizienis et al., 2004)",
+      "course": "css",
+      "sourceType": "latex",
+      "texDir": "aulas/css/dependability/avizienis",
+      "outputPdfPath": "/aulas/css/dependability/avizienis/taxonomia-dependabilidade.pdf",
+      "classes": [],
+      "order": 35
+    },
+    {
       "id": "css-teste-software",
       "title": "Teste de Software",
       "course": "css",

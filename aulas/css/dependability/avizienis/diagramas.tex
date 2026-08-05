@@ -1,0 +1,630 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% diagramas.tex
+%% Reproducoes em TikZ das figuras de Avizienis, Laprie, Randell &
+%% Landwehr, "Basic Concepts and Taxonomy of Dependable and Secure
+%% Computing", IEEE TDSC 1(1):11-33, 2004.
+%%
+%% Convencao semantica de cor usada em todos os diagramas:
+%%   depVermelho = ameacas (faltas, erros, falhas)
+%%   depVerde    = meios (prevencao, tolerancia, remocao, previsao)
+%%   depAzul     = atributos e definicoes
+%%   depLaranja  = atencao / destaque
+%%   depCinza    = estrutura neutra
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\tikzset{
+  %% caixas
+  nRaiz/.style   = {draw=depCinza!75, fill=black!6,        rounded corners, thick,
+                    align=center, font=\footnotesize\bfseries, inner sep=4pt},
+  nAmeaca/.style = {draw=depVermelho!75, fill=depVermelho!10, rounded corners, thick,
+                    align=center, font=\scriptsize\bfseries, inner sep=3.5pt},
+  nMeio/.style   = {draw=depVerde!70, fill=depVerde!10,    rounded corners, thick,
+                    align=center, font=\scriptsize\bfseries, inner sep=3.5pt},
+  nAtrib/.style  = {draw=depAzul!75, fill=depAzul!10,      rounded corners, thick,
+                    align=center, font=\scriptsize\bfseries, inner sep=3.5pt},
+  nAlerta/.style = {draw=depLaranja!80, fill=depLaranja!12, rounded corners, thick,
+                    align=center, font=\scriptsize\bfseries, inner sep=3.5pt},
+  nNeutro/.style = {draw=depCinza!60, fill=black!4,        rounded corners,
+                    align=center, font=\scriptsize, inner sep=3pt},
+  %% folhas de arvore (texto solto)
+  folha/.style   = {font=\scriptsize, anchor=west, inner sep=1pt},
+  folhaP/.style  = {font=\tiny, anchor=west, inner sep=1pt},
+  %% ligacoes
+  lig/.style     = {draw=depCinza!65, thick},
+  ligF/.style    = {draw=depCinza!55, semithick},
+  seta/.style    = {-{Latex[length=2mm]}, thick, depCinza!75},
+  setaR/.style   = {-{Latex[length=2.4mm]}, very thick, depVermelho!70},
+  rot/.style     = {font=\tiny\itshape, fill=white, inner sep=1pt},
+}
+
+%% Conector "colchete" horizontal usado nas arvores do artigo:
+%% liga um no pai (a direita dele) a uma lista de folhas.
+%% #1 = x do tronco, #2 = y da folha
+\newcommand{\troncoate}[3]{\draw[ligF] (#1,#3) -- (#2,#3);}
+
+% =====================================================================
+% Fig. 2 -- Arvore Dependabilidade e Seguranca
+% =====================================================================
+\newcommand{\diagArvore}{%
+\begin{tikzpicture}[scale=0.95, transform shape]
+  \node[nRaiz] (r) at (0,0) {Dependabilidade\\e Seguran\c{c}a};
+
+  \node[nAtrib]  (at) at (2.9, 2.35) {Atributos};
+  \node[nAmeaca] (am) at (2.9, 0.00) {Amea\c{c}as};
+  \node[nMeio]   (me) at (2.9,-2.35) {Meios};
+
+  \draw[lig] (r.east) -- (2.0,0) ;
+  \draw[lig] (2.0,-2.35) -- (2.0,2.35);
+  \draw[lig] (2.0, 2.35) -- (at.west);
+  \draw[lig] (2.0, 0.00) -- (am.west);
+  \draw[lig] (2.0,-2.35) -- (me.west);
+
+  % atributos
+  \draw[ligF] (4.2,1.10) -- (4.2,3.60);
+  \draw[ligF] (at.east) -- (4.2,2.35);
+  \foreach \i/\t in {0/Disponibilidade, 1/Confiabilidade, 2/Seguran\c{c}a f\'isica,
+                     3/Confidencialidade, 4/Integridade, 5/Manutenibilidade}{
+    \draw[ligF] (4.2,{3.60-0.5*\i}) -- (4.45,{3.60-0.5*\i});
+    \node[folha, text=depAzul!85!black] at (4.5,{3.60-0.5*\i}) {\t};
+  }
+
+  % ameacas
+  \draw[ligF] (4.2,-0.5) -- (4.2,0.5);
+  \draw[ligF] (am.east) -- (4.2,0);
+  \foreach \i/\t in {0/Faltas (\textit{faults}), 1/Erros (\textit{errors}), 2/Falhas (\textit{failures})}{
+    \draw[ligF] (4.2,{0.5-0.5*\i}) -- (4.45,{0.5-0.5*\i});
+    \node[folha, text=depVermelho!85!black] at (4.5,{0.5-0.5*\i}) {\t};
+  }
+
+  % meios
+  \draw[ligF] (4.2,-3.10) -- (4.2,-1.60);
+  \draw[ligF] (me.east) -- (4.2,-2.35);
+  \foreach \i/\t in {0/Preven\c{c}\~ao de faltas, 1/Toler\^ancia a faltas,
+                     2/Remo\c{c}\~ao de faltas, 3/Previs\~ao de faltas}{
+    \draw[ligF] (4.2,{-1.60-0.5*\i}) -- (4.45,{-1.60-0.5*\i});
+    \node[folha, text=depVerde!60!black] at (4.5,{-1.60-0.5*\i}) {\t};
+  }
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 1 + Fig. 14 -- Atributos: dependabilidade x seguranca
+% =====================================================================
+\newcommand{\diagAtributos}{%
+\begin{tikzpicture}[scale=1.0, transform shape]
+  \foreach \i/\t in {0/Disponibilidade, 1/Confiabilidade, 2/Seguran\c{c}a f\'isica,
+                     3/Confidencialidade, 4/Integridade, 5/Manutenibilidade}{
+    \node[font=\footnotesize, anchor=center] (a\i) at (0,{2.50-0.55*\i}) {\t};
+  }
+  % colchete esquerdo: dependabilidade -> todos
+  \draw[thick, depAzul!75] (-2.1,-0.35) -- (-2.1,2.50);
+  \foreach \i in {0,...,5}{
+    \draw[-{Latex[length=1.6mm]}, thick, depAzul!75] (-2.1,{2.50-0.55*\i}) -- ++(0.28,0);
+  }
+  \draw[thick, depAzul!75] (-2.1,1.075) -- (-3.0,1.075);
+  \node[font=\footnotesize\bfseries, text=depAzul!85!black, anchor=east] at (-3.05,1.075) {Dependabilidade};
+
+  % colchete direito: seguranca -> disponibilidade, confidencialidade, integridade
+  \draw[thick, depVermelho!70] (2.1,0.85) -- (2.1,2.50);
+  \foreach \i in {0,3,4}{
+    \draw[{Latex[length=1.6mm]}-, thick, depVermelho!70] (2.1,{2.50-0.55*\i}) -- ++(-0.28,0);
+  }
+  \draw[thick, depVermelho!70] (2.1,1.675) -- (2.75,1.675);
+  \node[font=\tiny\itshape, text=depVermelho!75!black, anchor=south] at (3.5,1.72) {a\c{c}\~oes autorizadas};
+  \draw[thick, depVermelho!70] (2.75,1.675) -- (4.25,1.675);
+  \node[font=\footnotesize\bfseries, text=depVermelho!80!black, anchor=west] at (4.3,1.675) {Seguran\c{c}a};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 11 -- A cadeia fundamental das ameacas
+% =====================================================================
+\newcommand{\diagCadeia}{%
+\resizebox{340pt}{!}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  elo/.style={rounded corners, thick, align=center, font=\footnotesize\bfseries,
+              minimum height=0.95cm, minimum width=1.9cm}]
+  \node[font=\large, text=depCinza] (d0) at (-0.6,0) {$\cdots$};
+  \node[elo, draw=depVermelho!75, fill=depVermelho!12] (f1) at (1.3,0)  {Falta\\{\tiny\itshape fault}};
+  \node[elo, draw=depLaranja!85, fill=depLaranja!14]   (e1) at (4.3,0)  {Erro\\{\tiny\itshape error}};
+  \node[elo, draw=depAzul!75,    fill=depAzul!12]      (h1) at (7.3,0)  {Falha\\{\tiny\itshape failure}};
+  \node[elo, draw=depVermelho!75, fill=depVermelho!12] (f2) at (10.3,0) {Falta\\{\tiny\itshape fault}};
+  \node[font=\large, text=depCinza] (d1) at (11.6,0) {$\cdots$};
+
+  \draw[setaR] (d0) -- (f1);
+  \draw[setaR] (f1) -- node[above, font=\scriptsize\itshape, text=depVermelho!80!black] {ativa\c{c}\~ao} (e1);
+  \draw[setaR] (e1) -- node[above, font=\scriptsize\itshape, text=depVermelho!80!black] {propaga\c{c}\~ao} (h1);
+  \draw[setaR] (h1) -- node[above, font=\scriptsize\itshape, text=depVermelho!80!black] {causa\c{c}\~ao} (f2);
+  \draw[setaR] (f2) -- (d1);
+
+  \node[font=\tiny, text=depCinza, anchor=north, align=center] at (1.3,-0.65)  {causa julgada\\ou hipotetizada};
+  \node[font=\tiny, text=depCinza, anchor=north, align=center] at (4.3,-0.65)  {parte do estado\\total do sistema};
+  \node[font=\tiny, text=depCinza, anchor=north, align=center] at (7.3,-0.65)  {evento na interface\\de servi\c{c}o};
+  \node[font=\tiny, text=depCinza, anchor=north, align=center] at (10.3,-0.65) {para o sistema\\que recebe o servi\c{c}o};
+\end{tikzpicture}}}
+
+% =====================================================================
+% Fig. 10 -- Propagacao de erro entre componentes
+% =====================================================================
+\newcommand{\diagPropagacao}{%
+\resizebox{340pt}{!}{%
+\begin{tikzpicture}[scale=0.92, transform shape,
+  err/.style={circle, draw=depLaranja!85, fill=depLaranja!14, thick,
+              font=\tiny\bfseries, inner sep=1pt, minimum size=0.62cm}]
+  % fronteiras
+  \draw[dashed, depCinza!75, thick] (-0.2,-0.9) rectangle (5.6,1.5);
+  \draw[dashed, depCinza!75, thick] (5.6,-0.9) rectangle (11.4,1.5);
+  \node[font=\scriptsize\bfseries, text=depCinza] at (2.7,1.25) {Componente A};
+  \node[font=\scriptsize\bfseries, text=depCinza] at (8.5,1.25) {Componente B};
+
+  % falta dormente interna e falta externa
+  \node[circle, draw=depVermelho!75, fill=depVermelho!12, thick, font=\tiny\bfseries,
+        align=center, inner sep=0.5pt, minimum size=0.85cm] (fd) at (0.75,0.75)
+        {Falta\\dormente};
+  \node[font=\tiny\bfseries, text=depVermelho!80!black, align=center, anchor=east] (fe) at (-0.35,-0.55) {Falta\\externa};
+
+  \node[err] (e1) at (2.3,0.15) {Erro};
+  \node[err] (e2) at (3.9,0.15) {Erro};
+  \node[err] (e3) at (5.6,0.15) {Erro};
+  \node[err] (e4) at (7.5,0.15) {Erro};
+  \node[err] (e5) at (9.8,0.15) {Erro};
+  \node[err] (e6) at (11.4,0.15) {Erro};
+
+  \draw[setaR] (fd) -- node[above right, font=\tiny\itshape, inner sep=1pt] {ativa\c{c}\~ao} (e1);
+  \draw[setaR] (fe) -- (e1);
+  \draw[-{Latex[length=1.8mm]}, thick, depLaranja!85, dashed] (e1) -- node[above, font=\tiny\itshape] {propaga\c{c}\~ao} (e2);
+  \draw[-{Latex[length=1.8mm]}, thick, depLaranja!85] (e2) -- node[above, font=\tiny\itshape] {propaga\c{c}\~ao} (e3);
+  \draw[-{Latex[length=1.8mm]}, thick, depLaranja!85] (e3) -- node[above, font=\tiny\itshape, align=center] {propaga\c{c}\~ao\\{\tiny externa}} (e4);
+  \draw[-{Latex[length=1.8mm]}, thick, depLaranja!85, dashed] (e4) -- node[above, font=\tiny\itshape] {propaga\c{c}\~ao} (e5);
+  \draw[-{Latex[length=1.8mm]}, thick, depLaranja!85] (e5) -- (e6);
+
+  \node[font=\tiny, text=depCinza, align=center, anchor=south] at (5.6,0.55) {interface\\de servi\c{c}o de A};
+  \node[font=\tiny, text=depCinza, align=center, anchor=south] at (11.4,0.55) {interface\\de servi\c{c}o de B};
+
+  % linhas de tempo
+  \node[font=\tiny\bfseries, text=depCinza, anchor=east, align=right] at (-0.3,-1.6) {servi\c{c}o de A};
+  \draw[thick, depVerde!65] (0.0,-1.6) -- node[above, font=\tiny] {correto} (5.6,-1.6);
+  \draw[-{Latex[length=1.6mm]}, thick, depVermelho!75] (5.6,-1.6) -- (5.6,-1.95);
+  \node[font=\tiny\bfseries, text=depVermelho!80!black, anchor=east] at (5.55,-1.9) {falha};
+  \draw[thick, depVermelho!60] (5.6,-1.95) -- node[below, font=\tiny] {incorreto} (8.4,-1.95);
+
+  \node[font=\tiny\bfseries, text=depCinza, anchor=east, align=right] at (5.3,-2.6) {servi\c{c}o de B};
+  \draw[thick, depVerde!65] (5.6,-2.6) -- node[above, font=\tiny] {correto} (11.4,-2.6);
+  \draw[-{Latex[length=1.6mm]}, thick, depVermelho!75] (11.4,-2.6) -- (11.4,-2.95);
+  \node[font=\tiny\bfseries, text=depVermelho!80!black, anchor=east] at (11.35,-2.9) {falha};
+\end{tikzpicture}}}
+
+% =====================================================================
+% Fig. 4 -- As oito dimensoes de classificacao de faltas
+% =====================================================================
+\newcommand{\diagOitoDimensoes}{%
+\resizebox{340pt}{!}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  dim/.style={draw=depCinza!70, fill=black!5, rounded corners, thick,
+              font=\scriptsize\bfseries, align=center, inner sep=2.5pt,
+              minimum width=2.6cm, minimum height=0.5cm},
+  val/.style={font=\scriptsize, anchor=west, inner sep=1pt}]
+
+  \node[nAmeaca, minimum width=1.6cm] (f) at (-0.2,-2.05) {Faltas\\{\tiny\itshape faults}};
+
+  \foreach \i/\d/\va/\vb in {%
+    0/Fase de cria\c{c}\~ao/desenvolvimento/opera\c{c}\~ao,
+    1/Fronteira do sistema/interna/externa,
+    2/Causa fenomenol\'ogica/natural/humana,
+    3/Dimens\~ao/hardware/software}{
+      \node[dim] (d\i) at (2.0,{-0.55*2*\i}) {\d};
+      \node[val, text=depVermelho!80!black] at (3.45,{-0.55*2*\i+0.26}) {\va};
+      \node[val, text=depVermelho!80!black] at (3.45,{-0.55*2*\i-0.26}) {\vb};
+      \draw[ligF] (d\i.east) -- (3.35,{-0.55*2*\i});
+      \draw[ligF] (3.35,{-0.55*2*\i-0.26}) -- (3.35,{-0.55*2*\i+0.26});
+      \draw[ligF] (3.35,{-0.55*2*\i+0.26}) -- (3.42,{-0.55*2*\i+0.26});
+      \draw[ligF] (3.35,{-0.55*2*\i-0.26}) -- (3.42,{-0.55*2*\i-0.26});
+      \draw[lig] (0.75,{-0.55*2*\i}) -- (d\i.west);
+  }
+  \foreach \i/\d/\va/\vb in {%
+    0/Objetivo/maliciosa/n\~ao maliciosa,
+    1/Inten\c{c}\~ao/deliberada/n\~ao deliberada,
+    2/Capacidade/acidental/por incompet\^encia,
+    3/Persist\^encia/permanente/transiente}{
+      \node[dim] (g\i) at (7.4,{-0.55*2*\i}) {\d};
+      \node[val, text=depVermelho!80!black] at (8.85,{-0.55*2*\i+0.26}) {\va};
+      \node[val, text=depVermelho!80!black] at (8.85,{-0.55*2*\i-0.26}) {\vb};
+      \draw[ligF] (g\i.east) -- (8.75,{-0.55*2*\i});
+      \draw[ligF] (8.75,{-0.55*2*\i-0.26}) -- (8.75,{-0.55*2*\i+0.26});
+      \draw[ligF] (8.75,{-0.55*2*\i+0.26}) -- (8.82,{-0.55*2*\i+0.26});
+      \draw[ligF] (8.75,{-0.55*2*\i-0.26}) -- (8.82,{-0.55*2*\i-0.26});
+      \draw[lig] (6.15,{-0.55*2*\i}) -- (g\i.west);
+  }
+  \draw[lig] (0.75,-3.3) -- (0.75,0);
+  \draw[lig] (6.15,-3.3) -- (6.15,0);
+  \draw[lig] (f.east) -- (0.75,-2.05);
+  \draw[lig] (f.east) -- (0.9,-2.05) -- (0.9,-3.9) -- (6.15,-3.9) -- (6.15,-3.3);
+\end{tikzpicture}}}
+
+% =====================================================================
+% Fig. 5 -- Os tres agrupamentos de faltas, com exemplos
+% =====================================================================
+\newcommand{\diagTresGrupos}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  ex/.style={draw=depCinza!55, fill=white, rounded corners, font=\tiny,
+             align=center, inner sep=2pt}]
+  \begin{scope}[opacity=0.35]
+    \fill[depVermelho!45] (0,0)   ellipse (2.5cm and 1.55cm);
+    \fill[depLaranja!45]  (3.0,0) ellipse (2.5cm and 1.55cm);
+    \fill[depAzul!45]     (6.0,0) ellipse (2.5cm and 1.55cm);
+  \end{scope}
+  \draw[thick, depVermelho!70] (0,0)   ellipse (2.5cm and 1.55cm);
+  \draw[thick, depLaranja!80]  (3.0,0) ellipse (2.5cm and 1.55cm);
+  \draw[thick, depAzul!70]     (6.0,0) ellipse (2.5cm and 1.55cm);
+
+  \node[font=\scriptsize\bfseries, text=depVermelho!80!black] at (-0.7,1.85) {Faltas de desenvolvimento};
+  \node[font=\scriptsize\bfseries, text=depLaranja!75!black]  at (3.0,-1.85) {Faltas f\'isicas};
+  \node[font=\scriptsize\bfseries, text=depAzul!85!black]     at (6.7,1.85)  {Faltas de intera\c{c}\~ao};
+
+  \node[ex] at (-1.25,0.45) {Falhas de\\software};
+  \node[ex] at (-1.25,-0.45) {Bombas\\l\'ogicas};
+  \node[ex] at (0.55,0.55) {\textit{Errata} de\\hardware};
+  \node[ex] at (0.55,-0.55) {Defeitos de\\produ\c{c}\~ao};
+  \node[ex] at (3.0,0.55) {Deteriora\c{c}\~ao\\f\'isica};
+  \node[ex] at (4.45,-0.55) {Interfer\^encia\\f\'isica};
+  \node[ex] at (4.6,0.55) {Tentativas\\de intrus\~ao};
+  \node[ex] at (6.5,0.5) {V\'irus e\\vermes};
+  \node[ex] at (6.5,-0.5) {Erros de\\entrada};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 8 -- Dominio da falha
+% =====================================================================
+\newcommand{\diagDominioFalha}{%
+\begin{tikzpicture}[scale=0.95, transform shape,
+  n1/.style={nRaiz, minimum width=2.2cm},
+  n2/.style={draw=depCinza!70, fill=black!5, rounded corners, thick,
+             font=\scriptsize\bfseries, align=center, inner sep=3pt},
+  n3/.style={nAmeaca, minimum width=1.55cm}]
+  \node[n1] (r) at (4.2,2.3) {Dom\'inio da falha};
+  \node[n2] (c) at (0.7,1.15) {Conte\'udo\\{\tiny(tempo correto)}};
+  \node[n2] (t) at (4.2,1.15) {Tempo\\{\tiny(conte\'udo correto)}};
+  \node[n2] (ct) at (7.8,1.15) {Conte\'udo e tempo};
+  \draw[lig] (r) -- (c); \draw[lig] (r) -- (t); \draw[lig] (r) -- (ct);
+
+  \node[n3] (f1) at (0.7,-0.35)  {Conte\'udo\\{\tiny\itshape content}};
+  \node[n3] (f2) at (2.85,-0.35) {Adiantada\\{\tiny\itshape early timing}};
+  \node[n3] (f3) at (5.0,-0.35)  {Atrasada\\{\tiny\itshape late timing}};
+  \node[n3] (f4) at (7.1,-0.35)  {Parada\\{\tiny\itshape halt}};
+  \node[n3] (f5) at (9.2,-0.35)  {Err\'atica\\{\tiny\itshape erratic}};
+  \draw[lig] (c) -- (f1);
+  \draw[lig] (t) -- (f2); \draw[lig] (t) -- (f3);
+  \draw[lig] (ct) -- (f4); \draw[lig] (ct) -- (f5);
+  \node[font=\tiny, text=depCinza, anchor=north, align=center] at (7.1,-0.95) {caso particular:\\sil\^encio};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 9 -- Modos de falha nos quatro pontos de vista
+% =====================================================================
+\newcommand{\diagModosFalha}{%
+\begin{tikzpicture}[scale=0.95, transform shape]
+  \node[nAmeaca, minimum width=1.7cm] (r) at (0,0) {Falhas\\{\tiny\itshape failures}};
+  \node[nRaiz] (d)  at (2.9, 2.05) {Dom\'inio};
+  \node[nRaiz] (de) at (2.9, 0.35) {Detectabilidade};
+  \node[nRaiz] (co) at (2.9,-0.95) {Consist\^encia};
+  \node[nRaiz] (cq) at (2.9,-2.35) {Consequ\^encias};
+  \draw[lig] (r.east) -- (1.35,0);
+  \draw[lig] (1.35,-2.35) -- (1.35,2.05);
+  \foreach \y in {2.05,0.35,-0.95,-2.35}{\draw[lig] (1.35,\y) -- (2.0,\y);}
+
+  \foreach \i/\t in {0/Falhas de conte\'udo, 1/Falhas de tempo adiantadas,
+                     2/Falhas de tempo atrasadas, 3/Falhas de parada, 4/Falhas err\'aticas}{
+    \draw[ligF] (4.65,{2.85-0.4*\i}) -- (4.9,{2.85-0.4*\i});
+    \node[folha] at (4.95,{2.85-0.4*\i}) {\t};}
+  \draw[ligF] (4.65,1.25) -- (4.65,2.85); \draw[ligF] (d.east) -- (4.65,2.05);
+
+  \foreach \i/\t in {0/Falhas sinalizadas, 1/Falhas n\~ao sinalizadas}{
+    \draw[ligF] (4.65,{0.55-0.4*\i}) -- (4.9,{0.55-0.4*\i});
+    \node[folha] at (4.95,{0.55-0.4*\i}) {\t};}
+  \draw[ligF] (4.65,0.15) -- (4.65,0.55); \draw[ligF] (de.east) -- (4.65,0.35);
+
+  \foreach \i/\t in {0/Falhas consistentes, 1/Falhas inconsistentes (bizantinas)}{
+    \draw[ligF] (4.65,{-0.75-0.4*\i}) -- (4.9,{-0.75-0.4*\i});
+    \node[folha] at (4.95,{-0.75-0.4*\i}) {\t};}
+  \draw[ligF] (4.65,-1.15) -- (4.65,-0.75); \draw[ligF] (co.east) -- (4.65,-0.95);
+
+  \foreach \i/\t in {0/Falhas menores, 1/$\vdots$, 2/Falhas catastr\'oficas}{
+    \draw[ligF] (4.65,{-1.75-0.4*\i}) -- (4.9,{-1.75-0.4*\i});
+    \node[folha] at (4.95,{-1.75-0.4*\i}) {\t};}
+  \draw[ligF] (4.65,-2.55) -- (4.65,-1.75); \draw[ligF] (cq.east) -- (4.65,-2.35);
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 3 -- Formas de manutencao
+% =====================================================================
+\newcommand{\diagManutencao}{%
+\begin{tikzpicture}[scale=0.92, transform shape,
+  cx/.style={draw=depCinza!70, fill=black!5, rounded corners, thick,
+             font=\scriptsize, align=center, inner sep=3pt, text width=2.35cm},
+  fin/.style={nMeio, text width=2.2cm}]
+  \node[nRaiz] (m) at (4.5,2.5) {Manuten\c{c}\~ao};
+  \node[nRaiz] (rp) at (1.9,1.55) {Reparos};
+  \node[nRaiz] (mo) at (7.1,1.55) {Modifica\c{c}\~oes};
+  \draw[lig] (m) -- (rp); \draw[lig] (m) -- (mo);
+
+  \node[cx] (c1) at (0.0,0.35) {remo\c{c}\~ao de faltas reportadas};
+  \node[cx] (c2) at (3.1,0.35) {descoberta e remo\c{c}\~ao de faltas dormentes};
+  \node[cx] (c3) at (6.0,0.35) {ajuste a mudan\c{c}as do ambiente};
+  \node[cx] (c4) at (9.0,0.35) {amplia\c{c}\~ao da fun\c{c}\~ao do sistema};
+  \draw[lig] (rp) -- (c1); \draw[lig] (rp) -- (c2);
+  \draw[lig] (mo) -- (c3); \draw[lig] (mo) -- (c4);
+
+  \node[fin] (f1) at (0.0,-1.0) {Corretiva};
+  \node[fin] (f2) at (3.1,-1.0) {Preventiva};
+  \node[fin] (f3) at (6.0,-1.0) {Adaptativa};
+  \node[fin] (f4) at (9.0,-1.0) {Aumentativa};
+  \foreach \a/\b in {c1/f1,c2/f2,c3/f3,c4/f4}{\draw[lig] (\a) -- (\b);}
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 13 -- Solidas x intermitentes
+% =====================================================================
+\newcommand{\diagSolidoIntermitente}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  cx/.style={draw=depCinza!70, fill=black!5, rounded corners, thick,
+             font=\scriptsize, align=center, inner sep=3.5pt}]
+  \node[cx] (p) at (1.6,1.5) {\textbf{Faltas permanentes}\\{\tiny desenvolvimento, f\'isicas, intera\c{c}\~ao}};
+  \node[cx] (t) at (7.6,1.5) {\textbf{Faltas transientes}\\{\tiny f\'isicas, intera\c{c}\~ao}};
+  \node[cx] (e) at (4.4,0.45) {\textbf{Faltas evasivas}\\{\tiny\itshape elusive}};
+  \node[nAmeaca, minimum width=2.4cm] (s) at (1.0,-0.95) {Faltas s\'olidas\\{\tiny\itshape solid / hard}};
+  \node[nAlerta, minimum width=2.9cm] (i) at (5.9,-0.95) {Faltas intermitentes\\{\tiny\itshape intermittent}};
+
+  \draw[lig] (0.55,0.95) -- (2.65,0.95);
+  \draw[lig] (1.6,1.05) -- (1.6,0.95);
+  \draw[lig] (2.65,0.95) -- (2.65,0.55);
+  \draw[seta] (0.55,0.95) -- (0.55,-0.55);
+  \draw[lig] (2.65,0.55) -- (e.west);
+  \draw[seta, depLaranja!85] (e.south) to[out=-70,in=150] (i.north west);
+  \draw[seta, depLaranja!85] (t.south) to[out=-100,in=40] (i.north east);
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 16 -- Tecnicas de tolerancia a faltas
+% =====================================================================
+\newcommand{\diagTolerancia}{%
+\resizebox{!}{175pt}{%
+\begin{tikzpicture}[scale=0.9, transform shape,
+  n2/.style={nMeio, text width=2.3cm},
+  n3/.style={nMeio, text width=2.1cm},
+  fol/.style={draw=depVerde!55, fill=depVerde!6, rounded corners,
+              font=\tiny, align=left, inner sep=3pt, text width=4.4cm}]
+  \node[nMeio, text width=2.0cm] (ft) at (0,0) {Toler\^ancia\\a faltas};
+  \node[n2] (ed) at (2.9, 2.6)  {Detec\c{c}\~ao de erro};
+  \node[n2] (rc) at (2.9,-1.5)  {Recupera\c{c}\~ao};
+  \draw[lig] (ft.east) -- (1.55,0); \draw[lig] (1.55,-1.5) -- (1.55,2.6);
+  \draw[lig] (1.55,2.6) -- (ed.west); \draw[lig] (1.55,-1.5) -- (rc.west);
+
+  \node[n3] (eh) at (6.2, 0.35) {Tratamento de erro};
+  \node[n3] (fh) at (6.2,-3.15) {Tratamento de falta};
+  \draw[lig] (rc.east) -- (4.9,-1.5); \draw[lig] (4.9,-3.15) -- (4.9,0.35);
+  \draw[lig] (4.9,0.35) -- (eh.west); \draw[lig] (4.9,-3.15) -- (fh.west);
+
+  \node[fol] (l1) at (11.1, 3.05) {\textbf{Concorrente}: durante a entrega normal do servi\c{c}o};
+  \node[fol] (l2) at (11.1, 2.15) {\textbf{Preemptiva}: com a entrega suspensa; procura erros latentes e faltas dormentes};
+  \draw[ligF] (8.8,2.15) -- (8.8,3.05); \draw[ligF] (ed.east) -- (8.8,2.6);
+  \draw[ligF] (8.8,3.05) -- (l1.west); \draw[ligF] (8.8,2.15) -- (l2.west);
+
+  \node[fol] (l3) at (11.1, 1.15) {\textbf{Retorno} (\textit{rollback}): volta a um estado salvo anterior ao erro};
+  \node[fol] (l4) at (11.1, 0.35) {\textbf{Avan\c{c}o} (\textit{rollforward}): o estado sem erros detectados \'e um estado novo};
+  \node[fol] (l5) at (11.1,-0.55) {\textbf{Compensa\c{c}\~ao}: o estado err\^oneo tem redund\^ancia bastante para mascarar o erro};
+  \draw[ligF] (8.8,-0.55) -- (8.8,1.15); \draw[ligF] (eh.east) -- (8.8,0.35);
+  \foreach \n/\y in {l3/1.15,l4/0.35,l5/-0.55}{\draw[ligF] (8.8,\y) -- (\n.west);}
+
+  \node[fol] (l6) at (11.1,-1.75) {\textbf{Diagn\'ostico}: identifica e registra as causas dos erros};
+  \node[fol] (l7) at (11.1,-2.65) {\textbf{Isolamento}: exclui os componentes faltosos, tornando a falta dormente};
+  \node[fol] (l8) at (11.1,-3.55) {\textbf{Reconfigura\c{c}\~ao}: aciona reservas ou reatribui tarefas};
+  \node[fol] (l9) at (11.1,-4.45) {\textbf{Reinicializa\c{c}\~ao}: verifica, atualiza e registra a nova configura\c{c}\~ao};
+  \draw[ligF] (8.8,-4.45) -- (8.8,-1.75); \draw[ligF] (fh.east) -- (8.8,-3.15);
+  \foreach \n/\y in {l6/-1.75,l7/-2.65,l8/-3.55,l9/-4.45}{\draw[ligF] (8.8,\y) -- (\n.west);}
+\end{tikzpicture}}}
+
+% =====================================================================
+% Fig. 17 -- As quatro estrategias de implementacao
+% =====================================================================
+\newcommand{\diagEstrategias}{%
+\begin{tikzpicture}[scale=0.9, transform shape,
+  et/.style={draw=depVerde!65, fill=depVerde!8, rounded corners, thick,
+             font=\tiny\bfseries, align=center, inner sep=2.5pt, minimum width=1.9cm},
+  fl/.style={-{Latex[length=1.6mm]}, semithick, depCinza!75},
+  rl/.style={font=\tiny, text=depCinza, inner sep=1pt}]
+
+  \foreach \k/\x in {0/0, 1/3.3, 2/6.6, 3/9.9}{
+    \draw[depCinza!35] ({\x-0.15},-4.35) -- ({\x-0.15},1.1);
+  }
+
+  % coluna 1: backward recovery
+  \node[et] (a1) at (1.4,0.6)  {Detec\c{c}\~ao de erro};
+  \node[et] (a2) at (1.4,-0.6) {Retorno};
+  \node[et] (a3) at (1.4,-2.6) {Tratamento de falta};
+  \draw[fl] (a1) -- (a2); \draw[fl] (a2) -- (a3);
+  \node[rl, anchor=west] at (1.55,-1.35) {falta intermitente};
+  \node[rl, anchor=west] at (1.55,-1.95) {falta s\'olida};
+  \draw[fl] (a3) -- (1.4,-3.9);
+  \node[rl, anchor=north] at (1.4,-3.95) {continua\c{c}\~ao};
+  \node[font=\scriptsize\bfseries, text=depVerde!55!black] at (1.4,-4.6) {Retorno};
+
+  % coluna 2
+  \node[et] (b1) at (4.7,0.6)  {Detec\c{c}\~ao de erro};
+  \node[et] (b2) at (4.7,-0.6) {Compensa\c{c}\~ao};
+  \node[et] (b3) at (4.7,-2.6) {Tratamento de falta};
+  \draw[fl] (b1) -- (b2); \draw[fl] (b2) -- (b3);
+  \draw[fl] (b3) -- (4.7,-3.9);
+  \node[font=\scriptsize\bfseries, text=depVerde!55!black] at (4.7,-4.6) {Avan\c{c}o total};
+
+  % coluna 3
+  \node[et] (c1) at (8.0,0.6)  {Detec\c{c}\~ao de erro};
+  \node[et] (c2) at (8.0,-0.6) {Avan\c{c}o};
+  \node[et] (c3) at (8.0,-2.6) {Tratamento de falta};
+  \draw[fl] (c1) -- (c2); \draw[fl] (c2) -- (c3);
+  \draw[fl] (c3) -- (8.0,-3.9);
+  \node[font=\scriptsize\bfseries, text=depVerde!55!black] at (8.0,-4.6) {Avan\c{c}o parcial};
+
+  % coluna 4
+  \node[et] (d0) at (11.3,1.0)  {Compensa\c{c}\~ao};
+  \node[et] (d1) at (11.3,-0.2) {Detec\c{c}\~ao de erro};
+  \node[et] (d2) at (11.3,-1.4) {Tratamento de falta};
+  \draw[fl] (d0) -- (d1); \draw[fl] (d1) -- (d2);
+  \draw[fl] (d2) -- (11.3,-3.9);
+  \node[font=\scriptsize\bfseries, text=depVerde!55!black, align=center] at (11.3,-4.6) {Mascaramento\\e recupera\c{c}\~ao};
+
+  \node[font=\scriptsize\bfseries, text=depCinza] at (4.7,1.35) {Detec\c{c}\~ao e recupera\c{c}\~ao};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 18 -- Cobertura da tolerancia a faltas
+% =====================================================================
+\newcommand{\diagCobertura}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  cb/.style={draw=depVerde!65, fill=depVerde!8, rounded corners, thick,
+             font=\scriptsize, align=center, inner sep=3.5pt}]
+  \node[cb] (r) at (4.5,1.7) {\textbf{Cobertura da toler\^ancia a faltas}};
+  \node[cb] (a) at (1.5,0.4) {Cobertura de tratamento\\de erro e de falta};
+  \node[cb] (b) at (6.9,0.4) {Cobertura da\\hip\'otese de falta};
+  \draw[lig] (r) -- (a); \draw[lig] (r) -- (b);
+  \node[cb] (c) at (5.0,-1.1) {Cobertura de\\modo de falha};
+  \node[cb] (d) at (8.9,-1.1) {Cobertura de\\independ\^encia de falha};
+  \draw[lig] (b) -- (c); \draw[lig] (b) -- (d);
+  \node[font=\tiny, text=depCinza, align=center, anchor=north, text width=3.1cm] at (1.5,-0.15)
+       {faltas nos pr\'oprios mecanismos de toler\^ancia};
+  \node[font=\tiny, text=depCinza, align=center, anchor=north, text width=3.0cm] at (5.0,-1.7)
+       {o componente falho n\~ao se comporta como suposto};
+  \node[font=\tiny, text=depCinza, align=center, anchor=north, text width=3.2cm] at (8.9,-1.7)
+       {h\'a falha de modo comum onde se supunha independ\^encia};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 19 -- Abordagens de verificacao
+% =====================================================================
+\newcommand{\diagVerificacao}{%
+\begin{tikzpicture}[scale=0.95, transform shape,
+  vb/.style={draw=depVerde!65, fill=depVerde!8, rounded corners, thick,
+             font=\scriptsize\bfseries, align=center, inner sep=3.5pt},
+  vl/.style={font=\tiny\itshape, text=depCinza}]
+  \node[nRaiz] (v) at (4.6,2.5) {Verifica\c{c}\~ao};
+  \node[vb] (e) at (1.7,1.2) {Verifica\c{c}\~ao est\'atica};
+  \node[vb] (d) at (7.5,1.2) {Verifica\c{c}\~ao din\^amica};
+  \draw[lig] (v) -- node[vl, above left, pos=0.55] {sistema n\~ao executado} (e);
+  \draw[lig] (v) -- node[vl, above right, pos=0.55] {sistema executado} (d);
+
+  \node[vb] (a1) at (0.0,-0.5) {An\'alise\\est\'atica};
+  \node[vb] (a2) at (2.2,-0.5) {Prova de\\teoremas};
+  \node[vb] (a3) at (4.3,-0.5) {Verifica\c{c}\~ao\\de modelos};
+  \node[vb] (a4) at (6.6,-0.5) {Execu\c{c}\~ao\\simb\'olica};
+  \node[vb] (a5) at (8.7,-0.5) {Teste};
+  \draw[lig] (e) -- (a1); \draw[lig] (e) -- (a2); \draw[lig] (e) -- (a3);
+  \draw[lig] (d) -- (a4); \draw[lig] (d) -- (a5);
+  \node[vl, anchor=north] at (1.1,-1.15) {sobre o sistema};
+  \node[vl, anchor=north] at (4.3,-1.15) {sobre um modelo};
+  \node[vl, anchor=north] at (6.6,-1.15) {entradas simb\'olicas};
+  \node[vl, anchor=north] at (8.7,-1.15) {entradas reais};
+\end{tikzpicture}}
+
+% =====================================================================
+% Fig. 21 -- Agrupamentos dos meios
+% =====================================================================
+\newcommand{\diagMeiosAgrupados}{%
+\resizebox{340pt}{!}{%
+\begin{tikzpicture}[scale=1.0, transform shape,
+  pt/.style={circle, fill=depCinza!85, inner sep=1.6pt}]
+  \node[nMeio, text width=1.8cm] (r) at (-0.3,-1.05) {Meios para dependabilidade e seguran\c{c}a};
+  \foreach \i/\t in {0/Preven\c{c}\~ao de faltas, 1/Toler\^ancia a faltas,
+                     2/Remo\c{c}\~ao de faltas, 3/Previs\~ao de faltas}{
+    \node[font=\scriptsize, anchor=west] at (1.5,{-0.7*\i}) {\t};
+    \draw[ligF] (3.55,{-0.7*\i}) -- (10.3,{-0.7*\i});
+    \draw[ligF] (1.35,{-0.7*\i}) -- (1.45,{-0.7*\i});
+  }
+  \draw[lig] (1.2,-2.1) -- (1.2,0); \draw[lig] (r.east) -- (1.2,-1.05);
+  \foreach \i in {0,...,3}{\draw[ligF] (1.2,{-0.7*\i}) -- (1.35,{-0.7*\i});}
+
+  \draw[thick, depVerde!65] (3.9,-2.5) rectangle (7.3,1.15);
+  \node[font=\tiny\bfseries, text=depVerde!55!black, align=center] at (4.75,0.85) {Provis\~ao de\\dependabilidade};
+  \node[font=\tiny\bfseries, text=depVerde!55!black, align=center] at (6.45,0.85) {An\'alise de\\dependabilidade};
+  \draw[ligF] (4.75,-2.4) -- (4.75,0.45); \draw[ligF] (6.45,-2.4) -- (6.45,0.45);
+  \node[pt] at (4.75,0) {};    \node[pt] at (4.75,-0.7) {};
+  \node[pt] at (6.45,-1.4) {}; \node[pt] at (6.45,-2.1) {};
+
+  \draw[thick, depAzul!65] (7.9,-2.5) rectangle (11.2,1.15);
+  \node[font=\tiny\bfseries, text=depAzul!80!black, align=center] at (8.7,0.85)  {Evita\c{c}\~ao\\de faltas};
+  \node[font=\tiny\bfseries, text=depAzul!80!black, align=center] at (10.3,0.85) {Aceita\c{c}\~ao\\de faltas};
+  \draw[ligF] (8.7,-2.4) -- (8.7,0.45); \draw[ligF] (10.3,-2.4) -- (10.3,0.45);
+  \node[pt] at (8.7,0) {};     \node[pt] at (8.7,-1.4) {};
+  \node[pt] at (10.3,-0.7) {}; \node[pt] at (10.3,-2.1) {};
+\end{tikzpicture}}}
+
+% =====================================================================
+% Fig. 22 -- Arvore refinada
+% =====================================================================
+\newcommand{\diagArvoreRefinada}{%
+\resizebox{!}{215pt}{%
+\begin{tikzpicture}[scale=0.86, transform shape,
+  cat/.style={rounded corners, thick, align=center, font=\scriptsize\bfseries, inner sep=3pt},
+  sub/.style={font=\scriptsize, anchor=west, inner sep=1pt},
+  ssub/.style={font=\tiny, anchor=west, inner sep=1pt}]
+
+  \node[nRaiz, text width=1.5cm] (r) at (0,-1.2) {Dependabilidade e Seguran\c{c}a};
+  \node[cat, draw=depAzul!75, fill=depAzul!10]      (at) at (2.2, 3.2)  {Atributos};
+  \node[cat, draw=depVermelho!75, fill=depVermelho!10](am) at (2.2, 0.4)  {Amea\c{c}as};
+  \node[cat, draw=depVerde!70, fill=depVerde!10]    (me) at (2.2,-4.6) {Meios};
+  \draw[lig] (r.east) -- (1.35,-1.2); \draw[lig] (1.35,-4.6) -- (1.35,3.2);
+  \foreach \n/\y in {at/3.2, am/0.4, me/-4.6}{\draw[lig] (1.35,\y) -- (\n.west);}
+
+  % Atributos
+  \draw[ligF] (3.2,1.95) -- (3.2,4.45); \draw[ligF] (at.east) -- (3.2,3.2);
+  \foreach \i/\t in {0/Disponibilidade, 1/Confiabilidade, 2/Seguran\c{c}a f\'isica,
+                     3/Confidencialidade, 4/Integridade, 5/Manutenibilidade}{
+    \draw[ligF] (3.2,{4.45-0.5*\i}) -- (3.4,{4.45-0.5*\i});
+    \node[sub, text=depAzul!85!black] at (3.45,{4.45-0.5*\i}) {\t};}
+
+  % Ameacas
+  \draw[ligF] (3.2,-0.6) -- (3.2,1.4); \draw[ligF] (am.east) -- (3.2,0.4);
+  \node[sub, text=depVermelho!85!black] at (3.45,1.4)  {Faltas};
+  \node[sub, text=depVermelho!85!black] at (3.45,0.4)  {Erros};
+  \node[sub, text=depVermelho!85!black] at (3.45,-0.6) {Falhas};
+  \foreach \y in {1.4,0.4,-0.6}{\draw[ligF] (3.2,\y) -- (3.4,\y);}
+  \draw[ligF] (5.2,1.0) -- (5.2,1.8); \draw[ligF] (4.65,1.4) -- (5.2,1.4);
+  \foreach \i/\t in {0/de desenvolvimento, 1/f\'isicas, 2/de intera\c{c}\~ao}{
+    \draw[ligF] (5.2,{1.8-0.4*\i}) -- (5.35,{1.8-0.4*\i});
+    \node[ssub] at (5.4,{1.8-0.4*\i}) {\t};}
+  \draw[ligF] (5.2,-1.0) -- (5.2,-0.2); \draw[ligF] (4.7,-0.6) -- (5.2,-0.6);
+  \foreach \i/\t in {0/de servi\c{c}o, 1/de desenvolvimento, 2/de dependabilidade}{
+    \draw[ligF] (5.2,{-0.2-0.4*\i}) -- (5.35,{-0.2-0.4*\i});
+    \node[ssub] at (5.4,{-0.2-0.4*\i}) {\t};}
+
+  % Meios
+  \draw[ligF] (3.2,-6.4) -- (3.2,-2.8); \draw[ligF] (me.east) -- (3.2,-4.6);
+  \foreach \i/\t in {0/Preven\c{c}\~ao de faltas, 1/Toler\^ancia a faltas,
+                     2/Remo\c{c}\~ao de faltas, 3/Previs\~ao de faltas}{
+    \draw[ligF] (3.2,{-2.8-1.2*\i}) -- (3.4,{-2.8-1.2*\i});
+    \node[sub, text=depVerde!55!black] at (3.45,{-2.8-1.2*\i}) {\t};}
+
+  % tolerancia
+  \draw[ligF] (6.2,-4.4) -- (6.2,-3.6); \draw[ligF] (5.7,-4.0) -- (6.2,-4.0);
+  \node[ssub] at (6.3,-3.6) {Detec\c{c}\~ao de erro};
+  \node[ssub] at (6.3,-4.4) {Recupera\c{c}\~ao};
+  \foreach \y in {-3.6,-4.4}{\draw[ligF] (6.2,\y) -- (6.28,\y);}
+  \draw[ligF] (8.9,-3.8) -- (8.9,-3.4); \draw[ligF] (8.35,-3.6) -- (8.9,-3.6);
+  \node[ssub] at (8.95,-3.4) {concorrente};
+  \node[ssub] at (8.95,-3.8) {preemptiva};
+  \draw[ligF] (8.9,-4.6) -- (8.9,-4.2); \draw[ligF] (7.85,-4.4) -- (8.9,-4.4);
+  \node[ssub] at (8.95,-4.2) {tratamento de erro};
+  \node[ssub] at (8.95,-4.6) {tratamento de falta};
+
+  % remocao
+  \draw[ligF] (6.2,-5.8) -- (6.2,-4.6); \draw[ligF] (5.6,-5.2) -- (6.2,-5.2);
+  \foreach \i/\t in {0/Verifica\c{c}\~ao, 1/Diagn\'ostico, 2/Corre\c{c}\~ao, 3/N\~ao regress\~ao}{
+    \draw[ligF] (6.2,{-4.6-0.4*\i}) -- (6.28,{-4.6-0.4*\i});
+    \node[ssub] at (6.3,{-4.6-0.4*\i}) {\t};}
+  \draw[ligF] (8.9,-4.8) -- (8.9,-4.4); \draw[ligF] (7.6,-4.6) -- (8.9,-4.6);
+
+  % previsao
+  \draw[ligF] (6.2,-7.0) -- (6.2,-6.6); \draw[ligF] (5.55,-6.8) -- (6.2,-6.8);
+  \node[ssub] at (6.3,-6.6) {Avalia\c{c}\~ao ordinal};
+  \node[ssub] at (6.3,-7.0) {Avalia\c{c}\~ao probabil\'istica};
+  \foreach \y in {-6.6,-7.0}{\draw[ligF] (6.2,\y) -- (6.28,\y);}
+  \draw[ligF] (9.4,-7.2) -- (9.4,-6.8); \draw[ligF] (8.9,-7.0) -- (9.4,-7.0);
+  \node[ssub] at (9.45,-6.8) {modelagem};
+  \node[ssub] at (9.45,-7.2) {teste operacional};
+\end{tikzpicture}}}
