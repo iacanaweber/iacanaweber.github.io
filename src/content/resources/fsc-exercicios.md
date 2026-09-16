@@ -9,7 +9,7 @@ items:
     class: 4
   - title: "Exercícios: Portas Lógicas"
     type: "pdf"
-    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/main.pdf"
+    pdfPath: "/aulas/fsc/02-PortasLogicas/exercicios/exercicios-portas-logicas.pdf"
     order: 140
     class: 6
 ---

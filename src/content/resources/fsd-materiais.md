@@ -1,4 +1,10 @@
 ---
+# ═══════════════════════════════════════════════════════════════════
+# ARQUIVO GERADO por scripts/sync-slides.mjs a partir de config/slides.json.
+# NÃO EDITE À MÃO — qualquer alteração é sobrescrita no próximo slides:sync
+# (que roda no hook de pre-commit). Itens manuais vão em *-exercicios.md
+# ou *-extra.md.
+# ═══════════════════════════════════════════════════════════════════
 course: "fsd"
 column: "materiais"
 items:

@@ -630,48 +630,52 @@ O RSA está tipicamente exposto a estes vetores de ataque analíticos.
 
 \end{frame}
 
-\section{Exercícios}
-
-\begin{frame}{Exercício: Parâmetros RSA}
-
-\textbf{1.} Sejam os primos $p=41$ e $q=17$ dados como parâmetros de configuração para o RSA.
-\vspace{1em}
-\begin{enumerate}
-    \item Qual dos parâmetros $e_1 = 32, e_2 = 49$ é um expoente RSA válido? Justifique sua escolha.
-    \vspace{1em}
-    \item Calcule a private key $k_{pr} = (p,q,d)$ correspondente. Use o algoritmo de Euclides estendido para a inversão e mostre cada passo do cálculo.
-\end{enumerate}
-
-\end{frame}
-
-\begin{frame}{Exercício: Exponenciação Modular com Square-and-Multiply}
-
-\textbf{2.} A computação eficiente da exponenciação modular é fundamental para o uso prático do RSA. 
-Calcule as seguintes exponenciações $x^e \pmod m$ usando o algoritmo de elevação ao quadrado e multiplicação:
-\vspace{1em}
-\begin{enumerate}
-    \item $x=2, e=79, m=101$
-    \item $x=3, e=197, m=101$
-    \item $x=5, e=54, m=151$
-    \item $x=8, e=127, m=151$
-\end{enumerate}
-\vspace{1em}
-Após cada passo de iteração, mostre o expoente do resultado intermediário em notação binária.
-
-\end{frame}
-
-
-\begin{frame}{Exercício: Criptografia e Decriptografia RSA}
-
-\textbf{3.} Cifre e decifre utilizando o algoritmo RSA com os seguintes parâmetros de sistema:
-\vspace{1em}
-\begin{enumerate}
-    \item $p = 3; \quad q = 11; \quad d = 7; \quad x = 5$
-    \item $p = 5; \quad q = 11; \quad e = 3; \quad x = 9$
-\end{enumerate}
-\vspace{1em}
-Utilize apenas uma calculadora simples.
-
-\end{frame}
-
+% ─────────────────────────────────────────────────────────────────
+% Exercícios comentados: não entram na versão distribuída dos slides.
+% Para reexibi-los, remova o prefixo "% " das linhas abaixo.
+% ─────────────────────────────────────────────────────────────────
+% \section{Exercícios}
+%
+% \begin{frame}{Exercício: Parâmetros RSA}
+%
+% \textbf{1.} Sejam os primos $p=41$ e $q=17$ dados como parâmetros de configuração para o RSA.
+% \vspace{1em}
+% \begin{enumerate}
+%     \item Qual dos parâmetros $e_1 = 32, e_2 = 49$ é um expoente RSA válido? Justifique sua escolha.
+%     \vspace{1em}
+%     \item Calcule a private key $k_{pr} = (p,q,d)$ correspondente. Use o algoritmo de Euclides estendido para a inversão e mostre cada passo do cálculo.
+% \end{enumerate}
+%
+% \end{frame}
+%
+% \begin{frame}{Exercício: Exponenciação Modular com Square-and-Multiply}
+%
+% \textbf{2.} A computação eficiente da exponenciação modular é fundamental para o uso prático do RSA. 
+% Calcule as seguintes exponenciações $x^e \pmod m$ usando o algoritmo de elevação ao quadrado e multiplicação:
+% \vspace{1em}
+% \begin{enumerate}
+%     \item $x=2, e=79, m=101$
+%     \item $x=3, e=197, m=101$
+%     \item $x=5, e=54, m=151$
+%     \item $x=8, e=127, m=151$
+% \end{enumerate}
+% \vspace{1em}
+% Após cada passo de iteração, mostre o expoente do resultado intermediário em notação binária.
+%
+% \end{frame}
+%
+%
+% \begin{frame}{Exercício: Criptografia e Decriptografia RSA}
+%
+% \textbf{3.} Cifre e decifre utilizando o algoritmo RSA com os seguintes parâmetros de sistema:
+% \vspace{1em}
+% \begin{enumerate}
+%     \item $p = 3; \quad q = 11; \quad d = 7; \quad x = 5$
+%     \item $p = 5; \quad q = 11; \quad e = 3; \quad x = 9$
+% \end{enumerate}
+% \vspace{1em}
+% Utilize apenas uma calculadora simples.
+%
+% \end{frame}
+%
 \end{document}

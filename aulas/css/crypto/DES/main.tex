@@ -685,52 +685,56 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Exercícios}
-
-\begin{frame}
-    \frametitle{Exercício: Não-linearidade das S-Boxes}
-
-    Conforme apresentado, uma propriedade importante que garante a segurança do DES é que as S-Boxes são não-lineares. Neste exercício, verificamos essa propriedade computando a saída da \( S_1 \) para alguns pares de entradas.
-
-    Mostre que:
-    \[
-        S_1(x_1) \oplus S_1(x_2) \neq S_1(x_1 \oplus x_2)
-    \]
-    onde "\(\oplus\)" denota o XOR bit a bit, para os seguintes casos:
-
-    \begin{enumerate}
-        \item \( x_1 = 000000,\ x_2 = 000001 \)
-        \item \( x_1 = 111111,\ x_2 = 100000 \)
-        \item \( x_1 = 101010,\ x_2 = 010101 \)
-    \end{enumerate}
-
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.5\linewidth]{SBOX_S1.png}\\
-        \vspace{-0.3em}
-        S-BOX $S_1$
-    \end{figure}
-
-
-\end{frame}
-
-
-
-\begin{frame}
-    \frametitle{Exercícios: Primeira Rodada do DES}
-
-    \begin{enumerate}
-        \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por zeros?
-        \vspace{0.5cm}
-        \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por uns?
-    \end{enumerate}
-
-    \vspace{0.5cm}
-    \textit{Dica: considere o efeito das permutações iniciais, expansão, XOR com a chave e as S-Boxes.}
-\end{frame}
-
-
-
-
-
+% ─────────────────────────────────────────────────────────────────
+% Exercícios comentados: não entram na versão distribuída dos slides.
+% Para reexibi-los, remova o prefixo "% " das linhas abaixo.
+% ─────────────────────────────────────────────────────────────────
+% \section{Exercícios}
+%
+% \begin{frame}
+%     \frametitle{Exercício: Não-linearidade das S-Boxes}
+%
+%     Conforme apresentado, uma propriedade importante que garante a segurança do DES é que as S-Boxes são não-lineares. Neste exercício, verificamos essa propriedade computando a saída da \( S_1 \) para alguns pares de entradas.
+%
+%     Mostre que:
+%     \[
+%         S_1(x_1) \oplus S_1(x_2) \neq S_1(x_1 \oplus x_2)
+%     \]
+%     onde "\(\oplus\)" denota o XOR bit a bit, para os seguintes casos:
+%
+%     \begin{enumerate}
+%         \item \( x_1 = 000000,\ x_2 = 000001 \)
+%         \item \( x_1 = 111111,\ x_2 = 100000 \)
+%         \item \( x_1 = 101010,\ x_2 = 010101 \)
+%     \end{enumerate}
+%
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.5\linewidth]{SBOX_S1.png}\\
+%         \vspace{-0.3em}
+%         S-BOX $S_1$
+%     \end{figure}
+%
+%
+% \end{frame}
+%
+%
+%
+% \begin{frame}
+%     \frametitle{Exercícios: Primeira Rodada do DES}
+%
+%     \begin{enumerate}
+%         \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por zeros?
+%         \vspace{0.5cm}
+%         \item Qual é a saída da \textbf{primeira rodada} do algoritmo DES quando o texto claro e a chave são ambos compostos apenas por uns?
+%     \end{enumerate}
+%
+%     \vspace{0.5cm}
+%     \textit{Dica: considere o efeito das permutações iniciais, expansão, XOR com a chave e as S-Boxes.}
+% \end{frame}
+%
+%
+%
+%
+%
 \end{document}

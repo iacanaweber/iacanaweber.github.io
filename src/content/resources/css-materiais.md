@@ -1,4 +1,10 @@
 ---
+# ═══════════════════════════════════════════════════════════════════
+# ARQUIVO GERADO por scripts/sync-slides.mjs a partir de config/slides.json.
+# NÃO EDITE À MÃO — qualquer alteração é sobrescrita no próximo slides:sync
+# (que roda no hook de pre-commit). Itens manuais vão em *-exercicios.md
+# ou *-extra.md.
+# ═══════════════════════════════════════════════════════════════════
 course: "css"
 column: "materiais"
 items:
@@ -33,7 +39,7 @@ items:
     class: 5
   - title: "Exercício: Problema dos Triângulos"
     type: "slides"
-    pdfPath: "/aulas/css/dependability/04_teste_software/exercicio-triangulos/main.pdf"
+    pdfPath: "/aulas/css/dependability/04_teste_software/exercicio-triangulos/exercicio-triangulos.pdf"
     order: 41
   - title: "Teste de Caixa Preta"
     type: "slides"
@@ -52,12 +58,12 @@ items:
     class: 7
   - title: "Trabalho Prático: Teste Funcional"
     type: "slides"
-    pdfPath: "/aulas/css/dependability/07_trabalho_teste_funcional/main.pdf"
+    pdfPath: "/aulas/css/dependability/07_trabalho_teste_funcional/07-trabalho-teste-funcional.pdf"
     order: 70
     class: 8
   - title: "Exercícios: Dependabilidade e Teste de Software"
     type: "slides"
-    pdfPath: "/aulas/css/dependability/08_exercicios_dependabilidade_teste/main.pdf"
+    pdfPath: "/aulas/css/dependability/08_exercicios_dependabilidade_teste/08-exercicios-dependabilidade-teste.pdf"
     order: 80
   - title: "Introdução à Criptografia"
     type: "slides"
@@ -71,7 +77,8 @@ items:
     class: "11-12"
   - title: "Exercícios: Cifras de Fluxo"
     type: "slides"
-    pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/main.pdf"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/cifras-de-fluxo-exercicios.pdf"
+    solutionPdfPath: "/aulas/css/crypto/Cifras_de_Fluxo/exercicios/cifras-de-fluxo-exercicios-gabarito.pdf"
     order: 111
   - title: "AES"
     type: "slides"
@@ -85,7 +92,8 @@ items:
     class: "15-16"
   - title: "Exercícios: Cifras de Bloco"
     type: "slides"
-    pdfPath: "/aulas/css/crypto/Cifras_de_Bloco/exercicios/main.pdf"
+    pdfPath: "/aulas/css/crypto/Cifras_de_Bloco/exercicios/cifras-de-bloco-exercicios.pdf"
+    solutionPdfPath: "/aulas/css/crypto/Cifras_de_Bloco/exercicios/cifras-de-bloco-exercicios-gabarito.pdf"
     order: 151
   - title: "Criptossistema RSA"
     type: "slides"
@@ -104,7 +112,7 @@ items:
     class: 24
   - title: "Trabalho Prático: Logaritmo Discreto"
     type: "slides"
-    pdfPath: "/aulas/css/crypto/Discrete_Logarithm_Lab/main.pdf"
+    pdfPath: "/aulas/css/crypto/Discrete_Logarithm_Lab/logaritmo-discreto-lab.pdf"
     order: 211
   - title: "Assinatura Digital"
     type: "slides"
@@ -133,7 +141,8 @@ items:
     class: 33
   - title: "Exercícios: Criptografia de Chave Pública (RSA, DH, DLP)"
     type: "slides"
-    pdfPath: "/aulas/css/crypto/Chave_Publica/exercicios/main.pdf"
+    pdfPath: "/aulas/css/crypto/Chave_Publica/exercicios/rsa-dh-dlp-exercicios.pdf"
+    solutionPdfPath: "/aulas/css/crypto/Chave_Publica/exercicios/rsa-dh-dlp-exercicios-gabarito.pdf"
     order: 331
   - title: "DES"
     type: "slides"

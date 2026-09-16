@@ -330,60 +330,64 @@
     \end{itemize}
 \end{frame}
 
-\section{Exercícios}
-
-\begin{frame}{Exercício 1: Cálculo de Chaves DHKE}
-    Calcule as duas chaves públicas e a chave conjunta $k_{AB}$ para o esquema DHKE com os parâmetros $p=467, \alpha=2$, e os seguintes pares de chaves privadas $(a,b)$:
-
-    \begin{itemize}
-        \item $a=3, b=5$
-        \item $a=400, b=134$
-        \item $a=228, b=57$
-    \end{itemize}
-        
-    \vspace{1em}
-
-    Em todos os casos, realize o cálculo da chave conjunta tanto do ponto de vista de Alice quanto de Bob. Isso servirá como uma verificação dos seus resultados.
-\end{frame}
-
-\begin{frame}{Exercício 2: Chaves Privadas no DHKE}
-    \small
-    No protocolo DHKE, as chaves privadas são escolhidas do conjunto
-    \[ \{2, \ldots, p-2\} \]
-    \vspace{1em}
-    Por que os valores 1 e $p-1$ são excluídos? Descreva a fraqueza desses dois valores.
-\end{frame}
-
-\begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
-    \small
-    A exclusão dos valores 1 e $p-1$ para chaves privadas no protocolo Diffie-Hellman (DHKE) é crucial para a segurança. Vejamos as fraquezas associadas a cada um:
-
-    \vspace{1em}
-    \textbf{Caso 1: Chave Privada $a=1$}
-    \begin{itemize}
-        \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=1$, sua chave pública se torna:
-        \[ A = \alpha^a \pmod p = \alpha^1 \pmod p = \alpha \pmod p \]
-        \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
-        \[ K_{AB} = B^a \pmod p = B^1 \pmod p = B \pmod p \]
-        \item \textbf{Fraqueza:} A chave conjunta é simplesmente a chave pública de Bob ($B$). Se um invasor (Oscar) interceptar $B$ (que é transmitido publicamente), ele conhecerá diretamente a chave secreta $K_{AB}$. Alice não adiciona nenhuma entropia ou segurança à chave.
-    \end{itemize}
-
-\end{frame}
-
-\begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
-    
-    \textbf{Caso 2: Chave Privada $a=p-1$}
-    \begin{itemize}
-        \item \textbf{Contexto (Pequeno Teorema de Fermat):} Se $p$ é um número primo, então para qualquer inteiro $\alpha$ não divisível por $p$, temos $\alpha^{p-1} \equiv 1 \pmod p$.
-        \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=p-1$, sua chave pública se torna:
-        \[ A = \alpha^a \pmod p = \alpha^{p-1} \pmod p \equiv 1 \pmod p \]
-        \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
-        \[ K_{AB} = B^a \pmod p = B^{p-1} \pmod p \]
-        Considerando que $B = \alpha^b \pmod p$ e $B \not\equiv 0 \pmod p$, então $B^{p-1} \equiv 1 \pmod p$.
-        \[ K_{AB} \equiv 1 \pmod p \]
-        \item \textbf{Fraqueza:} A chave conjunta resultante é sempre 1. Uma chave secreta de valor 1 é trivial, previsível e não oferece segurança alguma.
-    \end{itemize}
-
-\end{frame}
-
+% ─────────────────────────────────────────────────────────────────
+% Exercícios comentados: não entram na versão distribuída dos slides.
+% Para reexibi-los, remova o prefixo "% " das linhas abaixo.
+% ─────────────────────────────────────────────────────────────────
+% \section{Exercícios}
+%
+% \begin{frame}{Exercício 1: Cálculo de Chaves DHKE}
+%     Calcule as duas chaves públicas e a chave conjunta $k_{AB}$ para o esquema DHKE com os parâmetros $p=467, \alpha=2$, e os seguintes pares de chaves privadas $(a,b)$:
+%
+%     \begin{itemize}
+%         \item $a=3, b=5$
+%         \item $a=400, b=134$
+%         \item $a=228, b=57$
+%     \end{itemize}
+%         
+%     \vspace{1em}
+%
+%     Em todos os casos, realize o cálculo da chave conjunta tanto do ponto de vista de Alice quanto de Bob. Isso servirá como uma verificação dos seus resultados.
+% \end{frame}
+%
+% \begin{frame}{Exercício 2: Chaves Privadas no DHKE}
+%     \small
+%     No protocolo DHKE, as chaves privadas são escolhidas do conjunto
+%     \[ \{2, \ldots, p-2\} \]
+%     \vspace{1em}
+%     Por que os valores 1 e $p-1$ são excluídos? Descreva a fraqueza desses dois valores.
+% \end{frame}
+%
+% \begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
+%     \small
+%     A exclusão dos valores 1 e $p-1$ para chaves privadas no protocolo Diffie-Hellman (DHKE) é crucial para a segurança. Vejamos as fraquezas associadas a cada um:
+%
+%     \vspace{1em}
+%     \textbf{Caso 1: Chave Privada $a=1$}
+%     \begin{itemize}
+%         \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=1$, sua chave pública se torna:
+%         \[ A = \alpha^a \pmod p = \alpha^1 \pmod p = \alpha \pmod p \]
+%         \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
+%         \[ K_{AB} = B^a \pmod p = B^1 \pmod p = B \pmod p \]
+%         \item \textbf{Fraqueza:} A chave conjunta é simplesmente a chave pública de Bob ($B$). Se um invasor (Oscar) interceptar $B$ (que é transmitido publicamente), ele conhecerá diretamente a chave secreta $K_{AB}$. Alice não adiciona nenhuma entropia ou segurança à chave.
+%     \end{itemize}
+%
+% \end{frame}
+%
+% \begin{frame}{Explicação: Fraqueza das Chaves Privadas 1 e $p-1$}
+%     
+%     \textbf{Caso 2: Chave Privada $a=p-1$}
+%     \begin{itemize}
+%         \item \textbf{Contexto (Pequeno Teorema de Fermat):} Se $p$ é um número primo, então para qualquer inteiro $\alpha$ não divisível por $p$, temos $\alpha^{p-1} \equiv 1 \pmod p$.
+%         \item \textbf{Chave Pública de Alice ($A$):} Se Alice escolhe $a=p-1$, sua chave pública se torna:
+%         \[ A = \alpha^a \pmod p = \alpha^{p-1} \pmod p \equiv 1 \pmod p \]
+%         \item \textbf{Chave Conjunta ($K_{AB}$):} A chave conjunta calculada por Alice seria:
+%         \[ K_{AB} = B^a \pmod p = B^{p-1} \pmod p \]
+%         Considerando que $B = \alpha^b \pmod p$ e $B \not\equiv 0 \pmod p$, então $B^{p-1} \equiv 1 \pmod p$.
+%         \[ K_{AB} \equiv 1 \pmod p \]
+%         \item \textbf{Fraqueza:} A chave conjunta resultante é sempre 1. Uma chave secreta de valor 1 é trivial, previsível e não oferece segurança alguma.
+%     \end{itemize}
+%
+% \end{frame}
+%
 \end{document}

@@ -641,76 +641,80 @@
     \end{table}
 \end{frame}
 
-\section{Exercícios}
-
-\begin{frame}{Exercício: Serviços de Segurança}
-    \textbf{1)} Neste problema, consideramos alguns aspectos básicos dos serviços de segurança. Justifique todas as suas respostas.
-
-    \begin{enumerate}
-        \item Afirma-se que a autenticação do remetente (ou da mensagem) sempre implica em integridade dos dados. Por quê? A recíproca é verdadeira, ou seja, a integridade dos dados sempre implica em autenticação do remetente?
-        \vspace{1em}
-        \item A confidencialidade sempre garante a integridade?
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}{Solução: Serviços de Segurança}
-    \begin{enumerate}
-        \item \textbf{Autenticação implica em Integridade, mas o contrário não é verdadeiro.}
-        \begin{itemize}
-            \item \textbf{Por que sim?} A autenticação cria um ``selo'' criptográfico (MAC ou assinatura) que depende da chave secreta do remetente \textbf{e} do conteúdo exato da mensagem. Se a mensagem for alterada, o selo se quebra e a verificação falha, garantindo assim a integridade.
-            \item \textbf{Por que não o contrário?} Um mecanismo de integridade puro (como um Checksum/CRC) não usa segredos. Qualquer um, incluindo um invasor, pode criar um checksum válido para uma mensagem adulterada. Portanto, ele não prova quem enviou a mensagem.
-        \end{itemize}
-        \item \textbf{Não, confidencialidade não garante integridade.}
-        \begin{itemize}
-            \item A confidencialidade esconde o conteúdo da mensagem, mas não impede que ela seja alterada. Um invasor pode interceptar um texto cifrado e modificar alguns de seus bits. O destinatário, ao decifrar, obterá um texto simples corrompido e sem sentido, mas não terá um mecanismo para detectar que a alteração ocorreu. Alguns modos de operação de cifras de bloco (como o CBC) são vulneráveis a ataques de ``bit-flipping'' que exploram exatamente isso.
-        \end{itemize}
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}{Exercício: Esquema de Assinatura RSA}
-    \textbf{2)} Neste problema, analisamos o esquema de assinatura RSA.
-
-    \begin{enumerate}
-        \item Calcule a assinatura RSA para a mensagem $x = 1234$ e o módulo $n = 11111$. Escolha o menor valor possível para o expoente $e$.
-        \vspace{1em}
-        \item Qual é o benefício de escolher um expoente público $e$ pequeno? Justifique sua resposta!
-    \end{enumerate}
-\end{frame}
-
-\begin{frame}{Solução: Esquema de Assinatura RSA}
-    \scriptsize
-    \textbf{Cálculo da Assinatura RSA:}
-    \begin{itemize}
-        \item \textbf{Passo 1: Fatorar $n$ e calcular $\phi(n)$.} \\
-        $n = 11111 = 41 \cdot 271$. Ambos são primos. \\
-        $\phi(n) = (p-1)(q-1) = (40)(270) = 10800$.
-        \item \textbf{Passo 2: Encontrar o menor expoente $e$.} \\
-        $e$ deve ser um primo relativo a $\phi(n) = 10800$. O menor inteiro $e > 1$ que não divide $10800$ é $e=7$.
-        \item \textbf{Passo 3: Calcular a chave privada $d$.} \\
-        $d \equiv e^{-1} \pmod{\phi(n)} \rightarrow d \equiv 7^{-1} \pmod{10800}$. \\
-        Usando o Algoritmo Estendido de Euclides, encontramos $d = 1543$.
-        \item \textbf{Passo 4: Assinar a mensagem.} \\
-        A assinatura $s$ é calculada como $s \equiv x^d \pmod n$. \\
-        $s \equiv 1234^{1543} \pmod{11111}$. \\
-        Calculando a exponenciação modular, obtemos $s = 8182$.
-    \end{itemize}
-        
-    \textbf{Benefício de um expoente $e$ pequeno:}
-    \begin{itemize}
-        \item A principal vantagem é a \textbf{eficiência na verificação da assinatura}. A verificação requer o cálculo de $s^e \pmod n$. Se $e$ for um número pequeno (como 3, 7 ou 65537), esta exponenciação é extremamente rápida, pois envolve poucas multiplicações. Isso é ideal para dispositivos com pouca capacidade de processamento (como smart cards) ou para servidores que precisam verificar milhares de assinaturas por segundo.
-    \end{itemize}
-\end{frame}
-
-\begin{frame}{Exercício: Verificação de Assinaturas RSA}
-    \textbf{3)} Dado um esquema de assinatura RSA com a chave pública $(n = 9797, e = 131)$, quais das seguintes assinaturas são válidas?
-
-    \begin{itemize}
-        \item 1. $(x = 123, \text{sig}(x) = 6292)$
-        \vspace{1em}
-        \item 2. $(x = 4333, \text{sig}(x) = 4768)$
-        \vspace{1em}
-        \item 3. $(x = 4333, \text{sig}(x) = 1424)$
-    \end{itemize}
-\end{frame}
-
+% ─────────────────────────────────────────────────────────────────
+% Exercícios comentados: não entram na versão distribuída dos slides.
+% Para reexibi-los, remova o prefixo "% " das linhas abaixo.
+% ─────────────────────────────────────────────────────────────────
+% \section{Exercícios}
+%
+% \begin{frame}{Exercício: Serviços de Segurança}
+%     \textbf{1)} Neste problema, consideramos alguns aspectos básicos dos serviços de segurança. Justifique todas as suas respostas.
+%
+%     \begin{enumerate}
+%         \item Afirma-se que a autenticação do remetente (ou da mensagem) sempre implica em integridade dos dados. Por quê? A recíproca é verdadeira, ou seja, a integridade dos dados sempre implica em autenticação do remetente?
+%         \vspace{1em}
+%         \item A confidencialidade sempre garante a integridade?
+%     \end{enumerate}
+% \end{frame}
+%
+% \begin{frame}{Solução: Serviços de Segurança}
+%     \begin{enumerate}
+%         \item \textbf{Autenticação implica em Integridade, mas o contrário não é verdadeiro.}
+%         \begin{itemize}
+%             \item \textbf{Por que sim?} A autenticação cria um ``selo'' criptográfico (MAC ou assinatura) que depende da chave secreta do remetente \textbf{e} do conteúdo exato da mensagem. Se a mensagem for alterada, o selo se quebra e a verificação falha, garantindo assim a integridade.
+%             \item \textbf{Por que não o contrário?} Um mecanismo de integridade puro (como um Checksum/CRC) não usa segredos. Qualquer um, incluindo um invasor, pode criar um checksum válido para uma mensagem adulterada. Portanto, ele não prova quem enviou a mensagem.
+%         \end{itemize}
+%         \item \textbf{Não, confidencialidade não garante integridade.}
+%         \begin{itemize}
+%             \item A confidencialidade esconde o conteúdo da mensagem, mas não impede que ela seja alterada. Um invasor pode interceptar um texto cifrado e modificar alguns de seus bits. O destinatário, ao decifrar, obterá um texto simples corrompido e sem sentido, mas não terá um mecanismo para detectar que a alteração ocorreu. Alguns modos de operação de cifras de bloco (como o CBC) são vulneráveis a ataques de ``bit-flipping'' que exploram exatamente isso.
+%         \end{itemize}
+%     \end{enumerate}
+% \end{frame}
+%
+% \begin{frame}{Exercício: Esquema de Assinatura RSA}
+%     \textbf{2)} Neste problema, analisamos o esquema de assinatura RSA.
+%
+%     \begin{enumerate}
+%         \item Calcule a assinatura RSA para a mensagem $x = 1234$ e o módulo $n = 11111$. Escolha o menor valor possível para o expoente $e$.
+%         \vspace{1em}
+%         \item Qual é o benefício de escolher um expoente público $e$ pequeno? Justifique sua resposta!
+%     \end{enumerate}
+% \end{frame}
+%
+% \begin{frame}{Solução: Esquema de Assinatura RSA}
+%     \scriptsize
+%     \textbf{Cálculo da Assinatura RSA:}
+%     \begin{itemize}
+%         \item \textbf{Passo 1: Fatorar $n$ e calcular $\phi(n)$.} \\
+%         $n = 11111 = 41 \cdot 271$. Ambos são primos. \\
+%         $\phi(n) = (p-1)(q-1) = (40)(270) = 10800$.
+%         \item \textbf{Passo 2: Encontrar o menor expoente $e$.} \\
+%         $e$ deve ser um primo relativo a $\phi(n) = 10800$. O menor inteiro $e > 1$ que não divide $10800$ é $e=7$.
+%         \item \textbf{Passo 3: Calcular a chave privada $d$.} \\
+%         $d \equiv e^{-1} \pmod{\phi(n)} \rightarrow d \equiv 7^{-1} \pmod{10800}$. \\
+%         Usando o Algoritmo Estendido de Euclides, encontramos $d = 1543$.
+%         \item \textbf{Passo 4: Assinar a mensagem.} \\
+%         A assinatura $s$ é calculada como $s \equiv x^d \pmod n$. \\
+%         $s \equiv 1234^{1543} \pmod{11111}$. \\
+%         Calculando a exponenciação modular, obtemos $s = 8182$.
+%     \end{itemize}
+%         
+%     \textbf{Benefício de um expoente $e$ pequeno:}
+%     \begin{itemize}
+%         \item A principal vantagem é a \textbf{eficiência na verificação da assinatura}. A verificação requer o cálculo de $s^e \pmod n$. Se $e$ for um número pequeno (como 3, 7 ou 65537), esta exponenciação é extremamente rápida, pois envolve poucas multiplicações. Isso é ideal para dispositivos com pouca capacidade de processamento (como smart cards) ou para servidores que precisam verificar milhares de assinaturas por segundo.
+%     \end{itemize}
+% \end{frame}
+%
+% \begin{frame}{Exercício: Verificação de Assinaturas RSA}
+%     \textbf{3)} Dado um esquema de assinatura RSA com a chave pública $(n = 9797, e = 131)$, quais das seguintes assinaturas são válidas?
+%
+%     \begin{itemize}
+%         \item 1. $(x = 123, \text{sig}(x) = 6292)$
+%         \vspace{1em}
+%         \item 2. $(x = 4333, \text{sig}(x) = 4768)$
+%         \vspace{1em}
+%         \item 3. $(x = 4333, \text{sig}(x) = 1424)$
+%     \end{itemize}
+% \end{frame}
+%
 \end{document}
