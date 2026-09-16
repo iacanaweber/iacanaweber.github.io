@@ -2,6 +2,8 @@ AGENTS.md
 node_modules/
 dist/
 .astro/
+# Gerenciado por scripts/publish-assets.mjs (cópia allowlist de aulas/)
+public/aulas/
 .DS_Store
 *.swp
 *.swo
@@ -40,3 +42,6 @@ __pycache__/
 *.lof
 *.lot
 *.lol
+
+# Paper de terceiros (não redistribuir neste repositório público)
+aulas/css/dependability/avizienis/2004-aviz-laprie-randell.pdf

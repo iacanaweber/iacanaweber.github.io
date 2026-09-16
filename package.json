@@ -6,9 +6,13 @@
   "scripts": {
     "slides:sync": "node scripts/sync-slides.mjs",
     "slides:precommit": "node scripts/pre-commit-slides.mjs",
+    "publish-assets": "node scripts/publish-assets.mjs",
     "prepare": "node scripts/setup-git-hooks.mjs",
+    "predev": "node scripts/publish-assets.mjs",
     "dev": "astro dev",
+    "prebuild": "node scripts/publish-assets.mjs",
     "build": "astro build && npx pagefind --site dist",
+    "prebuild:ci": "node scripts/publish-assets.mjs",
     "build:ci": "astro build && npx pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"

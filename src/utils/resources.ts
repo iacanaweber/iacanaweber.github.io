@@ -8,6 +8,8 @@ export type FlatResource = {
     type: 'book' | 'tool' | 'link' | 'video' | 'slides' | 'pdf' | 'other';
     url?: string;
     pdfPath?: string;
+    solutionPdfPath?: string;
+    solutionUrl?: string;
     class?: number | string;
     column?: 'materiais' | 'exercicios' | 'extra';
     description?: string;
@@ -30,6 +32,8 @@ export function flattenResources(entries: CollectionEntry<'resources'>[]): FlatR
             type: item.type,
             url: item.url,
             pdfPath: item.pdfPath,
+            solutionPdfPath: item.solutionPdfPath,
+            solutionUrl: item.solutionUrl,
             class: item.class,
             column: item.column ?? entry.data.column,
             description: item.description,
@@ -49,6 +53,8 @@ export function flattenResources(entries: CollectionEntry<'resources'>[]): FlatR
         type: entry.data.type,
         url: entry.data.url,
         pdfPath: entry.data.pdfPath,
+        solutionPdfPath: entry.data.solutionPdfPath,
+        solutionUrl: entry.data.solutionUrl,
         class: entry.data.class,
         column: entry.data.column,
         description: entry.data.description,

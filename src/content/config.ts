@@ -35,6 +35,15 @@ const resourceItem = z.object({
   /** Path to a local file in public/ (e.g. "/courses/css/slides-01.pdf"). */
   pdfPath: z.string().optional(),
   /**
+   * Gabarito/solucionário vinculado a este item (ex.: lista de exercícios).
+   * Renderizado como badge "Gabarito" acoplado ao link do item.
+   * Convenção do pipeline: main_gabarito.tex ao lado do main.tex da lista é
+   * compilado pelo slides:sync para "<outputPdfPath sem .pdf>-gabarito.pdf".
+   */
+  solutionPdfPath: z.string().optional(),
+  /** Gabarito hospedado fora do site (ex.: link externo). */
+  solutionUrl: z.string().optional(),
+  /**
    * Class number this resource belongs to. If set, appears in the schedule table.
    * Use a number for a single class (e.g. 5) or a string range (e.g. "5-6") to span rows.
    */

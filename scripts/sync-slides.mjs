@@ -38,11 +38,11 @@ function commandExists(command) {
   return !result.error;
 }
 
-function runPdflatex(texDir, outDir) {
+function runPdflatex(texDir, outDir, texFile = 'main.tex') {
   for (let i = 0; i < 2; i += 1) {
     const result = spawnSync(
       'pdflatex',
-      ['-interaction=nonstopmode', '-halt-on-error', `-output-directory=${outDir}`, 'main.tex'],
+      ['-interaction=nonstopmode', '-halt-on-error', `-output-directory=${outDir}`, texFile],
       { cwd: texDir, stdio: 'pipe', encoding: 'utf8' }
     );
     if (result.status !== 0) {
@@ -53,10 +53,18 @@ function runPdflatex(texDir, outDir) {
       const message = errorLine
         ? `${errorLine.replace(/^!\s*/, '')}${sourceLine ? ` (${sourceLine})` : ''}`
         : `pdflatex failed with exit code ${result.status}`;
-      const logPath = join(outDir, 'main.log');
-      throw new Error(`LaTeX compile error in ${texDir}/main.tex: ${message}. See ${logPath}`);
+      const logPath = join(outDir, texFile.replace(/\.tex$/, '.log'));
+      throw new Error(`LaTeX compile error in ${texDir}/${texFile}: ${message}. See ${logPath}`);
     }
   }
+}
+
+/**
+ * Deriva o path do PDF de gabarito a partir do outputPdfPath da lista:
+ * ".../cifras-de-fluxo-exercicios.pdf" → ".../cifras-de-fluxo-exercicios-gabarito.pdf".
+ */
+function gabaritoPdfPathFor(outputPdfPath) {
+  return outputPdfPath.replace(/\.pdf$/i, '-gabarito.pdf');
 }
 
 function verifyLatexEnvironment() {
@@ -252,6 +260,10 @@ function addGeneratedItem(groupedItems, slide, classValue, suffixIndex) {
     pdfPath: slide.outputPdfPath,
     order: slide.order + suffixIndex,
   };
+  // Gabarito descoberto por convenção: main_gabarito.tex ao lado do main.tex.
+  if (slide.texDir && existsSync(join(repoRoot, slide.texDir, 'main_gabarito.tex'))) {
+    item.solutionPdfPath = gabaritoPdfPathFor(slide.outputPdfPath);
+  }
   if (classValue != null) item.class = classValue;
   group.items.push(item);
 }
@@ -263,6 +275,12 @@ function writeGroupedMarkdown(groupedItems) {
 
     const lines = [
       '---',
+      '# ═══════════════════════════════════════════════════════════════════',
+      '# ARQUIVO GERADO por scripts/sync-slides.mjs a partir de config/slides.json.',
+      '# NÃO EDITE À MÃO — qualquer alteração é sobrescrita no próximo slides:sync',
+      '# (que roda no hook de pre-commit). Itens manuais vão em *-exercicios.md',
+      '# ou *-extra.md.',
+      '# ═══════════════════════════════════════════════════════════════════',
       `course: ${yamlQuote(group.course)}`,
       `column: ${yamlQuote(group.column)}`,
       'items:',
@@ -272,6 +290,9 @@ function writeGroupedMarkdown(groupedItems) {
       lines.push(`  - title: ${yamlQuote(item.title)}`);
       lines.push(`    type: ${yamlQuote(item.type)}`);
       lines.push(`    pdfPath: ${yamlQuote(item.pdfPath)}`);
+      if (item.solutionPdfPath) {
+        lines.push(`    solutionPdfPath: ${yamlQuote(item.solutionPdfPath)}`);
+      }
       lines.push(`    order: ${item.order}`);
       if (item.class != null) {
         if (typeof item.class === 'number') {
@@ -315,13 +336,15 @@ function main() {
     assert(slide.title, `Slide ${slide.id} is missing title`);
     assert(typeof slide.course === 'undefined' || typeof slide.course === 'string', `Slide ${slide.id} has invalid course`);
     assert(
-      typeof slide.outputPdfPath === 'string' && slide.outputPdfPath.startsWith('/'),
-      `Slide ${slide.id} is missing valid outputPdfPath`
+      typeof slide.outputPdfPath === 'string' && slide.outputPdfPath.startsWith('/aulas/'),
+      `Slide ${slide.id} is missing valid outputPdfPath (must start with /aulas/)`
     );
     assert(Number.isFinite(slide.order), `Slide ${slide.id} has invalid order`);
     assert(sourceType === 'latex' || sourceType === 'pptx', `Slide ${slide.id} has invalid sourceType`);
 
-    const finalPdfPath = join(repoRoot, 'public', slide.outputPdfPath.replace(/^\/+/, ''));
+    // Os PDFs compilados vivem na árvore de fontes (aulas/) e são versionados;
+    // scripts/publish-assets.mjs copia para public/aulas/ na hora do build.
+    const finalPdfPath = join(repoRoot, slide.outputPdfPath.replace(/^\/+/, ''));
     ensureDirectory(dirname(finalPdfPath));
 
     if (sourceType === 'latex') {
@@ -330,17 +353,30 @@ function main() {
       const texMain = join(texDir, 'main.tex');
       assert(existsSync(texMain), `Missing TeX source: ${texMain}`);
 
-      if (needsLatexRebuild(texDir, finalPdfPath)) {
-        const buildOutDir = join(texBuildRoot, slide.id);
-        cleanupDirectory(buildOutDir);
-        runPdflatex(texDir, buildOutDir);
+      const targets = [{ texFile: 'main.tex', finalPath: finalPdfPath, label: slide.id }];
+      // Gabarito é cidadão do pipeline: main_gabarito.tex ao lado do main.tex
+      // é compilado junto, para <outputPdfPath sem .pdf>-gabarito.pdf.
+      if (existsSync(join(texDir, 'main_gabarito.tex'))) {
+        targets.push({
+          texFile: 'main_gabarito.tex',
+          finalPath: join(repoRoot, gabaritoPdfPathFor(slide.outputPdfPath).replace(/^\/+/, '')),
+          label: `${slide.id} (gabarito)`,
+        });
+      }
 
-        const producedPdf = join(buildOutDir, 'main.pdf');
-        assert(existsSync(producedPdf), `PDF was not produced for ${slide.id}`);
-        copyFileSync(producedPdf, finalPdfPath);
-        compiledCount += 1;
-      } else {
-        skippedCount += 1;
+      for (const target of targets) {
+        if (needsLatexRebuild(texDir, target.finalPath)) {
+          const buildOutDir = join(texBuildRoot, `${slide.id}${target.texFile === 'main.tex' ? '' : '--gabarito'}`);
+          cleanupDirectory(buildOutDir);
+          runPdflatex(texDir, buildOutDir, target.texFile);
+
+          const producedPdf = join(buildOutDir, target.texFile.replace(/\.tex$/, '.pdf'));
+          assert(existsSync(producedPdf), `PDF was not produced for ${target.label}`);
+          copyFileSync(producedPdf, target.finalPath);
+          compiledCount += 1;
+        } else {
+          skippedCount += 1;
+        }
       }
     } else {
       assert(slide.pptxPath, `Slide ${slide.id} is missing pptxPath`);

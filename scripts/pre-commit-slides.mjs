@@ -70,11 +70,29 @@ function ensureSourcesAreMapped(staged) {
   }
 }
 
+const EXAM_PATH_PATTERN = /(^|[/_\-.])(prova|provas|g1|g2)([/_\-.]|$)/i;
+
+function blockExamMaterial(staged) {
+  const examFiles = staged.filter(
+    file => file.startsWith('aulas/') && EXAM_PATH_PATTERN.test(file)
+  );
+  if (examFiles.length > 0) {
+    console.error('[pre-commit] BLOQUEADO: material com cara de prova num repositório PÚBLICO:');
+    for (const file of examFiles) console.error(`  - ${file}`);
+    console.error('[pre-commit] Política: prova nunca entra neste repositório (qualquer coisa');
+    console.error('[pre-commit] commitada é visível no GitHub). Guarde provas fora daqui.');
+    console.error('[pre-commit] Falso positivo? Renomeie o arquivo ou use git commit --no-verify.');
+    process.exit(1);
+  }
+}
+
 function main() {
   const staged = run('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR'])
     .split('\n')
     .map(line => line.trim())
     .filter(Boolean);
+
+  blockExamMaterial(staged);
 
   const shouldCompile = staged.some(hasCompileTrigger);
   if (!shouldCompile) {
@@ -93,16 +111,22 @@ function main() {
     process.exit(sync.status ?? 1);
   }
 
+  // Stagea os artefatos que o sync realmente produz: os .md gerados e os PDFs
+  // compilados dentro de aulas/ (o caminho antigo, public/assets/pdfs, só
+  // contém publicações e nunca recebia os slides — era por isso que "esquecer
+  // o git add" publicava PDF desatualizado). PDFs cobertos pelo .gitignore
+  // (ex.: material de terceiros) são pulados: git add neles falharia e
+  // derrubaria o commit inteiro.
   const addGenerated = spawnSync(
     'bash',
-    ['-lc', 'git add public/assets/pdfs src/content/resources/*-materiais.md'],
+    ['-lc', "git add src/content/resources/*-materiais.md && find aulas -name '*.pdf' -print0 | while IFS= read -r -d '' pdf; do git check-ignore -q \"$pdf\" || git add -- \"$pdf\"; done"],
     { stdio: 'inherit', encoding: 'utf8' }
   );
   if (addGenerated.status !== 0) {
     process.exit(addGenerated.status ?? 1);
   }
 
-  console.log('[pre-commit] Added generated PDFs/resources to commit.');
+  console.log('[pre-commit] Added generated resources and compiled PDFs (aulas/**.pdf) to commit.');
 }
 
 main();
