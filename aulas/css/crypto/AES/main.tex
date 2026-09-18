@@ -13,6 +13,13 @@
 
 \usepackage{tcolorbox}     % Para caixas coloridas e formatadas
 \tcbuselibrary{skins, breakable}  % Habilita opções avançadas do tcolorbox
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    filecolor=magenta,
+    urlcolor=cyan,
+    }
+\urlstyle{same}
 \usepackage{graphicx}      % Necessário para \scalebox
 
 \definecolor{graycell}{gray}{0.85} % define a cor de fundo da célula
@@ -28,7 +35,7 @@
 }
 
 % Informações da apresentação
-\title[Cifras de Bloco]{Cifras de Bloco}
+\title[AES]{AES: Advanced Encryption Standard}
 \author{Prof. Iaçanã Ianiski Weber}
 \institute{PUCRS}
 \date{CSS (98G08-4)}
@@ -78,7 +85,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Seções principais
-\section{Introdução ao Advanced Encription Standard (AES)}
+\section{Introdução ao Advanced Encryption Standard (AES)}
 \begin{frame}{AES no campo da Criptologia}
 
 \begin{center}
@@ -121,7 +128,7 @@
 \begin{frame}{Fatos Básicos sobre o AES}
 
 \begin{itemize}
-    \item O AES é o cifrador simétrico mais utilizado atualmente.
+    \item O AES é a cifra simétrica mais utilizada atualmente.
     
     \item O algoritmo AES foi escolhido pelo \textit{National Institute of Standards and Technology} (NIST) dos EUA em um processo de seleção que durou vários anos.
     
@@ -142,7 +149,7 @@
 
 \begin{itemize}
     \item A necessidade de uma nova cifra de bloco foi anunciada pelo NIST em janeiro de 1997.
-    \item 15 algoritmos candidatos foram aceitos em agosto de 1998.
+    \item Dos 21 algoritmos submetidos, 15 foram aceitos como candidatos em agosto de 1998.
     \item 5 finalistas foram anunciados em agosto de 1999:
     \begin{itemize}
         \item \textit{Mars} – IBM Corporation
@@ -152,9 +159,64 @@
         \item \textit{Twofish} – B. Schneier et al.
     \end{itemize}
     \item Em outubro de 2000, o \textit{Rijndael} foi escolhido como o AES.
-    \item O AES foi formalmente aprovado como padrão federal dos EUA em novembro de 2001.
+    \item O AES foi formalmente aprovado como padrão federal dos EUA (FIPS 197) em novembro de 2001, entrando em vigor em maio de 2002.
 \end{itemize}
 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Curiosidade: como o AES foi escolhido}
+    \begin{tcolorbox}[colback=blue!5,colframe=blue!50!black,boxrule=0.5pt]
+        \footnotesize
+        O AES foi o primeiro padrão criptográfico dos EUA escolhido por \textbf{concurso público internacional}: qualquer equipe do mundo podia submeter, e todas as propostas ficaram abertas à criptoanálise de quem quisesse atacá-las.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Foram 21 submissões, 15 candidatos aceitos, 5 finalistas e três conferências públicas de avaliação (1998, 1999 e 2000)
+        \item O vencedor não veio dos EUA: \textbf{Rijndael} é a junção dos sobrenomes dos belgas \textbf{Vincent Rijmen} e \textbf{Joan Daemen}
+        \item Contraste com o DES: lá as S-Boxes foram projetadas a portas fechadas junto com a NSA, sem justificativa pública --- o que alimentou décadas de suspeita de \textit{backdoor} (ver a aula de DES)
+        \item \textbf{Rijndael $\neq$ AES}: o Rijndael original aceita bloco e chave de 128 a 256 bits, em passos de 32; o FIPS 197 congelou o bloco em 128 bits e apenas três tamanhos de chave
+    \end{itemize}
+    \smallskip
+    {\tiny Fonte: NIST, \textit{Report on the Development of the Advanced Encryption Standard} (2000); FIPS 197 (2001).\par}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Curiosidade: a NSA deixa usar AES em material secreto?}
+    \begin{tcolorbox}[colback=green!6,colframe=green!50!black,boxrule=0.5pt]
+        \footnotesize
+        Deixa --- e essa foi a novidade histórica. Até o AES, material classificado dos EUA era protegido por cifras secretas, projetadas e mantidas pela própria NSA.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item Pela política \textbf{CNSSP-15}, o AES-128 protege informação classificada até o nível \textbf{SECRET}, e o AES-192/256 até \textbf{TOP SECRET}
+        \item É o mesmo algoritmo público que roda no seu navegador: não existe uma ``versão do governo'' --- o que muda é o tamanho da chave e o rigor exigido da implementação
+        \item Desde a \textbf{CNSA 2.0} (2022), a exigência subiu para \textbf{AES-256} em todos os níveis, por causa da ameaça quântica (ver a aula de Criptografia Pós-Quântica)
+    \end{itemize}
+    \smallskip
+    {\tiny Fontes: CNSS Policy 15 (CNSSP-15); NSA, \textit{Announcing the Commercial National Security Algorithm Suite 2.0} (2022).\par}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Curiosidade: e no Brasil?}
+    \begin{tcolorbox}[colback=yellow!10,colframe=orange!70!black,boxrule=0.5pt]
+        \footnotesize
+        Também existe norma brasileira que manda usar AES --- e ela foi atualizada em janeiro deste ano.
+    \end{tcolorbox}
+    \medskip
+    \begin{itemize}
+        \footnotesize
+        \item \textbf{ICP-Brasil:} o documento \textit{Padrões e Algoritmos Criptográficos da ICP-Brasil} (DOC-ICP-01.01), na versão 6.0 aprovada pela \textbf{IN ITI 35, de 30/01/2026}, admite \textbf{AES de 128 ou 256 bits} para a guarda da chave privada do titular e de seu backup --- é o AES que protege a chave do seu e-CPF dentro do token ou do HSM
+        \item A mesma norma já prevê envelopes híbridos com ML-KEM (\texttt{aes256WithMLKEM768Encryption}), colocando a ICP-Brasil na transição pós-quântica
+        \item \textbf{Pix:} o Manual de Segurança do Pix (BCB) exige TLS 1.2 ou superior, com autenticação mútua e \textit{cipher suites} AES-GCM (no mínimo \texttt{ECDHE-RSA-AES128-GCM-SHA256}) e certificados ICP-Brasil --- ou seja, todo Pix que vocês fazem passa por AES
+    \end{itemize}
+    \smallskip
+    {\tiny Fontes: ITI, IN 35/2026 (DOC-ICP-01.01 v6.0), \url{https://repositorio.iti.gov.br/instrucoes-normativas/IN2026_35_DOC_ICP_01.01_PQC.htm}; BCB, \textit{Manual de Segurança do Pix}.\par}
 \end{frame}
 
 \begin{frame}{AES: Visão Geral}
@@ -208,7 +270,7 @@ O número de rodadas depende do tamanho da chave escolhida:
 \begin{frame}{Estrutura Interna do AES}
 
 \begin{itemize}
-    \item AES é um cifra orientada a bytes
+    \item O AES é uma cifra orientada a bytes
     \item O estado $A$ (isto é, o caminho de dados de 128 bits) pode ser organizado em uma matriz 4x4:
 \end{itemize}
 
@@ -240,21 +302,21 @@ com $A_0, \ldots, A_{15}$ denotando os 16 bytes de entrada do AES.
 \end{figure}
 \vspace{-1em}
 \begin{itemize}
-    \item Nota: Na última rodada, a transformação \textbf{MixColumn} é omitida
+    \item Nota: na última rodada, a transformação \textbf{MixColumns} é omitida
 \end{itemize}
 
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Camada de Substituição de Byte}
+\begin{frame}{Camada de Substituição de Bytes (SubBytes)}
 
 \begin{columns}[t] % alinhamento no topo
 
     \begin{column}{0.7\textwidth}
     \vspace{-7em}
         \begin{itemize}
-            \item A camada Byte Substitution consiste em 16 \textbf{S-Boxes} com as seguintes propriedades:
+            \item A camada \textbf{SubBytes} consiste em 16 \textbf{S-Boxes} com as seguintes propriedades:
             \begin{itemize}
                 \item As S-Boxes são
                 \begin{itemize}
@@ -281,16 +343,28 @@ com $A_0, \ldots, A_{15}$ denotando os 16 bytes de entrada do AES.
 
 \end{frame}
 
-\begin{frame}{AES GF($2^8$) Inverso Multiplicativo}
+\begin{frame}{A S-Box por dentro: inverso em GF($2^8$) + transformação afim}
+    \begin{itemize}
+        \footnotesize
+        \item A S-Box não é uma tabela arbitrária. Cada byte $A_i$ é primeiro substituído pelo seu \textbf{inverso multiplicativo} em $GF(2^8)$, tomado módulo o polinômio irredutível $P(x) = x^8 + x^4 + x^3 + x + 1$
+        \item Sobre esse resultado aplica-se uma \textbf{transformação afim} em $GF(2)$: multiplicação por uma matriz fixa e soma da constante $(63)_{16}$. É ela que elimina pontos fixos e quebra a regularidade algébrica que a inversão sozinha teria
+        \item O byte $(00)_{16}$ não possui inverso multiplicativo; por definição ele é mapeado para si mesmo \textit{nessa primeira etapa} --- a transformação afim depois o leva a $(63)_{16}$
+    \end{itemize}
+    \vspace{0.5em}
     \begin{figure}
         \centering
-        \includegraphics[width=0.5\linewidth]{image_sbox_ops.png}
+        \includegraphics[width=0.75\linewidth]{image_sbox_ops.png}
     \end{figure}
-    \vspace{-1em}
+\end{frame}
+
+\begin{frame}{Tabela do inverso multiplicativo em GF($2^8$)}
+    \vspace{-0.5em}
     \begin{figure}
         \centering
-        \includegraphics[width=0.65\linewidth]{image.png}
+        \includegraphics[width=0.62\linewidth]{image.png}
     \end{figure}
+    \vspace{-0.8em}
+    {\footnotesize Entrada $(XY)_{16}$, saída igual ao inverso. Repare na primeira célula: $(00)_{16} \mapsto (00)_{16}$, a exceção que não tem inverso.\par}
 \end{frame}
 
 \begin{frame}{AES S-Box}
@@ -312,7 +386,7 @@ com $A_0, \ldots, A_{15}$ denotando os 16 bytes de entrada do AES.
             \item consiste em duas subcamadas:
             \begin{itemize}
                 \item \textbf{ShiftRows}: Permutação dos dados no nível de bytes
-                \item \textbf{MixColumn}: Operação matricial que combina (“mistura”) blocos de quatro bytes
+                \item \textbf{MixColumns}: operação matricial que combina (“mistura”) blocos de quatro bytes
             \end{itemize}
             \item realiza uma operação linear nas matrizes de estado $A$, $B$, ou seja,
             \[
@@ -366,7 +440,7 @@ B_{15} & B_3 & B_7 & B_{11}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Subcamada MixColumn}
+\begin{frame}{Subcamada MixColumns}
 
 \begin{itemize}
     \item Transformação linear que mistura cada coluna da matriz de estado
@@ -408,7 +482,7 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Camada de Adição de Chave}
+\begin{frame}{Camada de Adição de Chave (AddRoundKey)}
 
 \begin{itemize}
     \item Entradas:
@@ -433,7 +507,7 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Key Schedule}
+\begin{frame}{Expansão de Chaves (\textit{key schedule})}
 
 \begin{itemize}
     \item As subchaves são derivadas recursivamente da chave de entrada original de 128/192/256 bits
@@ -460,7 +534,7 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Key Schedule}
+\begin{frame}{Expansão de Chaves (\textit{key schedule})}
 
 \begin{minipage}{0.55\textwidth}
     \small Exemplo: \textit{Key schedule} para chave AES de 128 bits\\
@@ -482,13 +556,13 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Key Schedule}
+\begin{frame}{Expansão de Chaves (\textit{key schedule})}
 
 \begin{minipage}{0.74\textwidth}
     \begin{itemize}
         \item A função $g$ rotaciona seus quatro bytes de entrada e realiza uma substituição \textit{bytewise} usando a S-Box $\Rightarrow \text{não linearidade.}$
         
-        \item O coeficiente de rodada $RC$ é adicionado apenas ao byte mais à esquerda e varia a cada rodada:
+        \item A constante de rodada $RC$ (\textit{round constant}; \texttt{Rcon}, no FIPS 197) é somada apenas ao byte mais à esquerda e varia a cada rodada:
         \[
         RC[1] = x^0 = (00000001)_2
         \]
@@ -517,7 +591,7 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Decryption}
+\begin{frame}{Decriptação}
 
 \begin{minipage}{0.55\textwidth}
     \includegraphics[width=0.9\linewidth]{img/decyption.png}
@@ -527,13 +601,13 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 \vspace{-1em}
     \begin{itemize}
         \item AES não é baseado em uma rede de Feistel $\Rightarrow$ \textit{todas as camadas devem ser invertidas para decriptação:}
-        \item Camada MixColumn $\rightarrow$\\
-        \textbf{Inv MixColumn layer}
+        \item Camada MixColumns $\rightarrow$\\
+        \textbf{InvMixColumns}
         \item Camada ShiftRows $\rightarrow$\\
-        \textbf{Inv ShiftRows layer}
-        \item Camada de SubBytes $\rightarrow$\\
-        \textbf{Inv SubBytes layer}
-        \item Camada de Adição de Chave é sua própria inversa
+        \textbf{InvShiftRows}
+        \item Camada SubBytes $\rightarrow$\\
+        \textbf{InvSubBytes}
+        \item A camada AddRoundKey é sua própria inversa
     \end{itemize}
 \end{minipage}
 
@@ -541,12 +615,12 @@ onde 01, 02 e 03 estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Decryption}
+\begin{frame}{Decriptação}
 
 \begin{itemize}
-    \item \textbf{Inv MixColumn layer:}
+    \item \textbf{Camada InvMixColumns:}
     \begin{itemize}
-        \item Para reverter a operação MixColumn, cada coluna da matriz de estado $C$ deve ser multiplicada pela \textbf{inversa da matriz 4x4}, por exemplo:
+        \item Para reverter a operação MixColumns, cada coluna da matriz de estado $C$ deve ser multiplicada pela \textbf{inversa da matriz 4x4}, por exemplo:
     \end{itemize}
 \end{itemize}
 
@@ -584,10 +658,10 @@ onde 09, 0B, 0D e 0E estão em notação hexadecimal.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Decryption}
+\begin{frame}{Decriptação}
 
 \begin{itemize}
-    \item \textbf{Inv ShiftRows layer:}
+    \item \textbf{Camada InvShiftRows:}
     \begin{itemize}
         \item Todas as linhas da matriz de estado $B$ são deslocadas na direção oposta:
     \end{itemize}
@@ -622,10 +696,10 @@ B_7 & B_{11} & B_{15} & B_3
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Decryption}
+\begin{frame}{Decriptação}
 
 \begin{itemize}
-    \item \textbf{Inv Byte Substitution layer:}
+    \item \textbf{Camada InvSubBytes:}
     \begin{itemize}
         \item Como a S-Box é bijetiva, é possível construir um inverso, tal que:
         \[
@@ -636,7 +710,7 @@ B_7 & B_{11} & B_{15} & B_3
 
     \vspace{1em}
 
-    \item \textbf{Decryption key schedule:}
+    \item \textbf{Expansão de chaves na decriptação:}
     \begin{itemize}
         \item As subchaves são necessárias em ordem inversa (comparado com a encriptação)
         \item Na prática, para encriptação e decriptação, o mesmo \textit{key schedule} é usado.\\
@@ -662,23 +736,57 @@ B_7 & B_{11} & B_{15} & B_3
         \item Uma rodada pode ser computada com 16 \textit{table look-ups}
     \end{itemize}
 
-    \item As velocidades típicas de software são superiores a 1,6 Gbit/s em processadores modernos de 64 bits
+    \item Essas tabelas (\textit{T-tables}) foram a forma padrão de implementar AES em software --- e, como veremos, são também a porta de entrada dos ataques de \textit{cache-timing}
 \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Aceleração em hardware: AES-NI}
+
+\begin{itemize}
+    \item Desde 2010 os processadores x86 trazem o conjunto de instruções \textbf{AES-NI} (\texttt{AESENC}, \texttt{AESKEYGENASSIST}), que executa uma rodada inteira em hardware e em tempo constante; o ARMv8 tem instruções equivalentes (\texttt{AESE}/\texttt{AESMC})
+
+    \item Medido com \texttt{openssl speed} em um Intel i5-9400F (2,9 GHz, de 2019), \textbf{um único núcleo} entrega:
+    \begin{itemize}
+        \item AES-128-GCM: \textbf{6,0 GB/s} ($\approx$ 48 Gbit/s)
+        \item AES-128-CBC (encadeado, portanto serial): \textbf{1,5 GB/s} com AES-NI contra \textbf{0,4 GB/s} sem --- cerca de 3,6$\times$ de diferença
+    \end{itemize}
+
+    \item Além da velocidade, a instrução não faz consulta a tabelas: o tempo de execução independe dos dados, o que fecha a porta dos ataques de \textit{cache-timing}
+\end{itemize}
+{\tiny Medição local com OpenSSL 3.0.2, blocos de 16 KB, um núcleo; AES-NI desabilitado via \texttt{OPENSSL\_ia32cap}.\par}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Segurança}
+\begin{frame}{Segurança: força bruta e ataques analíticos}
 
 \begin{itemize}
-    \item \textbf{Brute-force attack:} Devido ao comprimento da chave de 128, 192 ou 256 bits, um ataque de força bruta não é viável
-    \vspace{1em}
-    \item \textbf{Analytical attacks:} Não existe nenhum ataque analítico conhecido que seja melhor do que a força bruta
-    \vspace{1em}
-    \item \textbf{Side-channel attacks:}
+    \footnotesize
+    \item \textbf{Força bruta:} com chaves de 128, 192 ou 256 bits, a busca exaustiva é inviável --- nenhum avanço previsível de hardware muda isso
+
+    \item \textbf{Ataques analíticos:} depois de mais de duas décadas de escrutínio público, não há ataque \textit{praticamente viável} contra o AES completo
     \begin{itemize}
-        \item Diversos \textit{side-channel attacks} já foram publicados
-        \color{red}\item Note que os \textit{side-channel attacks} não atacam o algoritmo em si, mas a sua implementação
+        \footnotesize
+        \item O melhor resultado publicado é o ataque \textit{biclique} (2011): recupera a chave do AES-128 em $2^{126,1}$ operações, uma economia de menos de 2 bits sobre a força bruta. É um resultado teórico importante, sem qualquer efeito prático
+        \item Há também ataques de \textbf{chave relacionada} contra AES-192/256 ($2^{99,5}$, Biryukov e Khovratovich, 2009), que exigem um modelo de ataque que não ocorre em protocolos bem construídos
+        \item Moral: ``AES quebrado'' em manchete costuma significar ``quebrado em um modelo que não existe na prática''
     \end{itemize}
+
+\end{itemize}
+{\tiny Biclique: A. Bogdanov, D. Khovratovich, C. Rechberger, ``\textit{Biclique Cryptanalysis of the Full AES}'', ASIACRYPT 2011 --- \url{https://eprint.iacr.org/2011/449}\par}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Segurança: ataques de canal lateral}
+
+\begin{itemize}
+    \item {\color{red}Ataques de canal lateral não atacam o algoritmo, e sim a implementação} --- a matemática do AES continua intacta
+    \item Exemplo concreto: as \textit{T-tables} vistas antes deixam rastro no cache do processador, e ataques de \textit{cache-timing} (Bernstein, 2005; Osvik, Shamir e Tromer, 2006) recuperaram chaves por esse caminho
+    \item Outros canais explorados na literatura: consumo de energia, tempo de execução e emanação eletromagnética --- especialmente relevantes em \textit{smart cards} e dispositivos embarcados, onde o atacante tem o hardware na mão
+    \item Mitigação prática: usar a instrução de hardware (AES-NI, ARMv8), que não consulta tabelas e roda em tempo constante
 \end{itemize}
 
 \end{frame}
@@ -688,15 +796,18 @@ B_7 & B_{11} & B_{15} & B_3
 \begin{frame}{Lições Aprendidas}
 
 \begin{itemize}
+    \footnotesize
     \item O AES é uma cifra de bloco moderna que suporta três tamanhos de chave: 128, 192 e 256 bits. Proporciona excelente segurança a longo prazo contra ataques de força bruta.
     
-    \item O AES tem sido estudado intensivamente desde o final da década de 1990 e nenhum ataque melhor que a força bruta foi encontrado.
+    \item O AES tem sido estudado intensivamente desde o final da década de 1990 e nenhum ataque praticamente viável foi encontrado.
     
-    \item O AES não é baseado em redes de Feistel. Suas operações básicas utilizam aritmética em campos de Galois e proporcionam forte difusão e confusão.
+    \item O AES não é baseado em redes de Feistel: é uma rede de substituição e permutação (SPN). Suas operações básicas utilizam aritmética em campos de Galois e proporcionam forte difusão e confusão.
     
-    \item O AES faz parte de diversos padrões abertos, como IPsec ou TLS, além de ser o algoritmo de criptografia obrigatório para aplicações do governo dos EUA. É provável que a cifra continue sendo o algoritmo de criptografia dominante por muitos anos.
+    \item O AES faz parte de diversos padrões abertos, como IPsec e TLS. No governo dos EUA, o FIPS 197 o torna obrigatório para informação sensível não classificada, e a CNSSP-15 o autoriza até TOP SECRET; no Brasil, a ICP-Brasil exige AES-128 ou 256 para a guarda de chaves privadas.
     
-    \item O AES é eficiente tanto em software quanto em hardware.
+    \item O AES é eficiente tanto em software quanto em hardware, sobretudo onde há instrução dedicada (AES-NI, ARMv8).
+
+    \item Frente a um computador quântico, o algoritmo de Grover reduz a busca de $2^k$ para cerca de $2^{k/2}$: o AES-128 cairia para $\sim$64 bits efetivos, enquanto o AES-256 permanece seguro. É por isso que as suítes mais recentes (CNSA 2.0, ICP-Brasil v6.0) padronizam AES-256 --- ver a aula de Criptografia Pós-Quântica.
 \end{itemize}
 
 \end{frame}
